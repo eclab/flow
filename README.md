@@ -28,6 +28,10 @@ developed on a 2.8Ghz i7 2015 Macbook Pro Retina).
 Flow has an [extensive manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf) which discusses additive synthesis, 
 Flow's modular approach, how to run it, how to integrate it with controllers and DAWs, and how to build new modules.
 
+## To Do
+
+Interested in helping out on Flow?  Our [To Do list](TODO.md) lists current open issues and bugs.
+
 ## Install and Run Flow
 
 Flow is cross-platform and will run on a variety of platforms (Windows, Linux) but we are personally developing on and for
