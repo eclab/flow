@@ -14,6 +14,10 @@ Flow is a fully-modular polyphonic additive software synthesizer written in pure
 Flow is an academic research project, and this version is an early prerelease and should be expected to have bugs.  Please
 let us know what you find.
 
+Flow is in **prerelease**.  This means that changes will be made to it in successive versions which could be entirely non-backward
+compatible.  These changes may and likely will break patches you made with earlier versions.  We make no guarantees of 
+consistency at this stage.
+
 Flow has about 50 modules of different shapes and sizes, and currently supports 8-16 voices at 128 partials and 44.1KHz with
  a rate of one new partial update every 32 samples.  Flow is a computationally expensive program and will keep your laptop 
 quite warm and your fan busy.  You need to have some fairly good hardware to run Flow successfully (for reference, Flow was 
