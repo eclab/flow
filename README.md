@@ -1,11 +1,11 @@
 # Flow 
 Modular, Polyphonic, Additive Synthesizer (Version 0)
  
-By Sean Luke (sean@cs.gmu.edu)
-With Help from Bryan Hoyle
+By Sean Luke (sean@cs.gmu.edu) \
+With Help from Bryan Hoyle \
 Copyright 2018 by George Mason University
 
-I've been asked where my Patreon page is.  So, sure, here's my <a href="https://www.patreon.com/SeanLuke">Patreon page</a>.
+I (Sean) have been asked where my Patreon page is.  So, sure, here's my <a href="https://www.patreon.com/SeanLuke">Patreon page</a>.
 
 
 ## About
@@ -32,7 +32,7 @@ OS X and Linux. We'd appreciate feedback and screenshots of it running on Window
 
 ### Installation and Running on OS X 
 
-First install Flow from this link: [Flow.app.zip](https://cs.gmu.edu/~eclab/projects/flow/Edisyn.app.zip). 
+First install Flow from this link: [Flow.app.zip](https://cs.gmu.edu/~eclab/projects/flow/Flow.app.zip). 
 Sadly, it's a whopping 70MB because it includes the Java VM.  :-(
 
 Sierra has really locked down the ability to run an application that's not from a commercial, paying Apple Developer.  And GMU is not one.  So you will have to instruct Sierra to permit Flow to run.
@@ -59,7 +59,7 @@ The following should work (but has not been tested):
 
 #### Note
 
-Edisyn makes heavy use of Java preferences.  There is a longstanding Java/Windows bug, not fixed as of Java 8, which breaks Java preferences.  This was supposedly slated to be fixed in Java 9, but we have not verified it.  If it's not working yet, Flow will still work, but you won't have any persistent preferences (you'll have to set it up every time).
+Flow makes heavy use of Java preferences.  There is a longstanding Java/Windows bug, not fixed as of Java 8, which breaks Java preferences.  This was supposedly slated to be fixed in Java 9, but we have not verified it.  If it's not working yet, Flow will still work, but you won't have any persistent preferences (you'll have to set it up every time).
 
 
 ### Installation and Running on Linux
