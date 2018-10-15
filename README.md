@@ -22,7 +22,7 @@ developed on a 2.8Ghz i7 2015 Macbook Pro Retina).
 ## Manual
 
 Flow has an [extensive manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf) which discusses additive synthesis, 
-Flow's modular approach, how to run it, and how to build new modules.
+Flow's modular approach, how to run it, how to integrate it with controllers and DAWs, and how to build new modules.
 
 ## Install and Run Flow
 
