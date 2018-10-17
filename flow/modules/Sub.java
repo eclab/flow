@@ -34,7 +34,8 @@ public class Sub extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations(new Constant[] { new Constant(1.0 / BOUND), Constant.ZERO, Constant.ZERO, Constant.ZERO }, new String[] { "-1 Oct", "-2 Oct", "-3 Oct", "-4 Oct" });
+        defineModulations(new Constant[] { new Constant(1.0 / BOUND), Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
+            new String[] { "-1 Oct", "-2 Oct", "-3 Oct", "-4 Oct" });
         setPushOrders(false);
         }
         

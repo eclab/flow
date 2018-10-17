@@ -33,6 +33,13 @@ public class LFO extends Modulation implements ModSource
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_RATE = 0;
+    public static final int MOD_PHASE = 1;
+    public static final int MOD_SCALE = 2;
+    public static final int MOD_SHIFT = 3;
+    public static final int MOD_SEED = 4;
+    public static final int MOD_RESET = 5;
+
     public static final int SIN = 0;
     public static final int TRIANGLE = 1;
     public static final int SQUARE = 2;
@@ -109,7 +116,7 @@ public class LFO extends Modulation implements ModSource
     void initializeRandom()     
         {
         // first reseed
-        double mod = modulate(4);
+        double mod = modulate(MOD_SEED);
                 
         if (mod == 0)
             {
@@ -124,8 +131,8 @@ public class LFO extends Modulation implements ModSource
 
         // next determine the first oldRandomPos and randomPos          
         oldRandomPos = 0;
-        double scale = modulate(2);
-        double shift = modulate(3);
+        double scale = modulate(MOD_SCALE);
+        double shift = modulate(MOD_SHIFT);
         modulateRandom(scale, shift, true, false);  // set a new random pos
         }
         
@@ -173,7 +180,8 @@ public class LFO extends Modulation implements ModSource
         // Modulation 2: Scale
         // Modulation 3: Shift
         // Modulation 4: Random Seed
-        defineModulations(new Constant[] { Constant.HALF, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ONE, Constant.ZERO }, new String[] { "Rate", "Phase", "Scale", "Shift", "Seed", "Reset" });
+        defineModulations(new Constant[] { Constant.HALF, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ONE, Constant.ZERO }, 
+            new String[] { "Rate", "Phase", "Scale", "Shift", "Seed", "Reset" });
         defineOptions(new String[] { "Type", "Free", "Invert", "Half Trigger", "Linear Rate", "MIDI Sync"}, new String[][] { TYPE_NAMES, { "Free" }, { "Invert" }, { "Half Trigger" }, { "Linear Rate" }, { "MIDI Sync" } } );
 
         this.type = TRIANGLE;
@@ -293,16 +301,16 @@ public class LFO extends Modulation implements ModSource
         {
         super.go();
                 
-        if (isTriggered(5))
+        if (isTriggered(MOD_RESET))
             {
             resetLFO();
             }
                 
-        double phase = modulate(1);  // get initial state
-        double rate = modulate(0);
+        double phase = modulate(MOD_PHASE);  // get initial state
+        double rate = modulate(MOD_RATE);
         if (!linear) rate = makeSensitive(rate);
-        double scale = modulate(2);
-        double shift = modulate(3);
+        double scale = modulate(MOD_SCALE);
+        double shift = modulate(MOD_SHIFT);
 
         // Update the current state.  This is complicated if we changed the rate;  jumps in
         // the rate will cause eccentricities in the waveform because we're basing this on
@@ -385,7 +393,7 @@ public class LFO extends Modulation implements ModSource
                 Box box = new Box(BoxLayout.Y_AXIS);
                 box.add(new ModulationOutput(mod, 0, this));
 
-                ModulationInput rate = new ModulationInput(mod, 0, this)
+                ModulationInput rate = new ModulationInput(mod, MOD_RATE, this)
                     {
                     public String[] getOptions() { return MidiClock.CLOCK_NAMES; }
                     public double convert(int elt) 

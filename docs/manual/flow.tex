@@ -841,14 +841,14 @@ public class MyModulation extends Modulation
     public void reset()
         {
         super.reset();
-        firstTick = sound.getOutput().getTick();
+        firstTick = getSyncTick(true);
         }
 
     public void go()
         {
         super.go();
         if (firstTick < 0) return;
-        int tick = sound.getOutput().getTick();
+        int tick = getSyncTick(true);
         if (((tick / 44100) - firstTick) % 2 == 0)
             setModulationOutput(0, 0.0);
         else
@@ -860,7 +860,7 @@ public class MyModulation extends Modulation
 \end{verbatim}
 }
 
-The method {\tt sound.getOutput.getTick()} gives us the current {\it tick}.  This will be an integer value representing the number of samples that have been generated so far.\footnote{{\it getTick()} is currently a integer for threading efficiency reasons.  But this means it overflows after about 13 hours. We may change it to a long later.}  Here we're using it to switch from 0.0 to 1.0 every second.  Note the use of division: this is inefficient and would be better handled using a countdown of some sort, but for simplicity's sake here...
+The method {\tt getSyncTick(true)} gives us the current {\it tick}.  This will be an integer value representing the number of samples that have been generated so far.\footnote{{\it getTick()} is currently a integer for threading efficiency reasons.  But this means it overflows after about 13 hours. We may change it to a long later.}  Here we're using it to switch from 0.0 to 1.0 every second.   Note that we pass {\it true} into {\tt getSyncTick(...)}: this tells Flow that if the MIDI clock is running, it should use the MIDI clock as the source of ticks rather than the wall clock.  Thus if the MIDI clock runs faster or slower, our ticks will come faster or slower as well.\footnote{If the MIDI clock is running as 120BPM, then the ticks from {\tt getSyncTick(...)} will be exactly the same as if we were using wall clock time.} 
 
 The method {\it reset()} is called when our module is entirely reset.  We should override it to set ourselves to a pristine state.  Here this means grabbing the current tick and using that as our base for future timing.  Be sure to call {\tt super.reset()}.  As you can see, if {\tt firstTick} hasn't been set yet (it's -1), we don't update.
 
@@ -890,7 +890,7 @@ public class MyModulation extends Modulation
     public void gate()
         {
         super.gate();
-        firstTick = sound.getOutput().getTick();
+        firstTick = getSyncTick(true);
         }
 
     public void release()
@@ -903,7 +903,7 @@ public class MyModulation extends Modulation
         {
         super.go();
         if (firstTick < 0) return;
-        int tick = sound.getOutput().getTick();
+        int tick = getSyncTick(true);
         if (((tick / 44100) - firstTick) % 2 == 0)
             setModulationOutput(0, 0.0);
         else
@@ -953,7 +953,7 @@ public class MyModulation extends Modulation
     public void reset()
         {
         super.reset();
-        firstTick = sound.getOutput().getTick();
+        firstTick = getSyncTick(true);
         update = free;
         }
         
@@ -974,7 +974,7 @@ public class MyModulation extends Modulation
         super.go();
         if (!update) return;
         double mod = modulate(0);
-        int tick = sound.getOutput().getTick();
+        int tick = getSyncTick(true);
         double val = 1.0;
         if (((int)((tick / (mod * 44099))) - firstTick + 1) % 2 == 0)   val = 0.0;
         if (type == TYPE_UNIPOLAR_POSITIVE)
@@ -1060,7 +1060,7 @@ Let's add a {\bf trigger} to our Modulation.  Every time we transition from low 
         super.go();
         if (!update) return;
         double mod = modulate(0);
-        int tick = sound.getOutput().getTick();
+        int tick = getSyncTick(true);
         double val = 1.0;
         if (((int)((tick / (mod * 44099))) - firstTick + 1) % 2 == 0)
             {

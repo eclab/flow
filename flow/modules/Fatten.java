@@ -17,6 +17,8 @@ public class Fatten extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_DETUNE = 0;
+
     public Fatten(Sound sound)
         {
         super(sound);
@@ -34,8 +36,7 @@ public class Fatten extends Unit
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
                 
-        double mod = modulate(0);
-        double cents = makeVerySensitive(modulate(0)) * 100;
+        double cents = makeVerySensitive(modulate(MOD_DETUNE)) * 100;
         if (cents != lastCents)
             {
             lastCents = cents;

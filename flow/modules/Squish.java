@@ -25,6 +25,9 @@ public class Squish extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_AMOUNT = 0;
+    public static final int MOD_PARTIAL = 1;
+
     public static final int TARGET_LARGEST = 0;
     public static final int TARGET_PARTIAL = 1;
         
@@ -50,7 +53,8 @@ public class Squish extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO  }, new String[] { "Amount", "Partial" });
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO  }, 
+            new String[] { "Amount", "Partial" });
         defineOptions(new String[] { "Style", "Largest" }, new String[][] { STYLES, { "Largest" } } );
         }
         
@@ -87,13 +91,13 @@ public class Squish extends Unit
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
 
-        double mod = modulate(0);
+        double mod = modulate(MOD_AMOUNT);
 
         double targetHarm = 0;
 
         if (target == TARGET_PARTIAL)
             {
-            targetHarm = (frequencies.length - 1) * modulate(1);
+            targetHarm = (frequencies.length - 1) * modulate(MOD_PARTIAL);
             }
         else // if (target == TARGET_LARGEST)
             {

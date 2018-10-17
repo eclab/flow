@@ -17,6 +17,8 @@ public class Average extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_SCALE = 0;
+
     boolean includeZeros = false;
     boolean getIncludeZeros() { return includeZeros; }
     void setIncludeZeros(boolean val) { includeZeros = val; }
@@ -57,7 +59,7 @@ public class Average extends Unit
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
                 
-        double mod = modulate(0);
+        double mod = modulate(MOD_SCALE);
         copyFrequencies(0);
         copyAmplitudes(0);
 

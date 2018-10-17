@@ -17,6 +17,8 @@ public class Buffer extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_TRIGGER = 0;
+
     boolean free;
     boolean start;
     boolean reset;
@@ -76,8 +78,8 @@ public class Buffer extends Unit
         double[] amplitudesIn = getAmplitudesIn(0);
         double[] frequenciesIn = getFrequenciesIn(0);
                 
-        modulate(0);
-        if (start || isTriggered(0))
+        modulate(MOD_TRIGGER);
+        if (start || isTriggered(MOD_TRIGGER))
             {
             System.arraycopy(amplitudesIn, 0, bufferedAmplitudes, 0, amplitudesIn.length);
             System.arraycopy(frequenciesIn, 0, bufferedFrequencies, 0, frequenciesIn.length);

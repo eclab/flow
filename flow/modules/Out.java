@@ -31,11 +31,18 @@ public class Out extends Unit
     {
     private static final long serialVersionUID = 1;
 
-    public static final int WAVE_SIZE = 100;
     public static final int NUM_MOD_OUTPUTS = 4;
     public static final int NUM_UNIT_OUTPUTS = 4;
+
+    public static final int MOD_OSC_1 = 0;
+    public static final int MOD_OSC_2 = 1;
+    public static final int MOD_GAIN = NUM_MOD_OUTPUTS;
+        
+    public static final int UNIT_DISPLAY_1 = 0;
+    public static final int UNIT_DISPLAY_2 = 1;
+        
+    public static final int WAVE_SIZE = 100;
     public static final double MAX_GAIN = 4.0;
-    public static final int GAIN_MOD = NUM_MOD_OUTPUTS;
 
     double gain;
     public double getGain() { return gain; }
@@ -55,7 +62,8 @@ public class Out extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, new String[] { "A", "B", "C", "D" } );
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER }, new String[] { "1", "2", "3", "4", "Gain" });
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER }, 
+            new String[] { "1", "2", "3", "4", "Gain" });
         sound.setEmits(this);
         }
 
@@ -75,7 +83,7 @@ public class Out extends Unit
             pushAmplitudes(0);
             pushFrequencies(0);
             pushOrders(0);                      // already pushed in super.go()
-            gain = modulate(GAIN_MOD) * MAX_GAIN;
+            gain = modulate(MOD_GAIN) * MAX_GAIN;
             }
         else
             {
@@ -86,10 +94,10 @@ public class Out extends Unit
         int tick = sound.getOutput().getTick();
         if (macro == null)
             {
-            double mod0 = modulate(0);
-            double mod1 = modulate(1);
-            waveTriggered[0] = waveTriggered[0] || isTriggered(0);
-            waveTriggered[1] = waveTriggered[1] || isTriggered(1);
+            double mod0 = modulate(MOD_OSC_1);
+            double mod1 = modulate(MOD_OSC_2);
+            waveTriggered[0] = waveTriggered[0] || isTriggered(MOD_OSC_1);
+            waveTriggered[1] = waveTriggered[1] || isTriggered(MOD_OSC_2);
 
             while (tick >= targetNextTick)  // we're top-level, gather the wave
                 {
@@ -172,9 +180,9 @@ public class Out extends Unit
             public JLabel getAuxUnitInputTitle(int number)
                 {
                 JLabel label = null;
-                if (number > 1) return label;
-                else if (number == 0) label = new JLabel("  (Audio)");
-                else if (number == 1) label = new JLabel("  (Aux)");
+                if (number > UNIT_DISPLAY_2) return label;
+                else if (number == UNIT_DISPLAY_1) label = new JLabel("  (Audio)");
+                else if (number == UNIT_DISPLAY_2) label = new JLabel("  (Aux)");
                 label.setPreferredSize(example.getPreferredSize());
                 label.setFont(Style.SMALL_FONT());
                 return label;
@@ -183,9 +191,9 @@ public class Out extends Unit
             public JLabel getAuxModulationInputTitle(int number)
                 {
                 JLabel label = null;
-                if (number > 1) return label;
-                else if (number == 0) label = new JLabel("  (Scope)");
-                else if (number == 1) label = new JLabel("  (Aux)");
+                if (number > MOD_OSC_2) return label;
+                else if (number == MOD_OSC_1) label = new JLabel("  (Scope)");
+                else if (number == MOD_OSC_2) label = new JLabel("  (Aux)");
                 label.setPreferredSize(example.getPreferredSize());
                 label.setFont(Style.SMALL_FONT());
                 return label;

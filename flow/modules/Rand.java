@@ -17,6 +17,8 @@ public class Rand extends Unit implements UnitSource
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_SEED = 0;
+
     public Random random = null;
         
     // for the time being we'll just keep to amplitudes
@@ -28,7 +30,7 @@ public class Rand extends Unit implements UnitSource
         
     public void reseed()
         {
-        double mod = modulate(0);
+        double mod = modulate(MOD_SEED);
                 
         if (mod != 0)
             {

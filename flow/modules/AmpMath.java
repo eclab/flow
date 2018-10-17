@@ -37,6 +37,12 @@ import flow.*;
 public class AmpMath extends Unit
     {
     private static final long serialVersionUID = 1;
+
+    public static final int UNIT_INPUT_A = 0;
+    public static final int UNIT_INPUT_B = 1;
+
+    public static final int MOD_SCALE = 0;
+
     public static String getName() { return "Amp Math"; }
 
     public static final int ADD = 0;
@@ -110,11 +116,11 @@ public class AmpMath extends Unit
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
                 
-        double[] inputs1amplitudes = getAmplitudesIn(1);
-        double[] inputs0amplitudes = getAmplitudesIn(0);
+        double[] inputs0amplitudes = getAmplitudesIn(UNIT_INPUT_A);
+        double[] inputs1amplitudes = getAmplitudesIn(UNIT_INPUT_B);
                 
         copyFrequencies(0);
-        double modulation = modulate(0);
+        double modulation = modulate(MOD_SCALE);
 
         switch(operation)
             {

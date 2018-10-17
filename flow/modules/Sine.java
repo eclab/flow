@@ -15,6 +15,8 @@ public class Sine extends Unit implements UnitSource
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_FREQUENCY = 0;
+
     public Sine(Sound sound) 
         {
         super(sound);
@@ -34,7 +36,7 @@ public class Sine extends Unit implements UnitSource
  
         double[] frequencies = getFrequencies(0);        
                
-        double mod = modulate(0);
+        double mod = modulate(MOD_FREQUENCY);
         frequencies[0] = mod * ((double)Unit.NUM_PARTIALS - 1.0) + 1;
         }
     }

@@ -15,6 +15,8 @@ public class Scale extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_SCALE = 0;
+
     public Scale(Sound sound) 
         {
         super(sound);
@@ -33,7 +35,7 @@ public class Scale extends Unit
 
         double[] frequencies = getFrequencies(0);
         
-        double mod = modulate(0);
+        double mod = modulate(MOD_SCALE);
         if (mod == 0.5) mod = 1.0;
         else if (mod > 0.5) mod = ((mod - 0.5) * 2) * MAX_BOUND + 1.0;
         else mod = (mod * 2);

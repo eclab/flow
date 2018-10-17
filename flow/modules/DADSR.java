@@ -85,14 +85,16 @@ public class DADSR extends Modulation implements ModSource
     public static final int CURVE_JUMP = 4;
     public static final int CURVE_WAIT = 5;
         
-    public static final int DELAY_TIME = 0;
-    public static final int DELAY_LEVEL = 1;
-    public static final int ATTACK_TIME = 2;
-    public static final int ATTACK_LEVEL = 3;
-    public static final int DECAY_TIME = 4;
-    public static final int DECAY_LEVEL = 5;
-    public static final int RELEASE_TIME = 6;
-    public static final int RELEASE_LEVEL = 7;
+    public static final int MOD_DELAY_TIME = 0;
+    public static final int MOD_DELAY_LEVEL = 1;
+    public static final int MOD_ATTACK_TIME = 2;
+    public static final int MOD_ATTACK_LEVEL = 3;
+    public static final int MOD_DECAY_TIME = 4;
+    public static final int MOD_DECAY_LEVEL = 5;
+    public static final int MOD_RELEASE_TIME = 6;
+    public static final int MOD_RELEASE_LEVEL = 7;
+    public static final int MOD_GATE_TR = 8;
+    public static final int MOD_REL_TR = 9;
         
     double[] level = new double[6];         // not all of these slots will be used
     double[] time = new double[6];          // not all of these slots will be used
@@ -161,16 +163,16 @@ public class DADSR extends Modulation implements ModSource
         
     void doGate()
         {
-        time[DELAY] = (modulate(DELAY_TIME));
-        level[DELAY] = modulate(DELAY_LEVEL);
-        time[ATTACK] = (modulate(ATTACK_TIME));
-        level[ATTACK] = modulate(ATTACK_LEVEL);
-        time[DECAY] = (modulate(DECAY_TIME));
-        level[DECAY] = modulate(DECAY_LEVEL);
+        time[DELAY] = (modulate(MOD_DELAY_TIME));
+        level[DELAY] = modulate(MOD_DELAY_LEVEL);
+        time[ATTACK] = (modulate(MOD_ATTACK_TIME));
+        level[ATTACK] = modulate(MOD_ATTACK_LEVEL);
+        time[DECAY] = (modulate(MOD_DECAY_TIME));
+        level[DECAY] = modulate(MOD_DECAY_LEVEL);
         time[SUSTAIN] = (0);  // doesn't matter
         level[SUSTAIN] = level[DECAY];  // really doesn't matter actually, release modifies it
-        time[RELEASE] = (modulate(RELEASE_TIME));
-        level[RELEASE] = modulate(RELEASE_LEVEL);
+        time[RELEASE] = (modulate(MOD_RELEASE_TIME));
+        level[RELEASE] = modulate(MOD_RELEASE_LEVEL);
         time[DONE] = (0); // doesn't matter
 
         if (gateReset)
@@ -208,13 +210,13 @@ public class DADSR extends Modulation implements ModSource
         super.go();
 
 
-        if (isTriggered(8))
+        if (isTriggered(MOD_GATE_TR))
             {
             doGate();
             }
         else 
             {
-            if (isTriggered(9))
+            if (isTriggered(MOD_REL_TR))
                 {
                 doRelease();
                 }
@@ -353,7 +355,7 @@ public class DADSR extends Modulation implements ModSource
                 for(int i = 0; i < mod.getNumModulations(); i++)
                     {
                     ModulationInput t;
-                    if (i == 0 || i == 2 || i == 4 || i == 6)
+                    if (i == MOD_DELAY_TIME || i == MOD_ATTACK_TIME || i == MOD_DECAY_TIME || i == MOD_RELEASE_TIME)
                         {
                         t = new ModulationInput(mod, i, this)
                             {

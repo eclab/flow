@@ -24,6 +24,10 @@ public class Stretch extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_AMOUNT = 0;
+    public static final int MOD_MAX_AMOUNT = 1;
+    public static final int MOD_PARTIAL = 2;
+
     public static final double MAX_STRETCH = 4;
         
     public static final int TARGET_LARGEST = 0;
@@ -50,7 +54,8 @@ public class Stretch extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ZERO }, new String[] { "Amount", "Max Amount", "Partial" });
+        defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ZERO }, 
+            new String[] { "Amount", "Max Amount", "Partial" });
         defineOptions(new String[] { "Style", "Largest" }, new String[][] { STYLES, { "Largest" } } );
         }
         
@@ -87,14 +92,14 @@ public class Stretch extends Unit
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
         
-        double mod = modulate(0);
-        double maxStretch = modulate(1) * MAX_STRETCH;
+        double mod = modulate(MOD_AMOUNT);
+        double maxStretch = modulate(MOD_MAX_AMOUNT) * MAX_STRETCH;
         
         double targetHarm = 0;
 
         if (target == TARGET_PARTIAL)
             {
-            targetHarm = (frequencies.length - 1) * modulate(2);
+            targetHarm = (frequencies.length - 1) * modulate(MOD_PARTIAL);
             }
         else // if (target == TARGET_LARGEST)
             {

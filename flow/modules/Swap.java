@@ -19,6 +19,8 @@ public class Swap extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_DISTANCE = 0;
+
     boolean swapFundamental;
         
     public boolean getSwapFundamental() { return swapFundamental; }
@@ -64,7 +66,7 @@ public class Swap extends Unit
 
         double[] amplitudes = getAmplitudes(0);        
         
-        double val = modulate(0) * (amplitudes.length - (swapFundamental ? 1 : 2)) + 1;
+        double val = modulate(MOD_DISTANCE) * (amplitudes.length - (swapFundamental ? 1 : 2)) + 1;
         int swap = (int)val;
         double by = val - swap;
 

@@ -74,6 +74,10 @@ public class Morph extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_INTERPOLATION = 0;
+    public static final int MOD_VARIANCE = 1;
+    public static final int MOD_SEED = 2;
+
     public Random random = null;
 
     int[] morphTo;
@@ -169,7 +173,7 @@ public class Morph extends Unit
 
     public void reseed()
         {
-        double mod = modulate(2);
+        double mod = modulate(MOD_SEED);
                 
         if (mod != 0)
             {
@@ -272,13 +276,13 @@ public class Morph extends Unit
         super.go();
 
         // we do swap morphs only if they have changed (or the variance has changed)
-        if (lastMorph != morph || (morph == MORPH_ALL_RANDOM && lastVariance != modulate(1)))
+        if (lastMorph != morph || (morph == MORPH_ALL_RANDOM && lastVariance != modulate(MOD_VARIANCE)))
             {
             buildMorph();
             lastMorph = morph;
             }
                 
-        double ramp = modulate(0);
+        double ramp = modulate(MOD_INTERPOLATION);
         updateInputs(ramp);
         
         double[] p1frequencies = getFrequenciesIn(loInput);
@@ -359,7 +363,7 @@ public class Morph extends Unit
         if (morph == MORPH_ALL_RANDOM)
             {
             Random rand = (random == null ? getSound().getRandom() : random);
-            lastVariance = modulate(1);
+            lastVariance = modulate(MOD_VARIANCE);
             double range = makeVerySensitive(lastVariance);
                         
             if (range == 0)

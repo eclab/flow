@@ -26,6 +26,9 @@ public class Shift extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_SHIFT = 0;
+    public static final int MOD_BOUND = 1;
+
     public static String getName() { return "Shift"; }
 
     double range;
@@ -78,8 +81,8 @@ public class Shift extends Unit
 
         double[] frequencies = getFrequencies(0);
         
-        double shift = modulate(0);
-        double bound = modulate(1);
+        double shift = modulate(MOD_SHIFT);
+        double bound = modulate(MOD_BOUND);
                 
         switch(type)
             {

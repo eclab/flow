@@ -26,6 +26,12 @@ public class FlangeFilter extends Unit
     {       
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_WET = 0;
+    public static final int MOD_OFFSET = 1;
+    public static final int MOD_OFFSET_MOD = 2;
+    public static final int MOD_STRETCH = 3;
+    public static final int MOD_STRETCH_MOD = 4;
+
     int style = STYLE_SPIKE_DOWN;
 
     public static final int STYLE_LINEAR = 0;
@@ -73,12 +79,6 @@ public class FlangeFilter extends Unit
             }
         }
     
-    public static final int MOD_AMOUNT = 0;
-    public static final int MOD_OFFSET = 1;
-    public static final int MOD_OFFSET_MOD = 2;
-    public static final int MOD_STRETCH = 3;
-    public static final int MOD_STRETCH_MOD = 4;
-    
     public FlangeFilter(Sound sound) 
         { 
         super(sound);   
@@ -109,7 +109,7 @@ public class FlangeFilter extends Unit
                 
         double filterFreq = modToFrequency(modulate(MOD_OFFSET)) + ( fixed ? 0 : pitch) + filterStretch * (modulate(MOD_OFFSET_MOD) - 0.5) * 4;
                                 
-        double gainMod = modulate(MOD_AMOUNT);
+        double wet = modulate(MOD_WET);
                                 
         for(int i = 0; i < amplitudes.length; i++)
             {
@@ -174,7 +174,7 @@ public class FlangeFilter extends Unit
             gain *= 2.0;
                         
             // Now we go -1...1
-            gain *= gainMod;
+            gain *= wet;
             gain += 1.0;
                         
             // Finally we multiply it in

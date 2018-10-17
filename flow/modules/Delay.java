@@ -20,6 +20,12 @@ public class Delay extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_WET = 0;
+    public static final int MOD_INITIAL_DELAY = 1;
+    public static final int MOD_LATER_DELAYS = 2;
+    public static final int MOD_INITIAL_CUT = 3;
+    public static final int MOD_LATER_CUTS = 4;
+
     public Delay(Sound sound)
         {
         super(sound);
@@ -62,15 +68,15 @@ public class Delay extends Unit
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
                 
-        double wet = modulate(0);
-        int initialDelay = (int)(makeSensitive(modulate(1)) * MAX_INITIAL_DELAY_LENGTH) + 1;  // so we can't have zero
+        double wet = modulate(MOD_WET);
+        int initialDelay = (int)(makeSensitive(modulate(MOD_INITIAL_DELAY)) * MAX_INITIAL_DELAY_LENGTH) + 1;  // so we can't have zero
         if (initialDelay > MAX_INITIAL_DELAY_LENGTH)
             initialDelay = MAX_INITIAL_DELAY_LENGTH;
-        int laterDelay = (int)(makeSensitive(modulate(2)) * MAX_LATER_DELAY_LENGTH) + 1;  // so we can't have zero
+        int laterDelay = (int)(makeSensitive(modulate(MOD_LATER_DELAYS)) * MAX_LATER_DELAY_LENGTH) + 1;  // so we can't have zero
         if (laterDelay > MAX_LATER_DELAY_LENGTH)
             laterDelay = MAX_LATER_DELAY_LENGTH;
-        double initialCut = modulate(3);
-        double laterCut = modulate(4);
+        double initialCut = modulate(MOD_INITIAL_CUT);
+        double laterCut = modulate(MOD_LATER_CUTS);
         copyFrequencies(0);
         double[] amps = getAmplitudesIn(0);
         

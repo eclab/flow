@@ -16,6 +16,12 @@ public class Fill extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int UNIT_INPUT_A = 0;
+    public static final int UNIT_INPUT_B = 1;
+
+    public static final int MOD_SCALE_A = 0;
+    public static final int MOD_SCALE_B = 1;
+
     // Mixes the harmonics of up to four units, using the frequencies of the first unit
         
     public Fill(Sound sound)
@@ -32,12 +38,12 @@ public class Fill extends Unit
         copyFrequencies(0);
         copyAmplitudes(0);
 
-        double[] amplitudes = getAmplitudes(0);
-        double[] frequencies = getFrequencies(0);
-        double[] amp2 = getAmplitudesIn(1);
-        double[] freq2 = getFrequenciesIn(1);
-        double scaleA = modulate(0);
-        double scaleB = modulate(1);
+        double[] amplitudes = getAmplitudes(0);         // INPUT_A was copied over
+        double[] frequencies = getFrequencies(0);               // INPUT_A was copied over
+        double[] amp2 = getAmplitudesIn(UNIT_INPUT_B);
+        double[] freq2 = getFrequenciesIn(UNIT_INPUT_B);
+        double scaleA = modulate(MOD_SCALE_A);
+        double scaleB = modulate(MOD_SCALE_B);
                 
                     
         int i2 = 0;            

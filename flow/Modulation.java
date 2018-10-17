@@ -627,11 +627,11 @@ public abstract class Modulation implements java.io.Serializable
         return triggered[num];
         }
         
-    /** Sets trigger NUM of Output Modulation port to the given ISTRIGGERED value, and sets its count to TRIGGERNUMBER. */
-    public void setTriggerValues(boolean isTriggered, int triggerNumber, int num)
+    /** Sets trigger NUM of Output Modulation port to the given ISTRIGGERED value, and sets its count to TRIGGERCOUNT. */
+    public void setTriggerValues(boolean isTriggered, int triggerCount, int num)
         {
         triggered[num] = isTriggered;
-        trigger[num] = triggerNumber;
+        trigger[num] = triggerCount;
         }
     
     /** Returns the clock tick value.  If we are syncing to MIDI clock,

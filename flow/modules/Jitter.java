@@ -20,8 +20,12 @@ public class Jitter extends Unit
 
     public static final int FREQUENCY_VAR = 0;
     public static final int AMPLITUDE_VAR = 1;
-    public static final int TRIGGER = 2;
-                        
+
+    public static final int MOD_FREQ_VAR = 0;
+    public static final int MOD_AMP_VAR = 1;
+    public static final int MOD_TRIGGER = 2;
+    public static final int MOD_SEED = 3;
+
     public double[][] targets = new double[3][];
     public boolean started = false;
     public Random random = null;
@@ -41,7 +45,7 @@ public class Jitter extends Unit
         
     public void reseed()
         {
-        double mod = modulate(3);
+        double mod = modulate(MOD_SEED);
                 
         if (mod != 0)
             {
@@ -75,16 +79,15 @@ public class Jitter extends Unit
         
         Random rand = (random == null ? getSound().getRandom() : random);
                                 
-        modulate(TRIGGER);
-        double frequencyModulation = modulate(FREQUENCY_VAR);
+        double frequencyModulation = modulate(MOD_FREQ_VAR);
         frequencyModulation = frequencyModulation * frequencyModulation * frequencyModulation * frequencyModulation;
-        double amplitudeModulationModulation = modulate(AMPLITUDE_VAR);
-        if (!started || isTriggered(TRIGGER))
+        double amplitudeModulationModulation = modulate(MOD_AMP_VAR);
+        if (!started || isTriggered(MOD_TRIGGER))
             {
             for(int i = 0; i < targets[FREQUENCY_VAR].length; i++)
                 {
                 targets[FREQUENCY_VAR][i] = (rand.nextDouble() * 2.0 - 1.0) * frequencyModulation;
-                targets[AMPLITUDE_VAR][i] = (rand.nextDouble() * 2.0 - 1.0) * modulate(AMPLITUDE_VAR);
+                targets[AMPLITUDE_VAR][i] = (rand.nextDouble() * 2.0 - 1.0) * modulate(MOD_AMP_VAR);
                 }
             started = true;
             }

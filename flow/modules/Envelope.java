@@ -27,6 +27,16 @@ public class Envelope extends Modulation implements ModSource
     {
     private static final long serialVersionUID = 1;
         
+    public static final int NUM_STATES = 8;
+    public static final int NOT_STARTED = -1;
+    public static final int START = 0;
+    public static final int SUSTAIN_START_STATE = 3;
+    public static final int SUSTAIN_END_STATE = 5;
+    public static final int DONE = 8;
+        
+    public static final int MOD_GATE_TR = NUM_STATES * 2;
+    public static final int MOD_REL_TR = NUM_STATES * 2 + 1;
+
     public static final int SUSTAIN = 0;
     public static final int SUSTAIN_LOOPING = 1;
     public static final int ONE_SHOT = 2;
@@ -35,13 +45,6 @@ public class Envelope extends Modulation implements ModSource
     public static final int FULL_LOOPING = 5;
         
     public static final String[] TYPE_NAMES = new String[] { "Sustain", "Sustain Loop", "One Shot", "Play Through", "Loop w/Rel", "Loop" };
-        
-    public static final int NUM_STATES = 8;
-    public static final int NOT_STARTED = -1;
-    public static final int START = 0;
-    public static final int SUSTAIN_START_STATE = 3;
-    public static final int SUSTAIN_END_STATE = 5;
-    public static final int DONE = 8;
         
     public static final int CURVE_LINEAR = 0;
     public static final int CURVE_X_2 = 1;
@@ -316,11 +319,11 @@ public class Envelope extends Modulation implements ModSource
         {
         super.go();
 
-        if (isTriggered(NUM_STATES * 2))
+        if (isTriggered(MOD_GATE_TR))
             {
             doGate();
             }
-        else if (isTriggered(NUM_STATES * 2 + 1))
+        else if (isTriggered(MOD_REL_TR))
             {
             doRelease();
             }
@@ -454,8 +457,8 @@ public class Envelope extends Modulation implements ModSource
                 
                 // Add Release and Reset
                 Box box2 = new Box(BoxLayout.X_AXIS);
-                box2.add(new ModulationInput(mod, NUM_STATES * 2, this));
-                box2.add(new ModulationInput(mod, NUM_STATES * 2 + 1, this));
+                box2.add(new ModulationInput(mod, MOD_GATE_TR, this));
+                box2.add(new ModulationInput(mod, MOD_REL_TR, this));
                 box.add(box2);
                                 
                 for(int i = 0; i < mod.getNumOptions(); i++)

@@ -19,6 +19,8 @@ public class PartialMod extends Unit implements ModSource
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_PARTIAL = 0;
+
     public static String getName() { return "Partial Mod"; }
 
     public int oldIndex;
@@ -33,7 +35,7 @@ public class PartialMod extends Unit implements ModSource
         {
         super.go();
         
-        double mod = (modulate(0) * (Unit.NUM_PARTIALS - 1));
+        double mod = (modulate(MOD_PARTIAL) * (Unit.NUM_PARTIALS - 1));
         int index = (int) mod;
         if (oldIndex != index)
             updateTrigger(0);

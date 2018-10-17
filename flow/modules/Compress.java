@@ -21,6 +21,8 @@ public class Compress extends Unit
     double lastModulation = Double.NaN;
     double[] lastAmps;
         
+    public static final int MOD_SCALE = 0;
+
     public Compress(Sound sound)
         {
         super(sound);
@@ -38,7 +40,7 @@ public class Compress extends Unit
         
         double[] amplitudes = getAmplitudes(0);
                 
-        double mod = 1.0 - modulate(0);
+        double mod = 1.0 - modulate(MOD_SCALE);
         if (mod >= 0.5) mod = (mod - 0.5) * 8 + 1;
         else mod = 1.0 / ((0.5 - mod) * 8 + 1);
         

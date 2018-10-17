@@ -32,6 +32,8 @@ public class WaveTable extends Unit implements UnitSource
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_POSITION = 0;
+
     public static final String FILENAME_EXTENSION = ".WAV";
 
     int currentPos = -1;
@@ -57,7 +59,7 @@ public class WaveTable extends Unit implements UnitSource
         {
         super.go();
                 
-        double mod = modulate(0);
+        double mod = modulate(MOD_POSITION);
         if (mod != currentPos)  // gotta update
             {
             double[] amplitudes = getAmplitudes(0);

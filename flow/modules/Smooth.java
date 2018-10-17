@@ -22,6 +22,8 @@ public class Smooth extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_AMOUNT = 0;
+
     boolean free;
     boolean start;
         
@@ -105,7 +107,7 @@ public class Smooth extends Unit
             }
         else
             {
-            double mod = makeVerySensitive(modulate(0));
+            double mod = makeVerySensitive(modulate(MOD_AMOUNT));
             for(int i = 0; i < frequencies.length; i++)
                 {
                 // This elaborate version of (1-mod) * s + mod * q

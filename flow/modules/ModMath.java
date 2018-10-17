@@ -42,6 +42,10 @@ import flow.gui.*;
 public class ModMath extends Modulation
     {       
     private static final long serialVersionUID = 1;
+
+    public static final int MOD_A = 0;
+    public static final int MOD_B = 1;
+
     public static String getName() { return "Mod Math"; }
 
     public static final int ADD = 0;
@@ -128,8 +132,8 @@ public class ModMath extends Modulation
         {
         super.go();
         
-        double mod0 = modulate(0);
-        double mod1 = modulate(1);
+        double mod0 = modulate(MOD_A);
+        double mod1 = modulate(MOD_B);
                                 
         double val = 0;
                 
@@ -211,22 +215,22 @@ public class ModMath extends Modulation
         switch(triggerOperation)
             {
             case TRIGGER_A:
-                if (isTriggered(0))
+                if (isTriggered(MOD_A))
                     updateTrigger(0);
                 break;
             case TRIGGER_A_OR_B:
-                if (isTriggered(0) ||
-                    isTriggered(1))
+                if (isTriggered(MOD_A) ||
+                    isTriggered(MOD_B))
                     updateTrigger(0);
                 break;
             case TRIGGER_A_AND_B:
-                if (isTriggered(0) &&
-                    isTriggered(1))
+                if (isTriggered(MOD_A) &&
+                    isTriggered(MOD_B))
                     updateTrigger(0);
                 break;
             case TRIGGER_A_AND_NOT_B:
-                if (isTriggered(0) &&
-                    !isTriggered(1))
+                if (isTriggered(MOD_A) &&
+                    !isTriggered(MOD_B))
                     updateTrigger(0);
                 break;
             case TRIGGER_2_A:
@@ -246,7 +250,7 @@ public class ModMath extends Modulation
             case TRIGGER_36_A:
             case TRIGGER_48_A:
             case TRIGGER_64_A:
-                if (isTriggered(0))
+                if (isTriggered(MOD_A))
                     triggerCount++;
                 if (triggerCount >= TRIGGER_DIVIDERS[triggerOperation - TRIGGER_2_A])
                     {

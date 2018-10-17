@@ -35,6 +35,10 @@ import flow.gui.*;
 public class PartialFilter extends Unit
     {
     private static final long serialVersionUID = 1;
+
+    public static final int UNIT_INPUT = 0;
+    public static final int UNIT_PARTIALS = 1;
+        
     public static String getName() { return "Partial Filter"; }
 
     boolean fixed;
@@ -83,10 +87,10 @@ public class PartialFilter extends Unit
         pushFrequencies(0);
         copyAmplitudes(0);
 
-        double[] amplitudes = getAmplitudes(0);
-        double[] frequencies = getFrequencies(0);
-        double[] nodeFreq = getFrequenciesIn(1);
-        double[] nodeGain = getAmplitudesIn(1);
+        double[] amplitudes = getAmplitudes(UNIT_INPUT);
+        double[] frequencies = getFrequencies(UNIT_INPUT);
+        double[] nodeFreq = getFrequenciesIn(UNIT_PARTIALS);
+        double[] nodeGain = getAmplitudesIn(UNIT_PARTIALS);
         
         double pitch = sound.getPitch();
         double scale = (_double ? 200.0 : 100.0);               // each frequency integer represents 100HZ or 200Hz

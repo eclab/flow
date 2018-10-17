@@ -16,6 +16,9 @@ public class Filter extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_FREQUENCY = 0;
+    public static final int MOD_DROPOFF = 1;
+
     public static final int TYPE_LP = 0;
     public static final int TYPE_HP = 1;
     public static final int TYPE_BP = 2;
@@ -64,8 +67,8 @@ public class Filter extends Unit
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
                 
-        double cutoff = modToFrequency(modulate(0));
-        double drop = modToFilterDropPerOctave(modulate(1));
+        double cutoff = modToFrequency(modulate(MOD_FREQUENCY));
+        double drop = modToFilterDropPerOctave(modulate(MOD_DROPOFF));
                 
         switch (type)
             {

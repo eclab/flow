@@ -16,13 +16,25 @@ public class Mix extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_GAIN_A = 0;
+    public static final int MOD_GAIN_B = 1;
+    public static final int MOD_GAIN_C = 2;
+    public static final int MOD_GAIN_D = 3;
+
+    public static final int UNIT_A = 0;
+    public static final int UNIT_B = 1;
+    public static final int UNIT_C = 2;
+    public static final int UNIT_D = 3;
+
     // Mixes the harmonics of up to four units, using the frequencies of the first unit
         
     public Mix(Sound sound)
         {
         super(sound);
-        defineModulations(new Constant[] { Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE }, new String[] { "Gain A", "Gain B", "Gain C", "Gain D" });
-        defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, new String[] { "Input A", "Input B", "Input C", "Input D" });
+        defineModulations(new Constant[] { Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE }, 
+            new String[] { "Gain A", "Gain B", "Gain C", "Gain D" });
+        defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, 
+            new String[] { "Input A", "Input B", "Input C", "Input D" });
         }
         
     public void go()
@@ -33,14 +45,14 @@ public class Mix extends Unit
 
         double[] amplitudes = getAmplitudes(0);
         
-        double[] amp1 = getAmplitudesIn(0);
-        double[] amp2 = getAmplitudesIn(1);
-        double[] amp3 = getAmplitudesIn(2);
-        double[] amp4 = getAmplitudesIn(3);
-        double gain1 = modulate(0);
-        double gain2 = modulate(1);
-        double gain3 = modulate(2);
-        double gain4 = modulate(3);
+        double[] amp1 = getAmplitudesIn(UNIT_A);
+        double[] amp2 = getAmplitudesIn(UNIT_B);
+        double[] amp3 = getAmplitudesIn(UNIT_C);
+        double[] amp4 = getAmplitudesIn(UNIT_D);
+        double gain1 = modulate(MOD_GAIN_A);
+        double gain2 = modulate(MOD_GAIN_B);
+        double gain3 = modulate(MOD_GAIN_C);
+        double gain4 = modulate(MOD_GAIN_D);
                                 
         for(int i = 0; i < amplitudes.length; i++)
             {

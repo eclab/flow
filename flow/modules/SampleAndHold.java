@@ -16,6 +16,9 @@ public class SampleAndHold extends Modulation
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_SIGNAL = 0;
+    public static final int MOD_TRIGGER = 1;
+
     public static String getName() { return "S & H"; }
 
     boolean started;
@@ -35,10 +38,9 @@ public class SampleAndHold extends Modulation
     public void go()
         {
         super.go();
-        modulate(1);
-        if (!started || isTriggered(1))
+        if (!started || isTriggered(MOD_TRIGGER))
             {
-            setModulationOutput(0, modulate(0));
+            setModulationOutput(0, modulate(MOD_SIGNAL));
             started = true;
             }
         }

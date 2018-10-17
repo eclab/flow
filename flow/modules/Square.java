@@ -16,6 +16,8 @@ public class Square extends Unit implements UnitSource //, Parameterizable
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_PULSE_WIDTH = 0;
+
     double lastMod = -1;
         
     public Square(Sound sound) 
@@ -37,7 +39,7 @@ public class Square extends Unit implements UnitSource //, Parameterizable
         {
         double[] amplitudes = getAmplitudes(0);
                 
-        double mod = modulate(0);
+        double mod = modulate(MOD_PULSE_WIDTH);
         if (lastMod != mod)
             {
             if (mod == 0.5)  // easy case!
@@ -73,21 +75,4 @@ public class Square extends Unit implements UnitSource //, Parameterizable
             lastMod = mod;
             }
         }
-/*
-
-// PRESETS
-
-static final double[][] PRESETS = new double[][] { { 0.25 }, { 0.75 } };
-static final String[] PRESET_NAMES = new String[] { "1/4", "3/4" };
-        
-public double[] getParameters() { return new double[] { modulate(0) }; }
-public boolean setParameters(double[] vals, int version) 
-{
-if (vals[0] != UNUSED_PARAMETER)
-setModulation(new Constant(vals[0]), 0);
-return true; 
-}
-public double[] getPreset(int preset) { return PRESETS[preset]; }
-public String[] getPresetNames(){ return PRESET_NAMES; }
-*/
     }

@@ -18,6 +18,9 @@ public class VCA extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_MOD = 0;
+    public static final int MOD_SCALE = 1;
+
     public static final double MAX_SCALE = 8.0;
         
     public VCA(Sound sound)
@@ -36,8 +39,8 @@ public class VCA extends Unit
 
         double[] amplitudes = getAmplitudes(0);
                 
-        double mod = modulate(0);
-        double scale = modulate(1);
+        double mod = modulate(MOD_MOD);
+        double scale = modulate(MOD_SCALE);
         if (scale == 0.5)
             scale = 1.0;
         else if (scale > 0.5) 
@@ -55,7 +58,7 @@ public class VCA extends Unit
         {
         if (isConstant)
             {
-            if (modulation == 1)  // Scale
+            if (modulation == MOD_SCALE)
                 {
                 if (value >= 0.5)
                     value = (value - 0.5) * 2 * (MAX_SCALE - 1) + 1;

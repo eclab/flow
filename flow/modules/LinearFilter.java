@@ -21,6 +21,11 @@ import flow.gui.*;
 public class LinearFilter extends Unit
     {
     private static final long serialVersionUID = 1;
+
+    public static final int MOD_NODES = 0;
+    public static final int MOD_BASE = 1;
+
+
     public static String getName() { return "Linear Filter"; }
 
     public int MAX_NODES = 8;
@@ -74,8 +79,8 @@ public class LinearFilter extends Unit
         double[] frequencies = getFrequencies(0);
         double pitch = sound.getPitch();
         
-        int numNodes = (int)(modulate(0) * MAX_NODES);
-        int baseFreq = (int)((modulate(1) * 2 - 1.0) * MAX_BASE_FREQUENCY);
+        int numNodes = (int)(modulate(MOD_NODES) * MAX_NODES);
+        int baseFreq = (int)((modulate(MOD_BASE) * 2 - 1.0) * MAX_BASE_FREQUENCY);
         
         for(int i = 0; i < numNodes; i++)
             nodeFreq[i] = modToInsensitiveFrequency(modulate(i + 2)) + baseFreq;
@@ -142,7 +147,7 @@ public class LinearFilter extends Unit
                 }
             else if (modulation == 1)  // Base Frequency
                 {
-                return "" + (int)((modulate(1) * 2 - 1.0) * MAX_BASE_FREQUENCY);
+                return "" + (int)((modulate(MOD_BASE) * 2 - 1.0) * MAX_BASE_FREQUENCY);
                 }
             else if (modulation < MAX_NODES + 1)
                 {
@@ -169,10 +174,10 @@ public class LinearFilter extends Unit
                 box1.add(new UnitOutput(unit, 0, this));
                 box.add(box1);
                 box1 = new Box(BoxLayout.X_AXIS);
-                ModulationInput m = new ModulationInput(unit, 0, this);
+                ModulationInput m = new ModulationInput(unit, MOD_NODES, this);
                 m.getData().setMinimumSize(example.getMinimumSize());
                 box1.add(m);
-                m = new ModulationInput(unit, 1, this);
+                m = new ModulationInput(unit, MOD_BASE, this);
                 m.getData().setMinimumSize(example.getMinimumSize());
                 m.getData().setPreferredSize(example.getPreferredSize());
                 box1.add(m);

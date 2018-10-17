@@ -26,6 +26,12 @@ public class Combine extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int UNIT_INPUT_A = 0;
+    public static final int UNIT_INPUT_B = 1;
+
+    public static final int MOD_SCALE_A = 0;
+    public static final int MOD_SCALE_B = 1;
+
     /// Do we attempt to merge identical frequencies into one frequency, or load them independently?
     boolean merge = false;
     /// Do we guarantee that each incoming partials gets 1/2 of the final partials, or just load them both asynchronously until expended?
@@ -82,14 +88,14 @@ public class Combine extends Unit
                 
         int i0 = 0;
         int i1 = 0;
-        double[] frequencies0 = getFrequenciesIn(0);
-        double[] frequencies1 = getFrequenciesIn(1);
-        double[] amplitudes0 = getAmplitudesIn(0);
-        double[] amplitudes1 = getAmplitudesIn(1);
+        double[] frequencies0 = getFrequenciesIn(UNIT_INPUT_A);
+        double[] amplitudes0 = getAmplitudesIn(UNIT_INPUT_A);
+        double[] frequencies1 = getFrequenciesIn(UNIT_INPUT_B);
+        double[] amplitudes1 = getAmplitudesIn(UNIT_INPUT_B);
         double f_out;
         
-        double scaleA = modulate(0);
-        double scaleB = modulate(1);
+        double scaleA = modulate(MOD_SCALE_A);
+        double scaleB = modulate(MOD_SCALE_B);
                 
         double maxIncomingFreqLen = (half ? frequencies0.length / 2 : frequencies0.length);
                 

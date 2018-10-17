@@ -24,6 +24,10 @@ public class Map extends Modulation
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_SIGNAL = 0;
+    public static final int MOD_BOUND_A = 1;
+    public static final int MOD_BOUND_B = 2;
+
     boolean invert;
     public boolean getInvert() { return invert; }
     public void setInvert(boolean val) { invert = val; }
@@ -66,7 +70,8 @@ public class Map extends Modulation
     public Map(Sound sound)
         {
         super(sound);
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ONE }, new String[] { "Signal", "Bound A", "Bound B" });
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ONE }, 
+            new String[] { "Signal", "Bound A", "Bound B" });
         defineOptions(new String[] { "Inverse", "Flip", "Center" }, new String[][] { { "Inverse" }, { "Flip" }, { "Center" } } );
         }
 
@@ -74,34 +79,34 @@ public class Map extends Modulation
         {
         super.go();
         
-        setTriggerValues(isTriggered(0), getTrigger(0), 0);
+        setTriggerValues(isTriggered(MOD_SIGNAL), getTrigger(MOD_SIGNAL), 0);
 
-        double mod0 = modulate(0);
-        double mod1 = modulate(1);
-        double mod2 = modulate(2);
+        double signal = modulate(MOD_SIGNAL);
+        double bound_a = modulate(MOD_BOUND_A);
+        double bound_b = modulate(MOD_BOUND_B);
         
         if (center)
             {
-            mod2 /= 2.0;
-            double m1 = mod1 - mod2;
-            double m2 = mod1 + mod2;
-            mod1 = (m1 < 0 ? 0 : m1);
-            mod2 = (m2 > 1 ? 1 : m2);
+            bound_b /= 2.0;             // bound_b is initially variance, bound_a is initially center
+            double lower = bound_a - bound_b;
+            double upper = bound_a + bound_b;
+            bound_a = (lower < 0 ? 0 : lower);
+            bound_b = (upper > 1 ? 1 : upper);
             }
-        else if (mod1 > mod2)                // swap
+        else if (bound_a > bound_b)                // swap
             {
-            double temp = mod2;
-            mod2 = mod1;
-            mod1 = temp;
+            double temp = bound_b;
+            bound_b = bound_a;
+            bound_a = temp;
             }
                 
         if (invert)
             {
-            if (mod1 == mod2)
-                setModulationOutput(0, mod1);
+            if (bound_a == bound_b)
+                setModulationOutput(0, bound_a);
             else
                 {
-                double d = (mod0 - mod1) / (mod2 - mod1);
+                double d = (signal - bound_a) / (bound_b - bound_a);
                 if (d < 0) d = 0;
                 if (d > 1) d = 1;
                                 
@@ -117,10 +122,10 @@ public class Map extends Modulation
             {
             if (flip)
                 {
-                mod0 = 1.0 - mod0;
+                signal = 1.0 - signal;
                 }
                         
-            setModulationOutput(0, mod1 + (mod2 - mod1) * mod0);
+            setModulationOutput(0, bound_a + (bound_b - bound_a) * signal);
             }
         }
 
@@ -149,9 +154,9 @@ public class Map extends Modulation
                 Modulation mod = (Modulation) getModulation();
                 box.add(new ModulationOutput(mod, 0, this));
                              
-                box.add(new ModulationInput(mod, 0, this));     // signal
-                ModulationInput a = new ModulationInput(mod, 1, this); // a
-                ModulationInput b = new ModulationInput(mod, 2, this); // b
+                box.add(new ModulationInput(mod, MOD_SIGNAL, this));     // signal
+                ModulationInput a = new ModulationInput(mod, MOD_BOUND_A, this); // a
+                ModulationInput b = new ModulationInput(mod, MOD_BOUND_B, this); // b
                 a.setMinimumSize(example.getMinimumSize());
                 b.setMinimumSize(example.getMinimumSize());
                 box.add(a);

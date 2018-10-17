@@ -29,6 +29,13 @@ public class Tinkle extends Unit implements UnitSource
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_TRIGGER = 0;
+    public static final int MOD_DECAY = 1;
+    public static final int MOD_VOLUME = 2;
+    public static final int MOD_NUMBER = 3;
+    public static final int MOD_PROBABILITY = 4;
+    public static final int MOD_SEED = 5;
+
     double[] currentAmplitudes = new double[NUM_PARTIALS];
     public Random random = null;
         
@@ -69,7 +76,7 @@ public class Tinkle extends Unit implements UnitSource
         
     public void reseed()
         {
-        double mod = modulate(5);
+        double mod = modulate(MOD_SEED);
         if (mod != 0)
             {
             long seed = Double.doubleToLongBits(mod);
@@ -86,8 +93,7 @@ public class Tinkle extends Unit implements UnitSource
         {
         super.go();
                 
-        modulate(0);
-        if (isTriggered(0))
+        if (isTriggered(MOD_TRIGGER))
             {
             tinkle();
             }
@@ -98,13 +104,13 @@ public class Tinkle extends Unit implements UnitSource
                 
     void tinkle()
         {
-        int number = (int)(modulate(3) * MAX_NUMBER);
-        double probability = modulate(4);
+        int number = (int)(modulate(MOD_NUMBER) * MAX_NUMBER);
+        double probability = modulate(MOD_PROBABILITY);
         Random rand = (random == null ? getSound().getRandom() : random);
         if (probability == 1.0 || rand.nextDouble() < probability)
             {
             int[] constrainedPartials = getConstrainedPartials();
-            double amp = modulate(2);
+            double amp = modulate(MOD_VOLUME);
             if (constrainedPartials.length > 0)
                 {
                 for(int i = 0; i < number; i++) 
@@ -119,7 +125,7 @@ public class Tinkle extends Unit implements UnitSource
         
     void reduce()
         {
-        double alpha = modulate(1) * 0.01 + 0.99;
+        double alpha = modulate(MOD_DECAY) * 0.01 + 0.99;
         for(int i = 0; i < currentAmplitudes.length; i++)
             {
             currentAmplitudes[i] = currentAmplitudes[i] * alpha;

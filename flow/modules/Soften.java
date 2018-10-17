@@ -15,8 +15,11 @@ public class Soften extends Modulation
     {
     private static final long serialVersionUID = 1;
 
-    public static String getName() { return "Soften"; }
+    public static final int MOD_SIGNAL = 0;
+    public static final int MOD_AMOUNT = 1;
+    public static final int MOD_SCALE = 2;
 
+    public static String getName() { return "Soften"; }
 
     public static final double SCALE_MAXIMUM = 10;
         
@@ -49,7 +52,8 @@ public class Soften extends Modulation
     public Soften(Sound sound)
         {
         super(sound);
-        defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ZERO }, new String[] { "Signal", "Amount", "Scale" });
+        defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ZERO }, 
+            new String[] { "Signal", "Amount", "Scale" });
         }
 
     public void reset()
@@ -67,21 +71,21 @@ public class Soften extends Modulation
     public void go()
         {
         super.go();
-        double signal = modulate(0);
+        double signal = modulate(MOD_SIGNAL);
         if (current != current)  // NaN
             current = signal;
         else
             {
-            double alpha = makeInsensitive(modulate(1));
+            double alpha = makeInsensitive(modulate(MOD_AMOUNT));
             current = alpha * current + (1 - alpha) * signal;
             }
 
-        double scale = modulate(2);
+        double scale = modulate(MOD_SCALE);
         double val = (current - 0.5) * (scale * (SCALE_MAXIMUM - 1) + 1) + 0.5;
         if (val < 0) val = 0;
         if (val > 1) val = 1;
         setModulationOutput(0, val);
-        if (isTriggered(0))
+        if (isTriggered(MOD_SIGNAL))
             updateTrigger(0);
         }
 

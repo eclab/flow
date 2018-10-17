@@ -21,6 +21,8 @@ public class Skeletonize extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_CUT = 0;
+
     public Skeletonize(Sound sound)
         {
         super(sound);
@@ -37,7 +39,7 @@ public class Skeletonize extends Unit
 
         double[] amplitudes = getAmplitudes(0);
         
-        double cut = 1.0 - modulate(0);
+        double cut = 1.0 - modulate(MOD_CUT);
 
         double[] upcuts = new double[amplitudes.length];
         double[] downcuts = new double[amplitudes.length];

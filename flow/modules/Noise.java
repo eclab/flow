@@ -38,6 +38,13 @@ public class Noise extends Unit implements UnitSource
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_HIGH = 0;
+    public static final int MOD_LOW = 1;
+    public static final int MOD_PARTIALS = 2;
+    public static final int MOD_AMP_VAR = 3;
+    public static final int MOD_RAMP = 4;
+    public static final int MOD_GAIN = 5;
+
     boolean top = true;
     public boolean isTop() { return top; }
     public void setTop(boolean val) { top = val; }
@@ -90,13 +97,13 @@ public class Noise extends Unit implements UnitSource
 
     public void go()
         {
-        int partials = (int)(modulate(2) * Unit.NUM_PARTIALS);
+        int partials = (int)(modulate(MOD_PARTIALS) * Unit.NUM_PARTIALS);
         
-        double _var = modulate(3);
-        double ramp = modulate(4);
-        double gain = modulate(5);
-        double lo = modToInsensitiveFrequency(modulate(1));
-        double hi = modToInsensitiveFrequency(modulate(0));
+        double _var = modulate(MOD_AMP_VAR);
+        double ramp = modulate(MOD_RAMP);
+        double gain = modulate(MOD_GAIN);
+        double lo = modToInsensitiveFrequency(modulate(MOD_LOW));
+        double hi = modToInsensitiveFrequency(modulate(MOD_HIGH));
         if (hi < lo) { double temp = hi; hi = lo; lo = temp; }
         
         double total = 0;
