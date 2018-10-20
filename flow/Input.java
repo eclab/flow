@@ -329,7 +329,7 @@ public class Input
                     notesOn.remove(sound);
                     }
                 }
-            if (notesOff.isEmpty())
+            else if (notesOff.isEmpty())
                 {
                 sound = (Sound)notesOn.removeLast();
                 }
