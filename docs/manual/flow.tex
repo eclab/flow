@@ -1150,8 +1150,45 @@ public class MyModulation extends Modulation implements Presetable, ModSource
 
 {\tt ModSource} simply tells {\name} that MyModulation is a modulation source, not some kind of modulation shaping thing.  Now it's in the right menu and the right title bar color.
 
-  
+\paragraph{Saving and Loading Patches}
+
+Flow saves and loads patches to very simple files: they're just GZipped JSON text files.   Typically your module will load and save without any issue.  However you should be aware of some items.
+
+First: there is a special optional JSON object available for you if you need to save custom data.  It's accessed by overriding the methods {\tt getData()} and {\tt setData(...)}.  See Wavetable and Draw for examples.
+
+Second: the key for each modulation input/output, each unit input/output, and each option in your module is a string which is normally just the title of the item.  For example, the key for our ModulationOutput entitled {\it Other} is simply {\tt "Other"}.  This can be a problem if you have elements of the same kind (ModulationOutputs say) which have the same name, or a name which changes.  For example, the Envelope module has a bunch of modulation inputs all called {\it Level}.  To deal with this you can override the method {\tt getKeyForModulationOutput(...)} (or {\it getKeyForOption(...), etc.}) to return a designated unique key.
+
+Third: you might also change your module, which causes problems when trying to be backward-compatible during loading.  If you update your module, you might override your modulation version in {\tt getVersion(...)}.  If you've changed your options, modulation inputs/outputs, and unit inputs/outputs, perhaps adding a new one or deleting some, you might need to check for this immediately before and/or immediately after they are loaded and set automatically, so as to revise them.  The methods {\tt preprocessLoad(...)} and {\tt postprocessLoad(...)} may be helpful.  You could completely override everything, if you wanted, by overriding the methods {\tt loadModulations(...)} or {\tt loadOptions(...)} etc..   Or you could just override {\t load(...)}.
+
+\paragraph{The Current Patch Format}  The format is in JSON and is as follows:
+
+\begin{itemize}
+\item {\tt \{  "flow":{\it file-format-version},\quad "name":{\it patch-name},\quad "modules":{\it modules} \} }
+\item {\it file-format-version:}\quad an integer \(\geq 0\) representing the version of this file format.  Presently 0. 
+\item {\it patch-name:}\quad a string. 
+\item {\it modules:}\quad {\tt [ {\it module,*} ] }
+\item {\it module:}\quad {\tt \{ "v":{\it module-version}\quad "class":{\it module-classname}\quad "id":{\it module-id}\quad "opt":{\it options}\\\hspace{\fill}\quad "unit":{\it unit-inputs}\quad "mod":{\it modulation-inputs} \quad{\it optional-data} \}}
+\item {\it module-version:}\quad the version of this kind of module.  An integer \(\geq 0\).  Modules are presently largely at 0.
+\item {\it module-classname:}\quad the class name of this module.  A string.
+\item {\it id:}\quad A unique identifier of this module, which is referenced by other modules when they state that they are connected to it.  A string.
+\item {\it optional-data:}\quad A JSON object in the form {\tt \{...\}} which the module may use as it likes to store additional data.  This object does not need to appear in the patch at all.  See Wavetable and Draw for examples of usage of optional data.
+\item {\it options:}\quad {\tt \{ {\it option-name}:{\it option-value*} \}}
+\item {\it option-name:}\quad An option name (a string).  Normally this is the same as returned by {\tt getOptionName(...)}.
+\item {\it option-value:}\quad The value of the option (an integer). 
+\item {\it modulation-inputs:}\quad {\tt \{ {\it modulation-input-name}:{\it modulation-input*} \}}
+\item {\it modulation-input-name:}\quad A modulation input name (a string).  Normally this is the same as returned by {\tt getModulationName(...)}.
+\item {\it modulation-input-value:}\quad Either a double between 0.0 or 1.0 representing the modulation dial value, or a {\it modulation-output}. 
+\item {\it modulation-output:}\quad {\tt \{ "at":{\it modulation-output-name}, "id":{\it id} \}}\qquad The id is for the attached module.
+\item {\it modulation-output-name:}\quad A modulation output name (a string).  Normally this is the same as returned by {\tt getModulationOutputName(...)}.
+\item {\it unit-inputs:}\quad {\tt \{ {\it unit-input-name}:{\it unit-input*} \}}
+\item {\it unit-input-name:}\quad A unit input name (a string).  Normally this is the same as returned by {\tt getInputName(...)}.
+\item {\it unit-input-value:}\quad{\tt \{ "at":{\it unit-output-name}, "id":{\it id} \}}\qquad The id is for the attached module.
+\item {\it unit-output-name:}\quad A unit output name (a string).  Normally this is the same as returned by {\tt getOutputName(...)}.
+\end{itemize}
+
 \subsection{Building a Unit}
+
+Read Section \ref{buildlingamodulation} (Building a Modulation) first.  It covers a lot of important stuff that we'll build on here.
 
 A {\bf Unit} is a module which emits partials.  If you like, it can also accept partials, and can both accept and emit modulations.  Let's make a trivial low pass filter: we'll zero out the amplitude of a partial if the partial is less than a certain value, which we'll define as a modulation.
 
