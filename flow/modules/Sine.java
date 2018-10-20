@@ -26,17 +26,32 @@ public class Sine extends Unit implements UnitSource
         double[] frequencies = getFrequencies(0);
         
         setClearOnReset(false);
+        sine = 0;
         amplitudes[0] = 1;
-        frequencies[0] = 1;
         }
 
+	double lastMod = Double.NaN;
+	int sine = 0;
+	
     public void go()
         {
         super.go();
  
         double[] frequencies = getFrequencies(0);        
-               
+        double[] amplitudes = getAmplitudes(0);
         double mod = modulate(MOD_FREQUENCY);
-        frequencies[0] = mod * ((double)Unit.NUM_PARTIALS - 1.0) + 1;
+        
+        if (lastMod != mod)
+        	{
+        	frequencies[sine] = mod * ((double)Unit.NUM_PARTIALS - 1.0) + 1;
+			simpleSort(0, false);
+			
+			for(int i = 0; i < Unit.NUM_PARTIALS; i++)
+				if (amplitudes[i] > 0)  // found it
+					{
+					sine = i;
+					break;
+					}
+	        }
         }
     }
