@@ -230,7 +230,7 @@ public class Sound
 	/** Stores the patch version to the given object. */
 	public static void savePatchVersion(JSONObject obj) throws JSONException
 		{
-		obj.put("v", PATCH_VERSION);
+		obj.put("flow", PATCH_VERSION);
 		}
 	
 	/** Stores the patch name to the given object. */
@@ -242,7 +242,10 @@ public class Sound
 	/** Loads the patch version from the given object. */
 	public static int loadPatchVersion(JSONObject obj) throws JSONException
 		{
-		return obj.getInt("v");
+		int version = obj.optInt("flow", -1);
+		if (version == -1)	// it's old
+			return obj.getInt("v");
+		else return version;
 		}
 		
 	/** Loads the patch name from the given object. */
