@@ -1255,8 +1255,12 @@ public class Unit extends Modulation
 		{
 		for(int i = 0; i < getNumInputs(); i++)
 			{
-			JSONObject m = inputs.getJSONObject(getKeyForInput(i));
-			if (m.getString("id").equals("null"))
+			JSONObject m = inputs.optJSONObject(getKeyForInput(i));
+			if (m == null)
+				{
+					System.err.println("WARNING: Could not load unit " + getKeyForInput(i) + " in " + this);
+				}
+			else if (m.getString("id").equals("null"))
 				{
 				setInput(Unit.NIL, i, 0);
 				} 

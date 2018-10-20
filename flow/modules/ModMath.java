@@ -146,7 +146,7 @@ public class ModMath extends Modulation
             break;
             case SUBTRACT:
                 {
-                val = Math.max(0.0, mod1 - mod0);
+                val = Math.max(0.0, mod0 - mod1);
                 }
             break;
             case MULTIPLY:

@@ -783,7 +783,15 @@ public abstract class Modulation implements java.io.Serializable
 		{
 		for(int i = 0; i < getNumOptions(); i++)
 			{
-			setOptionValue(i, options.getInt(getKeyForOption(i)));
+			int val = options.optInt(getKeyForOption(i), -1);
+			if (val == -1)
+				{
+				System.err.println("WARNING: Could not load option " + getKeyForOption(i) + " in " + this);
+				}
+			else
+				{
+				setOptionValue(i, val);
+				}
 			}
 		}
 		
@@ -799,9 +807,16 @@ public abstract class Modulation implements java.io.Serializable
 				}
 			else		// It's an ID
 				{
-				JSONObject m = mods.getJSONObject(getKeyForModulation(i));
-				Modulation mod = ids.get(m.getString("id"));
-				setModulation(mod, i, mod.getModulationOutputForKey(m.getString("at")));
+				JSONObject m = mods.optJSONObject(getKeyForModulation(i));
+				if (m == null)
+					{
+					System.err.println("WARNING: Could not load modulation " + getKeyForModulation(i) + " in " + this);
+					}
+				else
+					{
+					Modulation mod = ids.get(m.getString("id"));
+					setModulation(mod, i, mod.getModulationOutputForKey(m.getString("at")));
+					}
 				}
 			}
 		}
