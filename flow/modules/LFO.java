@@ -38,7 +38,7 @@ public class LFO extends Modulation implements ModSource
     public static final int MOD_SCALE = 2;
     public static final int MOD_SHIFT = 3;
     public static final int MOD_SEED = 4;
-    public static final int MOD_RESET = 5;
+    public static final int MOD_GATE_TR = 5;
 
     public static final int SIN = 0;
     public static final int TRIANGLE = 1;
@@ -143,13 +143,15 @@ public class LFO extends Modulation implements ModSource
         lastTick = firstTick;
         lastRate = Double.NaN;
         lastState = 0;
+        state = 0;
+		bias = 0;
         }
         
     public void gate() 
         { 
         super.gate();
                 
-        if (!free)
+        if (!free && isModulationConstant(MOD_GATE_TR))
             {
             resetLFO();
             }
@@ -181,7 +183,7 @@ public class LFO extends Modulation implements ModSource
         // Modulation 3: Shift
         // Modulation 4: Random Seed
         defineModulations(new Constant[] { Constant.HALF, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ONE, Constant.ZERO }, 
-            new String[] { "Rate", "Phase", "Scale", "Shift", "Seed", "Reset" });
+            new String[] { "Rate", "Phase", "Scale", "Shift", "Seed", "On Tr" });
         defineOptions(new String[] { "Type", "Free", "Invert", "Half Trigger", "Linear Rate", "MIDI Sync"}, new String[][] { TYPE_NAMES, { "Free" }, { "Invert" }, { "Half Trigger" }, { "Linear Rate" }, { "MIDI Sync" } } );
 
         this.type = TRIANGLE;
@@ -301,7 +303,7 @@ public class LFO extends Modulation implements ModSource
         {
         super.go();
                 
-        if (isTriggered(MOD_RESET))
+        if (isTriggered(MOD_GATE_TR))
             {
             resetLFO();
             }

@@ -112,7 +112,6 @@ public class Envelope extends Modulation implements ModSource
         {
         super(sound);
         defineOptions(
-        
             new String[] { "Curve", "Type", "Gate Reset", "MIDI Sync" }, 
             new String[][] { { "Linear", "x^2", "x^4", "x^8", "Jump", "Wait" }, TYPE_NAMES, { "Gate Reset" }, { "MIDI Sync" } } );        
 
@@ -129,7 +128,7 @@ public class Envelope extends Modulation implements ModSource
             "Sus 3", "Level",
             "Rel 1", "Level",
             "Rel 2", "Level",
-            "Gate Tr", "Rel Tr"
+            "On Tr", "Off Tr"
             };
         defineModulations(mods, names);
         setModulationOutput(0, 0);  
@@ -157,7 +156,8 @@ public class Envelope extends Modulation implements ModSource
     public void gate()
         {
         super.gate();
-        doGate();
+        if (isModulationConstant(MOD_GATE_TR))
+        	doGate();
         }
 
     void doGate()
@@ -193,7 +193,8 @@ public class Envelope extends Modulation implements ModSource
     public void release()
         {
         super.release();
-        doRelease();
+        if (isModulationConstant(MOD_REL_TR))
+        	doRelease();
         }
     
     void doRelease()
@@ -470,4 +471,25 @@ public class Envelope extends Modulation implements ModSource
                 }
             };
         }
+
+
+
+	public static final String[] MOD_NAMES = new String[]
+            {
+            "Pre 1", "Level 1",
+            "Pre 2", "Level 2",
+            "Pre 3", "Level 3", 
+            "Sus 1", "Level 4", 
+            "Sus 2", "Level 5", 
+            "Sus 3", "Level 6",
+            "Rel 1", "Level 7",
+            "Rel 2", "Level 8",
+            "On Tr", "Off Tr"
+            };
+
+    //// SERIALIZATION STUFF
+     public String getKeyForModulation(int input)
+     	 {
+     	 return MOD_NAMES[input];
+      	 }
     }

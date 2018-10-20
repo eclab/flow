@@ -149,7 +149,7 @@ public class DADSR extends Modulation implements ModSource
         {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
-            new String[] {  "Delay Time", "Delay Level", "Attack Time", "Attack Level", "Decay Time", "Sustain Level", "Release Time", "Release Level", "Gate Tr", "Rel Tr" });
+            new String[] {  "Delay Time", "Delay Level", "Attack Time", "Attack Level", "Decay Time", "Sustain Level", "Release Time", "Release Level", "On Tr", "Off Tr" });
         defineOptions(new String[] { "Curve", "One Shot", "Gate Reset", "MIDI Sync" }, new String[][] { { "Linear", "x^2", "x^4", "x^8", "Jump", "Wait" }, { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" } } );
         this.oneshot = false;
         setModulationOutput(0, 0);  
@@ -158,7 +158,8 @@ public class DADSR extends Modulation implements ModSource
     public void gate()
         {
         super.gate();
-        doGate();
+        if (isModulationConstant(MOD_GATE_TR))
+	        doGate();
         }
         
     void doGate()
@@ -189,7 +190,8 @@ public class DADSR extends Modulation implements ModSource
     public void release()
         {
         super.release();
-        doRelease();
+        if (isModulationConstant(MOD_REL_TR))
+        	doRelease();
         }
     
     void doRelease()
