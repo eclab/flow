@@ -155,4 +155,23 @@ public class NRPN extends Modulation implements ModSource
                 }
             };
         }
+
+
+    //// SERIALIZATION STUFF
+
+	public static final String[] MOD_NAMES = 
+            new String[] { "MSB_A", "LSB_A", "MSB_B", "LSB_B", "MSB_C", "LSB_C", "MSB_D", "LSB_D", "MSB_E", "LSB_E", "MSB_F", "LSB_F" };
+
+	public static final String[] MOD_OUT_NAMES =
+            new String[] { "Out_A", "Out_B", "Out_C", "Out_D", "Out_E", "Out_F" };
+
+     public String getKeyForModulation(int input)
+     	 {
+     	 return MOD_NAMES[input];
+      	 }
+      	 
+     public String getKeyForModulationOutput(int output)
+     	 {
+     	 return MOD_OUT_NAMES[output];
+      	 }
     }

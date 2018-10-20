@@ -33,6 +33,8 @@ public class Out extends Unit
 
     public static final int NUM_MOD_OUTPUTS = 4;
     public static final int NUM_UNIT_OUTPUTS = 4;
+    public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
+    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4", "Gain" };
 
     public static final int MOD_OSC_1 = 0;
     public static final int MOD_OSC_2 = 1;
@@ -61,10 +63,9 @@ public class Out extends Unit
     public Out(Sound sound)
         {
         super(sound);
-        defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, new String[] { "A", "B", "C", "D" } );
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER }, 
-            new String[] { "1", "2", "3", "4", "Gain" });
-        sound.setEmits(this);
+        defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, UNIT_NAMES);
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER }, MOD_NAMES);
+        if (sound != null) sound.setEmits(this);
         }
 
     void setMacro(Macro macro) { this.macro = macro; }
@@ -243,4 +244,18 @@ public class Out extends Unit
 
         return panel[0];
         }
+        
+        
+    //// SERIALIZATION STUFF
+     public String getKeyForModulation(int input)
+     	 {
+     	 if (input < NUM_MOD_OUTPUTS) return MOD_NAMES[input];
+      	 else return super.getKeyForModulation(input);
+      	 }
+   
+     public String getKeyForInput(int input)
+     	 {
+     	 if (input < NUM_UNIT_OUTPUTS) return UNIT_NAMES[input];
+      	 else return super.getKeyForInput(input);
+      	 }
     }

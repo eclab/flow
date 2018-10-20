@@ -11,6 +11,7 @@ import java.util.*;
 import java.awt.*;
 import javax.swing.*;
 import flow.gui.*;
+import org.json.*;
 
 /**  
      A special Unit which converts loaded patches into single modules to be used in higher-level
@@ -143,15 +144,17 @@ public class Macro extends Unit implements Cloneable
         }
     
     /** This is called to build a Macro and loading the sound. */
-    public Macro(Sound sound, Modulation[] modules, HashMap otherElements)
+    public Macro(Sound sound, Modulation[] modules, String patchName)
         {
         super(sound);  // modules hasn't been set yet
-        this.modules = modules;  // now it's set
+        loadModules(modules, patchName);
         setSound(sound);  // distribute to modules
-        
-        if (otherElements.containsKey(PATCH_NAME_KEY))
-            patchName = ((String)(otherElements.get(PATCH_NAME_KEY)));
-
+		}
+		
+	public void loadModules(Modulation[] modules, String patchName)
+		{
+        this.modules = modules;  // now it's set
+        this.patchName  = patchName;
         // find the last Out
         for(int m = modules.length - 1; m >= 0; m--)
             {
@@ -244,14 +247,56 @@ public class Macro extends Unit implements Cloneable
             defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, new String[] { "1", "2", "3", "4" } );  
             }             
         }
-        
+    
+	public void setData(JSONObject data, int moduleVersion, int patchVersion) throws Exception
+		{
+		loadModules(Sound.loadModules(data, patchVersion), Sound.loadName(data));
+		}
+
+    public JSONObject getData() 
+    	{ 
+    	JSONObject obj = new JSONObject();
+    	
+    	Sound.saveName(patchName, obj);
+    	
+		JSONArray array = new JSONArray();
+
+		int id = 0;		
+		int len = modules.length;
+		for(int i = 0; i < len; i++)
+			modules[i].setID("a" + (id++));
+
+		for(int i = 0; i < len; i++)
+			array.put(modules[i].save());
+		
+		obj.put("modules", array);
+		return obj;
+    	}
+    
+    
+    public static Macro loadMacro(Sound sound, File file)
+    	{
+		try 
+			{ 
+            JSONObject obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
+			return new Macro(sound, 
+				Sound.loadModules(obj, Sound.loadPatchVersion(obj)), 
+				Sound.loadName(obj));
+			}
+		catch (Exception ex)
+			{
+			// try the old way
+			return deserializeAsMacro(sound, file);
+			}
+    	}
+    
     public static Macro deserializeAsMacro(Sound sound, File file)
-        {
-        HashMap otherElements = new HashMap();
-        return new Macro(sound, deserialize(file, otherElements), otherElements);
-        }
-                
-    public static Modulation[] deserialize(File file, HashMap otherElements)
+    	{
+    	String[] patchName = new String[1];
+		return new Macro(sound, deserialize(file, patchName), patchName[0]);
+    	}
+    	
+    public static Modulation[] deserialize(File file, String[] patchName)
         {
         ObjectInputStream s = null;
         try
@@ -264,10 +309,12 @@ public class Macro extends Unit implements Cloneable
             Modulation[] modules = (Modulation[]) s.readObject();
             
             // build the other elements map
+            HashMap otherElements = new HashMap();
             ArrayList keys = (ArrayList)s.readObject();
             ArrayList values = (ArrayList)s.readObject();
             for(int i = 0; i < keys.size(); i++)
                 otherElements.put(keys.get(i), values.get(i));
+            patchName[0] = (String)(otherElements.get(PATCH_NAME_KEY));
                 
             s.close();
             return modules;
@@ -283,34 +330,6 @@ public class Macro extends Unit implements Cloneable
             e1.printStackTrace();
             try { if (s != null) s.close(); } catch (IOException e0) { }
             return null;
-            }
-        }
-
-    public static boolean serialize(File file, Modulation[] modules, HashMap otherElements)
-        {
-        ObjectOutputStream s = null;
-        try
-            {
-            s = 
-                new ObjectOutputStream(
-                    new GZIPOutputStream (
-                        new BufferedOutputStream(
-                            new FileOutputStream(file))));
-            s.writeObject(modules);
-
-            // send the other elements map
-            s.writeObject(new ArrayList(otherElements.keySet()));
-            s.writeObject(new ArrayList(otherElements.values()));
-
-            s.flush();
-            s.close();
-            return true;
-            }
-        catch (IOException e)
-            {
-            e.printStackTrace();
-            try { if (s != null) s.close(); } catch (IOException e2) { }
-            return false;
             }
         }
                         

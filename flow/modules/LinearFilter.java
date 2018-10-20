@@ -45,7 +45,7 @@ public class LinearFilter extends Unit
             new String[] { "Nodes", 
                            "Base",
                            "Freq 1 ", "Freq 2 ", "Freq 3 ", "Freq 4 ", "Freq 5 ", "Freq 6 ", "Freq 7 ", "Freq 8 ",  
-                           "Gain", "Gain", "Gain", "Gain", "Gain", "Gain", "Gain", "Gain" });
+                           "Gain 1", "Gain 2", "Gain 3", "Gain 4", "Gain 5", "Gain 6", "Gain 7", "Gain 8" });
         }
     
     // probably small enough to be inlined (33 bytes)

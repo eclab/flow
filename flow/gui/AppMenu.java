@@ -9,7 +9,8 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
 import java.io.*;
-
+import java.util.zip.*;
+import org.json.*;
 
 /** 
     A collection of functions which build the application menu.
@@ -17,6 +18,8 @@ import java.io.*;
 
 public class AppMenu
     {
+    public static final String PATCH_EXTENSION = ".flow";
+    
     // Returns a menu for a given module class.
     static JMenuItem menuFor(Class moduleClass, Rack rack)
         {
@@ -135,18 +138,34 @@ public class AppMenu
                      
                 HashMap otherElements = new HashMap();
                 otherElements.put(Macro.PATCH_NAME_KEY, rack.getPatchName());
-                                
+            	 
                 if (file != null)
                     {
-                    FileOutputStream os = null;
+					JSONObject obj = new JSONObject();
+					Sound.saveName(rack.getPatchName(), obj);
+                	Sound.savePatchVersion(obj);
+
+		 			PrintWriter p = null;
+                   FileOutputStream os = null;
                     try
                         {
                         os = new FileOutputStream(file);
                         rack.output.lock();
                         try
                             {
-                            Macro.serialize(file, mods, otherElements);
+							rack.output.getSound(0).saveModules(obj);
+							p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(file)));
+							System.out.println(obj);
+							p.println(obj);
+							p.close();
+							//Macro.serialize(file, mods, otherElements);
                             }
+                        catch (Exception e2)
+                        	{
+                        	e2.printStackTrace();
+                    		try { if (p != null) p.close(); }
+                    		catch (Exception e3) { }
+                        	}
                         finally 
                             {
                             rack.output.unlock();
@@ -203,32 +222,47 @@ public class AppMenu
             {
             String name = rack.getPatchName();
             if (name == null) name = "Untitled";
-            fd.setFile(name + ".patch");
+            fd.setFile(name + PATCH_EXTENSION);
             if (dirFile != null)
                 fd.setDirectory(dirFile.getParentFile().getPath());
             }
-                
+
         rack.disableMenuBar();
         fd.setVisible(true);
         rack.enableMenuBar();
                 
         File f = null; // make compiler happy
         FileOutputStream os = null;
+		PrintWriter p = null;
         if (fd.getFile() != null)
             try
                 {
-                f = new File(fd.getDirectory(), ensureFileEndsWith(fd.getFile(), ".patch"));
-                HashMap otherElements = new HashMap();
+                f = new File(fd.getDirectory(), ensureFileEndsWith(fd.getFile(), PATCH_EXTENSION));
+                
+                JSONObject obj = new JSONObject();
                 if (rack.getPatchName() == null)
-                    otherElements.put(Macro.PATCH_NAME_KEY, removeExtension(f.getName()));
+                	Sound.saveName(removeExtension(f.getName()), obj);
                 else
-                    otherElements.put(Macro.PATCH_NAME_KEY, rack.getPatchName());
+                    Sound.saveName(rack.getPatchName(), obj);
+                Sound.savePatchVersion(obj);
                 os = new FileOutputStream(f);
                 rack.output.lock();
                 try
                     {
-                    Macro.serialize(f, mods, otherElements);
+                    rack.output.getSound(0).saveModules(obj);
+                    p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(f)));
+					System.out.println(obj);
+                    p.println(obj);
+                    p.flush();
+                    p.close();
+                    //Macro.serialize(f, mods, otherElements);
                     }
+                catch (Exception e)
+                	{
+                	e.printStackTrace();
+                    try { if (p != null) p.close(); }
+                    catch (Exception e2) { }
+                	}
                 finally 
                     {
                     rack.output.unlock();
@@ -271,7 +305,7 @@ public class AppMenu
                     {
                     public boolean accept(File dir, String name)
                         {
-                        return ensureFileEndsWith(name, ".patch").equals(name);
+                        return ensureFileEndsWith(name, PATCH_EXTENSION).equals(name);
                         }
                     });
 
@@ -289,7 +323,7 @@ public class AppMenu
                 rack.enableMenuBar();
                 File f = null; // make compiler happy
                 
-                HashMap otherElements = new HashMap();
+                String[] patchName = new String[1];
                 
                 if (fd.getFile() != null)
                     //try
@@ -297,22 +331,40 @@ public class AppMenu
                     f = new File(fd.getDirectory(), fd.getFile());
                     rack.output.lock();
                     try
-                        {
-                        Modulation[][] mods = new Modulation[rack.getOutput().getNumSounds()][];
-                        for(int i = 0; i < mods.length; i++)
-                            {
-                            mods[i] = Macro.deserialize(f, otherElements);
-                            }
-                                                
-                        // Create and update Modulations and create ModulePanels
-                        load(mods, rack, otherElements);
-                        //rack.printStats();
-                        rack.checkOrder();
+                    	{
+                 		JSONObject obj = null;
+						int flowVersion = 0;
+						try 
+							{ 
+                 			obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))); 
+                 			flowVersion = Sound.loadPatchVersion(obj);
+                 			}
+                 		catch (Exception ex) { ex.printStackTrace(); }
+						// version
+		                   	try
+							{
+							Modulation[][] mods = new Modulation[rack.getOutput().getNumSounds()][];
+							for(int i = 0; i < mods.length; i++)
+								{
+								if (obj == null)
+									{
+									mods[i] = Macro.deserialize(f, patchName);		// old version
+									}
+								else
+									mods[i] = Sound.loadModules(obj, flowVersion);
+								}
+												
+							// Create and update Modulations and create ModulePanels
+							load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
+							//rack.printStats();
+							rack.checkOrder();
+							}
+						finally 
+							{
+							rack.output.unlock();
+							}
                         }
-                    finally 
-                        {
-                        rack.output.unlock();
-                        }
+                    catch(Exception ex) { ex.printStackTrace(); showSimpleError("Patch Reading Error", "The patch could not be loaded", rack); }
                     file = f;
                     dirFile = f;
                     }
@@ -335,7 +387,7 @@ public class AppMenu
                     {
                     public boolean accept(File dir, String name)
                         {
-                        return ensureFileEndsWith(name, ".patch").equals(name);
+                        return ensureFileEndsWith(name, PATCH_EXTENSION).equals(name);
                         }
                     });
 
@@ -624,7 +676,7 @@ public class AppMenu
     // Removes all modules from the rack, and
     // loads new modules from the given deserialized array.  The Modulations
     // are organized by Sound, then by Modulation.
-    static void load(Modulation[][] mods, Rack rack, HashMap otherElements)
+    static void load(Modulation[][] mods, Rack rack, String patchName)
         {
         Output output = rack.getOutput();
         rack.output.lock();
@@ -657,8 +709,7 @@ public class AppMenu
                 rack.addModulePanel(modpanel);
                 }
 
-            if (otherElements.containsKey(Macro.PATCH_NAME_KEY))
-                rack.setPatchName((String)(otherElements.get(Macro.PATCH_NAME_KEY)));
+            rack.setPatchName(patchName);
 
             // Connect and update ModulePanels
             rack.rebuild();
@@ -751,6 +802,7 @@ public class AppMenu
     flow.modules.Fill.class,
     flow.modules.Filter.class,
     flow.modules.FlangeFilter.class,
+//    flow.modules.Foo.class,
     flow.modules.In.class,
     flow.modules.Harmonics.class,
     flow.modules.Jitter.class,

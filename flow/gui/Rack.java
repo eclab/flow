@@ -20,6 +20,8 @@ import java.awt.datatransfer.*;
 
 import javax.sound.sampled.*;
 
+import org.json.*;
+
 /**
    Rack is the container which holds ModulePanels and allows you to move them, delete them,
    and add new ones.  Rack also is responsible for actually managing the wires layer.  Most
@@ -251,7 +253,7 @@ public class Rack extends JPanel
                 for(int i = 0; i < num; i++)
                     {
                     Sound sound = output.getSound(i);
-                    Macro macro = Macro.deserializeAsMacro(sound, file);
+                    Macro macro = Macro.loadMacro(sound, file);  // Macro.deserializeAsMacro(sound, file);
                     if (firstModulation == null)
                         firstModulation = macro;
                     }

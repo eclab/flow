@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.io.*;
+import org.json.*;
 
 /** 
     A Unit which allows a user to load, save, and graphically edit all the partials.
@@ -469,4 +470,39 @@ public class Draw extends Unit implements UnitSource
         display.setModulePanel(p);
         return p;
         }
+
+
+    //// SERIALIZATION STUFF
+
+	public JSONObject getData()
+		{
+		// not necessary to store orders
+		JSONObject obj = new JSONObject();
+		JSONArray amps = new JSONArray();
+		JSONArray freqs = new JSONArray();
+		double[] amplitudes = getAmplitudes(0);
+		double[] frequencies = getFrequencies(0);
+		for(int i = 0; i < frequencies.length; i++)
+			{
+			amps.put(i, amplitudes[i]);
+			freqs.put(i, frequencies[i]);
+			}
+		obj.put("amp", amps);
+		obj.put("freq", freqs);
+		return obj;
+		}
+	
+	public void setData(JSONObject data, int moduleVersion, int patchVersion)
+		{
+		// not necessary to store orders
+		JSONArray amps = data.getJSONArray("amp");
+		JSONArray freqs = data.getJSONArray("freq");
+		double[] amplitudes = getAmplitudes(0);
+		double[] frequencies = getFrequencies(0);
+		for(int i = 0; i < frequencies.length; i++)
+			{
+			amplitudes[i] = amps.getDouble(i);
+			frequencies[i] = freqs.getDouble(i);
+			}
+		} 
     }

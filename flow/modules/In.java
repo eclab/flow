@@ -21,13 +21,15 @@ public class In extends Unit
 
     public static final int NUM_MOD_INPUTS = 4;
     public static final int NUM_UNIT_INPUTS = 4;
+    public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
+    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4" };
     Macro macro = null;
         
     public In(Sound sound)
         {
         super(sound);
-        defineModulationOutputs( new String[] { "1", "2", "3", "4" });
-        defineOutputs(new String[] { "A", "B", "C", "D" });
+        defineModulationOutputs(MOD_NAMES);
+        defineOutputs(UNIT_NAMES);
         defineInputs(new Unit[0], new String[0]);
         standardizeFrequencies();
         setOrders();
@@ -115,4 +117,18 @@ public class In extends Unit
 
         return panel;
         }
+
+
+    //// SERIALIZATION STUFF
+     public String getKeyForModulationOutput(int output)
+     	 {
+     	 if (output < NUM_MOD_INPUTS) return MOD_NAMES[output];
+      	 else return super.getKeyForModulationOutput(output);
+      	 }
+   
+     public String getKeyForOutput(int output)
+     	 {
+     	 if (output < NUM_UNIT_INPUTS) return UNIT_NAMES[output];
+      	 else return super.getKeyForOutput(output);
+      	 }
     }

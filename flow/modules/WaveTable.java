@@ -11,6 +11,7 @@ import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import java.awt.*;
+import org.json.*;
 
 /**
    A Unit which provides the equivalent of a classic sparse wavetable.
@@ -35,6 +36,8 @@ public class WaveTable extends Unit implements UnitSource
     public static final int MOD_POSITION = 0;
 
     public static final String FILENAME_EXTENSION = ".WAV";
+    
+    public String name = null;
 
     int currentPos = -1;
         
@@ -116,13 +119,16 @@ public class WaveTable extends Unit implements UnitSource
                     }
                 
                 final PushButton button[] = new PushButton[1];
-                box.add(button[0] = new PushButton("Load...")
+                box.add(button[0] = new PushButton(name == null ? "Load..." : name)
                     {
                     public void perform()
                         {
                         File f = pan[0].doLoad("Load a Wavetable from https://waveeditonline.com/", FILENAME_EXTENSION);
                         if (f != null)
-                            button[0].getButton().setText(AppMenu.removeExtension(f.getName()));
+                        	{
+                        	name = AppMenu.removeExtension(f.getName());
+                            button[0].getButton().setText(name);
+                            }
                         }
                     });
                 return box;
@@ -159,7 +165,6 @@ public class WaveTable extends Unit implements UnitSource
                                 finished[s - 1] = (harmonics[s] >= MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
                                 }
                             buf.add(finished);
-                            System.err.println(++count);
                             }
 
                         double max = 0;
@@ -202,15 +207,43 @@ public class WaveTable extends Unit implements UnitSource
                     ex.printStackTrace();
                     }
                 }
-
-
-
-
             };
         return pan[0];
         }
 
 
     static final double MINIMUM_AMPLITUDE = 0.001;
+
+
+    //// SERIALIZATION STUFF
+
+	public JSONObject getData()
+		{
+		JSONObject obj = new JSONObject();
+		JSONArray wt = new JSONArray();
+		for(int i = 0; i < waveTable.length; i++)
+			for(int j = 0; j < waveTable[i].length; j++)
+				{
+				wt.put(waveTable[i][j]);
+				}
+		obj.put("wt", wt);
+		obj.put("name", (name == null ? "Load..." : name));
+		obj.put("x", waveTable.length);
+		obj.put("y", waveTable[0].length);
+		return obj;
+		}
+	
+	public void setData(JSONObject data, int moduleVersion, int patchVersion)
+		{
+		JSONArray wt = data.getJSONArray("wt");
+		name = data.getString("name");
+		waveTable = new double[data.getInt("x")][data.getInt("y")];
+		int c = 0;
+		for(int i = 0; i < waveTable.length; i++)
+			for(int j = 0; j < waveTable[i].length; j++)
+				{
+				waveTable[i][j] = wt.getDouble(c++);
+				}
+		} 
         
     }
