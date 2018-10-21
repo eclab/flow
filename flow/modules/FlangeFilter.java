@@ -32,6 +32,8 @@ public class FlangeFilter extends Unit
     public static final int MOD_STRETCH = 3;
     public static final int MOD_STRETCH_MOD = 4;
 
+	public static final double MAX_STRETCH = 4;
+	
     int style = STYLE_SPIKE_DOWN;
 
     public static final int STYLE_LINEAR = 0;
@@ -103,7 +105,7 @@ public class FlangeFilter extends Unit
                 
         // The filter stretch (lobe size) is presently the BASE LOBE SIZE + lobe scale * modulation
                 
-        double filterStretch = makeSensitive(modulate(MOD_STRETCH)) * 22049 + 1 + 22049 * modulate(MOD_STRETCH_MOD);
+        double filterStretch = (makeSensitive(modulate(MOD_STRETCH)) * 22049 + 1) * (1 + modulate(MOD_STRETCH_MOD) * (MAX_STRETCH - 1));
 
         // The filter frequency is presently the BASE frequency + lobe size * number of lobes * modulation
                 
