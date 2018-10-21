@@ -82,7 +82,7 @@ public class Fatten extends Unit
             {
             double c;
             if (lastCents != lastCents)  // it's NaN
-                c = makeVerySensitive(0.5) * 100;
+                c = 0;
             else c = lastCents;
             return String.format("%.2f", c) + " Cents";
             }
