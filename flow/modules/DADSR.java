@@ -106,6 +106,7 @@ public class DADSR extends Modulation implements ModSource
     boolean oneshot;        
     boolean sync;
     boolean gateReset = false;
+    boolean ignoreRelease = false;
         
     public boolean getSync() { return sync; }
     public void setSync(boolean val) { sync = val; }
@@ -115,11 +116,14 @@ public class DADSR extends Modulation implements ModSource
     public void setCurve(int val) { curve = val; }
     public boolean getGateReset() { return gateReset; }
     public void setGateReset(boolean val) { gateReset = val; }
+    public void setIgnoreRelease(boolean val) { ignoreRelease = val; }
+    public boolean getIgnoreRelease() { return ignoreRelease; }
 
     public static final int OPTION_CURVE = 0;
     public static final int OPTION_ONE_SHOT = 1;
     public static final int OPTION_GATE_RESET = 2;
     public static final int OPTION_SYNC = 3;
+    public static final int OPTION_IGNORE_RELEASE = 4;
 
     public int getOptionValue(int option) 
         { 
@@ -129,6 +133,7 @@ public class DADSR extends Modulation implements ModSource
             case OPTION_ONE_SHOT: return getOneShot() ? 1 : 0;
             case OPTION_GATE_RESET: return getGateReset() ? 1 : 0;
             case OPTION_SYNC: return getSync() ? 1 : 0;
+            case OPTION_IGNORE_RELEASE: return getIgnoreRelease() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -141,6 +146,7 @@ public class DADSR extends Modulation implements ModSource
             case OPTION_ONE_SHOT: setOneShot(value != 0); return;
             case OPTION_GATE_RESET: setGateReset(value != 0); return;
             case OPTION_SYNC: setSync(value != 0); return;
+            case OPTION_IGNORE_RELEASE: setIgnoreRelease(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -150,7 +156,7 @@ public class DADSR extends Modulation implements ModSource
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
             new String[] {  "Delay Time", "Delay Level", "Attack Time", "Attack Level", "Decay Time", "Sustain Level", "Release Time", "Release Level", "On Tr", "Off Tr" });
-        defineOptions(new String[] { "Curve", "One Shot", "Gate Reset", "MIDI Sync" }, new String[][] { { "Linear", "x^2", "x^4", "x^8", "Jump", "Wait" }, { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" } } );
+        defineOptions(new String[] { "Curve", "One Shot", "Gate Reset", "MIDI Sync", "No Release" }, new String[][] { { "Linear", "x^2", "x^4", "x^8", "Jump", "Wait" }, { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" }, { "No Release" } } );
         this.oneshot = false;
         setModulationOutput(0, 0);  
         }
@@ -196,6 +202,8 @@ public class DADSR extends Modulation implements ModSource
     
     void doRelease()
         {
+        if (ignoreRelease) level[RELEASE] = getModulationOutput(0);
+        
         state = RELEASE;
         start = getSyncTick(sync);
         interval = toTicks(time[RELEASE]);
@@ -210,7 +218,6 @@ public class DADSR extends Modulation implements ModSource
     public void go()
         {
         super.go();
-
 
         if (isTriggered(MOD_GATE_TR))
             {
