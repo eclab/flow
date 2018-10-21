@@ -31,7 +31,7 @@ public class Filter extends Unit
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineOptions(new String[] { "Type" }, new String[][] { { "LP", "HP", "BP", "Notch" } });
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ONE }, new String[] { "Frequency", "Dropoff" });
+        defineModulations(new Constant[] { Constant.ZERO, Constant.HALF }, new String[] { "Frequency", "Dropoff" });
         }
 
     public int getType() { return type; }
@@ -66,8 +66,10 @@ public class Filter extends Unit
                         
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
+        double pitch = sound.getPitch();
                 
         double cutoff = modToFrequency(modulate(MOD_FREQUENCY));
+        double cutoffdivpitch = cutoff / pitch;
         double drop = modToFilterDropPerOctave(modulate(MOD_DROPOFF));
                 
         switch (type)
@@ -76,9 +78,9 @@ public class Filter extends Unit
                 {                
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    if (frequencies[i] > cutoff)
+                    if (frequencies[i] > cutoffdivpitch)
                         // Maybe use Apache Commons FastMath?  Maybe use Utilities.fastmath etc.?
-                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (frequencies[i] - cutoff));
+                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (frequencies[i] - cutoffdivpitch));
                     }
                 }
             break;
@@ -86,9 +88,9 @@ public class Filter extends Unit
                 {
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    if (frequencies[i] < cutoff)
+                    if (frequencies[i] < cutoffdivpitch)
                         // Maybe use Apache Commons FastMath?  Maybe use Utilities.fastmath etc.?
-                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (cutoff - frequencies[i]));
+                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (cutoffdivpitch - frequencies[i]));
                     }
                 }
             break;
@@ -96,12 +98,12 @@ public class Filter extends Unit
                 {
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    if (frequencies[i] > cutoff)
+                    if (frequencies[i] > cutoffdivpitch)
                         // Maybe use Apache Commons FastMath?  Maybe use Utilities.fastmath etc.?
-                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (frequencies[i] - cutoff));
-                    else if (frequencies[i] < cutoff)
+                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (frequencies[i] - cutoffdivpitch));
+                    else if (frequencies[i] < cutoffdivpitch)
                         {
-                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (cutoff - frequencies[i]));
+                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (cutoffdivpitch - frequencies[i]));
                         }
                     }
                 }
@@ -110,12 +112,12 @@ public class Filter extends Unit
                 {
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    if (frequencies[i] > cutoff)
+                    if (frequencies[i] > cutoffdivpitch)
                         // Maybe use Apache Commons FastMath?  Maybe use Utilities.fastmath etc.?
-                        amplitudes[i] = amplitudes[i] * (1.0 - Utility.hybridpow(drop, (frequencies[i] - cutoff)));
-                    else if (frequencies[i] < cutoff)
+                        amplitudes[i] = amplitudes[i] * (1.0 - Utility.hybridpow(drop, (frequencies[i] - cutoffdivpitch)));
+                    else if (frequencies[i] < cutoffdivpitch)
                         {
-                        amplitudes[i] = amplitudes[i] * (1.0 - Utility.hybridpow(drop, (cutoff - frequencies[i])));
+                        amplitudes[i] = amplitudes[i] * (1.0 - Utility.hybridpow(drop, (cutoffdivpitch - frequencies[i])));
                         }
                     }
                 }
