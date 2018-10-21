@@ -80,10 +80,7 @@ public class Fatten extends Unit
         {
         if (isModulationConstant(modulation))
             {
-            double c;
-            if (lastCents != lastCents)  // it's NaN
-                c = 0;
-            else c = lastCents;
+       		 double c = makeVerySensitive(modulate(MOD_DETUNE)) * 100;
             return String.format("%.2f", c) + " Cents";
             }
         else return "";
