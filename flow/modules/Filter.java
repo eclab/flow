@@ -68,7 +68,7 @@ public class Filter extends Unit
         double[] frequencies = getFrequencies(0);
         double pitch = sound.getPitch();
                 
-        double cutoff = modToFrequency(modulate(MOD_FREQUENCY));
+        double cutoff = modToFrequency(makeInsensitive(modulate(MOD_FREQUENCY)));
         double cutoffdivpitch = cutoff / pitch;
         double drop = modToFilterDropPerOctave(modulate(MOD_DROPOFF));
                 
