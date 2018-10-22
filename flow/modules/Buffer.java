@@ -48,7 +48,15 @@ public class Buffer extends Unit
         
     public boolean getFree() { return free; }
     public void setFree(boolean free) { this.free = free; } 
-        
+    
+    public Object clone()
+    	{
+    	Buffer obj = (Buffer)(super.clone());
+    	obj.bufferedAmplitudes = (double[])(obj.bufferedAmplitudes.clone());
+    	obj.bufferedFrequencies = (double[])(obj.bufferedFrequencies.clone());
+    	return obj;
+    	}
+    
     public Buffer(Sound sound) 
         {
         super(sound);

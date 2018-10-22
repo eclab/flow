@@ -66,7 +66,15 @@ public class UnitInput extends InputOutput implements Rebuildable
                 ModulePanel connectionPanel = rack.getModulePanel(index);
                 UnitWire wire = new UnitWire(rack);
 
-                int outUnitNumber = unit.getInputIndex(number);
+				int outUnitNumber = 0;
+				if (number == ConstraintsChooser.INDEX)
+					{
+					outUnitNumber = unit.getConstraintIndex();
+					}
+                else
+                	{
+                	outUnitNumber = unit.getInputIndex(number);
+                	}
                 UnitOutput outputUnit = connectionPanel.findUnitOutputForIndex(outUnitNumber);
                 wire.setStart(outputUnit);
                 wire.setEnd(this);

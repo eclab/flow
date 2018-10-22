@@ -125,6 +125,14 @@ public class DADSR extends Modulation implements ModSource
     public static final int OPTION_SYNC = 3;
     public static final int OPTION_IGNORE_RELEASE = 4;
 
+    public Object clone()
+    	{
+    	DADSR obj = (DADSR)(super.clone());
+    	obj.level = (double[])(obj.level.clone());
+    	obj.time = (double[])(obj.time.clone());
+    	return obj;
+    	}
+    
     public int getOptionValue(int option) 
         { 
         switch(option)

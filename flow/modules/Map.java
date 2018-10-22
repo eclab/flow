@@ -157,8 +157,8 @@ public class Map extends Modulation
                 box.add(new ModulationInput(mod, MOD_SIGNAL, this));     // signal
                 ModulationInput a = new ModulationInput(mod, MOD_BOUND_A, this); // a
                 ModulationInput b = new ModulationInput(mod, MOD_BOUND_B, this); // b
-                a.setMinimumSize(example.getMinimumSize());
-                b.setMinimumSize(example.getMinimumSize());
+                a.getTitle().setMinimumSize(example.getMinimumSize());
+                b.getTitle().setMinimumSize(example.getMinimumSize());
                 box.add(a);
                 box.add(b);
                                 

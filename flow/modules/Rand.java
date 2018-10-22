@@ -21,6 +21,14 @@ public class Rand extends Unit implements UnitSource
 
     public Random random = null;
         
+    public Object clone()
+    	{
+    	Rand obj = (Rand)(super.clone());
+    	if (obj.random != null)
+    		obj.random = new Random();  // will be reset on gate()
+    	return obj;
+    	}
+
     // for the time being we'll just keep to amplitudes
     public Rand(Sound sound)
         {

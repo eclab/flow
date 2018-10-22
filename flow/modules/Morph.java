@@ -87,6 +87,13 @@ public class Morph extends Unit
     boolean morphFrequency = true;
     boolean morphAmplitude = true;
         
+    public Object clone()
+    	{
+    	Morph obj = (Morph)(super.clone());
+    	obj.morphTo = (int[])(obj.morphTo.clone());
+    	return obj;
+    	}
+
     public void setMorphFrequency(boolean val) { morphFrequency = val; }
     public boolean getMorphFrequency() { return morphFrequency; }
     public void setMorphAmplitude(boolean val) { morphAmplitude = val; }

@@ -101,6 +101,14 @@ public class Envelope extends Modulation implements ModSource
     double[] level = new double[NUM_STATES];
     double[] time = new double[NUM_STATES];
     
+    public Object clone()
+    	{
+    	Envelope obj = (Envelope)(super.clone());
+    	obj.level = (double[])(obj.level.clone());
+    	obj.time = (double[])(obj.time.clone());
+    	return obj;
+    	}
+
     int state;
     double start;
     double interval;

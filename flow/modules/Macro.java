@@ -43,7 +43,66 @@ public class Macro extends Unit implements Cloneable
     boolean[] unitIns = new boolean[4];
     boolean[] modOuts = new boolean[4];
     boolean[] modIns = new boolean[4];
+
+    public Object clone()
+    	{
+    	Macro obj = (Macro)(super.clone());
+    	obj.unitOuts = (boolean[])(obj.unitOuts.clone());
+    	obj.unitIns = (boolean[])(obj.unitIns.clone());
+    	obj.modOuts = (boolean[])(obj.modOuts.clone());
+    	obj.modIns = (boolean[])(obj.modIns.clone());
+    	obj.modules = (Modulation[])(obj.modules.clone());
+    	for(int i = 0; i < obj.modules.length; i++)
+    		obj.modules[i] = (Modulation)(obj.modules[i].clone());
+    		
+    	// Here we need to rewire the modules again
+		// We first build a map of old modules to new ones
+    	HashMap <Modulation, Modulation> map = new HashMap<>();
+    	for(int i = 0; i < modules.length; i++)
+    		{
+    		map.put(modules[i], obj.modules[i]);
+    		}
+    	
+    	// Now build the modulation input and unit inputs, pointing to the new modules
+    	for(int i = 0; i < modules.length; i++)
+    		{
+    		for(int j = 0; j < modules[i].getNumModulations(); j++)
+    			{
+    			if (modules[i].getModulation(j) instanceof Constant)
+    				{
+    				obj.modules[i].setModulation((Modulation)(modules[i].getModulation(j).clone()), j, modules[i].getModulationIndex(j));
+    				}
+    			else
+    				{
+	    			obj.modules[i].setModulation(map.get(modules[i].getModulation(j)), j, modules[i].getModulationIndex(j));
+	    			}
+    			}
+    		if (modules[i] instanceof Unit)
+    			{
+	    		for(int j = 0; j < ((Unit)modules[i]).getNumInputs(); j++)
+    				{
+    				if (((Unit)(modules[i])).getInput(j) instanceof Nil)
+    					{
+    					((Unit)(obj.modules[i])).setInput(Unit.NIL, j, ((Unit)modules[i]).getInputIndex(j));
+    					}
+    				else
+    					{
+    					((Unit)(obj.modules[i])).setInput(((Unit)(map.get(((Unit)modules[i]).getInput(j)))), j, ((Unit)modules[i]).getInputIndex(j));
+						}
+    				}
+    			}
+    		}
+    	
+    	// We also need to identify the new "Out" and the ins again.
+    	// We do this by simply calling loadModules
+    	obj.ins = new ArrayList<In>();
+    	obj.out = null;
+    	obj.loadModules(obj.modules, obj.patchName);
     
+    
+    	return obj;
+    	}
+
     public String getNameForModulation() { return patchName; }
     
     public void resetTrigger(int num)

@@ -25,7 +25,6 @@ public class LinearFilter extends Unit
     public static final int MOD_NODES = 0;
     public static final int MOD_BASE = 1;
 
-
     public static String getName() { return "Linear Filter"; }
 
     public int MAX_NODES = 8;
@@ -34,6 +33,14 @@ public class LinearFilter extends Unit
     double[] nodeGain = new double[MAX_NODES];
     double[] nodeFreq = new double[MAX_NODES];
         
+    public Object clone()
+    	{
+    	LinearFilter obj = (LinearFilter)(super.clone());
+    	obj.nodeGain = (double[])(obj.nodeGain.clone());
+    	obj.nodeFreq = (double[])(obj.nodeFreq.clone());
+    	return obj;
+    	}
+
     public LinearFilter(Sound sound) 
         { 
         super(sound);

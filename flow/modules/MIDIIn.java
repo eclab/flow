@@ -57,6 +57,15 @@ public class MIDIIn extends Modulation implements ModSource
     public static final int NUM_CC = 8;
     double[] lastCC = new double[NUM_CC];
 
+
+    public Object clone()
+    	{
+    	MIDIIn obj = (MIDIIn)(super.clone());
+    	obj.lastCC = (double[])(obj.lastCC.clone());
+    	return obj;
+    	}
+
+
     boolean gated;
     boolean noteOnTrigger;
     boolean noteOffTrigger;
@@ -163,11 +172,9 @@ public class MIDIIn extends Modulation implements ModSource
 
     //// SERIALIZATION STUFF
 
-	public static final String[] MOD_NAMES =
-            new String[] { "CC_A", "CC_B", "CC_C", "CC_D", "CC_E", "CC_F", "CC_G", "CC_H" };
+	public static final String[] MOD_NAMES = new String[] { "CC_A", "CC_B", "CC_C", "CC_D", "CC_E", "CC_F", "CC_G", "CC_H" };
 
-	public static final String[] MOD_OUT_NAMES =
-            new String[] { "Gate", "Note", "Velocity", "Release", "Pressure", "Clock", "Bend", "Out_A", "Out_B", "Out_C", "Out_D", "Out_E", "Out_F", "Out_G", "Out_H" };
+	public static final String[] MOD_OUT_NAMES = new String[] { "Gate", "Note", "Velocity", "Release", "Pressure", "Clock", "Bend", "Out_A", "Out_B", "Out_C", "Out_D", "Out_E", "Out_F", "Out_G", "Out_H" };
 
      public String getKeyForModulation(int input)
      	 {

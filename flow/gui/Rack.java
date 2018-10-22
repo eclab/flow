@@ -92,7 +92,10 @@ public class Rack extends JPanel
         add(pane2, BorderLayout.NORTH);
 
         setTransferHandler(new ModulePanelTransferHandler());
-        this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener()));
+        this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener())
+        	{
+        	public int getDefaultActions() { return TransferHandler.MOVE | TransferHandler.COPY; }
+        	});
         setPatchName(getPatchName());
         setAddModulesAfter(Prefs.getLastAddModulesAfter());
 
@@ -934,6 +937,23 @@ public class Rack extends JPanel
 
 class ModulePanelTransferHandler extends TransferHandler implements DragSourceMotionListener 
     {
+    /*
+    public boolean canImport(TransferHandler.TransferSupport support) 
+    	{
+        if (!support.isDrop() || !support.isDataFlavorSupported(Rack.flavor)) return false;
+        
+        if ((support.getDropAction() & TransferHandler.COPY) == TransferHandler.COPY)
+        	{
+			return true;
+        	}
+        else if ((support.getDropAction() & TransferHandler.MOVE) == TransferHandler.MOVE)
+			{
+			return true;
+			}
+		else return false;
+    	}
+	*/
+
     public Transferable createTransferable(JComponent c) 
         {
         if (c instanceof ModulePanel) 
@@ -947,7 +967,7 @@ class ModulePanelTransferHandler extends TransferHandler implements DragSourceMo
         {
         if (c instanceof ModulePanel) 
             {
-            return TransferHandler.COPY;
+            return TransferHandler.COPY | TransferHandler.MOVE;
             }
         else return TransferHandler.NONE;
         }
@@ -955,14 +975,8 @@ class ModulePanelTransferHandler extends TransferHandler implements DragSourceMo
     public void dragMouseMoved(DragSourceDragEvent dsde) {}
     } 
 
-class ModulePanelDropTargetListener implements DropTargetListener 
+class ModulePanelDropTargetListener extends DropTargetAdapter 
     {
-    // Could easily find uses for these, like cursor changes, etc.
-    public void dragEnter(DropTargetDragEvent dtde) {}
-    public void dragOver(DropTargetDragEvent dtde) { }
-    public void dropActionChanged(DropTargetDragEvent dtde) {}
-    public void dragExit(DropTargetEvent dte) { }
-
     public void drop(DropTargetDropEvent dtde) 
         {
         Object transferableObj = null;
@@ -987,77 +1001,156 @@ class ModulePanelDropTargetListener implements DropTargetListener
             
             int removed = 0;
             int added = -1;
-            if (comp instanceof ModulePanel)
-                {
-                if (comp == droppedPanel) return;  // no change
-                boolean before = (p.getX() < comp.getWidth() / 2);  // p is in a ModulePanel coordinate system
-                removed = rack.allModulePanels.indexOf(droppedPanel);
-                rack.allModulePanels.remove(droppedPanel);
-                for(int i = 0; i < rack.allModulePanels.size(); i++)
-                    {
-                    if (rack.allModulePanels.get(i) == comp)
-                        {
-                        added = (before ? i : i + 1);
-                        rack.allModulePanels.add(added, (ModulePanel)droppedPanel);
-                        break;
-                        }
-                    }
-                }
-            else if (comp == rack)  // we dragged to the end
-                {
-                final int SCROLLBAR_SLOP = 20;
-                final int TOP_SLOP = 4;
-                Rectangle paneBounds = rack.pane.getBounds();
-                if (p.y <= paneBounds.y + TOP_SLOP || p.y >= paneBounds.y + paneBounds.height - SCROLLBAR_SLOP)
-                    {
-                    System.err.println("Drag failed");  // display region
-                    return;
-                    }
-                else
-                    {       
-                    removed = rack.allModulePanels.indexOf(droppedPanel);
-                    rack.allModulePanels.remove(droppedPanel);
-                    added = rack.allModulePanels.size();
-                    rack.allModulePanels.add(added, (ModulePanel)droppedPanel);
-                    }
-                }
-            else
-                {
-                System.err.println("Drag failed");  // wasn't a mod panel I guess
-                return;
-                }
-                
-            if (removed == -1)
-                {
-                System.err.println("ModulePanelDropTargetListener WARNING: no such removed panel " + droppedPanel);
-                }
-            else if (added == -1)
-                {
-                System.err.println("ModulePanelDropTargetListener WARNING: no such added panel relative to " + comp);
-                }
-            else
-                {
-                // reorganize sounds
-                rack.getOutput().lock();
-                try
-                    {
-                    int len = rack.getOutput().getNumSounds();
-                    for(int i = 0; i < len; i++)
-                        {
-                        Modulation mod = rack.getOutput().getSound(i).removeRegistered(removed);
-                        rack.getOutput().getSound(i).addRegistered(added, mod);
-                        }
-                    }
-                finally 
-                    {
-                    rack.getOutput().unlock();
-                    }
-                }
+            
+            if (dtde.getDropAction() == DnDConstants.ACTION_MOVE)
+            	{
+				if (comp instanceof ModulePanel)
+					{
+					if (comp == droppedPanel) return;  // no change
+					boolean before = (p.getX() < comp.getWidth() / 2);  // p is in a ModulePanel coordinate system
+					removed = rack.allModulePanels.indexOf(droppedPanel);
+					rack.allModulePanels.remove(droppedPanel);
+					for(int i = 0; i < rack.allModulePanels.size(); i++)
+						{
+						if (rack.allModulePanels.get(i) == comp)
+							{
+							added = (before ? i : i + 1);
+							rack.allModulePanels.add(added, (ModulePanel)droppedPanel);
+							break;
+							}
+						}
+					}
+				else if (comp == rack)  // we dragged to the end
+					{
+					final int SCROLLBAR_SLOP = 20;
+					final int TOP_SLOP = 4;
+					Rectangle paneBounds = rack.pane.getBounds();
+					if (p.y <= paneBounds.y + TOP_SLOP || p.y >= paneBounds.y + paneBounds.height - SCROLLBAR_SLOP)
+						{
+						System.err.println("Drag failed");  // display region
+						return;
+						}
+					else
+						{       
+						removed = rack.allModulePanels.indexOf(droppedPanel);
+						rack.allModulePanels.remove(droppedPanel);
+						added = rack.allModulePanels.size();
+						rack.allModulePanels.add(added, (ModulePanel)droppedPanel);
+						}
+					}
+				else
+					{
+					System.err.println("Drag failed");  // wasn't a mod panel I guess
+					return;
+					}
+				
+				if (removed == -1)
+					{
+					System.err.println("ModulePanelDropTargetListener WARNING: no such removed panel " + droppedPanel);
+					}
+				else if (added == -1)
+					{
+					System.err.println("ModulePanelDropTargetListener WARNING: no such added panel relative to " + comp);
+					}
+				else
+					{
+					// reorganize sounds
+					rack.getOutput().lock();
+					try
+						{
+						int len = rack.getOutput().getNumSounds();
+						for(int i = 0; i < len; i++)
+							{
+							Modulation mod = rack.getOutput().getSound(i).removeRegistered(removed);
+							rack.getOutput().getSound(i).addRegistered(added, mod);
+							}
+						}
+					finally 
+						{
+						rack.getOutput().unlock();
+						}
+					}
+				}
+			else if (dtde.getDropAction() == DnDConstants.ACTION_COPY) /// COPYING
+				{
+				if (comp instanceof ModulePanel)
+					{
+					if (comp == droppedPanel) return;  // no change
+					boolean before = (p.getX() < comp.getWidth() / 2);  // p is in a ModulePanel coordinate system
+					removed = rack.allModulePanels.indexOf(droppedPanel);
+					for(int i = 0; i < rack.allModulePanels.size(); i++)
+						{
+						if (rack.allModulePanels.get(i) == comp)
+							{
+							added = (before ? i : i + 1);
+							break;
+							}
+						}
+					}
+				else if (comp == rack)  // we dragged to the end
+					{
+					final int SCROLLBAR_SLOP = 20;
+					final int TOP_SLOP = 4;
+					Rectangle paneBounds = rack.pane.getBounds();
+					if (p.y <= paneBounds.y + TOP_SLOP || p.y >= paneBounds.y + paneBounds.height - SCROLLBAR_SLOP)
+						{
+						System.err.println("Drag failed");  // display region
+						return;
+						}
+					else
+						{       
+						removed = rack.allModulePanels.indexOf(droppedPanel);
+						added = rack.allModulePanels.size();
+						}
+					}
+				else
+					{
+					System.err.println("Drag failed");  // wasn't a mod panel I guess
+					return;
+					}
+				
+				if (removed == -1)
+					{
+					System.err.println("ModulePanelDropTargetListener WARNING: no such removed panel " + droppedPanel);
+					}
+				else if (added == -1)
+					{
+					System.err.println("ModulePanelDropTargetListener WARNING: no such added panel relative to " + comp);
+					}
+				else
+					{
+					// reorganize sounds
+					rack.getOutput().lock();
+					if (!(rack.getOutput().getSound(0).getRegistered(removed) instanceof Out))  // can't copy Out
+						{
+						try
+							{
+							int len = rack.getOutput().getNumSounds();
+							Modulation mod0 = null;
+							for(int i = 0; i < len; i++)
+								{
+								Modulation mod = rack.getOutput().getSound(i).getRegistered(removed);
+								Modulation newmod = (Modulation)(mod.clone());
+								if (mod0 == null) mod0 = newmod;
+								rack.getOutput().getSound(i).addRegistered(added, newmod);
+								}
+						ModulePanel mp = mod0.getPanel();
+						mp.setRack(rack);
+						rack.allModulePanels.add(added, mp);
+							}
+						finally 
+							{
+							rack.getOutput().unlock();
+							}
+						}
+					}
+                }	
                         
             // rebuild the box from scratch
             rack.box.removeAll();
             for(int i = 0; i < rack.allModulePanels.size(); i++)
                 rack.box.add(rack.allModulePanels.get(i));
+			rack.rebuild();
             rack.box.revalidate();
             rack.repaint();
                         

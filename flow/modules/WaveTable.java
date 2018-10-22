@@ -43,6 +43,17 @@ public class WaveTable extends Unit implements UnitSource
         
     double[][] waveTable;
         
+    public Object clone()
+    	{
+    	WaveTable obj = (WaveTable)(super.clone());
+    	obj.waveTable = (double[][])(obj.waveTable);
+    	for(int i = 0; i < obj.waveTable.length; i++)
+    		{
+    		obj.waveTable[i] = (double[])(obj.waveTable[i].clone());
+    		}
+    	return obj;
+    	}
+
     public WaveTable(Sound sound) 
         {
         super(sound);

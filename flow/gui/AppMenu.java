@@ -300,6 +300,7 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
+                System.err.println("Load Patch");
                 FileDialog fd = new FileDialog((JFrame)(SwingUtilities.getRoot(rack)), "Load Patch File...", FileDialog.LOAD);
                 fd.setFilenameFilter(new FilenameFilter()
                     {
@@ -319,6 +320,7 @@ public class AppMenu
                     }
                 
                 rack.disableMenuBar();
+                System.err.println("Visible");
                 fd.setVisible(true);
                 rack.enableMenuBar();
                 File f = null; // make compiler happy

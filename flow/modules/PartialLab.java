@@ -29,16 +29,27 @@ public class PartialLab extends Unit implements UnitSource
     int[] type = new int[NUM_FUNCTIONS];
     int[] oldConstraint = new int[NUM_FUNCTIONS];
     int[] constraint = new int[NUM_FUNCTIONS];
+    double[] lastMod = new double[NUM_FUNCTIONS];
+    double[] lastGain = new double[NUM_FUNCTIONS];
         
     public int getType(int num) { return type[num]; }
     public void setType(int num, int val) { type[num] = val; }
     public int getConstraintOf(int num) { return constraint[num]; }
     public void setConstraintOf(int num, int val) { constraint[num] = val; }
         
-    double[] lastMod = new double[NUM_FUNCTIONS];
-    double[] lastGain = new double[NUM_FUNCTIONS];
-    String[] constNames;
-        
+    public Object clone()
+    	{
+    	PartialLab obj = (PartialLab)(super.clone());
+    	obj.oldType = (int[])(obj.oldType.clone());
+    	obj.type = (int[])(obj.type.clone());
+    	obj.oldConstraint = (int[])(obj.oldConstraint.clone());
+    	obj.constraint = (int[])(obj.constraint.clone());
+    	obj.lastMod = (double[])(obj.lastMod.clone());
+    	obj.lastGain = (double[])(obj.lastGain.clone());
+    	return obj;
+    	}
+
+
     public PartialLab(Sound sound) 
         {
         super(sound);

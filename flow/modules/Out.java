@@ -60,6 +60,18 @@ public class Out extends Unit
     
     // Out
     
+    public Object clone()
+    	{
+    	Out obj = (Out)(super.clone());
+    	obj.modWave = (double[][])(obj.modWave.clone());
+    	for(int i = 0; i < obj.modWave.length; i++)
+    		obj.modWave[i] = (double[])(obj.modWave[i].clone());
+    	obj.wavePos = (int[])(obj.wavePos.clone());
+    	obj.waveTriggered = (boolean[])(obj.waveTriggered.clone());
+    	return obj;
+    	}
+
+
     public Out(Sound sound)
         {
         super(sound);

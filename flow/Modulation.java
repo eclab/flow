@@ -74,7 +74,7 @@ import org.json.*;
    how to access these getters and setters in a consistent way.
 **/
 
-public abstract class Modulation implements java.io.Serializable
+public abstract class Modulation implements java.io.Serializable, Cloneable
     {
     private static final long serialVersionUID = 1;
 
@@ -165,7 +165,7 @@ public abstract class Modulation implements java.io.Serializable
     /// option is TRUE.  This makes it convenient for building checkboxes etc.
         
     String[] optionNames = new String[0];
-    String[][] optionValues;
+    String[][] optionValues = new String[0][0];
     
     /** Defines various options by their names and arrays of names of possible (integer 0... n) values. 
         The names array can be ragged.  */
@@ -198,6 +198,8 @@ public abstract class Modulation implements java.io.Serializable
         
     Modulation[] modulations = new Modulation[0];
     Constant[] defaultModulations = new Constant[0];
+    Constant[] lastModulations = new Constant[0];
+    
     int[] modulationIndexes = new int[0];
     String[] modulationNames = new String[0];
 
@@ -205,6 +207,8 @@ public abstract class Modulation implements java.io.Serializable
     public void defineModulations(Constant[] modulations, String[] names)
         {
         defaultModulations = modulations;
+        lastModulations = new Constant[modulations.length];
+        System.arraycopy(modulations, 0, lastModulations, 0, modulations.length);
         this.modulations = new Modulation[modulations.length];  // can't clone :-(
         for (int i = 0; i < modulations.length; i++)
             this.modulations[i] = modulations[i];
@@ -271,6 +275,8 @@ public abstract class Modulation implements java.io.Serializable
     /** Sets Input Modulation port NUM to the Output Modulation port INDEX of the given modulation. */
     public void setModulation(Modulation mod, int num, int index)
         {
+        if (mod instanceof Constant)
+        	lastModulations[num] = (Constant)mod;
         modulations[num] = mod;
         modulationIndexes[num] = index;
         }
@@ -302,7 +308,15 @@ public abstract class Modulation implements java.io.Serializable
     /** Returns Input Modulation port NUM to its default Modulation (a Constant). */
     public void clearModulation(int num)
         {
+        lastModulations[num] = defaultModulations[num];
         modulations[num] = defaultModulations[num];
+        modulationIndexes[num] = 0;
+        }
+                
+    /** Returns Input Modulation port NUM to its last Constant value. */
+    public void restoreModulation(int num)
+        {
+        modulations[num] = lastModulations[num];
         modulationIndexes[num] = 0;
         }
                 
@@ -675,6 +689,7 @@ public abstract class Modulation implements java.io.Serializable
     public void printStats()
         {
         System.err.println("\nELEMENT " + this);
+        System.err.println("\nSOUND " + sound);
         for(int i = 0; i < modulations.length; i++)                     
             System.err.println("" + i + " MOD IN: " + modulations[i] + " DEFAULT: " + defaultModulations[i]);
         for(int i = 0; i < triggered.length; i++)                       
@@ -686,7 +701,59 @@ public abstract class Modulation implements java.io.Serializable
                     getOptionValues(i)[getOptionValue(i)]));
             }
         }
-        
+    
+    public Object clone()
+    	{
+		Modulation obj = null;
+    	try
+    		{
+    		obj = (Modulation)(super.clone());
+    		}
+    	catch (CloneNotSupportedException ex) { ex.printStackTrace(); }  // never happens
+    	
+    	// ---- Copy over options ----
+    	// Option Names
+    	obj.optionNames = (String[])(optionNames.clone());
+    	// Option Values
+    	obj.optionValues = (String[][])(optionValues.clone());
+    	for(int i = 0; i < optionValues.length; i++)
+    		obj.optionValues[i] = (String[])(obj.optionValues[i].clone());
+    	// Set the values
+    	for(int i = 0; i < optionNames.length; i++)
+    		obj.setOptionValue(i, getOptionValue(i));
+    		
+    	// --- Copy over modulation inputs.  We retain a pointer to the old modulation inputs unless they're Constants. ---
+    	// Input Modulation Names
+   		obj.modulationNames = (String[])(modulationNames.clone());
+   		// Input Modulations.  Copy if we're Constant.
+   		obj.modulations = (Modulation[])(modulations.clone());
+    	for(int i = 0; i < obj.modulations.length; i++)
+    		{
+    		if (obj.modulations[i] instanceof Constant)
+	    		obj.modulations[i] = (Modulation)(obj.modulations[i].clone());
+    		}
+    	// Modulation Indexes
+    	obj.modulationIndexes = (int[])(modulationIndexes.clone());	
+    	// Copy Default Modulations
+    	obj.defaultModulations = (Constant[])(defaultModulations.clone());
+    	for(int i = 0; i < obj.defaultModulations.length; i++)
+    		obj.defaultModulations[i] = (Constant)(obj.defaultModulations[i].clone());
+    	// Copy Last Constant Modulations Used
+    	obj.lastModulations = (Constant[])(lastModulations.clone());
+    	for(int i = 0; i < obj.lastModulations.length; i++)
+    		obj.lastModulations[i] = (Constant)(obj.lastModulations[i].clone());
+
+    	// --- Copy over modulation outputs ---
+    	// Output names
+		obj.modulationOutputNames = (String[])(modulationOutputNames.clone());    	
+		// Current output values
+		obj.modulationOutputs = (double[])(modulationOutputs.clone());
+		// Current output triggers
+		obj.triggered = (boolean[])(triggered.clone());
+		obj.trigger = (int[])(trigger.clone());
+
+    	return obj;
+    	}
 
 
     ///// JSON Serialization
