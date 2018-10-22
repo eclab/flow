@@ -568,7 +568,7 @@ public class ModulationInput extends InputOutput implements Rebuildable
                     for(int i = 0; i < numSounds; i++)
                         {
                         Modulation a = (Modulation)(output.getSound(i).getRegistered(index));
-                        a.clearModulation(number);
+                        a.restoreModulation(number);
                         }
                     }
                 }

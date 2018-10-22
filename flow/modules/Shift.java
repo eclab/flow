@@ -91,11 +91,10 @@ public class Shift extends Unit
                 // If it's not Math.pow, but hybridpow, we get weird jumps
                 double multiplier = Math.pow(2, (shift - 0.5) * bound * MAX_BOUND);
 
-//                for(int i = 0; i < frequencies.length; i++)
-                //                  {
-                //                frequencies[i] = frequencies[i] * multiplier;
-                //              }
-                frequencies[0] = frequencies[0] * multiplier;
+                for(int i = 0; i < frequencies.length; i++)
+					  {
+					frequencies[i] = frequencies[i] * multiplier;
+				  }
                 }
             break;
                         

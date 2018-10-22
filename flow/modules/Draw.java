@@ -52,6 +52,14 @@ public class Draw extends Unit implements UnitSource
     public transient double[] backupFrequencies;
     public transient double[] backupAmplitudes;
         
+    public Object clone()
+    	{
+    	Draw obj = (Draw)(super.clone());
+    	obj.backupFrequencies = (double[])(obj.backupFrequencies.clone());
+    	obj.backupAmplitudes = (double[])(obj.backupAmplitudes.clone());
+    	return obj;
+    	}
+
     void backup()
         {
         backupFrequencies = getFrequencies(0).clone();

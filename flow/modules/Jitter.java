@@ -30,7 +30,17 @@ public class Jitter extends Unit
     public boolean started = false;
     public Random random = null;
         
-        
+    public Object clone()
+    	{
+    	Jitter obj = (Jitter)(super.clone());
+    	if (obj.random != null)
+    		obj.random = new Random();  // will be reset on gate()
+    	obj.targets = (double[][])(obj.targets.clone());
+    	for(int i = 0; i < obj.targets.length; i++)
+    		obj.targets[i] = (double[])(obj.targets[i].clone());
+    	return obj;
+    	}
+
     public Jitter(Sound sound)
         {
         super(sound);

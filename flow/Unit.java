@@ -897,6 +897,8 @@ public class Unit extends Modulation
     boolean invertConstraints = false;
     double[] invertConstrainedAmplitudes = null;
     double[] invertConstrainedFrequencies = null;
+    int[] constraintInPartials = null;
+        
 
     /** Sets the constraints to the non-zero amplitude harmonics in the Unit attached to the given Unit Input Port whose output port is index.
         Setting to Unit.NIL indicates that the constraints are not based on these harmonics.  */
@@ -916,8 +918,6 @@ public class Unit extends Modulation
     /** Returns whether the constraints are inverted or not. */
     public boolean getInvertConstraints() { return invertConstraints; }
 
-    int[] constraintInPartials = null;
-        
     /** Return a list of harmonic constraints.   This list consists of indexes into the frequencies, amplitudes, and orders arrays. */
     public int[] getConstrainedPartials()
         {
@@ -1207,6 +1207,48 @@ public class Unit extends Modulation
         }
 
     public static String getName() { return "Unit"; }
+
+    public Object clone()
+    	{
+    	Unit obj = (Unit)(super.clone());
+    	
+    	// ---- Copy over unit inputs.  We retain pointers to the old inputs. ----
+    	// Input Names
+    	obj.inputNames = (String[])(inputNames.clone());
+    	// Defaults
+    	obj.defaultInputs = (Unit[])(defaultInputs.clone());
+    	obj.inputs = (Unit[])(inputs.clone());
+    	// unit indexes.  We're setting them all to zero because we reset to defaults (which are constants)
+    	obj.inputIndexes = (int[])(inputIndexes.clone());	
+
+
+		// ---- Copy over unit outputs ----
+		// Output Names
+		obj.outputNames = (String[])(outputNames.clone());
+		// Amplitudes
+		obj.amplitudes = (double[][])(amplitudes.clone());
+		for(int i = 0; i < obj.amplitudes.length; i++)
+			obj.amplitudes[i] = (double[])(obj.amplitudes[i].clone());
+		// Frequencies
+		obj.frequencies = (double[][])(frequencies.clone());
+		for(int i = 0; i < obj.frequencies.length; i++)
+			obj.frequencies[i] = (double[])(obj.frequencies[i].clone());
+		// Orders
+		obj.orders = (byte[][])(orders.clone());
+		for(int i = 0; i < obj.orders.length; i++)
+			obj.orders[i] = (byte[])(obj.orders[i].clone());
+
+		
+		// ---- Copy over constraints.  We retain a pointer to the old constraint input if necessary.  So we just copy over the cached info. ----
+		if (obj.invertConstrainedAmplitudes != null)
+			obj.invertConstrainedAmplitudes = (double[])(obj.invertConstrainedAmplitudes.clone());
+		if (obj.invertConstrainedFrequencies != null)
+			obj.invertConstrainedFrequencies = (double[])(obj.invertConstrainedFrequencies.clone());
+		if (obj.constraintInPartials != null)
+			obj.constraintInPartials = (int[])(obj.constraintInPartials.clone());
+
+    	return obj;
+    	}
 
 
 
