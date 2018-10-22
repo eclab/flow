@@ -297,7 +297,7 @@ which seems to work fine.  If you'd like support and a much better user experien
 
 \item {\bf On Windows}\quad I can't help you here.
 
-\item {\bf On Linux}\quad I can't help you here either.
+\item {\bf On Linux}\quad You'll want to use Jack 2 and Cadence. A good solution with minimal friction is to enable the ALSA and Pulseaudio bridges from within the Cadence GUI. Set the buffer size for your sound card in Cadence to something small, like 128 samples (ideally, the smallest you can get it without popping or crackling): this allows you to minimize the application buffer size, reducing latency. After running Cadence and starting the jack daemon, run flow and set the sound output to the jack bridge in Pulseaudio via Pavucontrol (or equivelent audio configurator). This will allow you to route audio from Pulseaudio into jack, which will most likely be able to interface with your DAW and other audio applications.
 
 \end{itemize}
 
