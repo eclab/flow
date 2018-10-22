@@ -55,8 +55,10 @@ public class Draw extends Unit implements UnitSource
     public Object clone()
     	{
     	Draw obj = (Draw)(super.clone());
-    	obj.backupFrequencies = (double[])(obj.backupFrequencies.clone());
-    	obj.backupAmplitudes = (double[])(obj.backupAmplitudes.clone());
+    	if (obj.backupFrequencies != null)
+    		obj.backupFrequencies = (double[])(obj.backupFrequencies.clone());
+    	if (obj.backupAmplitudes != null)
+    		obj.backupAmplitudes = (double[])(obj.backupAmplitudes.clone());
     	return obj;
     	}
 
