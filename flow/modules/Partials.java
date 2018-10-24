@@ -28,7 +28,7 @@ public class Partials extends Unit implements UnitSource
         String[] str = new String[NUM_PARTIALS * 2];
         for(int i = 0; i < NUM_PARTIALS; i++)
             {
-            con[i] = new Constant((i + 1) / 127.0);
+            con[i] = new Constant((i + 1) / (NUM_PARTIALS - 1));
             con[i + NUM_PARTIALS] = Constant.ZERO;
             str[i] = "Freq " + (i + 1);
             str[i + NUM_PARTIALS] = "Amp";
@@ -45,7 +45,7 @@ public class Partials extends Unit implements UnitSource
               
         for(int i = 0; i < NUM_PARTIALS; i++)
             {
-            frequencies[i] = modulate(i) * 127;
+            frequencies[i] = modulate(i) * (NUM_PARTIALS - 1);
             amplitudes[i] = modulate(i + NUM_PARTIALS);
             }
         }
@@ -53,7 +53,7 @@ public class Partials extends Unit implements UnitSource
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
         {
         if (modulation < NUM_PARTIALS && isConstant)
-            return String.format("%.2f", value * 127);
+            return String.format("%.2f", value * (NUM_PARTIALS - 1));
         else return super.getModulationValueDescription(modulation, value, isConstant);
         }
 
@@ -63,7 +63,7 @@ public class Partials extends Unit implements UnitSource
             {
             public JComponent buildPanel()
                 {               
-                JLabel example = new JLabel("127.00");
+                JLabel example = new JLabel("" + (NUM_PARTIALS - 1) + ".00");
                 Box box = new Box(BoxLayout.Y_AXIS);
                 Unit unit = (Unit) getModulation();
                 box.add(new UnitOutput(unit, 0, this));

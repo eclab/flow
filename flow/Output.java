@@ -463,7 +463,7 @@ public class Output
             }
         else
             {
-            Thread.currentThread().yield();
+            //Thread.currentThread().yield();
             totalOutputWaits++;
             }
         }
@@ -513,7 +513,6 @@ public class Output
             byte[] orders = with.orders[s];
             double[] pos = positions[s];
             double[] ca = currentAmplitudes[s];
-            
             double v = with.velocities[s] * with.gain;
             double pitch = with.pitches[s];
             double tr = pitch * Math.PI * 2 * Output.INV_SAMPLING_RATE;
@@ -522,6 +521,7 @@ public class Output
                 {
                 double amplitude = amp[i];
                 int oi = orders[i];
+                if (oi < 0) oi += 256;		// if we're using 256 partials, which we're not doing yet...
                 
                 // This was a difficult bug to nail down.  Because we're using our (1-alpha) trick, if we
                 // slowly drop to zero, we'll find our way into subnormals, it appears that subnormals are handled

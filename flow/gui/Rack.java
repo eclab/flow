@@ -762,7 +762,7 @@ public class Rack extends JPanel
             }
         
         boolean result = showMultiOption(this, 
-            new String[] { "MIDI Device", "MIDI Channel", "Num MPE Channels", "Audio Device" }, 
+            new String[] { "MIDI Device", "MIDI Channel", "MPE Channels", "Audio Device" }, 
             new JComponent[] { devicesCombo, channelsCombo, mpeChannelsCombo, mixersCombo }, 
             "MIDI and Audio Options", 
             "Select the MIDI device and channel, and the Audio device.");
@@ -1121,28 +1121,29 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 					{
 					// reorganize sounds
 					rack.getOutput().lock();
-					if (!(rack.getOutput().getSound(0).getRegistered(removed) instanceof Out))  // can't copy Out
+					try
 						{
-						try
+						if (!(rack.getOutput().getSound(0).getRegistered(removed) instanceof Out))  // can't copy Out
 							{
-							int len = rack.getOutput().getNumSounds();
-							Modulation mod0 = null;
-							for(int i = 0; i < len; i++)
-								{
-								Modulation mod = rack.getOutput().getSound(i).getRegistered(removed);
-								Modulation newmod = (Modulation)(mod.clone());
-								if (mod0 == null) mod0 = newmod;
-								rack.getOutput().getSound(i).addRegistered(added, newmod);
-								}
-						ModulePanel mp = mod0.getPanel();
-						mp.setRack(rack);
-						rack.allModulePanels.add(added, mp);
-							}
-						finally 
-							{
-							rack.getOutput().unlock();
+								int len = rack.getOutput().getNumSounds();
+								Modulation mod0 = null;
+								for(int i = 0; i < len; i++)
+									{
+									Modulation mod = rack.getOutput().getSound(i).getRegistered(removed);
+									Modulation newmod = (Modulation)(mod.clone());
+									if (mod0 == null) mod0 = newmod;
+									rack.getOutput().getSound(i).addRegistered(added, newmod);
+									}
+							ModulePanel mp = mod0.getPanel();
+							mp.setRack(rack);
+							rack.allModulePanels.add(added, mp);
 							}
 						}
+					finally 
+						{
+						rack.getOutput().unlock();
+						}
+							
 					}
                 }	
                         

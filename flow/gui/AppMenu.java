@@ -829,6 +829,7 @@ public class AppMenu
     flow.modules.SampleAndHold.class,
     flow.modules.Sawtooth.class,
     flow.modules.Scale.class,
+    flow.modules.Seq.class,
     flow.modules.Shift.class,
     flow.modules.Sine.class,
     flow.modules.Skeletonize.class,

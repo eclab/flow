@@ -24,7 +24,7 @@ import org.json.*;
     (presently ".partials"), and consist simply of text files of lines 
     consisting of the PARTIAL INDEX, FREQUENCY, and AMPLITUDE of each partial.
     The partial index is only for text-editing convenience and is ignored on reading in;
-    the partials are assumed to be complete and in order (indexes 0...127).
+    the partials are assumed to be complete and in order (indexes 0... NUM_PARTIALS-1).
         
     <p>The user can also constrain which partials he wishes to edit using constraints
     similar to the standard unit constraints.
