@@ -136,13 +136,14 @@ Modules
 * PartialMod
   - Seems not to be working.
 * PartialFilter
-* Shift
 * Rand
   - Is this a useful module?  Should we delete or merge it?
 * Rectified
 * Sample and Hold
 * Sawtooth
 * Scale
+* Seq
+* Shift
 * Sine
   -  This could be made more useful perhaps
 * Skeletonize
