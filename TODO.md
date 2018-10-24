@@ -17,13 +17,8 @@ System
 * The software has not been tested on Windows at all, and only in limited form on 
   Linux.
 
-* Modulation should revert to the previous constant value, rather than the default, after you've pulled the plug on a wire.
-
 * Must figure out why the voice thread slows DOWN when only outputting a
   single voice (see comment around line 400 of Output.java)
-
-* I don't know why the various voices get slightly out of sync with one
-  another.  They should be in perfect sync.  
 
 * simpleSort is (right now) a Cocktail Sort -- a variation of Bubble Sort.  The
   idea is to have a good sort for arrays that have very little out of place, and
@@ -33,14 +28,6 @@ System
 * MIDI clock is flakey and inaccurate.  Also, we ignore clock pulses while stopped,
   when in fact we should be using them to estimate our upcoming tempo.
 
-* We need a main() that fires up officially.  This is basically waiting until we
-  can come up with a name.
-  
-* Ultimately we're going to need a better patch file format.  At the moment we use
-  Java serialization.  The problem with this is that when we add new features to
-  modules which change their number or type of instance variables, it'll break every
-  patch which uses that module.  Some kind of version handling would be helpful. 
-  
 * Is there a strong reason to add back in Phase?
 
 * At present we're using java.util.Random, which is (1) multithreaded and thus

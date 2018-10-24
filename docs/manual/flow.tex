@@ -131,7 +131,7 @@ At present {\name} has the following specifications.  They may change:
 
 \begin{center}
 \begin{tabular}{rl}
-Number of Partials&128 (without phase)\\
+Number of Partials&64, 128, or 256 (User-selectable.  Partials are at present without phase)\\
 Polyphony&8 Voices (Adjustable from 1--16)\\
 Partials Update Rate&Every 32 Samples\\
 Audio Sampling Rate&44,100 Hz\\
@@ -276,6 +276,7 @@ This procedure will create a bunch of of virtual devices with names like {\tt Vi
 \end{itemize}
 
 \subsubsection{Routing Audio to a Digital Audio Workstation}
+\label{audioloopback}
 
 \begin{wrapfigure}{r}{3in}
 \begin{center}\vspace{-2em}\includegraphics[width=3in]{loopbackaudio}\end{center}
@@ -325,6 +326,16 @@ There's only one Rack: you can't create or load multiple patches at a time.  If 
 One of the particularly interesting features of {\name} is its ability to load a saved patch as a {\bf Macro}.  A Macro encapsulates the patch and allows you to use it as a module in a larger patch.  Macro modules appear with green title bars and are named the name of the patch.
 
 A patch is most useful as a Macro if it's been wired up to send and receive modulation and partials through its module.  To do this, you'll need to prepare the patch first.  See Section~\ref{creatingmacros} for an extensive discussion of the process.
+
+\subsubsection{Tuning Parameters}
+{\name} is very computationally expensive and benefits from some tuning.  If you select {\bf Tuning Parameters} from the {\bf Play} menu, you can at present change three parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session. 
+
+\begin{itemize}
+\item {\bf Polyphony} (1--16, default: 8)\qquad This is the number of voices the synthesizer can play at once.  More voices incurs a higher load.
+\item {\bf Audio Buffer Size} (default: 2048)\qquad This is the size of the audio buffer that {\name} keeps filled for your operating system to tap into to generate sounds.  Some operating systems require a large buffer size: for example, OS X technically can run with a buffer of only 1024, but on my laptop realistically {\name} name requires a buffer larger than that (1536 or 2048 seem to work).  Large buffers incur significantly higher latency, which you don't want. On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{audioloopback} for more information.  I can't help you much regarding Windows.
+\item {\bf Partials} (64--256, default: 128)\qquad This is the number of partials passed around from module to module.  More partials will produce a richer sound, particularly in bass notes, but incur a much higher performance penalty.
+}
+\end{itemize}
 
 \bump
 \section{The Modules}
@@ -718,7 +729,7 @@ The final class in the core package is {\bf Utility}, which simply provides vari
 \label{threads}
 \end{wrapfigure}
 
-\paragraph{Threads} These classes spawn and are manipulated by several threads, as shown in Figure~\ref{threads}.  First and foremost is the {\bf voice sync thread}.  This thread can either be spawned to run on its own, or it can simply be the application's \texttt{main(...)} thread, calling \texttt{output.go()} in an infinite loop.  The voice sync thread is responsible for getting the latest MIDI data from the {\bf MIDI input receiver thread}, then syncing all of the {\bf individual voice threads} and having them produce a new set of partials, one per Sound.  Finally, it hands these partials to the {\bf sound output thread} which converts them into a sound wave and emits it.  If there is only one voice, the voice sync thread has the option of handling that voice itself rather than spawning with and negotiating with an individual voice thread.
+\paragraph{Threads} These classes spawn and are manipulated by several threads, as shown in Figure~\ref{threads}.  First and foremost is the {\bf voice sync thread}.  This thread can either be spawned to run on its own, or it can simply be the application's \texttt{main(...)} thread, calling \texttt{output.go()} in an infinite loop.  The voice sync thread is responsible for getting the latest MIDI data from the {\bf MIDI input receiver thread}, then syncing all of the {\bf individual voice threads} and having them produce a new set of partials, one per Sound.  If there is only one voice, the voice sync thread has the option of handling that voice itself rather than spawning with and negotiating with an individual voice thread.  Finally, it hands these partials to the {\bf sound output thread} which converts them into a sound wave and emits it.  The sound output thread does this by splitting the task per-voice into separate output threads to add up the respective partials.
 
 The sound output thread and MIDI input receiver threads run constantly in the background; but the voice sync thread and the individual voice threads can all be paused by locking on Output's {\bf sound lock}.  The recommended pattern is:\footnote{This isn't a synchronized statement because the lock is a ``fair'' (non-barging) recurrent lock internally.  The locks used in synchronized statements are (unfortunately) unfair, and we can't use that.}
 
@@ -739,12 +750,12 @@ And indeed this is how the Swing event thread (if you have a GUI) interacts with
 
 \paragraph{When the threads are spawned}  The MIDI input receiver thread and the output sound thread are both spawned when you call {\tt new Output()}.  The voice sync thread is not necessarily spawned: if you call {\tt output.go()} in a tight loop, then you are the voice sync thread.  However you can spawn a voice sync thread to do this for you by calling {\tt output.startPrimaryVoiceThread()}.  The individual voice threads are spawned (if at all) as soon as the voice sync thread calls {\tt output.go()} for the first time.  This means that you must have constructed all the Sound objects and registered them with the Output prior to this happening.
 
-\paragraph{Performance tuning parameters} You should be aware of several tunable parameters in Output.java which impact on the performance of these threads and ultimately the performance of the application.  Some of these are constants, others are variables which Output.java loads from Java preferences in its constructor (and it'd be best if you changed them there).
+\paragraph{Performance tuning parameters} You should be aware of several tunable parameters in Output.java which impact on the performance of these threads and ultimately the performance of the application.  Some of these are constants, others are variables which Output.java loads from Java preferences in its constructor, and are available to change in the GUI.
 
 \begin{itemize}
 \item {\tt SAMPLING\_RATE}\qquad This value, normally 44100, could of course be reduced (perhaps halved) to improve performance, but at a dramatic cost in sound quality.  I would not do that.
 
-\item {\tt bufferSize}\qquad The size of the sound buffer being fed by the sound output thread.  Java's audio system grabs data from this buffer in fairly random gulps: on the Mac they're 128 bytes at a time and can happen in spurts.  The sound output thread feeds the buffer two bytes (one 16-bit sample) at a time.  If the audio system cannot grab bytes from the buffer without reducing it to zero, then you will hear a {\bf glitch} (an audible pop or zap).  We don't want those.  We fix this by keeping the buffer pretty big.  The disadvantage of a large buffer is that if we have filled it, we're creating latency, and we don't want that either.  At an absolute minimum the buffer must be at least 1024 (the apparent minimum on the Mac to even work properly); but in reality we need it larger than that to prevent glitches.  2048 seems adequate but potentially can make a large latency (about 46 milliseconds worst-case).
+\item {\tt bufferSize}\qquad The size of the sound buffer being fed by the sound output thread.  Java's audio system grabs data from this buffer in fairly random gulps: on the Mac they're 128 bytes at a time and can happen in spurts.  The sound output thread feeds the buffer two bytes (one 16-bit sample) at a time.  If the audio system cannot grab bytes from the buffer without reducing it to zero, then you will hear a {\bf glitch} (an audible pop or zap).  We don't want those.  We fix this by keeping the buffer pretty big.  The disadvantage of a large buffer is that if we have filled it, we're creating latency, and we don't want that either.  At an absolute minimum the buffer must be at least 1024 (the apparent minimum on the Mac to even work properly); but in reality we need it larger than that to prevent glitches.  1536 seems adequate but potentially can make a large latency (about 29 milliseconds worst-case).
 
 \item {\tt DEFAULT\_SKIP}\qquad We don't necessarily produce a new set of partials for every single sample; if your computer isn't fast enough, this isn't reasonable.  Instead we generate \(N\) samples for each partials set.  This is the value of {\tt DEFAULT\_SKIP}.  The default value is 32.  Upon receiving a new sample set, the sound output thread linearly interpolates between the previous sample set and the next one over 32 samples.  This also induces a different kind of lag: if you generate a sound, you'll have to wait up to 32 samples before it begins to be produced, and up to 64 samples before it is fully present.  Ideally {\tt skip} would be 1, which would produce the best quality sound, as well as produce true FM synthesis effects.  But there you have it.
 
@@ -754,12 +765,14 @@ And indeed this is how the Swing event thread (if you have a GUI) interacts with
 
 \item {\tt voicesPerThread}\qquad If you have a high thread context switching overhead, you can assign more than one voice to a single thread.  For example, if {\tt voicesPerThread} was equal to 2, then you'd have 4 threads handling your 8 voices.  If you don't have 8 cores, you might wish to do this.  However keep in mind that the total number of modules your voice can have is bounded by a single core: if you have two voices on a thread, they will share that core and your total number will be halved.  By default this value is 1.
 
+\item {\tt NUM_OUTPUTS_PER_THRES}\qquad Affects the number of output threads generated to convert the partial results into the sound.  Fewer threads, and you've got more work being done by a single processor (which may not be able to take the load); but more threads means more total work given the thread context switching.  By default this is 2, which seems to work well on my laptop.
+
 \end{itemize}
 
 Finally, there's one constant in Unit.java of interest:
 
 \begin{itemize}
-\item {\tt NUM\_PARTIALS}\qquad is the number of partials being handed from module to module.  This is by default 128.  You can change this value (for example, reduce it), though it might impact on how patches work as some modules make assumptions about the number of partials. 
+\item {\tt NUM\_PARTIALS}\qquad is the number of partials being handed from module to module.  This is by default 128, but can be changed to 64 or 128 in the Preferences. 
 \end{itemize}
 
 \begin{figure}[t]
@@ -1180,7 +1193,7 @@ Third: you might also change your module, which causes problems when trying to b
 
 \begin{itemize}
 \item {\tt \{  "flow":{\it file-format-version},\quad "name":{\it patch-name},\quad "modules":{\it modules} \} }
-\item {\it file-format-version:}\quad an integer \(\geq 0\) representing the version of this file format.  Presently 0. 
+\item {\it file-format-version:}\quad an integer \(\geq 0\) indicating the version of Flow which created this file.  Presently 0. 
 \item {\it patch-name:}\quad a string. 
 \item {\it modules:}\quad {\tt [ {\it module,*} ] }
 \item {\it module:}\quad {\tt \{ "v":{\it module-version}\quad "class":{\it module-classname}\quad "id":{\it module-id}\quad "opt":{\it options}\\\hspace{\fill}\quad "unit":{\it unit-inputs}\quad "mod":{\it modulation-inputs} \quad{\it optional-data} \}}
