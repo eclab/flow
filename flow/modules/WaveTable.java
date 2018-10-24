@@ -204,6 +204,7 @@ public class WaveTable extends Unit implements UnitSource
                         rack.getOutput().lock();
                         try
                             {
+                            waveTable = new double[done.length][NUM_PARTIALS];
                             // load the wavetable independent of the number of partials
                             for(int i = 0; i < waveTable.length; i++)
                             	{
@@ -264,7 +265,8 @@ public class WaveTable extends Unit implements UnitSource
 			{
 			for(int j = 0; j < y; j++)
 				{
-				waveTable[i][j] = wt.optDouble(c++, 0);
+				double d = wt.optDouble(c++, 0);
+				if (j < NUM_PARTIALS) waveTable[i][j] = d;  // if we have fewer partials than is listed, we skip this one.
 				}
 			}
 		} 

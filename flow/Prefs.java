@@ -242,6 +242,19 @@ public class Prefs
         return Input.DEFAULT_NUM_MPE_CHANNELS;                       
         }
 
+    public static void setLastNumPartials(int num) { setLastX("" + num, "NumPartials"); }
+    public static int getLastNumPartials() 
+        { 
+        String s = getLastX("NumPartials"); 
+        try
+            {
+            if (s != null)
+                return Integer.parseInt(s);
+            }
+        catch (NumberFormatException e) { }
+        return Unit.DEFAULT_NUM_PARTIALS;                       
+        }
+
     public static void setLastOneVoice(boolean val) { setLastX("" + val, "OneVoice"); }
     public static boolean getLastOneVoice() 
         { 

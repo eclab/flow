@@ -51,7 +51,8 @@ public class Unit extends Modulation
     private static final long serialVersionUID = 1;
 
     /** Number of partials processed by Units -- the size of their amplitudes and frequencies arrays. */
-    public static final int NUM_PARTIALS = 256;
+    public static final int DEFAULT_NUM_PARTIALS = 256;
+    public static int NUM_PARTIALS = Prefs.getLastNumPartials();
     
     /** A common default Unit.  Has standardized frequencies and amplitudes that are all zero. 
         Do NOT use (foo == Unit.NIL) as a test to see if a Nil is attached to a given port, because

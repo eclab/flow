@@ -110,7 +110,7 @@ public class Morph extends Unit
     public void setFree(boolean val) { free = val; }
     public boolean getFree() { return free; }
         
-    public static final int NUM_MORPH_PAIRS = 128;  // regardless of the number of partials
+    public static final int NUM_MORPH_PAIRS = 1024;  // regardless of the number of partials
         
     public static final int OPTION_MORPH_TYPE = 0;
     public static final int OPTION_INCLUDE_FUNDAMENTAL = 1;
@@ -417,6 +417,7 @@ public class Morph extends Unit
     public static final int MORPH_PAIRS_8 = 4;
     public static final int MORPH_PAIRS_INCREASING = 5;
         
+    /*
     // These are not compelling but they are consistent compared to Random
     public static final int MORPH_RANDOM_2 = 6;
     public static final int MORPH_RANDOM_3 = 7;
@@ -428,12 +429,13 @@ public class Morph extends Unit
     public static final int MORPH_RANDOM_32 = 13;
     public static final int MORPH_RANDOM_64 = 14;
     public static final int MORPH_RANDOM_128 = 15;
+    */
         
                 
     public static final String[] MORPH_NAMES = new String[]
-    { "Normal", "Random", "2-Pair", "4-Pair", "8-Pair", "Increasing", "Rand 2", "Rand 3", "Rand 4", "Rand 5", "Rand 6", "Rand 8", "Rand 16", "Rand 32", "Rand 64", "Rand 128" };
+    { "Normal", "Random", "2-Pair", "4-Pair", "8-Pair", "Increasing" }; //  "Rand 2", "Rand 3", "Rand 4", "Rand 5", "Rand 6", "Rand 8", "Rand 16", "Rand 32", "Rand 64", "Rand 128" };
 
-    public static final int[][] morphs = new int[MORPH_RANDOM_128 + 1][NUM_PARTIALS + 1];  // yes, *129*, in case we want to include the fundamental
+    public static final int[][] morphs = new int[MORPH_PAIRS_INCREASING + 1][NUM_PARTIALS + 1];  // yes, *129*, in case we want to include the fundamental
         
     static boolean done = false;
     public void doStatic()
@@ -444,7 +446,7 @@ public class Morph extends Unit
         int len = morphs[0].length - 1;
                 
         // standard and INITIALIZATION
-        for(int j = 0; j < MORPH_RANDOM_128 + 1; j++)
+        for(int j = 0; j < MORPH_PAIRS_INCREASING + 1; j++)
             {
             for(int i = 0; i < morphs[j].length; i++)
                 {
@@ -499,6 +501,8 @@ public class Morph extends Unit
             int j;
             for(j = current; j < current + i; j++)
                 {
+                if (j + i / 2 >= morphs[MORPH_PAIRS_INCREASING].length)
+                	break;
                 if (j < current + i / 2)
                     {
                     morphs[MORPH_PAIRS_INCREASING][j] = j + i / 2;
@@ -509,6 +513,7 @@ public class Morph extends Unit
             }
         morphs[MORPH_PAIRS_INCREASING][len - 1] = len - 1;
 
+/*
         // The random ones are fixed
                 
 // 2 [except for 61, 70, 73, and 92]
@@ -540,6 +545,7 @@ public class Morph extends Unit
 
 // 128
         morphs[MORPH_RANDOM_128] = new int[] { 0, 67, 119, 97, 120, 107, 46, 20, 41, 63, 106, 77, 113, 40, 76, 102, 103, 81, 115, 44, 7, 61, 80, 42, 104, 108, 86, 28, 27, 92, 87, 60, 116, 95, 88, 112, 37, 36, 75, 93, 13, 8, 23, 122, 19, 94, 6, 114, 70, 85, 125, 111, 117, 82, 126, 79, 109, 110, 121, 100, 31, 21, 98, 9, 96, 74, 90, 1, 71, 89, 48, 68, 73, 72, 65, 38, 14, 11, 99, 55, 22, 17, 53, 118, 101, 49, 26, 30, 34, 69, 66, 124, 29, 39, 45, 33, 64, 3, 62, 78, 59, 84, 15, 16, 24, 123, 10, 5, 25, 56, 57, 51, 35, 12, 47, 18, 32, 52, 83, 2, 4, 58, 43, 105, 91, 50, 54, 127, 128 };
+*/
         }
 
     public ModulePanel getPanel()

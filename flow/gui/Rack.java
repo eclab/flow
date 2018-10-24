@@ -674,6 +674,12 @@ public class Rack extends JPanel
 
     public void chooseTuningParameters()
         {
+        int[] partials = new int[] { 64, 128, 256 };
+        String[] s_partials = new String[] { "64", "128", "256" };
+        JComboBox partialsCombo = new JComboBox(s_partials);
+        int partial = Prefs.getLastNumPartials();
+        partialsCombo.setSelectedIndex(partial == 64 ? 0 : (partial == 128 ? 1 : 2));
+
         int[] voices = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
         String[] s_voices = new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
         JComboBox voicesCombo = new JComboBox(s_voices);
@@ -693,8 +699,8 @@ public class Rack extends JPanel
         bufferSizeCombo.setSelectedIndex(index);
         
         int result = showMultiOption(this, 
-            new String[] { "Polyphony", "Audio Buffer Size" }, 
-            new JComponent[] { voicesCombo, bufferSizeCombo }, 
+            new String[] { "Polyphony", "Audio Buffer Size", "Partials" }, 
+            new JComponent[] { voicesCombo, bufferSizeCombo, partialsCombo }, 
             "Tuning Parameters", 
             "<html>Parameters don't take effect until<br>the synthesizer is restarted.",
             new String[] { "Okay", "Cancel", "Reset" });
@@ -703,11 +709,13 @@ public class Rack extends JPanel
             {
             Prefs.setLastNumVoices(voices[voicesCombo.getSelectedIndex()]);
             Prefs.setLastBufferSize(bufferSize[bufferSizeCombo.getSelectedIndex()]);
+            Prefs.setLastNumPartials(partials[partialsCombo.getSelectedIndex()]);
             }
         else if (result == 2) // RESET
             {
             Prefs.setLastNumVoices(Output.DEFAULT_NUM_VOICES);
             Prefs.setLastBufferSize(Output.DEFAULT_BUFFER_SIZE);
+            Prefs.setLastNumPartials(Unit.DEFAULT_NUM_PARTIALS);
             }
         }
 

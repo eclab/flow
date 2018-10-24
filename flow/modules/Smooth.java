@@ -108,6 +108,7 @@ public class Smooth extends Unit
             for(int i = 0; i < frequencies.length; i++)
                 {
                 int order = inputs0orders[i];
+                if (order < 0) order += 256;
                 smoothedFrequencies[order] = inputs0frequencies[i];
                 smoothedAmplitudes[order] = inputs0amplitudes[i];
                 smoothedOrders[order] = (byte)i;
@@ -124,6 +125,7 @@ public class Smooth extends Unit
                 // I don't have evidence that it will happen here, but it sure did in Output.java
                 // under very similar circumstances.  See "difficult bug" in Output.java.
                 int order = inputs0orders[i];
+                if (order < 0) order += 256;
                 
                 double sFreq = smoothedFrequencies[order];
                 double iFreq = inputs0frequencies[order];
