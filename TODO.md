@@ -134,8 +134,10 @@ Modules
   - Should we move Gain to above the modulations?
   - Should we add compression/limiting?
 * PartialMod
-  - Seems not to be working.
+  - Seems not to be working right.
 * PartialFilter
+* PartialsLab
+  - We could extend this to make it more useful.
 * Rand
   - Is this a useful module?  Should we delete or merge it?
 * Rectified
@@ -156,12 +158,8 @@ Modules
 * VCA
 * Viewer
   - This needs to be cleaned up a bit
-* Wave
-  - I asked nicely to Waldorf to use their waves (which I have) and they said no.
-    So we need a new source of wavetable waves.
 * Wavetable
-  - I asked nicely to Waldorf to use their wavetables (which I have) and they said no.
-    So we need a new source of wavetables.
+
 
 Uncompleted Modules
 -------------------
@@ -173,7 +171,4 @@ Uncompleted Modules
   - This module does not exist. The idea should be to have a module which does more
     advanced combinations of constraints than you'd have in the standard constraint
     facility.  Should we make one?
-
-* PartialsLab
-  - I'm working on an additional function-based partials source.  Also not done.
 
