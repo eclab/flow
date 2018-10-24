@@ -480,101 +480,7 @@ public class Output
     
     // Builds a single sample from the partials.  ALPHA is the current interpolation
     // factor (from 0...1) 
-    double buildSample(double[][] currentAmplitudes)
-        {
-        double[] pa = null;
-
-        // build the sample
-        double sample = 0;
-        
-        int start = 0;
-        int end = numSounds;
-        
-        if (onlyPlayFirstSound)
-            {
-            Sound sound = input.getLastPlayedSound();
-            if (sound != null)
-                {
-                start = sound.getIndex();
-                end = start + 1;
-                }
-            else    // just do Sound #0
-                {
-                start = 0;
-                end = 1;
-                }
-            }
-        
-        for (int s = 0; s < numSounds; s++)  // see important comment below
-            {            
-            double[] amp = with.amplitudes[s];
-            double[] freq = with.frequencies[s];
-            byte[] orders = with.orders[s];
-            double[] pos = positions[s];
-            double[] ca = currentAmplitudes[s];
-            double v = with.velocities[s];
-            double pitch = with.pitches[s];
-            double tr = pitch * Math.PI * 2 * Output.INV_SAMPLING_RATE;
-            
-            for (int i = 0; i < pos.length; i++)
-                {
-                double amplitude = amp[i];
-                int oi = orders[i];
-                if (oi < 0) oi += 256;		// if we're using 256 partials, which we're not doing yet...
-                
-                // This was a difficult bug to nail down.  Because we're using our (1-alpha) trick, if we
-                // slowly drop to zero, we'll find our way into subnormals, it appears that subnormals are handled
-                // by Java in *software*, resulting in a radical slowdown in this region.  Subnormals show up around
-                // e^-308, so here if both ca[i] or what we're dropping to is even close to subnormals,
-                // we just shut ca[0] straight to 0 to skip the whole subnormal range.
-                if (ca[oi] > WELL_ABOVE_SUBNORMALS || amplitude * PARTIALS_INTERPOLATION_ALPHA > WELL_ABOVE_SUBNORMALS)
-                    ca[oi] = ca[oi] * (1.0 - PARTIALS_INTERPOLATION_ALPHA) + amplitude * PARTIALS_INTERPOLATION_ALPHA;
-                else
-                    ca[oi] = 0;
-                amplitude = ca[oi];
-                /// End Difficult Bug
-                                
-                if (amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
-                    {
-                    double frequency = freq[i];
-                    double absoluteFrequency = frequency * pitch;
-                                        
-                    if (absoluteFrequency > SAMPLING_RATE / 2.0)  // beyond Nyquist.  We may assume that ALL later frequencies are also beyond Nyquist since we're sorted.
-                        {
-                        break;          // continue;
-                        }
-                    if (absoluteFrequency <= 0.0)  // don't bother
-                        continue;    
-                    
-                    pos[oi] += frequency * tr;
-                    if (pos[oi] >= Math.PI * 2)
-                        {
-                        pos[oi] = pos[oi] - (Math.PI * 2);
-                            
-                        if (pos[oi] >= Math.PI * 2)
-                            {
-                            pos[oi] = pos[oi] % (Math.PI * 2);
-                            }
-                        }
-
-                    // For some crazy reason, if I do buildSample too fast, and thus the
-                    // output sound thread loops too fast, it significantly slows down
-                    // the voice thread.  I don't know why -- I thought it might have something
-                    // to do with the output sound thead checking emitsReady too fast, but now
-                    // I really don't know.  :-(  As a result, when the user chooses "play voice 1 only",
-                    // the voice thread loop really slows down.  So my approach right now is the
-                    // single stupidest approach -- just do the full multi-voice computation here
-                    // but only load the voice 1 samples into the sound output.
-
-                    double smp = Utility.fastSin(pos[oi]) * amplitude * v;
-                    if (s >= start && s < end) sample += smp;
-                    }
-                }
-            }
-        return sample;
-        }
-
-    double buildSample2(int s, double[][] currentAmplitudes)
+    double buildSample(int s, double[][] currentAmplitudes)
         {
         double[] pa = null;
 
@@ -597,7 +503,7 @@ public class Output
                 {
                 double amplitude = amp[i];
                 int oi = orders[i];
-                if (oi < 0) oi += 256;		// if we're using 256 partials, which we're not doing yet...
+                if (oi < 0) oi += 256;		// if we're using 256 partials, they need to be all positive
                 
                 // This was a difficult bug to nail down.  Because we're using our (1-alpha) trick, if we
                 // slowly drop to zero, we'll find our way into subnormals, it appears that subnormals are handled
@@ -620,8 +526,10 @@ public class Output
                         {
                         break;          // continue;
                         }
-                    if (absoluteFrequency <= 0.0)  // don't bother
-                        continue;    
+                    if (absoluteFrequency <= 0.0)  // don't bother, though this shouldn't happen (well, it might be 0.0)
+                        {
+                        continue;
+                        }
                     
                     pos[oi] += frequency * tr;
                     if (pos[oi] >= Math.PI * 2)
@@ -663,17 +571,23 @@ public class Output
     public boolean getAndResetGlitched() { boolean val = glitched; glitched = false; return val; }
 
 
-    // Locks for negotiating between the primary voice thread and the per-voice threads
-    // These are managed via blockVoiceUntil() and signalVoice()
+
+
+
+
+
+
+    // Locks for negotiating between the primary output thread and the per-output threads
+    // These are managed via blockOutputUntil() and signalOutput()
     Object[] outputLocks;
     boolean[] lightweightOutputSemaphores;
         
 
-    //// When the semaphore is FALSE, the per-voice thread is in charge of its Sound.
-    //// When the semaphore is TRUE, the primary voice thread is in charge.
+    //// When the semaphore is FALSE, the per-output thread is in charge of its Sound.
+    //// When the semaphore is TRUE, the primary output thread is in charge.
     ////
-    //// The primary voice thread signals TRUE, then blocks until FALSE.
-    //// The reverse is true for the per-voice threads.
+    //// The primary output thread signals TRUE, then blocks until FALSE.
+    //// The reverse is true for the per-output threads.
     
     void blockOutputUntil(int output, boolean val)
         {
@@ -697,7 +611,7 @@ public class Output
 
 
 
-
+public static final int NUM_OUTPUTS_PER_THREAD = 2;
 
     // long lastTimeFoo = 0;
     // int timeCountFoo = 0;
@@ -723,7 +637,7 @@ double samples[][] = new double[0][SKIP];
 					lightweightOutputSemaphores[i] = true;
 					}
 
-			for(int i = 0; i < MAX_VOICES; i++)
+			for(int i = 0; i < MAX_VOICES; i += NUM_OUTPUTS_PER_THREAD)
 				{
 				final int _i = i;
             Thread thread = new Thread(new Runnable()
@@ -733,18 +647,34 @@ double samples[][] = new double[0][SKIP];
                     while(true) 
                         {
                         blockOutputUntil(_i, true); 
-                        if (_i < samples.length)
+                        
+                        // should I play?
+                        boolean play = true;			// yes by default
+                        if (onlyPlayFirstSound)
+                        	{
+							Sound sound = input.getLastPlayedSound();
+							if (sound == null)
+								play = (_i == 0);	// if only one sound, and there's no sound yet, it's sound 0
+							else
+								play = (sound.getIndex() == _i);	// if only one sound, and there's a sound, is it me?
+							}
+							
+                        if (play && _i < samples.length)		// voice hasn't been loaded yet, hang tight
                         	{
 							double[] samplessnd = samples[_i];
-							for (int skipPos = 0; skipPos < SKIP; skipPos++)
+							for(int j = _i; j < Math.min(MAX_VOICES, _i + NUM_OUTPUTS_PER_THREAD); j++)
 								{
-								samplessnd[skipPos] = buildSample2(_i, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+								for (int skipPos = 0; skipPos < SKIP; skipPos++)
+									{
+									samplessnd[skipPos] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+									}
 								}
 							}
 						else
 							{
 							Thread.currentThread().yield();  // I may not exist
 							}
+							
                         signalOutput(_i, false);
                         }
                     }
@@ -768,14 +698,16 @@ double samples[][] = new double[0][SKIP];
                     	samples = new double[getNumSounds()][SKIP];
 
                     checkAndSwap();
-                        for(int snd = 0; snd < numSounds; snd++)
-                        	{
-                        	signalOutput(snd, true);
-	                        }
-                        for(int snd = 0; snd < numSounds; snd++)
-                        	{
-                        	blockOutputUntil(snd, false);
-	                        }
+                    
+                    // Fire up output threads
+					for(int snd = 0; snd < numSounds; snd += NUM_OUTPUTS_PER_THREAD)
+						{
+						signalOutput(snd, true);
+						}
+					for(int snd = 0; snd < numSounds; snd += NUM_OUTPUTS_PER_THREAD)
+						{
+						blockOutputUntil(snd, false);
+						}
 	                        
                 	for (int skipPos = 0; skipPos < SKIP; skipPos++)
                 		{
@@ -810,38 +742,6 @@ double samples[][] = new double[0][SKIP];
                         //  timeCountFoo = 0;
                         //  }
                         }
-
-                    /* 
-                    for (int skipPos = 0; skipPos < SKIP; skipPos++)
-                        {
-                        // emit the sample
-                        double d = buildSample(currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
-                        if (d > 32767)
-                            {
-                            d = 32767;
-                            clipped = true;
-                            }
-                        if (d < -32768)
-                            {
-                            d = -32768;
-                            clipped = true;
-                            }
-                            
-                        int val = (int)(d);
-                        audioBuffer[skipPos * 2 + 1] = (byte)((val >> 8) & 255);
-                        audioBuffer[skipPos * 2] = (byte)(val & 255);
-                        tick++;                                 /// See documentation elsewhere about threadsafe nature of tick
-                        
-                        //  timeCountFoo++;
-                        //  if (timeCountFoo > 44100)
-                        //  {
-                        //  long vv = System.currentTimeMillis();
-                        //  //System.err.println("-> " + (vv - lastTimeFoo));
-                        //  lastTimeFoo = vv;
-                        //  timeCountFoo = 0;
-                        //  }
-                        }
-                        */
                     
                     sdl.write(audioBuffer, 0, SKIP * 2);
                     }
@@ -850,7 +750,6 @@ double samples[][] = new double[0][SKIP];
         
         thread.setName("Sound Output");
         thread.setDaemon(true);
-        //thread.setPriority(Thread.MAX_PRIORITY);
         thread.start();
         }
         
