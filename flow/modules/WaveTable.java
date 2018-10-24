@@ -59,10 +59,10 @@ public class WaveTable extends Unit implements UnitSource
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Position" });
         setClearOnReset(false);
-        waveTable = new double[2][128];
+        waveTable = new double[2][NUM_PARTIALS];
         waveTable[0][0] = 1;
         waveTable[1][0] = 1;
-        for(int i = 1; i < 128; i++)
+        for(int i = 1; i < NUM_PARTIALS; i++)
             {
             waveTable[0][i] = 0;
             waveTable[1][i] = 0;
@@ -204,7 +204,15 @@ public class WaveTable extends Unit implements UnitSource
                         rack.getOutput().lock();
                         try
                             {
-                            waveTable = done;
+                            // load the wavetable independent of the number of partials
+                            for(int i = 0; i < waveTable.length; i++)
+                            	{
+                            	for(int j = 0; j < waveTable[i].length; j++)
+                            		{
+                            		waveTable[i][j] = 0;
+                            		}
+                            	System.arraycopy(done[i], 0, waveTable[i], 0, Math.min(done[i].length, waveTable[i].length));
+                            	}
                             }
                         finally 
                             {
@@ -248,13 +256,17 @@ public class WaveTable extends Unit implements UnitSource
 		{
 		JSONArray wt = data.getJSONArray("wt");
 		name = data.getString("name");
-		waveTable = new double[data.getInt("x")][data.getInt("y")];
+		int x = data.getInt("x");
+		int y = data.getInt("y");
+		waveTable = new double[x][NUM_PARTIALS];
 		int c = 0;
-		for(int i = 0; i < waveTable.length; i++)
-			for(int j = 0; j < waveTable[i].length; j++)
+		for(int i = 0; i < x; i++)
+			{
+			for(int j = 0; j < y; j++)
 				{
-				waveTable[i][j] = wt.getDouble(c++);
+				waveTable[i][j] = wt.optDouble(c++, 0);
 				}
+			}
 		} 
         
     }

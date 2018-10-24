@@ -180,9 +180,14 @@ public class Macro extends Unit implements Cloneable
                 double[] frequencies = getFrequencies(i);
                 byte[] orders = getOrders(i);
                         
-                System.arraycopy(out.getAmplitudesIn(i), 0, amplitudes, 0, amplitudes.length);
                 System.arraycopy(out.getFrequenciesIn(i), 0, frequencies, 0, frequencies.length);
                 System.arraycopy(out.getOrdersIn(i), 0, orders, 0, orders.length);
+                System.arraycopy(out.getAmplitudesIn(i), 0, amplitudes, 0, amplitudes.length);
+                // we handle the gain here, since we are extracting data directly from out. 
+                double gain = out.getGain();
+                if (gain != 1.0)
+                	for(int q = 0; q < amplitudes.length; q++)
+                		amplitudes[q] *= gain;
                 }
             }
         }

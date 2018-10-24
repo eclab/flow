@@ -209,7 +209,6 @@ public class Sound
 
 
 	///// JSON Serialization
-	public static final int PATCH_VERSION = 0;
 
 	/** Stores all the modules to a JSONArray, stored in the given object. */
 	public void saveModules(JSONObject obj) throws JSONException
@@ -230,7 +229,7 @@ public class Sound
 	/** Stores the patch version to the given object. */
 	public static void savePatchVersion(JSONObject obj) throws JSONException
 		{
-		obj.put("flow", PATCH_VERSION);
+		obj.put("flow", Flow.VERSION);
 		}
 	
 	/** Stores the patch name to the given object. */

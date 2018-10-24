@@ -48,6 +48,7 @@ public class Out extends Unit
 
     double gain;
     public double getGain() { return gain; }
+
     Macro macro = null;
     
     double[][] modWave = new double[2][WAVE_SIZE];
@@ -90,18 +91,31 @@ public class Out extends Unit
         {
         super.go();
         
+        gain = modulate(MOD_GAIN) * MAX_GAIN;
+
         // extract the gain and the output
         if (macro == null)  // going to the output
             {
-            pushAmplitudes(0);
             pushFrequencies(0);
             pushOrders(0);                      // already pushed in super.go()
-            gain = modulate(MOD_GAIN) * MAX_GAIN;
+
+            if (gain == 1.0)
+    			{
+	            pushAmplitudes(0);
+	            }
+			else
+            	{
+            	double g = gain;
+    			copyAmplitudes(0);
+    			double[] amplitudes = getAmplitudes(0);
+    			for(int i = 0; i < amplitudes.length; i++)
+    				amplitudes[i] *= g;
+    			}
             }
         else
             {
             // Macros will extract the amplitudes, frequencies, and all modulation
-            // on their own.
+            // on their own.  And they're also handle the gain.
             }
 
         int tick = sound.getOutput().getTick();

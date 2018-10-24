@@ -511,8 +511,8 @@ public class Draw extends Unit implements UnitSource
 		double[] frequencies = getFrequencies(0);
 		for(int i = 0; i < frequencies.length; i++)
 			{
-			amplitudes[i] = amps.getDouble(i);
-			frequencies[i] = freqs.getDouble(i);
+			amplitudes[i] = amps.optDouble(i, 0);
+			frequencies[i] = freqs.optDouble(i, i);
 			}
 		} 
     }
