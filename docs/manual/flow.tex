@@ -86,7 +86,7 @@ An additive synthesizer is a synthesizer which produces sounds by {\it adding up
 
 Consider Figure~\ref{sinewaves}, which shows three sine waves in green, orange, and blue.  These sine waves are differing in their {\it frequency} (how fast they go up and down), and in their {\it amplitude} (how far they go up and down).  If you add the three sine waves up, you get the wave shown in bold.  In fact, it's easily shown that in theory you can synthesize {\it any wave} by adding up the right combination of sine waves.
 
-Notice we didn't mention {\it phase}.  Phase is the horizontal shift in the sine wave, as shown in Figure \ref{phases}.  As it turns out, humans can't easily distinguish between sounds whose partials only differ in phase (though they can tell when phase is rapidly {\it changing}).  We just don't have the hardware built-in to do it.  This means that we can ignore the phase component of our sine waves in order to simplify the synthesis process: we'll assume that all sine waves have a phase angle of \(0\degree\).  Indeed, a great many additive synthesizers, including {\name}, don't consider phase in order to keep things simpler (and faster).
+Notice we didn't mention {\it phase}.  Phase is the horizontal shift in the sine wave, as shown in Figure \ref{phases}.  As it turns out, humans can't easily distinguish between sounds whose partials only differ in phase: we just don't have the hardware built-in to do it.\footnote{We {\it can} detect when phase is changing: that's how most FM synthesizers work.  We can also detect when two superimposed waves differ in phase in some way: for example, two sine waves with the same phase just double their volume: but if one of them is out of phase by \(\pi\), they effectively cancel each other out.}   As a result,  many additive synthesizers, including {\name}, don't consider phase in order to simplify matters.  We will assume that all partials have a phase angle of \(0\degree\).
 
 If we only consider frequency and amplitude, we can chart our three sine waves as shown in Figure~\ref{partials}: showing the amplitude of each partial by frequency.  Notice that the \(Y\) axis is still Amplitude, but the \(X\) axis has changed from {\it time} to {\it frequency}. For this reason, thinking of a sound in this fashion is known as casting the sound into the {\bf frequency domain}; whereas thinking of a sound as a wave in the traditional way (Figure~\ref{sinewaves}) is known as considering it in the {\bf time domain}.  While we have been trained to think of sound waves in the time domain: in fact our brains receive sound information in the frequency domain: hardware in our ears first breaks out the sounds into high and low frequencies before our brains even get them.
 
@@ -115,7 +115,7 @@ In {\name}, if you adjust partials so that they are all harmonics, with no gaps 
 
 \subsection{Fully Modular Additive Synthesis}  Additive synthesis is viewed as a sort of holy grail of synthesis: because you can generate all sounds in an additive fashion in theory, additive synthesis is in some sense an ``optimal'' way to doing synthesis: but it has a problem which prevents it from being easily used in reality.   And that problem is: the classical approach to additive synthesis involves a very, very large number of tedious parameters.  Sound waves have many hundreds or thousands of partials, each with a frequency and amplitude and maybe phase: and as sounds change and evolve over time, so do all those values.  And so a synthesizer in which you set all the partials independently will have a great many parameters to set.  Consider: the Kawai K5000 had 126 harmonics, each with a base amplitude and {\it its own envelope} which specified how it changed over time.  This meant that the Kawai K5000' s patches had on the order of a thousand parameters.\footnote{I'm not denigrating the K5000.  The K5000 was one of the most incredible and awe-inspiring synthesizers in history.}
 
-An alternative approach, taken by software tools such as Harmor, Harmless, Razor, and Loom,\footnote{Harmor and Harmless are trademarks of Image-Line Software.  See https:/\!/www.image-line.com/plugins/Synths/Harmor/  and https:/\!/www.image-line.com/plugins/Synths/Harmless/\qquad Razor is a trademark of Native Instruments, Inc.  You can find Razor at https:/\!/www.native-instruments.com/en/products/komplete/synths/razor/\qquad And Loom is a trademark of inMusic Brands.  You can find Loom at http:/\!/www.airmusictech.com/product/loom-ii}
+An alternative approach, taken by software tools such as Harmor/Harmless, Razor, and Loom,\footnote{Harmor and Harmless are trademarks of Image-Line Software.  See https:/\!/www.image-line.com/plugins/Synths/Harmor/  and https:/\!/www.image-line.com/plugins/Synths/Harmless/\qquad Razor is a trademark of Native Instruments, Inc.  You can find Razor at https:/\!/www.native-instruments.com/en/products/komplete/synths/razor/\qquad And Loom is a trademark of inMusic Brands.  You can find Loom at http:/\!/www.airmusictech.com/product/loom-ii}
 is to create a series of modules which either generate sets of partials or modify existing partials, and then to arrange them in an assembly line, routing partials from one module to the next, until a sound is emitted at the end.  The idea is that instead of directly manipulating partials and envelopes, you're using operations (the modules) designed to sculpt away at the partials.  But because you can't wire up the modules in any fashion, these tools generally use a kind of {\bf semi-modular synthesis} approach.  
 
 {\name} is in contrast closer to a {\bf fully modular synthesis} approach: you can organize as many modules as you like, and wire them up however you like, just like a hardware modular synthesizer. Since they're not in a line, modules can be fed from, and feed into, {\it multiple} other modules.  There's no reason you can't have modules wired up in cycles or other patterns.  And just like in a hardware modular synthesizer, if you don't wire the modules up at all, you don't get any sound. 
@@ -137,7 +137,7 @@ Partials Update Rate&Every 32 Samples\\
 Audio Sampling Rate&44,100 Hz\\
 Audio Bit Depth&16 bit\\
 Channels&Mono (that is, not stereo)\\
-MIDI Features&MPE, Clock, Channel and Polyphonic Aftertouch, Bend, NRPN, RPN, CC\\
+MIDI Features&MPE, Clock, Channel and Polyphonic Aftertouch, Pitch Bend, NRPN, RPN, CC\\
 \end{tabular}
 \end{center}
 
@@ -157,17 +157,17 @@ After you fire up {\name}, you're presented with a near-empty {\bf rack} and can
 
 If you look carefully at Figure~\ref{screenshot}, you'll see that there are not only twelve modules, but also two wide black rectangular regions called {\bf displays}, and two small squarish black regions called {\bf oscilloscopes}.  Displays show partials in the same manner as Figure~\ref{partials}, and oscilloscopes display modulation signals.
 
-\subsection{Adding and Moving Modules}  Modules are added to the rack by choosing them from the {\bf Modules} menu.  You can move a module to another location by dragging its title bar.  You can delete a module by clicking on its close box: the little white dot to the left of its title.
+\subsection{Adding, Moving, Copying, and Closing Modules}  Modules are added to the rack by choosing them from the {\bf Modules} menu.  You can move a module to another location by dragging its title bar.  You can also copy a module to another location by dragging its title bar while holding the Control key (on the Mac, you can also hold the Option key).  Finally, you can delete a module by clicking on its close box: the little white dot to the left of its title.
 
 \subsection{Partial and Modulation Signals}  Modules can send and receive two kinds of signals.  First, a module can send or receive {\bf sets of partials} to/from other modules.  Since this is an additive synthesizer, a set of partials is essentially a sound being emitted from a module.  Additionally, a module can send or receive a {\bf modulation signal}.  This is a single number, ranging from 0 to 1, which can change over time.  Modulation signals are used to change parameters in modules in real time.  
 
-Modules can send any number of partials and modulation signals, and they can receive any number of the same.  But some modules are intended {\it primarily} to {\bf create modulation signals} (their title bars are red), to {\bf modify incoming modulation signals and emit new versions} (light red title bars), to {\bf create partials} (blue), or to {\bf modify incoming modulation signals and emit new versions} (light blue).  A few system-level modules, such as the {\bf Out} module, have black title bars.  Macros (see Section~\ref{aboutmacros}) have green title bars.
+Modules can send any number of partials and modulation signals, and they can receive any number of the same.  But some modules are intended {\it primarily} to {\bf create modulation signals} (their title bars are red), to {\bf shape incoming modulation signals and emit new versions} (light red title bars), to {\bf create partials} (blue), or to {\bf shape incoming modulation signals and emit new versions} (light blue).  A few system-level modules, such as the {\bf Out} module, have black title bars.  Macros (see Section~\ref{aboutmacros}) have green title bars.
 
 Figure~\ref{simplepatch} shows a very simple patch: a Sawtooth wave run through a low pass filter whose cutoff frequency is modulated by a sine-wave LFO.   Notice the special module {\bf Out}.  If you attach a module to the jack labelled {\it A (Audio)} on this module, then the module's partials will be used to produce the final output sound.  We've attached the jack {\it Out} on the module {\bf Filter} to the jack {\it A (Audio)} in the module {\bf Out}, so the Filter's output is being routed directly to audio.   For more information on the capabilities of the {\bf Out} module, see Section~\ref{outmodule}.
 
 \begin{wrapfigure}{r}{2.6in}
 \includegraphics[width=2.6in]{simplepatch.png}
-\caption{A Simple Patch}
+\caption{A Simple, and Terrible, Patch}
 \vspace{-1em}
 \label{simplepatch}
 \end{wrapfigure}
@@ -183,6 +183,12 @@ You disconnect a wire by clicking on the input jack it's connected to.
 
 \paragraph{Patching Backwards}  Typically you'd wire a module to send information on to another module further to its right in the Rack.  But there's no reason you can't wire a module to send to another module to its {\it left}, and there are often good reasons to do so.  However you should be aware of one minor consequence of this.  Every time the Rack wants to get the latest partials to send the audio output, it does by pulsing modules left-to-right.  A module can extract information from other modules only when it's being pulsed.  Normally this is fine: if module \(X\) gets information from module \(Y\) to its left, by the time \(X\) is extracting information from \(Y\), \(Y\) has already been pulsed and so is ready to provide the latest information.  But if module \(X\) is getting information from module \(Z\) to its {\it right}, \(Z\) has not been pulsed yet and so its information will be old.  How old?  By default, it'll be typically about 32 samples, or about 0.725~ms old.  If you chain a bunch of modules backwards like this in a line, this delay starts multiplying.   With about 5 modules wired backwards in a chain like this, you'd be over 3~ms, which is getting into the realm of human detection.\footnote{Perhaps it's the effect you were aiming for!} 
 
+\subsection{Responding to Notes} To support polyphony, MPE, and other features, {\name} differs from a classic modular synthesizer design in that you don't feed modules the current pitch or volume information in the form of Gate/CV signals. Rather, every module is automatically informed when a note has been pressed and it has been released.  There's no reason to send a gate or CV signal to an envelope, for example, as it already knows the note has been pressed.
+
+It's best to think of the Rack not as 1 Rack, but as \(N\) copies of the Rack, where \(N\) is the polyphony of the synthesizer.  Each time a note is pressed, one Rack copy is assigned to that note, and the modules are all told that it the note has been pressed (and later that it has been released).  Modules can query other information as appropriate, such as aftertouch or pitch bend.  At the end of pipeline, the {\it Out} module produces a set of partials with frequencies (normally starting at 1.0) and amplitudes.  These frequencies are each multiplied against the note pitch, and the amplitudes are multiplied against the note volume: sine waves are produced and added up, and this becomes the final sound.
+
+Though modules such as envelopes (or LFOs) already know that notes have been played, it's occasionally useful to trigger them manually rather than having them trigger themselves automatically; there are certain additional options available to do this.
+
 \subsection{Setting Values in Dials}
 
 If an input jack for a modulation isn't connected, it appears as a dial: you can fix its value to anything between 0.0 and 1.0 inclusive by dragging the dial up or down.  Some dials won't show values between 0.0 and 1.0, but rather give a more informative value display like ``3.23 sec''  or ``2023 Hz''.  But underneath they're always just values from 0 to 1.
@@ -190,7 +196,7 @@ If an input jack for a modulation isn't connected, it appears as a dial: you can
 There are some other options available on setting these dials.  
 
 \begin{itemize}
-\item If you double-click on the dial, a menu will pop up with common settings for you to choose from.  Importantly, if you double-click on rate or time dials in LFOs or various Envelopes, these settings will correspond to note speeds if you were playing at 120 BPM (or whatever rate the MIDI Clock is running at).
+\item If you double-click on the dial, a menu will pop up with common settings for you to choose from.  Importantly, if you double-click on rate or time dials in LFOs or various Envelopes, these settings will correspond to note speeds if you were playing at 120 BPM (or whatever rate the MIDI Clock is running~at).
 \item If you hold the {\bf Alt} or {\bf Option} key down and then drag, your resolution will be 4x.
 \item If you hold the {\bf Control} key down and then drag, your resolution will be 16x.
 \item If you hold the {\bf Control} {\it and} the {\bf Alt} or {\bf Option} keys down and then drag, your resolution will be 64x.
@@ -238,7 +244,11 @@ If you directly connect a partials source to your Out module, it'll start playin
 
 Ultimately you'll probably set things up with a {\bf VCA} (see the last entry in Section~\ref{unitshapers}) which won't play the sound unless a key is pressed and an {\bf Envelope} (typically a {\bf DADSR Envelope}: see Section~\ref{modsources}) sends the appropriate modulation signal.  That way different voices are played when you play different keys.  At this point you'll want to uncheck {\bf Play 1 Voice Only} so you can play more than one voice.
 
-So how do you play a using keyboard?  You attach it to {\name} by selecting {\bf MIDI and Audio Preferences} in the {\bf Play} menu, then choosing the appropriate MIDI channel and MIDI device.  Similarly you can choose the appropriate output audio device for your computer, if you have multiple ones.
+So how do you play a using keyboard?  You attach it to {\name} by selecting {\bf MIDI and Audio Preferences} in the {\bf Play} menu, then choosing the appropriate MIDI channel (or ``All Channels'') and MIDI device.  Similarly you can choose the appropriate output audio device for your computer, if you have multiple ones.
+
+\subsubsection{Using MPE}
+
+To set up a MIDI Polyphonic Expression (MPE) device, go to {\bf MIDI and Audio Preferences} in the {\bf Play} menu, and change the MIDI Channel to either the MPE Lower Zone or the MPE Upper Zone, as determined by your MPE Controller.  You can then specify the number of MPE channels in the Zone.  {\name} also responds to an MPE Configuration Message (or MCM) sent over MIDI from your controller.
 
 \subsubsection{Routing MIDI from a Digital Audio Workstation}
 \label{routingmidi}
@@ -332,7 +342,7 @@ The Modules are divided into five categories:
 \subsection{Modulation Sources}
 \label{modsources}
 
-\paragraph{DADSR}  A standard Delay-Attack-Decay-Sustain-Release envelope.\footnote{Though in fact the ``Delay'' is really just a first-stage attack: it's only effectively a delay if its level is set to 0.  Indeed, if you treated it as an attack, and then set Attack's level to the same as Delay's level, then you'd have an``ADHSR'' (``H'' for ``Hold'', as in E-mu products and the Moog One.} You can select curves from linear to pseudo-exponential, plus ``Jump'', which immediately jumps to the next level, and ``Wait'', which doesn't move to the next level until the state is over, at which time it jumps to it.  The envelope can be one shot (it doesn't stop at sustain), and it can be set to reset to 0 on a Gate (Note Down), as opposed to just starting from its current position.  The envelope triggers on completion of each of its stages.  You can request that the envelope sync to MIDI when the synthesizer is set to MIDI (otherwise it's based on time as usual).   
+\paragraph{DADSR}  A standard Delay-Attack-Decay-Sustain-Release envelope.\footnote{Though in fact the ``Delay'' is really just a first-stage attack: it's only effectively a delay if its level is set to 0.  Indeed, if you treated it as an attack, and then set Attack's level to the same as Delay's level, then you'd have an``ADHSR'' (``H'' for ``Hold'', as in E-mu products and the Moog One.} You can select curves from linear to pseudo-exponential, plus ``Jump'', which immediately jumps to the next level, and ``Wait'', which doesn't move to the next level until the state is over, at which time it jumps to it.  The envelope can be one shot (it doesn't stop at sustain), and it can be set to reset to 0 on a Gate (Note Down), as opposed to just starting from its current position.  The envelope triggers on completion of each of its stages.  You can request that the envelope sync to MIDI when the synthesizer is set to MIDI (otherwise it's based on time as usual).  Finally, you can set the envelope such that a note-off doesn't cause it to enter its release stage, but rather causes it to freeze permanently at its currently position.
 
 If you double-click on any time dial, a pop-up menu will appear which lets you set various not speeds corresponding to playing at 120BPM.  If the MIDI clock is running, these note speeds will correspond to the MIDI clock's rate.
 
@@ -414,7 +424,7 @@ See also {\bf MIDIIn}, previous.
 \item {\bf A or B}\quad Triggers on A's trigger or on B's trigger.
 \item {\bf A and B}\quad Triggers only when A's trigger and B's trigger coincide.
 \item {\bf A and not B}\quad Triggers only when A's trigger occurs but B's trigger does not.
-\item {\bf 2 A} {\it through} {\bf 192 A}\quad A rate divider.  Triggers every \(N\) triggers of A.   \footnote{Note that if you're dividing a MIDI Clock pulse, some of these divisions might be useful for specifying note lengths:\\
+\item {\bf 2 A} {\it through} {\bf 192 A}\quad A rate divider.  Triggers every \(N\) triggers of A.\footnote{Note that if you're dividing a MIDI Clock pulse, some of these divisions might be useful for specifying note lengths:\\
 \\
 \begin{tabular}{rlrlrl}
 	1&	Eighth Triplet (Triplet 64th Note)	&12&	Eighth Note							&48&	Half Note		\\
@@ -429,6 +439,12 @@ See also {\bf MIDIIn}, previous.
 \end{itemize}
 
 \paragraph{S \& H}  Sample and Hold.  Takes an incoming modulation signal and a trigger.  On receiving the trigger, it samples the signal and outputs that value until the next trigger, when it resamples, etc.
+
+\paragraph{Seq}  A step sequencer of up to 32 steps, as specified by {\it Steps}.  Each step is a modulation value which you can set.  On gate (note-on), the sequencer resets itself to step 1, and the step increments each time the {\it Trigger} is fired.  The value of the current step is outputted as {\it Mod}.  Additionally, {\it Mod} outputs a trigger each time the step is incremented: you could use this to reset a sound to its start, for example. 
+
+If {\it Free} is true, then the sequencer is free-running and ignores note-on.  If {\it Sample} is true, then {\it Mod} outputs the value of the current step as sampled immediately when transitioned to that step; but if {\it Sample} is false, then the value of the current step may be changed in real-time, and {\it Mod} will output whatever its current value is.
+
+In addition to sequencing modulation signals, Seq can also be used in combination with {\bf Shift} to sequence note values.  To do this, attach {\it Mod} to Shift's {\it Shift} port, and set Shift's {\it Bound} to 1.0 and its {\it Type} to {\it Pitch}.  Feed the sound into Shift's {\it Input}, and the result in Shift's {\it Out}.  In this arrangement, each of Seq's modulation dials ranges from two octaves below to two octaves above.  To make things easier, if you double-click on a modulation dial, the pop-up menu is set up to present you with notes from one octave below to one octave above (keyed in C, but it'll be relative to whatever the current pitch is).  See also {\bf Shift}.
 
 \paragraph{Soften}  A modulation signal smoother.\footnote{So why isn't this called Smooth?  Because there's another module called Smooth: see later in Section~\ref{unitshapers}}  Takes an incoming modulation signal and a degree with which to smooth it.  You can also specify whether or not Soften is free-running or always resets on gate.   Because softening will often significantly reduce the amplitude of a signal, Soften has an additional modulation, {\it Scale}, which lets you scale it back up.
 
@@ -469,11 +485,11 @@ See also {\bf MIDIIn}, previous.
 
 \paragraph{Rand}  Random partials.  Outputs all partials, standardized, with random amplitudes.  If the seed is 0, then the amplitudes are different each gate; otherwise they are the same random values each gate, using a random number generator with the given seed.
 
-\paragraph{Rectified}  The harmonics of a rectified wave, which is essentially \(|\sin(x)|\).
+\paragraph{Rectified}  The harmonics of a rectified sine wave, that is, \(|\sin(x)|\).
 
 \paragraph{Sawtooth}  The harmonics of a sawtooth wave.
 
-\paragraph{Sine}  A single harmonic at 1.0 amplitude.  The harmonic any from 0 to 127.
+\paragraph{Sine}  A single harmonic at 1.0 amplitude.  The harmonic can be any partial frequency from 1.0 to 128.0.
 
 \vbox{
 \paragraph{Tinkle}  Produces random partials, creating a tinkling effect.  Some {\it number} of new partials are created whenever the {\it trigger} occurs, and at the given {\it volume}.  The partials {\it decay} at some rate.  The {\it probability} specifies the likelihood that partials will be created when a trigger occurs.
@@ -556,7 +572,7 @@ You have the option of normalizing the resulting partials.
 
 \paragraph{Flange Filter} This filter simulates various flanging, phasing, and chorusing effects via rough approximations of comb filters.  You can select what kind of comb filter shape you'd like (``spike down'' is the classic for flanging and chorusing etc.).    You can also stipulate whether the filter shifts to follow the pitch of your note or is fixed in the frequency location of its lobes.    The flange filter has several confusing dials.  {\it Offset} lets you specify the lobe positions.  {\it OffsetMod} is similar, but it's designed to have a modulation source attach to it.  {\it Stretch} lets you specify the size of the lobes.  {\it StrechMod} is similar but is once again designed to have a modulation source attach to it.  You can also specify the wet/dry ratio. {\bf Hint:}  the {\it degree} of OffsetMod or StretchMod is very high, but you can reduce this by changing your LFO's Scale value.  The LFO's shift is also interesting to play with.
 
-\paragraph{Shift} This shifts all the partials in your input in a certain way.  {\it Shift} specifies by how much (this is easily modulated), and {\it Bound} scales the shifting.  There are three ways you can shift.  First you can shift the {\it Pitch}: this is essentially multiplying the partials by a certain amount.  Second, you can shift the {\it Frequency}: this {\it adds} a certain amount to the partials, which creates an inharmonic shift effect.  Third, you can shift the {\it Partials}: this moves each partial towards the former frequency of the partial above it (or below it).
+\paragraph{Shift} This shifts all the partials in your input in a certain way.  {\it Shift} specifies by how much (this is easily modulated), and {\it Bound} scales the shifting.  There are three ways you can shift.  First you can shift the {\it Pitch}: this is essentially multiplying the partials by a certain amount.  Second, you can shift the {\it Frequency}: this {\it adds} a certain amount to the partials, which creates an inharmonic shift effect.  Third, you can shift the {\it Partials}: this moves each partial towards the former frequency of the partial above it (or below it).  See also {\bf Seq}.
 
 \paragraph{Linear Filter} This is a filter where you can specify up to 8 nodes (points of change) in terms of frequency and gain.  The filter then just draws lines attaching the nodes, and this becomes the filter frequency function.  Nodes are always sorted first by frequency.  {\it Num Nodes} is the number of nodes being used.  See also {\bf Partial Filter}.
 
@@ -1186,6 +1202,20 @@ Third: you might also change your module, which causes problems when trying to b
 \item {\it unit-output-name:}\quad A unit output name (a string).  Normally this is the same as returned by {\tt getOutputName(...)}.
 \end{itemize}
 
+\paragraph{Cloning}  One obscure feature of {\name} is that Modulations and Units can not just be {\it moved} in the Rack, but can in fact be {\it copied}.  This is done by holding the Control key (on the Mac, Option also works) while dragging the Module.  This in turn calls the Module's {\tt clone()} method.  You need to override this method to insure that it performs a deep clone.  In many situations you'd need not implement this method at all.  But if your Modulation or Unit is holding an array or perhaps some other object which must be copied, you'll need to implement it like this:
+
+\vbox{\footnotesize
+\begin{verbatim}
+     int[] stuff;    // let's say this is the array you need to copy into the cloned object
+     public Object clone()
+        {
+        MyClass obj = (MyClass)(super.clone());
+        obj.stuff = (int[])(stuff.clone());
+        return obj;
+        }
+\end{verbatim}
+}
+
 \subsection{Building a Unit}
 
 Read Section \ref{buildlingamodulation} (Building a Modulation) first.  It covers a lot of important stuff that we'll build on here.
@@ -1490,6 +1520,6 @@ What's going on here is as follows.  Recall that the ModulePanel is associated w
 
 You want to do all this as fast as you can: holding the sound lock for very long can cause audio disruptions.
 
-\paragraph{Test the Code}  Try it out again!  And that concludes our little tutorial.
+\paragraph{Test the Code}  Try it out again!   And that concludes our little tutorial.
 
 \end{document}

@@ -54,6 +54,17 @@ System
   of promise but they still feel meh.  It's fun to experiment in additive, but
   we need patches that are nontrivial to do in some other way and are useful.
 
+* Speeding up the Output thread.  Right now the Output thread is basically maxed out.
+  This is preventing us from going to 256 partials, from significantly increasing
+  the polyphony, etc.  I've tried splitting the Output thread (notably the
+  buildSample() function) into multiple threads, but the thread context switch
+  overhead is just too high.  This needs to be worked on: I'd very much like to get
+  to 256 partials.
+
+* BTW: to update to 256 partials would involve updating more than just Unit.NUM_PARTIALS.
+  We'd also need to build some new random Morph patterns appropriate for the size,
+  and also revise the Constraints to include the new partials, among a few other things.
+
 
 Modules
 -------
