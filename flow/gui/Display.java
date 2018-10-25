@@ -122,8 +122,8 @@ public class Display extends JComponent
 
                     if (emit != null && emit instanceof Out && !(emit.getInput(incoming) instanceof Nil))
                         {
-                        amplitudes = (double[])(emit.getAmplitudesIn(incoming).clone());
-                        frequencies = (double[])(emit.getFrequenciesIn(incoming).clone());
+                        amplitudes = (double[])(emit.getAmplitudes(incoming).clone());
+                        frequencies = (double[])(emit.getFrequencies(incoming).clone());
                         }
                     }
                 else
