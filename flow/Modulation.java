@@ -276,7 +276,7 @@ public abstract class Modulation implements java.io.Serializable, Cloneable
     public void setModulation(Modulation mod, int num, int index)
         {
         if (mod instanceof Constant)
-        	lastModulations[num] = (Constant)mod;
+            lastModulations[num] = (Constant)mod;
         modulations[num] = mod;
         modulationIndexes[num] = index;
         }
@@ -703,57 +703,57 @@ public abstract class Modulation implements java.io.Serializable, Cloneable
         }
     
     public Object clone()
-    	{
-		Modulation obj = null;
-    	try
-    		{
-    		obj = (Modulation)(super.clone());
-    		}
-    	catch (CloneNotSupportedException ex) { ex.printStackTrace(); }  // never happens
-    	
-    	// ---- Copy over options ----
-    	// Option Names
-    	obj.optionNames = (String[])(optionNames.clone());
-    	// Option Values
-    	obj.optionValues = (String[][])(optionValues.clone());
-    	for(int i = 0; i < optionValues.length; i++)
-    		obj.optionValues[i] = (String[])(obj.optionValues[i].clone());
-    	// Set the values
-    	for(int i = 0; i < optionNames.length; i++)
-    		obj.setOptionValue(i, getOptionValue(i));
-    		
-    	// --- Copy over modulation inputs.  We retain a pointer to the old modulation inputs unless they're Constants. ---
-    	// Input Modulation Names
-   		obj.modulationNames = (String[])(modulationNames.clone());
-   		// Input Modulations.  Copy if we're Constant.
-   		obj.modulations = (Modulation[])(modulations.clone());
-    	for(int i = 0; i < obj.modulations.length; i++)
-    		{
-    		if (obj.modulations[i] instanceof Constant)
-	    		obj.modulations[i] = (Modulation)(obj.modulations[i].clone());
-    		}
-    	// Modulation Indexes
-    	obj.modulationIndexes = (int[])(modulationIndexes.clone());	
-    	// Copy Default Modulations
-    	obj.defaultModulations = (Constant[])(defaultModulations.clone());
-    	for(int i = 0; i < obj.defaultModulations.length; i++)
-    		obj.defaultModulations[i] = (Constant)(obj.defaultModulations[i].clone());
-    	// Copy Last Constant Modulations Used
-    	obj.lastModulations = (Constant[])(lastModulations.clone());
-    	for(int i = 0; i < obj.lastModulations.length; i++)
-    		obj.lastModulations[i] = (Constant)(obj.lastModulations[i].clone());
+        {
+        Modulation obj = null;
+        try
+            {
+            obj = (Modulation)(super.clone());
+            }
+        catch (CloneNotSupportedException ex) { ex.printStackTrace(); }  // never happens
+        
+        // ---- Copy over options ----
+        // Option Names
+        obj.optionNames = (String[])(optionNames.clone());
+        // Option Values
+        obj.optionValues = (String[][])(optionValues.clone());
+        for(int i = 0; i < optionValues.length; i++)
+            obj.optionValues[i] = (String[])(obj.optionValues[i].clone());
+        // Set the values
+        for(int i = 0; i < optionNames.length; i++)
+            obj.setOptionValue(i, getOptionValue(i));
+                
+        // --- Copy over modulation inputs.  We retain a pointer to the old modulation inputs unless they're Constants. ---
+        // Input Modulation Names
+        obj.modulationNames = (String[])(modulationNames.clone());
+        // Input Modulations.  Copy if we're Constant.
+        obj.modulations = (Modulation[])(modulations.clone());
+        for(int i = 0; i < obj.modulations.length; i++)
+            {
+            if (obj.modulations[i] instanceof Constant)
+                obj.modulations[i] = (Modulation)(obj.modulations[i].clone());
+            }
+        // Modulation Indexes
+        obj.modulationIndexes = (int[])(modulationIndexes.clone());     
+        // Copy Default Modulations
+        obj.defaultModulations = (Constant[])(defaultModulations.clone());
+        for(int i = 0; i < obj.defaultModulations.length; i++)
+            obj.defaultModulations[i] = (Constant)(obj.defaultModulations[i].clone());
+        // Copy Last Constant Modulations Used
+        obj.lastModulations = (Constant[])(lastModulations.clone());
+        for(int i = 0; i < obj.lastModulations.length; i++)
+            obj.lastModulations[i] = (Constant)(obj.lastModulations[i].clone());
 
-    	// --- Copy over modulation outputs ---
-    	// Output names
-		obj.modulationOutputNames = (String[])(modulationOutputNames.clone());    	
-		// Current output values
-		obj.modulationOutputs = (double[])(modulationOutputs.clone());
-		// Current output triggers
-		obj.triggered = (boolean[])(triggered.clone());
-		obj.trigger = (int[])(trigger.clone());
+        // --- Copy over modulation outputs ---
+        // Output names
+        obj.modulationOutputNames = (String[])(modulationOutputNames.clone());          
+        // Current output values
+        obj.modulationOutputs = (double[])(modulationOutputs.clone());
+        // Current output triggers
+        obj.triggered = (boolean[])(triggered.clone());
+        obj.trigger = (int[])(trigger.clone());
 
-    	return obj;
-    	}
+        return obj;
+        }
 
 
     ///// JSON Serialization
@@ -763,146 +763,146 @@ public abstract class Modulation implements java.io.Serializable, Cloneable
     public String getID() { return "" + id; }
     
     /** A hook which is called on the modulation during load-time, after all modulations have been constructed and
-    	their IDs have been set, but before any of their options, modulation inputs/outputs, or unit input/outputs
-    	have been set.   By default this method does nothing. */
+        their IDs have been set, but before any of their options, modulation inputs/outputs, or unit input/outputs
+        have been set.   By default this method does nothing. */
     public void preprocessLoad(int moduleVersion, int patchVersion) { }
     /** A hook which is called on the modulation during load-time, after all modulations have had
-    	their options, modulation inputs/outputs, and unit input/outputs set.  By default this method does nothing. */
+        their options, modulation inputs/outputs, and unit input/outputs set.  By default this method does nothing. */
     public void postprocessLoad(int moduleVersion, int patchVersion) { }
     /** Called to return a String to be used as a JSON key for the given modulation input. 
-    	This must be unique within modulation inputs in the modulation.  By default the name of the modulation input is used.  */
+        This must be unique within modulation inputs in the modulation.  By default the name of the modulation input is used.  */
     public String getKeyForModulation(int input) { return "" + getModulationName(input); }
     /** Called to return a String to be used as a JSON key for the given modulation output. 
-    	This must be unique within modulation outputs in the modulation.  By default the name of the modulation output is used.  */
+        This must be unique within modulation outputs in the modulation.  By default the name of the modulation output is used.  */
     public String getKeyForModulationOutput(int output) { return "" + getModulationOutputName(output); }
     /** Called to return a String to be used as a JSON key for the given option. 
-    	This must be unique within options in the modulation.  By default the name of the option is used.  */
+        This must be unique within options in the modulation.  By default the name of the option is used.  */
     public String getKeyForOption(int option) { return "" + getOptionName(option); }
     /** Called to return the Data object to store in the file for the modulation, or null if none should be stored. 
-    	By default null is returned. */
+        By default null is returned. */
     public JSONObject getData() { return null; }
     /** Called to update the modulation with respect to the the Data object currently stored in the file 
-    	for the modulation.  This data object may be null.  This method will be called before the
-    	modulation outputs/inputs, unit output/inputs, and options have been loaded. By default, does nothing.  */
-	public void setData(JSONObject data, int moduleVersion, int patchVersion) throws Exception { }  // this method may have null passed in if there was no data (which might be an error?)
+        for the modulation.  This data object may be null.  This method will be called before the
+        modulation outputs/inputs, unit output/inputs, and options have been loaded. By default, does nothing.  */
+    public void setData(JSONObject data, int moduleVersion, int patchVersion) throws Exception { }  // this method may have null passed in if there was no data (which might be an error?)
     /** Returns the modulation output number for a given JSON Key, or SERIALIZATION_NOT_FOUND if the key is not found.
-      This method is the inverse of getKeyForModulationOutput(...)  */
-	public int getModulationOutputForKey(String key)
-		{
-		// Terribly inefficient but it'll suffice
-		for(int i = 0; i < getNumModulationOutputs(); i++)
-			{
-			if (getKeyForModulationOutput(i).equals(key)) return i;
-			}
-		return SERIALIZATION_NOT_FOUND;
-		}
+        This method is the inverse of getKeyForModulationOutput(...)  */
+    public int getModulationOutputForKey(String key)
+        {
+        // Terribly inefficient but it'll suffice
+        for(int i = 0; i < getNumModulationOutputs(); i++)
+            {
+            if (getKeyForModulationOutput(i).equals(key)) return i;
+            }
+        return SERIALIZATION_NOT_FOUND;
+        }
 
     /** Saves the Modulation to a JSON Object. */
-	public JSONObject save() throws JSONException
-		{
-		JSONObject obj = new JSONObject();
-		
-		// class
-		obj.put("class", this.getClass().getCanonicalName());
+    public JSONObject save() throws JSONException
+        {
+        JSONObject obj = new JSONObject();
+                
+        // class
+        obj.put("class", this.getClass().getCanonicalName());
 
-		// id
-		obj.put("id", getID());
-		
-		// version
-		obj.put("v", getVersion());
+        // id
+        obj.put("id", getID());
+                
+        // version
+        obj.put("v", getVersion());
 
-		// options
-		JSONObject options = new JSONObject();
-		for(int i = 0; i < getNumOptions(); i++)
-			options.put(getKeyForOption(i), getOptionValue(i));
-		obj.put("opt", options);
-		
-		// mods
-		JSONObject mods = new JSONObject();
-		for(int i = 0; i < getNumModulations(); i++)
-			{
-			Modulation mod = getModulation(i);
-			int modIndex = getModulationIndex(i);
-			if (mod instanceof Constant)
-				{
-				Constant c = (Constant)mod;
-				mods.put(getKeyForModulation(i), c.getValue());
-				}
-			else
-				{
-				JSONObject m = new JSONObject();
-				m.put("id", mod.getID());
-				m.put("at", mod.getKeyForModulationOutput(modIndex));
-				mods.put(getKeyForModulation(i), m);
-				}
-			}
-		obj.put("mod", mods);
-		
-		// auxillary data
-		Object data = getData();
-		if (data != null)
-			obj.put("data", data);
-		return obj;
-		}
+        // options
+        JSONObject options = new JSONObject();
+        for(int i = 0; i < getNumOptions(); i++)
+            options.put(getKeyForOption(i), getOptionValue(i));
+        obj.put("opt", options);
+                
+        // mods
+        JSONObject mods = new JSONObject();
+        for(int i = 0; i < getNumModulations(); i++)
+            {
+            Modulation mod = getModulation(i);
+            int modIndex = getModulationIndex(i);
+            if (mod instanceof Constant)
+                {
+                Constant c = (Constant)mod;
+                mods.put(getKeyForModulation(i), c.getValue());
+                }
+            else
+                {
+                JSONObject m = new JSONObject();
+                m.put("id", mod.getID());
+                m.put("at", mod.getKeyForModulationOutput(modIndex));
+                mods.put(getKeyForModulation(i), m);
+                }
+            }
+        obj.put("mod", mods);
+                
+        // auxillary data
+        Object data = getData();
+        if (data != null)
+            obj.put("data", data);
+        return obj;
+        }
 
     /** Loads options from the given JSON Object representing the option storage. */
-	public void loadOptions(JSONObject options, int moduleVersion, int patchVersion)
-		{
-		for(int i = 0; i < getNumOptions(); i++)
-			{
-			int val = options.optInt(getKeyForOption(i), -1);
-			if (val == -1)
-				{
-				System.err.println("WARNING: Could not load option " + getKeyForOption(i) + " in " + this);
-				}
-			else
-				{
-				setOptionValue(i, val);
-				}
-			}
-		}
-		
+    public void loadOptions(JSONObject options, int moduleVersion, int patchVersion)
+        {
+        for(int i = 0; i < getNumOptions(); i++)
+            {
+            int val = options.optInt(getKeyForOption(i), -1);
+            if (val == -1)
+                {
+                System.err.println("WARNING: Could not load option " + getKeyForOption(i) + " in " + this);
+                }
+            else
+                {
+                setOptionValue(i, val);
+                }
+            }
+        }
+                
     /** Loads modulation inputs from the given JSON Object representing the modulation storage. */
-	public void loadModulations(JSONObject mods, HashMap<String, Modulation> ids, int moduleVersion, int patchVersion)
-		{
-		for(int i = 0; i < getNumModulations(); i++)
-			{
-			double v = mods.optDouble(getKeyForModulation(i), Double.NaN);
-			if (v == v)  // it's not NAN
-				{
-				setModulation(new Constant(v), i);
-				}
-			else		// It's an ID
-				{
-				JSONObject m = mods.optJSONObject(getKeyForModulation(i));
-				if (m == null)
-					{
-					System.err.println("WARNING: Could not load modulation " + getKeyForModulation(i) + " in " + this);
-					}
-				else
-					{
-					Modulation mod = ids.get(m.getString("id"));
-					setModulation(mod, i, mod.getModulationOutputForKey(m.getString("at")));
-					}
-				}
-			}
-		}
+    public void loadModulations(JSONObject mods, HashMap<String, Modulation> ids, int moduleVersion, int patchVersion)
+        {
+        for(int i = 0; i < getNumModulations(); i++)
+            {
+            double v = mods.optDouble(getKeyForModulation(i), Double.NaN);
+            if (v == v)  // it's not NAN
+                {
+                setModulation(new Constant(v), i);
+                }
+            else            // It's an ID
+                {
+                JSONObject m = mods.optJSONObject(getKeyForModulation(i));
+                if (m == null)
+                    {
+                    System.err.println("WARNING: Could not load modulation " + getKeyForModulation(i) + " in " + this);
+                    }
+                else
+                    {
+                    Modulation mod = ids.get(m.getString("id"));
+                    setModulation(mod, i, mod.getModulationOutputForKey(m.getString("at")));
+                    }
+                }
+            }
+        }
 
     /** Loads the Modulation from the given JSON Object. */
-	public void load(JSONObject obj, HashMap<String, Modulation> ids, int patchVersion) throws Exception
-		{
-		// version
-		int moduleVersion = obj.getInt("v");
-		
-		// auxillary data, possibly null
-		setData(obj.optJSONObject("data"), moduleVersion, patchVersion);
+    public void load(JSONObject obj, HashMap<String, Modulation> ids, int patchVersion) throws Exception
+        {
+        // version
+        int moduleVersion = obj.getInt("v");
+                
+        // auxillary data, possibly null
+        setData(obj.optJSONObject("data"), moduleVersion, patchVersion);
 
-		// options
-		JSONObject options = obj.getJSONObject("opt");
-		loadOptions(options, moduleVersion, patchVersion);
-		
-		// mods
-		JSONObject mods = obj.getJSONObject("mod");
-		loadModulations(mods, ids, moduleVersion, patchVersion);
-		}
+        // options
+        JSONObject options = obj.getJSONObject("opt");
+        loadOptions(options, moduleVersion, patchVersion);
+                
+        // mods
+        JSONObject mods = obj.getJSONObject("mod");
+        loadModulations(mods, ids, moduleVersion, patchVersion);
+        }
     }

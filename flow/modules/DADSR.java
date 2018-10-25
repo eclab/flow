@@ -126,12 +126,12 @@ public class DADSR extends Modulation implements ModSource
     public static final int OPTION_IGNORE_RELEASE = 4;
 
     public Object clone()
-    	{
-    	DADSR obj = (DADSR)(super.clone());
-    	obj.level = (double[])(obj.level.clone());
-    	obj.time = (double[])(obj.time.clone());
-    	return obj;
-    	}
+        {
+        DADSR obj = (DADSR)(super.clone());
+        obj.level = (double[])(obj.level.clone());
+        obj.time = (double[])(obj.time.clone());
+        return obj;
+        }
     
     public int getOptionValue(int option) 
         { 
@@ -173,7 +173,7 @@ public class DADSR extends Modulation implements ModSource
         {
         super.gate();
         if (isModulationConstant(MOD_GATE_TR))
-	        doGate();
+            doGate();
         }
         
     void doGate()
@@ -205,7 +205,7 @@ public class DADSR extends Modulation implements ModSource
         {
         super.release();
         if (isModulationConstant(MOD_REL_TR))
-        	doRelease();
+            doRelease();
         }
     
     void doRelease()

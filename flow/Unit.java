@@ -1210,120 +1210,120 @@ public class Unit extends Modulation
     public static String getName() { return "Unit"; }
 
     public Object clone()
-    	{
-    	Unit obj = (Unit)(super.clone());
-    	
-    	// ---- Copy over unit inputs.  We retain pointers to the old inputs. ----
-    	// Input Names
-    	obj.inputNames = (String[])(inputNames.clone());
-    	// Defaults
-    	obj.defaultInputs = (Unit[])(defaultInputs.clone());
-    	obj.inputs = (Unit[])(inputs.clone());
-    	// unit indexes.  We're setting them all to zero because we reset to defaults (which are constants)
-    	obj.inputIndexes = (int[])(inputIndexes.clone());	
+        {
+        Unit obj = (Unit)(super.clone());
+        
+        // ---- Copy over unit inputs.  We retain pointers to the old inputs. ----
+        // Input Names
+        obj.inputNames = (String[])(inputNames.clone());
+        // Defaults
+        obj.defaultInputs = (Unit[])(defaultInputs.clone());
+        obj.inputs = (Unit[])(inputs.clone());
+        // unit indexes.  We're setting them all to zero because we reset to defaults (which are constants)
+        obj.inputIndexes = (int[])(inputIndexes.clone());       
 
 
-		// ---- Copy over unit outputs ----
-		// Output Names
-		obj.outputNames = (String[])(outputNames.clone());
-		// Amplitudes
-		obj.amplitudes = (double[][])(amplitudes.clone());
-		for(int i = 0; i < obj.amplitudes.length; i++)
-			obj.amplitudes[i] = (double[])(obj.amplitudes[i].clone());
-		// Frequencies
-		obj.frequencies = (double[][])(frequencies.clone());
-		for(int i = 0; i < obj.frequencies.length; i++)
-			obj.frequencies[i] = (double[])(obj.frequencies[i].clone());
-		// Orders
-		obj.orders = (byte[][])(orders.clone());
-		for(int i = 0; i < obj.orders.length; i++)
-			obj.orders[i] = (byte[])(obj.orders[i].clone());
+        // ---- Copy over unit outputs ----
+        // Output Names
+        obj.outputNames = (String[])(outputNames.clone());
+        // Amplitudes
+        obj.amplitudes = (double[][])(amplitudes.clone());
+        for(int i = 0; i < obj.amplitudes.length; i++)
+            obj.amplitudes[i] = (double[])(obj.amplitudes[i].clone());
+        // Frequencies
+        obj.frequencies = (double[][])(frequencies.clone());
+        for(int i = 0; i < obj.frequencies.length; i++)
+            obj.frequencies[i] = (double[])(obj.frequencies[i].clone());
+        // Orders
+        obj.orders = (byte[][])(orders.clone());
+        for(int i = 0; i < obj.orders.length; i++)
+            obj.orders[i] = (byte[])(obj.orders[i].clone());
 
-		
-		// ---- Copy over constraints.  We retain a pointer to the old constraint input if necessary.  So we just copy over the cached info. ----
-		if (obj.invertConstrainedAmplitudes != null)
-			obj.invertConstrainedAmplitudes = (double[])(obj.invertConstrainedAmplitudes.clone());
-		if (obj.invertConstrainedFrequencies != null)
-			obj.invertConstrainedFrequencies = (double[])(obj.invertConstrainedFrequencies.clone());
-		if (obj.constraintInPartials != null)
-			obj.constraintInPartials = (int[])(obj.constraintInPartials.clone());
+                
+        // ---- Copy over constraints.  We retain a pointer to the old constraint input if necessary.  So we just copy over the cached info. ----
+        if (obj.invertConstrainedAmplitudes != null)
+            obj.invertConstrainedAmplitudes = (double[])(obj.invertConstrainedAmplitudes.clone());
+        if (obj.invertConstrainedFrequencies != null)
+            obj.invertConstrainedFrequencies = (double[])(obj.invertConstrainedFrequencies.clone());
+        if (obj.constraintInPartials != null)
+            obj.constraintInPartials = (int[])(obj.constraintInPartials.clone());
 
-    	return obj;
-    	}
+        return obj;
+        }
 
 
 
     ///// JSON Serialization
     /** Called to return a String to be used as a JSON key for the given unit input. 
-    	This must be unique within unit inputs in the unit.  By default the name of the unit input is used.  */
+        This must be unique within unit inputs in the unit.  By default the name of the unit input is used.  */
     public String getKeyForInput(int input) { return "" + getInputName(input); }
     /** Called to return a String to be used as a JSON key for the given unit input. 
-    	This must be unique within unit outputs in the unit.  By default the name of the unit input is used.  */
+        This must be unique within unit outputs in the unit.  By default the name of the unit input is used.  */
     public String getKeyForOutput(int output) { return "" + getOutputName(output); }
 
     /** Returns the unit output number for a given JSON Key, or SERIALIZATION_NOT_FOUND if the key is not found.
-      This method is the inverse of getKeyForOutput(...)  */
-	public int getOutputForKey(String key)
-		{
-		// Terribly inefficient but it'll suffice
-		for(int i = 0; i < getNumOutputs(); i++)
-			{
-			if (getKeyForOutput(i).equals(key)) return i;
-			}
-		return SERIALIZATION_NOT_FOUND;
-		}
-	
-	public JSONObject save() throws JSONException
-		{
-		JSONObject obj = super.save();
-				
-		// inputs
-		JSONObject inputs = new JSONObject();
-		for(int i = 0; i < getNumInputs(); i++)
-			{
-			Unit input = getInput(i);
-			int inputIndex = getInputIndex(i);
-			JSONObject m = new JSONObject();
-			m.put("id", input.getID());
-			m.put("at", input.getKeyForOutput(inputIndex));
-			inputs.put(getKeyForInput(i), m);
-			}
-		obj.put("unit", inputs);
+        This method is the inverse of getKeyForOutput(...)  */
+    public int getOutputForKey(String key)
+        {
+        // Terribly inefficient but it'll suffice
+        for(int i = 0; i < getNumOutputs(); i++)
+            {
+            if (getKeyForOutput(i).equals(key)) return i;
+            }
+        return SERIALIZATION_NOT_FOUND;
+        }
+        
+    public JSONObject save() throws JSONException
+        {
+        JSONObject obj = super.save();
+                                
+        // inputs
+        JSONObject inputs = new JSONObject();
+        for(int i = 0; i < getNumInputs(); i++)
+            {
+            Unit input = getInput(i);
+            int inputIndex = getInputIndex(i);
+            JSONObject m = new JSONObject();
+            m.put("id", input.getID());
+            m.put("at", input.getKeyForOutput(inputIndex));
+            inputs.put(getKeyForInput(i), m);
+            }
+        obj.put("unit", inputs);
 
-		return obj;
-		}
+        return obj;
+        }
 
     /** Loads unit inputs from the given JSON Object representing the modulation storage. */
-	public void loadUnits(JSONObject inputs, HashMap<String, Modulation> ids, int moduleVersion, int patchVersion)
-		{
-		for(int i = 0; i < getNumInputs(); i++)
-			{
-			JSONObject m = inputs.optJSONObject(getKeyForInput(i));
-			if (m == null)
-				{
-					System.err.println("WARNING: Could not load unit " + getKeyForInput(i) + " in " + this);
-				}
-			else if (m.getString("id").equals("null"))
-				{
-				setInput(Unit.NIL, i, 0);
-				} 
-			else
-				{
-				Unit unit = (Unit)(ids.get(m.getString("id")));
-				setInput(unit, i, unit.getOutputForKey(m.getString("at")));
-				}
-			}	
-		}
-		
-	public void load(JSONObject obj, HashMap<String, Modulation> ids, int patchVersion) throws Exception
-		{
-		super.load(obj, ids, patchVersion);
+    public void loadUnits(JSONObject inputs, HashMap<String, Modulation> ids, int moduleVersion, int patchVersion)
+        {
+        for(int i = 0; i < getNumInputs(); i++)
+            {
+            JSONObject m = inputs.optJSONObject(getKeyForInput(i));
+            if (m == null)
+                {
+                System.err.println("WARNING: Could not load unit " + getKeyForInput(i) + " in " + this);
+                }
+            else if (m.getString("id").equals("null"))
+                {
+                setInput(Unit.NIL, i, 0);
+                } 
+            else
+                {
+                Unit unit = (Unit)(ids.get(m.getString("id")));
+                setInput(unit, i, unit.getOutputForKey(m.getString("at")));
+                }
+            }       
+        }
+                
+    public void load(JSONObject obj, HashMap<String, Modulation> ids, int patchVersion) throws Exception
+        {
+        super.load(obj, ids, patchVersion);
 
-		// version
-		int moduleVersion = obj.getInt("v");
-		
-		// inputs
-		JSONObject inputs = obj.getJSONObject("unit");
-		loadUnits(inputs, ids, moduleVersion, patchVersion);
-		}
+        // version
+        int moduleVersion = obj.getInt("v");
+                
+        // inputs
+        JSONObject inputs = obj.getJSONObject("unit");
+        loadUnits(inputs, ids, moduleVersion, patchVersion);
+        }
     }

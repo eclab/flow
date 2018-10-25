@@ -62,15 +62,15 @@ public class Out extends Unit
     // Out
     
     public Object clone()
-    	{
-    	Out obj = (Out)(super.clone());
-    	obj.modWave = (double[][])(obj.modWave.clone());
-    	for(int i = 0; i < obj.modWave.length; i++)
-    		obj.modWave[i] = (double[])(obj.modWave[i].clone());
-    	obj.wavePos = (int[])(obj.wavePos.clone());
-    	obj.waveTriggered = (boolean[])(obj.waveTriggered.clone());
-    	return obj;
-    	}
+        {
+        Out obj = (Out)(super.clone());
+        obj.modWave = (double[][])(obj.modWave.clone());
+        for(int i = 0; i < obj.modWave.length; i++)
+            obj.modWave[i] = (double[])(obj.modWave[i].clone());
+        obj.wavePos = (int[])(obj.wavePos.clone());
+        obj.waveTriggered = (boolean[])(obj.waveTriggered.clone());
+        return obj;
+        }
 
 
     public Out(Sound sound)
@@ -100,17 +100,17 @@ public class Out extends Unit
             pushOrders(0);                      // already pushed in super.go()
 
             if (gain == 1.0)
-    			{
-	            pushAmplitudes(0);
-	            }
-			else
-            	{
-            	double g = gain;
-    			copyAmplitudes(0);
-    			double[] amplitudes = getAmplitudes(0);
-    			for(int i = 0; i < amplitudes.length; i++)
-    				amplitudes[i] *= g;
-    			}
+                {
+                pushAmplitudes(0);
+                }
+            else
+                {
+                double g = gain;
+                copyAmplitudes(0);
+                double[] amplitudes = getAmplitudes(0);
+                for(int i = 0; i < amplitudes.length; i++)
+                    amplitudes[i] *= g;
+                }
             }
         else
             {
@@ -273,15 +273,15 @@ public class Out extends Unit
         
         
     //// SERIALIZATION STUFF
-     public String getKeyForModulation(int input)
-     	 {
-     	 if (input < NUM_MOD_OUTPUTS) return MOD_NAMES[input];
-      	 else return super.getKeyForModulation(input);
-      	 }
+    public String getKeyForModulation(int input)
+        {
+        if (input < NUM_MOD_OUTPUTS) return MOD_NAMES[input];
+        else return super.getKeyForModulation(input);
+        }
    
-     public String getKeyForInput(int input)
-     	 {
-     	 if (input < NUM_UNIT_OUTPUTS) return UNIT_NAMES[input];
-      	 else return super.getKeyForInput(input);
-      	 }
+    public String getKeyForInput(int input)
+        {
+        if (input < NUM_UNIT_OUTPUTS) return UNIT_NAMES[input];
+        else return super.getKeyForInput(input);
+        }
     }

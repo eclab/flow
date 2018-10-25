@@ -17,11 +17,11 @@ public class Dilate extends Unit
     {
     private static final long serialVersionUID = 1;
 
-     public static final int MOD_CUT = 0;
+    public static final int MOD_CUT = 0;
      
-     boolean right;
-	public boolean getRight() { return right; }
-     public void setRight(boolean val) { right = val; }
+    boolean right;
+    public boolean getRight() { return right; }
+    public void setRight(boolean val) { right = val; }
      
     public static final int OPTION_RIGHT = 0;
 
@@ -44,7 +44,7 @@ public class Dilate extends Unit
         }
 
 
-   public Dilate(Sound sound)
+    public Dilate(Sound sound)
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
@@ -75,29 +75,29 @@ public class Dilate extends Unit
             }
                 
         if (!right)
-        	{
-			double[] downcuts = new double[amplitudes.length];
-			downcuts[amplitudes.length - 1] = amplitudes[amplitudes.length - 1];
-			for(int i = amplitudes.length - 2; i >= 0; i--)
-				{
-				if (amplitudes[i] <= downcuts[i + 1])
-					{ downcuts[i] = cut * downcuts[i] + (1 - cut) * downcuts[i + 1]; }
-				else
-					{ downcuts[i] = amplitudes[i]; }
-				}
-				
-			for(int i = 0; i < amplitudes.length; i++)
-				{
-				amplitudes[i] = Math.max(upcuts[i], downcuts[i]);
-				}
-			}
-		else
-			{
-			for(int i = 0; i < amplitudes.length; i++)
-				{
-				amplitudes[i] = upcuts[i];
-				}
-			}
+            {
+            double[] downcuts = new double[amplitudes.length];
+            downcuts[amplitudes.length - 1] = amplitudes[amplitudes.length - 1];
+            for(int i = amplitudes.length - 2; i >= 0; i--)
+                {
+                if (amplitudes[i] <= downcuts[i + 1])
+                    { downcuts[i] = cut * downcuts[i] + (1 - cut) * downcuts[i + 1]; }
+                else
+                    { downcuts[i] = amplitudes[i]; }
+                }
+                                
+            for(int i = 0; i < amplitudes.length; i++)
+                {
+                amplitudes[i] = Math.max(upcuts[i], downcuts[i]);
+                }
+            }
+        else
+            {
+            for(int i = 0; i < amplitudes.length; i++)
+                {
+                amplitudes[i] = upcuts[i];
+                }
+            }
         
         constrain(); 
         }       

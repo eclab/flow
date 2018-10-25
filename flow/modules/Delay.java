@@ -45,16 +45,16 @@ public class Delay extends Unit
     double[][] laterDelayBuf = new double[MAX_LATER_DELAY_LENGTH][NUM_PARTIALS];
         
     public Object clone()
-    	{
-    	Delay obj = (Delay)(super.clone());
-    	obj.initialDelayBuf = (double[][])(obj.initialDelayBuf.clone());
-    	for(int i = 0; i < obj.initialDelayBuf.length; i++)
-    		obj.initialDelayBuf[i] = (double[])(obj.initialDelayBuf[i].clone());
-    	obj.laterDelayBuf = (double[][])(obj.laterDelayBuf.clone());
-    	for(int i = 0; i < obj.laterDelayBuf.length; i++)
-    		obj.laterDelayBuf[i] = (double[])(obj.laterDelayBuf[i].clone());
-    	return obj;
-    	}
+        {
+        Delay obj = (Delay)(super.clone());
+        obj.initialDelayBuf = (double[][])(obj.initialDelayBuf.clone());
+        for(int i = 0; i < obj.initialDelayBuf.length; i++)
+            obj.initialDelayBuf[i] = (double[])(obj.initialDelayBuf[i].clone());
+        obj.laterDelayBuf = (double[][])(obj.laterDelayBuf.clone());
+        for(int i = 0; i < obj.laterDelayBuf.length; i++)
+            obj.laterDelayBuf[i] = (double[])(obj.laterDelayBuf[i].clone());
+        return obj;
+        }
     
         
     public void reset()

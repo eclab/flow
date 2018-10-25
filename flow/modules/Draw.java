@@ -53,14 +53,14 @@ public class Draw extends Unit implements UnitSource
     public transient double[] backupAmplitudes;
         
     public Object clone()
-    	{
-    	Draw obj = (Draw)(super.clone());
-    	if (obj.backupFrequencies != null)
-    		obj.backupFrequencies = (double[])(obj.backupFrequencies.clone());
-    	if (obj.backupAmplitudes != null)
-    		obj.backupAmplitudes = (double[])(obj.backupAmplitudes.clone());
-    	return obj;
-    	}
+        {
+        Draw obj = (Draw)(super.clone());
+        if (obj.backupFrequencies != null)
+            obj.backupFrequencies = (double[])(obj.backupFrequencies.clone());
+        if (obj.backupAmplitudes != null)
+            obj.backupAmplitudes = (double[])(obj.backupAmplitudes.clone());
+        return obj;
+        }
 
     void backup()
         {
@@ -484,35 +484,35 @@ public class Draw extends Unit implements UnitSource
 
     //// SERIALIZATION STUFF
 
-	public JSONObject getData()
-		{
-		// not necessary to store orders
-		JSONObject obj = new JSONObject();
-		JSONArray amps = new JSONArray();
-		JSONArray freqs = new JSONArray();
-		double[] amplitudes = getAmplitudes(0);
-		double[] frequencies = getFrequencies(0);
-		for(int i = 0; i < frequencies.length; i++)
-			{
-			amps.put(i, amplitudes[i]);
-			freqs.put(i, frequencies[i]);
-			}
-		obj.put("amp", amps);
-		obj.put("freq", freqs);
-		return obj;
-		}
-	
-	public void setData(JSONObject data, int moduleVersion, int patchVersion)
-		{
-		// not necessary to store orders
-		JSONArray amps = data.getJSONArray("amp");
-		JSONArray freqs = data.getJSONArray("freq");
-		double[] amplitudes = getAmplitudes(0);
-		double[] frequencies = getFrequencies(0);
-		for(int i = 0; i < frequencies.length; i++)
-			{
-			amplitudes[i] = amps.optDouble(i, 0);
-			frequencies[i] = freqs.optDouble(i, i);
-			}
-		} 
+    public JSONObject getData()
+        {
+        // not necessary to store orders
+        JSONObject obj = new JSONObject();
+        JSONArray amps = new JSONArray();
+        JSONArray freqs = new JSONArray();
+        double[] amplitudes = getAmplitudes(0);
+        double[] frequencies = getFrequencies(0);
+        for(int i = 0; i < frequencies.length; i++)
+            {
+            amps.put(i, amplitudes[i]);
+            freqs.put(i, frequencies[i]);
+            }
+        obj.put("amp", amps);
+        obj.put("freq", freqs);
+        return obj;
+        }
+        
+    public void setData(JSONObject data, int moduleVersion, int patchVersion)
+        {
+        // not necessary to store orders
+        JSONArray amps = data.getJSONArray("amp");
+        JSONArray freqs = data.getJSONArray("freq");
+        double[] amplitudes = getAmplitudes(0);
+        double[] frequencies = getFrequencies(0);
+        for(int i = 0; i < frequencies.length; i++)
+            {
+            amplitudes[i] = amps.optDouble(i, 0);
+            frequencies[i] = freqs.optDouble(i, i);
+            }
+        } 
     }

@@ -32,8 +32,8 @@ public class FlangeFilter extends Unit
     public static final int MOD_STRETCH = 3;
     public static final int MOD_STRETCH_MOD = 4;
 
-	public static final double MAX_STRETCH = 4;
-	
+    public static final double MAX_STRETCH = 4;
+        
     int style = STYLE_SPIKE_DOWN;
 
     public static final int STYLE_LINEAR = 0;

@@ -80,7 +80,7 @@ public class Fatten extends Unit
         {
         if (isModulationConstant(modulation))
             {
-       		 double c = makeVerySensitive(modulate(MOD_DETUNE)) * 100;
+            double c = makeVerySensitive(modulate(MOD_DETUNE)) * 100;
             return String.format("%.2f", c) + " Cents";
             }
         else return "";

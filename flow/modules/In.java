@@ -120,15 +120,15 @@ public class In extends Unit
 
 
     //// SERIALIZATION STUFF
-     public String getKeyForModulationOutput(int output)
-     	 {
-     	 if (output < NUM_MOD_INPUTS) return MOD_NAMES[output];
-      	 else return super.getKeyForModulationOutput(output);
-      	 }
+    public String getKeyForModulationOutput(int output)
+        {
+        if (output < NUM_MOD_INPUTS) return MOD_NAMES[output];
+        else return super.getKeyForModulationOutput(output);
+        }
    
-     public String getKeyForOutput(int output)
-     	 {
-     	 if (output < NUM_UNIT_INPUTS) return UNIT_NAMES[output];
-      	 else return super.getKeyForOutput(output);
-      	 }
+    public String getKeyForOutput(int output)
+        {
+        if (output < NUM_UNIT_INPUTS) return UNIT_NAMES[output];
+        else return super.getKeyForOutput(output);
+        }
     }

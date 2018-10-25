@@ -32,13 +32,13 @@ public class Smooth extends Unit
     byte smoothedOrders[];
         
     public Object clone()
-    	{
-    	Smooth obj = (Smooth)(super.clone());
-    	obj.smoothedFrequencies = (double[])(obj.smoothedFrequencies);
-    	obj.smoothedAmplitudes = (double[])(obj.smoothedAmplitudes);
-    	obj.smoothedOrders = (byte[])(obj.smoothedOrders);
-    	return obj;
-    	}
+        {
+        Smooth obj = (Smooth)(super.clone());
+        obj.smoothedFrequencies = (double[])(obj.smoothedFrequencies);
+        obj.smoothedAmplitudes = (double[])(obj.smoothedAmplitudes);
+        obj.smoothedOrders = (byte[])(obj.smoothedOrders);
+        return obj;
+        }
 
     public boolean getFree() { return free; }
     public void setFree(boolean free) { this.free = free; }

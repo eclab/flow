@@ -102,12 +102,12 @@ public class Envelope extends Modulation implements ModSource
     double[] time = new double[NUM_STATES];
     
     public Object clone()
-    	{
-    	Envelope obj = (Envelope)(super.clone());
-    	obj.level = (double[])(obj.level.clone());
-    	obj.time = (double[])(obj.time.clone());
-    	return obj;
-    	}
+        {
+        Envelope obj = (Envelope)(super.clone());
+        obj.level = (double[])(obj.level.clone());
+        obj.time = (double[])(obj.time.clone());
+        return obj;
+        }
 
     int state;
     double start;
@@ -165,7 +165,7 @@ public class Envelope extends Modulation implements ModSource
         {
         super.gate();
         if (isModulationConstant(MOD_GATE_TR))
-        	doGate();
+            doGate();
         }
 
     void doGate()
@@ -202,7 +202,7 @@ public class Envelope extends Modulation implements ModSource
         {
         super.release();
         if (isModulationConstant(MOD_REL_TR))
-        	doRelease();
+            doRelease();
         }
     
     void doRelease()
@@ -482,22 +482,22 @@ public class Envelope extends Modulation implements ModSource
 
 
 
-	public static final String[] MOD_NAMES = new String[]
-            {
-            "Pre 1", "Level 1",
-            "Pre 2", "Level 2",
-            "Pre 3", "Level 3", 
-            "Sus 1", "Level 4", 
-            "Sus 2", "Level 5", 
-            "Sus 3", "Level 6",
-            "Rel 1", "Level 7",
-            "Rel 2", "Level 8",
-            "On Tr", "Off Tr"
-            };
+    public static final String[] MOD_NAMES = new String[]
+    {
+    "Pre 1", "Level 1",
+    "Pre 2", "Level 2",
+    "Pre 3", "Level 3", 
+    "Sus 1", "Level 4", 
+    "Sus 2", "Level 5", 
+    "Sus 3", "Level 6",
+    "Rel 1", "Level 7",
+    "Rel 2", "Level 8",
+    "On Tr", "Off Tr"
+    };
 
     //// SERIALIZATION STUFF
-     public String getKeyForModulation(int input)
-     	 {
-     	 return MOD_NAMES[input];
-      	 }
+    public String getKeyForModulation(int input)
+        {
+        return MOD_NAMES[input];
+        }
     }

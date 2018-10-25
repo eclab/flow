@@ -38,16 +38,16 @@ public class PartialLab extends Unit implements UnitSource
     public void setConstraintOf(int num, int val) { constraint[num] = val; }
         
     public Object clone()
-    	{
-    	PartialLab obj = (PartialLab)(super.clone());
-    	obj.oldType = (int[])(obj.oldType.clone());
-    	obj.type = (int[])(obj.type.clone());
-    	obj.oldConstraint = (int[])(obj.oldConstraint.clone());
-    	obj.constraint = (int[])(obj.constraint.clone());
-    	obj.lastMod = (double[])(obj.lastMod.clone());
-    	obj.lastGain = (double[])(obj.lastGain.clone());
-    	return obj;
-    	}
+        {
+        PartialLab obj = (PartialLab)(super.clone());
+        obj.oldType = (int[])(obj.oldType.clone());
+        obj.type = (int[])(obj.type.clone());
+        obj.oldConstraint = (int[])(obj.oldConstraint.clone());
+        obj.constraint = (int[])(obj.constraint.clone());
+        obj.lastMod = (double[])(obj.lastMod.clone());
+        obj.lastGain = (double[])(obj.lastGain.clone());
+        return obj;
+        }
 
 
     public PartialLab(Sound sound) 

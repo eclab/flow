@@ -144,7 +144,7 @@ public class LFO extends Modulation implements ModSource
         lastRate = Double.NaN;
         lastState = 0;
         state = 0;
-		bias = 0;
+        bias = 0;
         }
         
     public void gate() 

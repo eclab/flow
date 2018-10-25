@@ -94,11 +94,11 @@ public class Drawbars extends Unit implements UnitSource, Presetable
     double[] previousMods = new double[NUM_DRAWBARS];
     
     public Object clone()
-    	{
-    	Drawbars obj = (Drawbars)(super.clone());
-    	obj.previousMods = (double[])(obj.previousMods.clone());
-    	return obj;
-    	}
+        {
+        Drawbars obj = (Drawbars)(super.clone());
+        obj.previousMods = (double[])(obj.previousMods.clone());
+        return obj;
+        }
 
     public void reset() { for(int i = 0; i < previousMods.length; i++) previousMods[i] = Double.NaN; } 
     

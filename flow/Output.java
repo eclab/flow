@@ -490,71 +490,71 @@ public class Output
         int start = 0;
         int end = numSounds;
         
-            double[] amp = with.amplitudes[s];
-            double[] freq = with.frequencies[s];
-            byte[] orders = with.orders[s];
-            double[] pos = positions[s];
-            double[] ca = currentAmplitudes[s];
-            double v = with.velocities[s];
-            double pitch = with.pitches[s];
-            double tr = pitch * Math.PI * 2 * Output.INV_SAMPLING_RATE;
+        double[] amp = with.amplitudes[s];
+        double[] freq = with.frequencies[s];
+        byte[] orders = with.orders[s];
+        double[] pos = positions[s];
+        double[] ca = currentAmplitudes[s];
+        double v = with.velocities[s];
+        double pitch = with.pitches[s];
+        double tr = pitch * Math.PI * 2 * Output.INV_SAMPLING_RATE;
             
-            for (int i = 0; i < pos.length; i++)
-                {
-                double amplitude = amp[i];
-                int oi = orders[i];
-                if (oi < 0) oi += 256;		// if we're using 256 partials, they need to be all positive
+        for (int i = 0; i < pos.length; i++)
+            {
+            double amplitude = amp[i];
+            int oi = orders[i];
+            if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
                 
-                // This was a difficult bug to nail down.  Because we're using our (1-alpha) trick, if we
-                // slowly drop to zero, we'll find our way into subnormals, it appears that subnormals are handled
-                // by Java in *software*, resulting in a radical slowdown in this region.  Subnormals show up around
-                // e^-308, so here if both ca[i] or what we're dropping to is even close to subnormals,
-                // we just shut ca[0] straight to 0 to skip the whole subnormal range.
-                if (ca[oi] > WELL_ABOVE_SUBNORMALS || amplitude * PARTIALS_INTERPOLATION_ALPHA > WELL_ABOVE_SUBNORMALS)
-                    ca[oi] = ca[oi] * (1.0 - PARTIALS_INTERPOLATION_ALPHA) + amplitude * PARTIALS_INTERPOLATION_ALPHA;
-                else
-                    ca[oi] = 0;
-                amplitude = ca[oi];
-                /// End Difficult Bug
+            // This was a difficult bug to nail down.  Because we're using our (1-alpha) trick, if we
+            // slowly drop to zero, we'll find our way into subnormals, it appears that subnormals are handled
+            // by Java in *software*, resulting in a radical slowdown in this region.  Subnormals show up around
+            // e^-308, so here if both ca[i] or what we're dropping to is even close to subnormals,
+            // we just shut ca[0] straight to 0 to skip the whole subnormal range.
+            if (ca[oi] > WELL_ABOVE_SUBNORMALS || amplitude * PARTIALS_INTERPOLATION_ALPHA > WELL_ABOVE_SUBNORMALS)
+                ca[oi] = ca[oi] * (1.0 - PARTIALS_INTERPOLATION_ALPHA) + amplitude * PARTIALS_INTERPOLATION_ALPHA;
+            else
+                ca[oi] = 0;
+            amplitude = ca[oi];
+            /// End Difficult Bug
                                 
-                if (amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
-                    {
-                    double frequency = freq[i];
-                    double absoluteFrequency = frequency * pitch;
+            if (amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
+                {
+                double frequency = freq[i];
+                double absoluteFrequency = frequency * pitch;
                                         
-                    if (absoluteFrequency > SAMPLING_RATE / 2.0)  // beyond Nyquist.  We may assume that ALL later frequencies are also beyond Nyquist since we're sorted.
-                        {
-                        break;          // continue;
-                        }
-                    if (absoluteFrequency <= 0.0)  // don't bother, though this shouldn't happen (well, it might be 0.0)
-                        {
-                        continue;
-                        }
+                if (absoluteFrequency > SAMPLING_RATE / 2.0)  // beyond Nyquist.  We may assume that ALL later frequencies are also beyond Nyquist since we're sorted.
+                    {
+                    break;          // continue;
+                    }
+                if (absoluteFrequency <= 0.0)  // don't bother, though this shouldn't happen (well, it might be 0.0)
+                    {
+                    continue;
+                    }
                     
-                    pos[oi] += frequency * tr;
+                pos[oi] += frequency * tr;
+                if (pos[oi] >= Math.PI * 2)
+                    {
+                    pos[oi] = pos[oi] - (Math.PI * 2);
+                            
                     if (pos[oi] >= Math.PI * 2)
                         {
-                        pos[oi] = pos[oi] - (Math.PI * 2);
-                            
-                        if (pos[oi] >= Math.PI * 2)
-                            {
-                            pos[oi] = pos[oi] % (Math.PI * 2);
-                            }
+                        pos[oi] = pos[oi] % (Math.PI * 2);
                         }
-
-                    // For some crazy reason, if I do buildSample too fast, and thus the
-                    // output sound thread loops too fast, it significantly slows down
-                    // the voice thread.  I don't know why -- I thought it might have something
-                    // to do with the output sound thead checking emitsReady too fast, but now
-                    // I really don't know.  :-(  As a result, when the user chooses "play voice 1 only",
-                    // the voice thread loop really slows down.  So my approach right now is the
-                    // single stupidest approach -- just do the full multi-voice computation here
-                    // but only load the voice 1 samples into the sound output.
-
-                    double smp = Utility.fastSin(pos[oi]) * amplitude * v;
-                    sample += smp;
                     }
+
+                // For some crazy reason, if I do buildSample too fast, and thus the
+                // output sound thread loops too fast, it significantly slows down
+                // the voice thread.  I don't know why -- I thought it might have something
+                // to do with the output sound thead checking emitsReady too fast, but now
+                // I really don't know.  :-(  As a result, when the user chooses "play voice 1 only",
+                // the voice thread loop really slows down.  So my approach right now is the
+                // single stupidest approach -- just do the full multi-voice computation here
+                // but only load the voice 1 samples into the sound output.
+
+                double smp = Utility.fastSin(pos[oi]) * amplitude * v;
+                sample += smp;
                 }
+            }
         return sample;
         }
         
@@ -611,14 +611,14 @@ public class Output
 
 
 
-public static final int NUM_OUTPUTS_PER_THREAD = 2;
+    public static final int NUM_OUTPUTS_PER_THREAD = 2;
 
     // long lastTimeFoo = 0;
     // int timeCountFoo = 0;
     
-double samples[][] = new double[0][SKIP];
+    double samples[][] = new double[0][SKIP];
 
-  // Starts the output thread.  Called from the constructor.
+    // Starts the output thread.  Called from the constructor.
     void startOutputThread()
         {
         Thread thread = new Thread(new Runnable()
@@ -629,45 +629,45 @@ double samples[][] = new double[0][SKIP];
                 /// Note that these are indexed by ORDER, not by actual index position
                 double[][] currentAmplitudes = new double[numVoices][Unit.NUM_PARTIALS];
   
-				lightweightOutputSemaphores = new boolean[MAX_VOICES];
-				outputLocks = new Object[MAX_VOICES];
-				for (int i = 0; i < MAX_VOICES; i++) 
-					{
-					outputLocks[i] = new Object[0];
-					lightweightOutputSemaphores[i] = true;
-					}
+                lightweightOutputSemaphores = new boolean[MAX_VOICES];
+                outputLocks = new Object[MAX_VOICES];
+                for (int i = 0; i < MAX_VOICES; i++) 
+                    {
+                    outputLocks[i] = new Object[0];
+                    lightweightOutputSemaphores[i] = true;
+                    }
 
-			for(int i = 0; i < MAX_VOICES; i += NUM_OUTPUTS_PER_THREAD)
-				{
-				final int _i = i;
-				Thread thread = new Thread(new Runnable()
-					{
-					public void run()
-						{
-						while(true) 
-							{
-							blockOutputUntil(_i, true); 
-						
-							for(int j = _i; j < Math.min(MAX_VOICES, _i + NUM_OUTPUTS_PER_THREAD); j++)
-								{
-								if (j < samples.length)		// voice hasn't been loaded yet, hang tight
-									{
-									double[] samplessnd = samples[j];
-									for (int skipPos = 0; skipPos < SKIP; skipPos++)
-										{
-										samplessnd[skipPos] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
-										}
-									}
-								}
-							
-							signalOutput(_i, false);
-							}
-						}
-					});
-            thread.setName("Output " + _i);
-            thread.setDaemon(true);
-            thread.start();
-            }
+                for(int i = 0; i < MAX_VOICES; i += NUM_OUTPUTS_PER_THREAD)
+                    {
+                    final int _i = i;
+                    Thread thread = new Thread(new Runnable()
+                        {
+                        public void run()
+                            {
+                            while(true) 
+                                {
+                                blockOutputUntil(_i, true); 
+                                                
+                                for(int j = _i; j < Math.min(MAX_VOICES, _i + NUM_OUTPUTS_PER_THREAD); j++)
+                                    {
+                                    if (j < samples.length)         // voice hasn't been loaded yet, hang tight
+                                        {
+                                        double[] samplessnd = samples[j];
+                                        for (int skipPos = 0; skipPos < SKIP; skipPos++)
+                                            {
+                                            samplessnd[skipPos] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+                                            }
+                                        }
+                                    }
+                                                        
+                                signalOutput(_i, false);
+                                }
+                            }
+                        });
+                    thread.setName("Output " + _i);
+                    thread.setDaemon(true);
+                    thread.start();
+                    }
 
                              
                 while(true)
@@ -682,53 +682,53 @@ double samples[][] = new double[0][SKIP];
                         }
                         
                     if (samples.length != getNumSounds())
-                    	samples = new double[getNumSounds()][SKIP];
+                        samples = new double[getNumSounds()][SKIP];
 
                     checkAndSwap();
                     
-					if (onlyPlayFirstSound)
-						{
-						Sound sound = input.getLastPlayedSound();
-						if (sound == null)
-							solo = 0;
-						else
-							solo = sound.getIndex();
-							
-						double[] samplessnd = samples[solo];
-						for (int skipPos = 0; skipPos < SKIP; skipPos++)
-							{
-							samplessnd[skipPos] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
-							}
-						}
+                    if (onlyPlayFirstSound)
+                        {
+                        Sound sound = input.getLastPlayedSound();
+                        if (sound == null)
+                            solo = 0;
+                        else
+                            solo = sound.getIndex();
+                                                        
+                        double[] samplessnd = samples[solo];
+                        for (int skipPos = 0; skipPos < SKIP; skipPos++)
+                            {
+                            samplessnd[skipPos] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+                            }
+                        }
                     else
-                    	{
-						// Fire up output threads
-						for(int snd = 0; snd < numSounds; snd += NUM_OUTPUTS_PER_THREAD)
-							{
-							signalOutput(snd, true);
-							}
-						for(int snd = 0; snd < numSounds; snd += NUM_OUTPUTS_PER_THREAD)
-							{
-							blockOutputUntil(snd, false);
-							}
-						}
-							
-                	for (int skipPos = 0; skipPos < SKIP; skipPos++)
-                		{
-                		double d = 0;
-                		if (solo != -1)
-                			{
-                			d += samples[solo][skipPos];
-                			}
-                		else
-                			{
-							for(int snd = 0; snd < samples.length; snd++)
-								{
-								d += samples[snd][skipPos];
-								}
-							}
-                        	
-                   		if (d > 32767)
+                        {
+                        // Fire up output threads
+                        for(int snd = 0; snd < numSounds; snd += NUM_OUTPUTS_PER_THREAD)
+                            {
+                            signalOutput(snd, true);
+                            }
+                        for(int snd = 0; snd < numSounds; snd += NUM_OUTPUTS_PER_THREAD)
+                            {
+                            blockOutputUntil(snd, false);
+                            }
+                        }
+                                                        
+                    for (int skipPos = 0; skipPos < SKIP; skipPos++)
+                        {
+                        double d = 0;
+                        if (solo != -1)
+                            {
+                            d += samples[solo][skipPos];
+                            }
+                        else
+                            {
+                            for(int snd = 0; snd < samples.length; snd++)
+                                {
+                                d += samples[snd][skipPos];
+                                }
+                            }
+                                
+                        if (d > 32767)
                             {
                             d = 32767;
                             clipped = true;
@@ -1015,5 +1015,5 @@ double samples[][] = new double[0][SKIP];
                 }
             } 
 
-        }    	
+        }       
     }

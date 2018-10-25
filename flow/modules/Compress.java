@@ -24,11 +24,11 @@ public class Compress extends Unit
     public static final int MOD_SCALE = 0;
 
     public Object clone()
-    	{
-    	Compress obj = (Compress)(super.clone());
-    	obj.lastAmps = (double[])(obj.lastAmps.clone());
-    	return obj;
-    	}
+        {
+        Compress obj = (Compress)(super.clone());
+        obj.lastAmps = (double[])(obj.lastAmps.clone());
+        return obj;
+        }
     
     public Compress(Sound sound)
         {

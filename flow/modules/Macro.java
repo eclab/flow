@@ -45,63 +45,63 @@ public class Macro extends Unit implements Cloneable
     boolean[] modIns = new boolean[4];
 
     public Object clone()
-    	{
-    	Macro obj = (Macro)(super.clone());
-    	obj.unitOuts = (boolean[])(obj.unitOuts.clone());
-    	obj.unitIns = (boolean[])(obj.unitIns.clone());
-    	obj.modOuts = (boolean[])(obj.modOuts.clone());
-    	obj.modIns = (boolean[])(obj.modIns.clone());
-    	obj.modules = (Modulation[])(obj.modules.clone());
-    	for(int i = 0; i < obj.modules.length; i++)
-    		obj.modules[i] = (Modulation)(obj.modules[i].clone());
-    		
-    	// Here we need to rewire the modules again
-		// We first build a map of old modules to new ones
-    	HashMap <Modulation, Modulation> map = new HashMap<>();
-    	for(int i = 0; i < modules.length; i++)
-    		{
-    		map.put(modules[i], obj.modules[i]);
-    		}
-    	
-    	// Now build the modulation input and unit inputs, pointing to the new modules
-    	for(int i = 0; i < modules.length; i++)
-    		{
-    		for(int j = 0; j < modules[i].getNumModulations(); j++)
-    			{
-    			if (modules[i].getModulation(j) instanceof Constant)
-    				{
-    				obj.modules[i].setModulation((Modulation)(modules[i].getModulation(j).clone()), j, modules[i].getModulationIndex(j));
-    				}
-    			else
-    				{
-	    			obj.modules[i].setModulation(map.get(modules[i].getModulation(j)), j, modules[i].getModulationIndex(j));
-	    			}
-    			}
-    		if (modules[i] instanceof Unit)
-    			{
-	    		for(int j = 0; j < ((Unit)modules[i]).getNumInputs(); j++)
-    				{
-    				if (((Unit)(modules[i])).getInput(j) instanceof Nil)
-    					{
-    					((Unit)(obj.modules[i])).setInput(Unit.NIL, j, ((Unit)modules[i]).getInputIndex(j));
-    					}
-    				else
-    					{
-    					((Unit)(obj.modules[i])).setInput(((Unit)(map.get(((Unit)modules[i]).getInput(j)))), j, ((Unit)modules[i]).getInputIndex(j));
-						}
-    				}
-    			}
-    		}
-    	
-    	// We also need to identify the new "Out" and the ins again.
-    	// We do this by simply calling loadModules
-    	obj.ins = new ArrayList<In>();
-    	obj.out = null;
-    	obj.loadModules(obj.modules, obj.patchName);
+        {
+        Macro obj = (Macro)(super.clone());
+        obj.unitOuts = (boolean[])(obj.unitOuts.clone());
+        obj.unitIns = (boolean[])(obj.unitIns.clone());
+        obj.modOuts = (boolean[])(obj.modOuts.clone());
+        obj.modIns = (boolean[])(obj.modIns.clone());
+        obj.modules = (Modulation[])(obj.modules.clone());
+        for(int i = 0; i < obj.modules.length; i++)
+            obj.modules[i] = (Modulation)(obj.modules[i].clone());
+                
+        // Here we need to rewire the modules again
+        // We first build a map of old modules to new ones
+        HashMap <Modulation, Modulation> map = new HashMap<>();
+        for(int i = 0; i < modules.length; i++)
+            {
+            map.put(modules[i], obj.modules[i]);
+            }
+        
+        // Now build the modulation input and unit inputs, pointing to the new modules
+        for(int i = 0; i < modules.length; i++)
+            {
+            for(int j = 0; j < modules[i].getNumModulations(); j++)
+                {
+                if (modules[i].getModulation(j) instanceof Constant)
+                    {
+                    obj.modules[i].setModulation((Modulation)(modules[i].getModulation(j).clone()), j, modules[i].getModulationIndex(j));
+                    }
+                else
+                    {
+                    obj.modules[i].setModulation(map.get(modules[i].getModulation(j)), j, modules[i].getModulationIndex(j));
+                    }
+                }
+            if (modules[i] instanceof Unit)
+                {
+                for(int j = 0; j < ((Unit)modules[i]).getNumInputs(); j++)
+                    {
+                    if (((Unit)(modules[i])).getInput(j) instanceof Nil)
+                        {
+                        ((Unit)(obj.modules[i])).setInput(Unit.NIL, j, ((Unit)modules[i]).getInputIndex(j));
+                        }
+                    else
+                        {
+                        ((Unit)(obj.modules[i])).setInput(((Unit)(map.get(((Unit)modules[i]).getInput(j)))), j, ((Unit)modules[i]).getInputIndex(j));
+                        }
+                    }
+                }
+            }
+        
+        // We also need to identify the new "Out" and the ins again.
+        // We do this by simply calling loadModules
+        obj.ins = new ArrayList<In>();
+        obj.out = null;
+        obj.loadModules(obj.modules, obj.patchName);
     
     
-    	return obj;
-    	}
+        return obj;
+        }
 
     public String getNameForModulation() { return patchName; }
     
@@ -186,8 +186,8 @@ public class Macro extends Unit implements Cloneable
                 // we handle the gain here, since we are extracting data directly from out. 
                 double gain = out.getGain();
                 if (gain != 1.0)
-                	for(int q = 0; q < amplitudes.length; q++)
-                		amplitudes[q] *= gain;
+                    for(int q = 0; q < amplitudes.length; q++)
+                        amplitudes[q] *= gain;
                 }
             }
         }
@@ -213,10 +213,10 @@ public class Macro extends Unit implements Cloneable
         super(sound);  // modules hasn't been set yet
         loadModules(modules, patchName);
         setSound(sound);  // distribute to modules
-		}
-		
-	public void loadModules(Modulation[] modules, String patchName)
-		{
+        }
+                
+    public void loadModules(Modulation[] modules, String patchName)
+        {
         this.modules = modules;  // now it's set
         this.patchName  = patchName;
         // find the last Out
@@ -312,54 +312,54 @@ public class Macro extends Unit implements Cloneable
             }             
         }
     
-	public void setData(JSONObject data, int moduleVersion, int patchVersion) throws Exception
-		{
-		loadModules(Sound.loadModules(data, patchVersion), Sound.loadName(data));
-		}
+    public void setData(JSONObject data, int moduleVersion, int patchVersion) throws Exception
+        {
+        loadModules(Sound.loadModules(data, patchVersion), Sound.loadName(data));
+        }
 
     public JSONObject getData() 
-    	{ 
-    	JSONObject obj = new JSONObject();
-    	
-    	Sound.saveName(patchName, obj);
-    	
-		JSONArray array = new JSONArray();
+        { 
+        JSONObject obj = new JSONObject();
+        
+        Sound.saveName(patchName, obj);
+        
+        JSONArray array = new JSONArray();
 
-		int id = 0;		
-		int len = modules.length;
-		for(int i = 0; i < len; i++)
-			modules[i].setID("a" + (id++));
+        int id = 0;             
+        int len = modules.length;
+        for(int i = 0; i < len; i++)
+            modules[i].setID("a" + (id++));
 
-		for(int i = 0; i < len; i++)
-			array.put(modules[i].save());
-		
-		obj.put("modules", array);
-		return obj;
-    	}
+        for(int i = 0; i < len; i++)
+            array.put(modules[i].save());
+                
+        obj.put("modules", array);
+        return obj;
+        }
     
     
     public static Macro loadMacro(Sound sound, File file)
-    	{
-		try 
-			{ 
+        {
+        try 
+            { 
             JSONObject obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
-			return new Macro(sound, 
-				Sound.loadModules(obj, Sound.loadPatchVersion(obj)), 
-				Sound.loadName(obj));
-			}
-		catch (Exception ex)
-			{
-			// try the old way
-			return deserializeAsMacro(sound, file);
-			}
-    	}
+            return new Macro(sound, 
+                Sound.loadModules(obj, Sound.loadPatchVersion(obj)), 
+                Sound.loadName(obj));
+            }
+        catch (Exception ex)
+            {
+            // try the old way
+            return deserializeAsMacro(sound, file);
+            }
+        }
     
     public static Macro deserializeAsMacro(Sound sound, File file)
-    	{
-    	String[] patchName = new String[1];
-		return new Macro(sound, deserialize(file, patchName), patchName[0]);
-    	}
-    	
+        {
+        String[] patchName = new String[1];
+        return new Macro(sound, deserialize(file, patchName), patchName[0]);
+        }
+        
     public static Modulation[] deserialize(File file, String[] patchName)
         {
         ObjectInputStream s = null;

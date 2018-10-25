@@ -86,42 +86,42 @@ public class KHarmonics extends Unit implements UnitSource
         scan.close();
         }
 
-	public void go()
+    public void go()
         {
         super.go();
         
         double m = modulate(0);
         if (m != mod || normalize != oldNormalize || oldHarmonics != harmonics || oldHarmonics2 != harmonics2)
-        	{
-        	mod = m;
-        	oldNormalize = normalize;
-        	oldHarmonics = harmonics;
-        	oldHarmonics2 = harmonics2;
-        	
-			double[] amplitudes = getAmplitudes(0);
-			
-			if (mod == 0)
-				{
-				System.arraycopy(HARMONICS[harmonics], 0, amplitudes, 0, Math.min(HARMONICS[harmonics].length, amplitudes.length));
-				}
-			else if (mod == 1)
-				{
-				System.arraycopy(HARMONICS[harmonics2], 0, amplitudes, 0, Math.min(HARMONICS[harmonics2].length, amplitudes.length));
-				}
-			else
-				{
-				double[] h1 = HARMONICS[harmonics];
-				double[] h2 = HARMONICS[harmonics2];
-				
-				for(int i = 0; i < HARMONICS[harmonics].length; i++)
-					{
-					amplitudes[i] = (1 - m) * h1[i] + m * h2[i];
- 					}
-				}
-				
-			if (normalize) 
-				normalizeAmplitudes();
-			}
+            {
+            mod = m;
+            oldNormalize = normalize;
+            oldHarmonics = harmonics;
+            oldHarmonics2 = harmonics2;
+                
+            double[] amplitudes = getAmplitudes(0);
+                        
+            if (mod == 0)
+                {
+                System.arraycopy(HARMONICS[harmonics], 0, amplitudes, 0, Math.min(HARMONICS[harmonics].length, amplitudes.length));
+                }
+            else if (mod == 1)
+                {
+                System.arraycopy(HARMONICS[harmonics2], 0, amplitudes, 0, Math.min(HARMONICS[harmonics2].length, amplitudes.length));
+                }
+            else
+                {
+                double[] h1 = HARMONICS[harmonics];
+                double[] h2 = HARMONICS[harmonics2];
+                                
+                for(int i = 0; i < HARMONICS[harmonics].length; i++)
+                    {
+                    amplitudes[i] = (1 - m) * h1[i] + m * h2[i];
+                    }
+                }
+                                
+            if (normalize) 
+                normalizeAmplitudes();
+            }
         }
                 
     public KHarmonics(Sound sound) 

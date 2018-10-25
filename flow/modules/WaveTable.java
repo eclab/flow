@@ -44,15 +44,15 @@ public class WaveTable extends Unit implements UnitSource
     double[][] waveTable;
         
     public Object clone()
-    	{
-    	WaveTable obj = (WaveTable)(super.clone());
-    	obj.waveTable = (double[][])(obj.waveTable);
-    	for(int i = 0; i < obj.waveTable.length; i++)
-    		{
-    		obj.waveTable[i] = (double[])(obj.waveTable[i].clone());
-    		}
-    	return obj;
-    	}
+        {
+        WaveTable obj = (WaveTable)(super.clone());
+        obj.waveTable = (double[][])(obj.waveTable);
+        for(int i = 0; i < obj.waveTable.length; i++)
+            {
+            obj.waveTable[i] = (double[])(obj.waveTable[i].clone());
+            }
+        return obj;
+        }
 
     public WaveTable(Sound sound) 
         {
@@ -136,8 +136,8 @@ public class WaveTable extends Unit implements UnitSource
                         {
                         File f = pan[0].doLoad("Load a Wavetable from https://waveeditonline.com/", FILENAME_EXTENSION);
                         if (f != null)
-                        	{
-                        	name = AppMenu.removeExtension(f.getName());
+                            {
+                            name = AppMenu.removeExtension(f.getName());
                             button[0].getButton().setText(name);
                             }
                         }
@@ -207,13 +207,13 @@ public class WaveTable extends Unit implements UnitSource
                             waveTable = new double[done.length][NUM_PARTIALS];
                             // load the wavetable independent of the number of partials
                             for(int i = 0; i < waveTable.length; i++)
-                            	{
-                            	for(int j = 0; j < waveTable[i].length; j++)
-                            		{
-                            		waveTable[i][j] = 0;
-                            		}
-                            	System.arraycopy(done[i], 0, waveTable[i], 0, Math.min(done[i].length, waveTable[i].length));
-                            	}
+                                {
+                                for(int j = 0; j < waveTable[i].length; j++)
+                                    {
+                                    waveTable[i][j] = 0;
+                                    }
+                                System.arraycopy(done[i], 0, waveTable[i], 0, Math.min(done[i].length, waveTable[i].length));
+                                }
                             }
                         finally 
                             {
@@ -237,38 +237,38 @@ public class WaveTable extends Unit implements UnitSource
 
     //// SERIALIZATION STUFF
 
-	public JSONObject getData()
-		{
-		JSONObject obj = new JSONObject();
-		JSONArray wt = new JSONArray();
-		for(int i = 0; i < waveTable.length; i++)
-			for(int j = 0; j < waveTable[i].length; j++)
-				{
-				wt.put(waveTable[i][j]);
-				}
-		obj.put("wt", wt);
-		obj.put("name", (name == null ? "Load..." : name));
-		obj.put("x", waveTable.length);
-		obj.put("y", waveTable[0].length);
-		return obj;
-		}
-	
-	public void setData(JSONObject data, int moduleVersion, int patchVersion)
-		{
-		JSONArray wt = data.getJSONArray("wt");
-		name = data.getString("name");
-		int x = data.getInt("x");
-		int y = data.getInt("y");
-		waveTable = new double[x][NUM_PARTIALS];
-		int c = 0;
-		for(int i = 0; i < x; i++)
-			{
-			for(int j = 0; j < y; j++)
-				{
-				double d = wt.optDouble(c++, 0);
-				if (j < NUM_PARTIALS) waveTable[i][j] = d;  // if we have fewer partials than is listed, we skip this one.
-				}
-			}
-		} 
+    public JSONObject getData()
+        {
+        JSONObject obj = new JSONObject();
+        JSONArray wt = new JSONArray();
+        for(int i = 0; i < waveTable.length; i++)
+            for(int j = 0; j < waveTable[i].length; j++)
+                {
+                wt.put(waveTable[i][j]);
+                }
+        obj.put("wt", wt);
+        obj.put("name", (name == null ? "Load..." : name));
+        obj.put("x", waveTable.length);
+        obj.put("y", waveTable[0].length);
+        return obj;
+        }
+        
+    public void setData(JSONObject data, int moduleVersion, int patchVersion)
+        {
+        JSONArray wt = data.getJSONArray("wt");
+        name = data.getString("name");
+        int x = data.getInt("x");
+        int y = data.getInt("y");
+        waveTable = new double[x][NUM_PARTIALS];
+        int c = 0;
+        for(int i = 0; i < x; i++)
+            {
+            for(int j = 0; j < y; j++)
+                {
+                double d = wt.optDouble(c++, 0);
+                if (j < NUM_PARTIALS) waveTable[i][j] = d;  // if we have fewer partials than is listed, we skip this one.
+                }
+            }
+        } 
         
     }

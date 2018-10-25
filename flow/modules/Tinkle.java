@@ -40,13 +40,13 @@ public class Tinkle extends Unit implements UnitSource
     public Random random = null;
         
     public Object clone()
-    	{
-    	Tinkle obj = (Tinkle)(super.clone());
-    	obj.currentAmplitudes = (double[])(obj.currentAmplitudes);
-    	if (obj.random != null)
-    		obj.random = new Random();  // will be reset on gate()
-    	return obj;
-    	}
+        {
+        Tinkle obj = (Tinkle)(super.clone());
+        obj.currentAmplitudes = (double[])(obj.currentAmplitudes);
+        if (obj.random != null)
+            obj.random = new Random();  // will be reset on gate()
+        return obj;
+        }
 
     public Tinkle(Sound sound)
         {

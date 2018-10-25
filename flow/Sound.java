@@ -208,87 +208,87 @@ public class Sound
 
 
 
-	///// JSON Serialization
+    ///// JSON Serialization
 
-	/** Stores all the modules to a JSONArray, stored in the given object. */
-	public void saveModules(JSONObject obj) throws JSONException
-		{
-		JSONArray array = new JSONArray();
+    /** Stores all the modules to a JSONArray, stored in the given object. */
+    public void saveModules(JSONObject obj) throws JSONException
+        {
+        JSONArray array = new JSONArray();
 
-		int id = 0;		
-		int len = elements.size();
-		for(int i = 0; i < len; i++)
-			elements.get(i).setID("a" + (id++));
+        int id = 0;             
+        int len = elements.size();
+        for(int i = 0; i < len; i++)
+            elements.get(i).setID("a" + (id++));
 
-		for(int i = 0; i < len; i++)
-			array.put(elements.get(i).save());
-		
-		obj.put("modules", array);
-		}
-	
-	/** Stores the patch version to the given object. */
-	public static void savePatchVersion(JSONObject obj) throws JSONException
-		{
-		obj.put("flow", Flow.VERSION);
-		}
-	
-	/** Stores the patch name to the given object. */
-	public static void saveName(String name, JSONObject obj) throws JSONException
-		{
-		obj.put("name", name);
-		}
-		
-	/** Loads the patch version from the given object. */
-	public static int loadPatchVersion(JSONObject obj) throws JSONException
-		{
-		int version = obj.optInt("flow", -1);
-		if (version == -1)	// it's old
-			return obj.getInt("v");
-		else return version;
-		}
-		
-	/** Loads the patch name from the given object. */
-	public static String loadName(JSONObject obj) throws JSONException
-		{
-		return obj.optString("name", "Untitled");
-		}
-		
-	/** Loads all the modules from the given JSONObject, and returns them.
-		Does not registers the modules: they are created with a null Sound. */
-	public static Modulation[] loadModules(JSONObject obj, int patchVersion) throws Exception
-		{
-		JSONArray array = obj.getJSONArray("modules");
-		HashMap<String, Modulation> ids = new HashMap<>();
-		int len = array.length();
-		Modulation[] result = new Modulation[len];
+        for(int i = 0; i < len; i++)
+            array.put(elements.get(i).save());
+                
+        obj.put("modules", array);
+        }
+        
+    /** Stores the patch version to the given object. */
+    public static void savePatchVersion(JSONObject obj) throws JSONException
+        {
+        obj.put("flow", Flow.VERSION);
+        }
+        
+    /** Stores the patch name to the given object. */
+    public static void saveName(String name, JSONObject obj) throws JSONException
+        {
+        obj.put("name", name);
+        }
+                
+    /** Loads the patch version from the given object. */
+    public static int loadPatchVersion(JSONObject obj) throws JSONException
+        {
+        int version = obj.optInt("flow", -1);
+        if (version == -1)      // it's old
+            return obj.getInt("v");
+        else return version;
+        }
+                
+    /** Loads the patch name from the given object. */
+    public static String loadName(JSONObject obj) throws JSONException
+        {
+        return obj.optString("name", "Untitled");
+        }
+                
+    /** Loads all the modules from the given JSONObject, and returns them.
+        Does not registers the modules: they are created with a null Sound. */
+    public static Modulation[] loadModules(JSONObject obj, int patchVersion) throws Exception
+        {
+        JSONArray array = obj.getJSONArray("modules");
+        HashMap<String, Modulation> ids = new HashMap<>();
+        int len = array.length();
+        Modulation[] result = new Modulation[len];
 
-		for(int i = 0; i < len; i++)
-			{
-			JSONObject modobj = array.getJSONObject(i);
-			Modulation mod = (Modulation)(Class.forName(modobj.getString("class")).getConstructor(Sound.class).newInstance((Sound)null));
-			mod.setID(modobj.getString("id"));
-			ids.put(mod.getID(), mod);
-			result[i] = mod;
-			}
+        for(int i = 0; i < len; i++)
+            {
+            JSONObject modobj = array.getJSONObject(i);
+            Modulation mod = (Modulation)(Class.forName(modobj.getString("class")).getConstructor(Sound.class).newInstance((Sound)null));
+            mod.setID(modobj.getString("id"));
+            ids.put(mod.getID(), mod);
+            result[i] = mod;
+            }
 
-		for(int i = 0; i < len; i++)
-			{
-			JSONObject modobj = array.getJSONObject(i);
-			result[i].preprocessLoad(modobj.getInt("v"), patchVersion);
-			}
-			
-		for(int i = 0; i < len; i++)
-			{
-			result[i].load(array.getJSONObject(i), ids, patchVersion);
-			}
+        for(int i = 0; i < len; i++)
+            {
+            JSONObject modobj = array.getJSONObject(i);
+            result[i].preprocessLoad(modobj.getInt("v"), patchVersion);
+            }
+                        
+        for(int i = 0; i < len; i++)
+            {
+            result[i].load(array.getJSONObject(i), ids, patchVersion);
+            }
 
-		for(int i = 0; i < len; i++)
-			{
-			JSONObject modobj = array.getJSONObject(i);
-			result[i].postprocessLoad(modobj.getInt("v"), patchVersion);
-			}
-			
-		return result;
-		}
+        for(int i = 0; i < len; i++)
+            {
+            JSONObject modobj = array.getJSONObject(i);
+            result[i].postprocessLoad(modobj.getInt("v"), patchVersion);
+            }
+                        
+        return result;
+        }
 
     }

@@ -34,12 +34,12 @@ public class LinearFilter extends Unit
     double[] nodeFreq = new double[MAX_NODES];
         
     public Object clone()
-    	{
-    	LinearFilter obj = (LinearFilter)(super.clone());
-    	obj.nodeGain = (double[])(obj.nodeGain.clone());
-    	obj.nodeFreq = (double[])(obj.nodeFreq.clone());
-    	return obj;
-    	}
+        {
+        LinearFilter obj = (LinearFilter)(super.clone());
+        obj.nodeGain = (double[])(obj.nodeGain.clone());
+        obj.nodeFreq = (double[])(obj.nodeFreq.clone());
+        return obj;
+        }
 
     public LinearFilter(Sound sound) 
         { 

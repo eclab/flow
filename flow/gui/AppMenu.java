@@ -138,34 +138,34 @@ public class AppMenu
                      
                 HashMap otherElements = new HashMap();
                 otherElements.put(Macro.PATCH_NAME_KEY, rack.getPatchName());
-            	 
+                 
                 if (file != null)
                     {
-					JSONObject obj = new JSONObject();
-					Sound.saveName(rack.getPatchName(), obj);
-                	Sound.savePatchVersion(obj);
+                    JSONObject obj = new JSONObject();
+                    Sound.saveName(rack.getPatchName(), obj);
+                    Sound.savePatchVersion(obj);
 
-		 			PrintWriter p = null;
-                   FileOutputStream os = null;
+                    PrintWriter p = null;
+                    FileOutputStream os = null;
                     try
                         {
                         os = new FileOutputStream(file);
                         rack.output.lock();
                         try
                             {
-							rack.output.getSound(0).saveModules(obj);
-							p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(file)));
-							System.out.println(obj);
-							p.println(obj);
-							p.close();
-							//Macro.serialize(file, mods, otherElements);
+                            rack.output.getSound(0).saveModules(obj);
+                            p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(file)));
+                            System.out.println(obj);
+                            p.println(obj);
+                            p.close();
+                            //Macro.serialize(file, mods, otherElements);
                             }
                         catch (Exception e2)
-                        	{
-                        	e2.printStackTrace();
-                    		try { if (p != null) p.close(); }
-                    		catch (Exception e3) { }
-                        	}
+                            {
+                            e2.printStackTrace();
+                            try { if (p != null) p.close(); }
+                            catch (Exception e3) { }
+                            }
                         finally 
                             {
                             rack.output.unlock();
@@ -233,7 +233,7 @@ public class AppMenu
                 
         File f = null; // make compiler happy
         FileOutputStream os = null;
-		PrintWriter p = null;
+        PrintWriter p = null;
         if (fd.getFile() != null)
             try
                 {
@@ -241,7 +241,7 @@ public class AppMenu
                 
                 JSONObject obj = new JSONObject();
                 if (rack.getPatchName() == null)
-                	Sound.saveName(removeExtension(f.getName()), obj);
+                    Sound.saveName(removeExtension(f.getName()), obj);
                 else
                     Sound.saveName(rack.getPatchName(), obj);
                 Sound.savePatchVersion(obj);
@@ -251,18 +251,18 @@ public class AppMenu
                     {
                     rack.output.getSound(0).saveModules(obj);
                     p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(f)));
-					System.out.println(obj);
+                    System.out.println(obj);
                     p.println(obj);
                     p.flush();
                     p.close();
                     //Macro.serialize(f, mods, otherElements);
                     }
                 catch (Exception e)
-                	{
-                	e.printStackTrace();
+                    {
+                    e.printStackTrace();
                     try { if (p != null) p.close(); }
                     catch (Exception e2) { }
-                	}
+                    }
                 finally 
                     {
                     rack.output.unlock();
@@ -333,38 +333,38 @@ public class AppMenu
                     f = new File(fd.getDirectory(), fd.getFile());
                     rack.output.lock();
                     try
-                    	{
-                 		JSONObject obj = null;
-						int flowVersion = 0;
-						try 
-							{ 
-                 			obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))); 
-                 			flowVersion = Sound.loadPatchVersion(obj);
-                 			}
-                 		catch (Exception ex) { ex.printStackTrace(); }
-						// version
-		                   	try
-							{
-							Modulation[][] mods = new Modulation[rack.getOutput().getNumSounds()][];
-							for(int i = 0; i < mods.length; i++)
-								{
-								if (obj == null)
-									{
-									mods[i] = Macro.deserialize(f, patchName);		// old version
-									}
-								else
-									mods[i] = Sound.loadModules(obj, flowVersion);
-								}
-												
-							// Create and update Modulations and create ModulePanels
-							load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
-							//rack.printStats();
-							rack.checkOrder();
-							}
-						finally 
-							{
-							rack.output.unlock();
-							}
+                        {
+                        JSONObject obj = null;
+                        int flowVersion = 0;
+                        try 
+                            { 
+                            obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))); 
+                            flowVersion = Sound.loadPatchVersion(obj);
+                            }
+                        catch (Exception ex) { ex.printStackTrace(); }
+                        // version
+                        try
+                            {
+                            Modulation[][] mods = new Modulation[rack.getOutput().getNumSounds()][];
+                            for(int i = 0; i < mods.length; i++)
+                                {
+                                if (obj == null)
+                                    {
+                                    mods[i] = Macro.deserialize(f, patchName);              // old version
+                                    }
+                                else
+                                    mods[i] = Sound.loadModules(obj, flowVersion);
+                                }
+                                                                                                
+                            // Create and update Modulations and create ModulePanels
+                            load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
+                            //rack.printStats();
+                            rack.checkOrder();
+                            }
+                        finally 
+                            {
+                            rack.output.unlock();
+                            }
                         }
                     catch(Exception ex) { ex.printStackTrace(); showSimpleError("Patch Reading Error", "The patch could not be loaded", rack); }
                     file = f;

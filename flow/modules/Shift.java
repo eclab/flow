@@ -92,9 +92,9 @@ public class Shift extends Unit
                 double multiplier = Math.pow(2, (shift - 0.5) * bound * MAX_BOUND);
 
                 for(int i = 0; i < frequencies.length; i++)
-					  {
-					frequencies[i] = frequencies[i] * multiplier;
-				  }
+                    {
+                    frequencies[i] = frequencies[i] * multiplier;
+                    }
                 }
             break;
                         
