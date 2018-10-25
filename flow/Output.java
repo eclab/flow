@@ -640,45 +640,30 @@ double samples[][] = new double[0][SKIP];
 			for(int i = 0; i < MAX_VOICES; i += NUM_OUTPUTS_PER_THREAD)
 				{
 				final int _i = i;
-            Thread thread = new Thread(new Runnable()
-                {
-                public void run()
-                    {
-                    while(true) 
-                        {
-                        blockOutputUntil(_i, true); 
-                        
-                        // should I play?
-                        boolean play = true;			// yes by default
-                        if (onlyPlayFirstSound)
-                        	{
-							Sound sound = input.getLastPlayedSound();
-							if (sound == null)
-								play = (_i == 0);	// if only one sound, and there's no sound yet, it's sound 0
-							else
-								play = (sound.getIndex() == _i);	// if only one sound, and there's a sound, is it me?
-							}
-							
-                        if (play && _i < samples.length)		// voice hasn't been loaded yet, hang tight
-                        	{
-							double[] samplessnd = samples[_i];
+				Thread thread = new Thread(new Runnable()
+					{
+					public void run()
+						{
+						while(true) 
+							{
+							blockOutputUntil(_i, true); 
+						
 							for(int j = _i; j < Math.min(MAX_VOICES, _i + NUM_OUTPUTS_PER_THREAD); j++)
 								{
-								for (int skipPos = 0; skipPos < SKIP; skipPos++)
+								if (j < samples.length)		// voice hasn't been loaded yet, hang tight
 									{
-									samplessnd[skipPos] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+									double[] samplessnd = samples[j];
+									for (int skipPos = 0; skipPos < SKIP; skipPos++)
+										{
+										samplessnd[skipPos] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+										}
 									}
 								}
-							}
-						else
-							{
-							Thread.currentThread().yield();  // I may not exist
-							}
 							
-                        signalOutput(_i, false);
-                        }
-                    }
-                });
+							signalOutput(_i, false);
+							}
+						}
+					});
             thread.setName("Output " + _i);
             thread.setDaemon(true);
             thread.start();
@@ -687,6 +672,8 @@ double samples[][] = new double[0][SKIP];
                              
                 while(true)
                     {
+                    int solo = -1;
+                    
                     int available = sdl.available();
                     if (available >= bufferSize - 128)
                         {
@@ -699,23 +686,47 @@ double samples[][] = new double[0][SKIP];
 
                     checkAndSwap();
                     
-                    // Fire up output threads
-					for(int snd = 0; snd < numSounds; snd += NUM_OUTPUTS_PER_THREAD)
+					if (onlyPlayFirstSound)
 						{
-						signalOutput(snd, true);
+						Sound sound = input.getLastPlayedSound();
+						if (sound == null)
+							solo = 0;
+						else
+							solo = sound.getIndex();
+							
+						double[] samplessnd = samples[solo];
+						for (int skipPos = 0; skipPos < SKIP; skipPos++)
+							{
+							samplessnd[skipPos] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+							}
 						}
-					for(int snd = 0; snd < numSounds; snd += NUM_OUTPUTS_PER_THREAD)
-						{
-						blockOutputUntil(snd, false);
+                    else
+                    	{
+						// Fire up output threads
+						for(int snd = 0; snd < numSounds; snd += NUM_OUTPUTS_PER_THREAD)
+							{
+							signalOutput(snd, true);
+							}
+						for(int snd = 0; snd < numSounds; snd += NUM_OUTPUTS_PER_THREAD)
+							{
+							blockOutputUntil(snd, false);
+							}
 						}
-	                        
+							
                 	for (int skipPos = 0; skipPos < SKIP; skipPos++)
                 		{
                 		double d = 0;
-                        for(int snd = 0; snd < samples.length; snd++)
-                        	{
-                        	d += samples[snd][skipPos];
-                        	}
+                		if (solo != -1)
+                			{
+                			d += samples[solo][skipPos];
+                			}
+                		else
+                			{
+							for(int snd = 0; snd < samples.length; snd++)
+								{
+								d += samples[snd][skipPos];
+								}
+							}
                         	
                    		if (d > 32767)
                             {
