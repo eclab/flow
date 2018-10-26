@@ -77,6 +77,7 @@ public class Out extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, UNIT_NAMES);
+        defineOutputs( new String[] { "A", "B" } );
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER }, MOD_NAMES);
         if (sound != null) sound.setEmits(this);
         }
@@ -103,6 +104,11 @@ public class Out extends Unit
 			double[] amplitudes = getAmplitudes(0);
 			for(int i = 0; i < amplitudes.length; i++)
 				amplitudes[i] *= gain;
+				
+			// provide for auxillary display
+			pushFrequencies(1, 1);
+			pushAmplitudes(1, 1);
+			pushOrders(1, 1);
             }
         else
             {
