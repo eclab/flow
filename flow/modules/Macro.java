@@ -344,7 +344,7 @@ public class Macro extends Unit implements Cloneable
             { 
             JSONObject obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
             return new Macro(sound, 
-                Sound.loadModules(obj, Sound.loadPatchVersion(obj)), 
+                Sound.loadModules(obj, Sound.loadFlowVersion(obj)), 
                 Sound.loadName(obj));
             }
         catch (Exception ex)

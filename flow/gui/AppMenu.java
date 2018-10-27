@@ -90,15 +90,17 @@ public class AppMenu
 
     static JMenuItem namePatchMenu(Rack rack)
         {
-        JMenuItem name = new JMenuItem("Name Patch...");
+        JMenuItem name = new JMenuItem("Patch Info...");
 
         name.addActionListener(new ActionListener()
             {
             public void actionPerformed(ActionEvent e)
                 {
-                String result = Rack.showTextDialog(rack, rack, "Patch Name", "Enter a Patch Name:", rack.getPatchName());
-                if (result == null) return;
-                else rack.setPatchName(result);
+				String[] result = Rack.showPatchDialog(rack, rack.getPatchName(), rack.getPatchAuthor(), rack.getPatchVersion(), rack.getPatchInfo());
+                rack.setPatchName(result[0]);
+                rack.setPatchAuthor(result[1]);
+                rack.setPatchVersion(result[2]);
+                rack.setPatchInfo(result[3]);
                 }
             });
         return name;
@@ -136,14 +138,14 @@ public class AppMenu
                     mods[i] = rack.allModulePanels.get(i).getModulation();
                     }
                      
-                HashMap otherElements = new HashMap();
-                otherElements.put(Macro.PATCH_NAME_KEY, rack.getPatchName());
-                 
                 if (file != null)
                     {
                     JSONObject obj = new JSONObject();
                     Sound.saveName(rack.getPatchName(), obj);
-                    Sound.savePatchVersion(obj);
+                    Sound.saveFlowVersion(obj);
+					Sound.savePatchVersion(rack.getPatchVersion(), obj);
+					Sound.savePatchInfo(rack.getPatchInfo(), obj);
+					Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
 
                     PrintWriter p = null;
                     FileOutputStream os = null;
@@ -158,7 +160,6 @@ public class AppMenu
                             System.out.println(obj);
                             p.println(obj);
                             p.close();
-                            //Macro.serialize(file, mods, otherElements);
                             }
                         catch (Exception e2)
                             {
@@ -244,7 +245,10 @@ public class AppMenu
                     Sound.saveName(removeExtension(f.getName()), obj);
                 else
                     Sound.saveName(rack.getPatchName(), obj);
-                Sound.savePatchVersion(obj);
+				Sound.savePatchVersion(rack.getPatchVersion(), obj);
+				Sound.savePatchInfo(rack.getPatchInfo(), obj);
+				Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
+                Sound.saveFlowVersion(obj);
                 os = new FileOutputStream(f);
                 rack.output.lock();
                 try
@@ -255,7 +259,6 @@ public class AppMenu
                     p.println(obj);
                     p.flush();
                     p.close();
-                    //Macro.serialize(f, mods, otherElements);
                     }
                 catch (Exception e)
                     {
@@ -339,7 +342,7 @@ public class AppMenu
                         try 
                             { 
                             obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))); 
-                            flowVersion = Sound.loadPatchVersion(obj);
+                            flowVersion = Sound.loadFlowVersion(obj);
                             }
                         catch (Exception ex) { ex.printStackTrace(); }
                         // version
@@ -358,7 +361,9 @@ public class AppMenu
                                                                                                 
                             // Create and update Modulations and create ModulePanels
                             load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
-                            //rack.printStats();
+                            rack.setPatchVersion(Sound.loadPatchVersion(obj));
+                            rack.setPatchInfo(Sound.loadPatchInfo(obj));
+                            rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
                             rack.checkOrder();
                             }
                         finally 

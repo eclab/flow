@@ -35,6 +35,9 @@ public class Rack extends JPanel
     Box box;
     Output output;
     String patchName = null;
+    String patchAuthor = null;
+    String patchVersion = null;
+    String patchInfo = null;
     boolean addModulesAfter;
     
     // A list of all current module panels.  Note that this isn't all the
@@ -158,6 +161,15 @@ public class Rack extends JPanel
             ((JFrame) frame).setTitle(p);
             }
         }
+
+    public String getPatchAuthor() { return patchAuthor; }
+    public void setPatchAuthor(String val) { patchAuthor = val; }
+
+    public String getPatchVersion() { return patchVersion; }
+    public void setPatchVersion(String val) { patchVersion = val; }
+
+    public String getPatchInfo() { return patchInfo; }
+    public void setPatchInfo(String val) { patchInfo = val; }
     
     /** Adds a Unit Wire to the rack */
     public void addUnitWire(UnitWire wire) { unitWires.add(wire); }
@@ -812,13 +824,16 @@ public class Rack extends JPanel
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-        JPanel p = new JPanel();
-        p.setLayout(new BorderLayout());
-        p.add(new JLabel("    "), BorderLayout.NORTH);
-        p.add(new JLabel(message), BorderLayout.CENTER);
-        p.add(new JLabel("    "), BorderLayout.SOUTH);
+	        JPanel p = new JPanel();
+    	    p.setLayout(new BorderLayout());
+        	p.add(new JLabel("    "), BorderLayout.NORTH);
+		if (message != null)
+			{
+        	p.add(new JLabel(message), BorderLayout.CENTER);
+        	p.add(new JLabel("    "), BorderLayout.SOUTH);
+        	}
+        	panel.add(p, BorderLayout.NORTH);
         panel.add(list, BorderLayout.CENTER);
-        panel.add(p, BorderLayout.NORTH);
         if (buttons == null || buttons.length == 0)
             {
             return JOptionPane.showConfirmDialog(root, panel, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null);
@@ -880,44 +895,41 @@ public class Rack extends JPanel
 
 
     public static final int LABEL_MAX_LENGTH = 32;
-    public static String showTextDialog(Rack rack, JComponent root, String title, String label, String originalText)
-        {
-        JTextField text = new JTextField(LABEL_MAX_LENGTH);
-        text.setText(originalText);
-                
-        Box box = new Box(BoxLayout.Y_AXIS);
-        box.add(new JLabel(label));
-                
-        // The following hack is inspired by https://tips4java.wordpress.com/2010/03/14/dialog-focus/
-        // and results in the text field being selected (which is what should have happened in the first place) 
-                
-        text.addAncestorListener(new javax.swing.event.AncestorListener()
-            {
-            public void ancestorAdded(javax.swing.event.AncestorEvent e)    
-                { 
-                JComponent component = e.getComponent();
-                component.requestFocusInWindow();
-                text.selectAll(); 
-                }
-            public void ancestorMoved(javax.swing.event.AncestorEvent e) {}
-            public void ancestorRemoved(javax.swing.event.AncestorEvent e) {}
-            });
-        box.add(text);
-        box.add(box.createGlue());
-                
-        rack.disableMenuBar();
-        int opt = JOptionPane.showOptionDialog(root, box, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
-        rack.enableMenuBar();
-                
-        if (opt == JOptionPane.OK_OPTION)
-            {
-            return text.getText().trim();
-            }
-        else return null;
-        }
+	public static String[] showPatchDialog(JComponent root, String name, String author, String version, String info)
+		{
+		if (name == null) name = "";
+		if (author == null) author = "";
+		if (version == null) version = "";
+		if (info == null) info = "";
 
+        JTextField n = new JTextField(LABEL_MAX_LENGTH);
+        n.setText(name);
 
+        JTextField a = new JTextField(LABEL_MAX_LENGTH);
+        a.setText(author);
 
+        JTextField v = new JTextField(LABEL_MAX_LENGTH);
+        v.setText(version);
+
+        JTextArea i = new JTextArea(5, LABEL_MAX_LENGTH);
+        i.setText(info);
+        i.setLineWrap(true);
+        JScrollPane pane = new JScrollPane(i);
+        pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        pane.setBorder(v.getBorder());
+
+        int result = showMultiOption(root, 
+            new String[] { "Patch Name", "Author", "Version", "Patch Info" }, 
+            new JComponent[] { n, a, v, pane }, 
+            "Patch Info", null,
+            new String[] { "Okay", "Cancel" });
+            
+        if (result == 1)  // cancel
+        	return new String[] { name, author, version, info };
+        else
+        	return new String[] { n.getText(), a.getText(), v.getText(), i.getText() };
+		}
+		
 
 
     /// Drag-and-drop data flavor

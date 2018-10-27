@@ -118,7 +118,7 @@ public abstract class InputOutput extends JPanel
             {
             if (!getTitleCanChange()) return;
                                 
-            String result = Rack.showTextDialog(modPanel.rack, InputOutput.this, "New Label", "Enter a Label:", title.getText().trim());
+            String result = showTextDialog(modPanel.rack, InputOutput.this, "New Label", "Enter a Label:", title.getText().trim());
                                 
             if (result != null)
                 {
@@ -127,6 +127,46 @@ public abstract class InputOutput extends JPanel
                 }
             }
         }
+
+    public static final int LABEL_MAX_LENGTH = 32;
+    public static String showTextDialog(Rack rack, JComponent root, String title, String label, String originalText)
+        {
+        JTextField text = new JTextField(LABEL_MAX_LENGTH);
+        text.setText(originalText);
+                
+        Box box = new Box(BoxLayout.Y_AXIS);
+        box.add(new JLabel(label));
+                
+        // The following hack is inspired by https://tips4java.wordpress.com/2010/03/14/dialog-focus/
+        // and results in the text field being selected (which is what should have happened in the first place) 
+                
+        text.addAncestorListener(new javax.swing.event.AncestorListener()
+            {
+            public void ancestorAdded(javax.swing.event.AncestorEvent e)    
+                { 
+                JComponent component = e.getComponent();
+                component.requestFocusInWindow();
+                text.selectAll(); 
+                }
+            public void ancestorMoved(javax.swing.event.AncestorEvent e) {}
+            public void ancestorRemoved(javax.swing.event.AncestorEvent e) {}
+            });
+        box.add(text);
+        box.add(box.createGlue());
+                
+        rack.disableMenuBar();
+        int opt = JOptionPane.showOptionDialog(root, box, title, JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, null, null);
+        rack.enableMenuBar();
+                
+        if (opt == JOptionPane.OK_OPTION)
+            {
+            return text.getText().trim();
+            }
+        else return null;
+        }
+
+
+
 
 
     // Defines jacks for input/output modules

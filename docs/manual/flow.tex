@@ -327,14 +327,19 @@ One of the particularly interesting features of {\name} is its ability to load a
 
 A patch is most useful as a Macro if it's been wired up to send and receive modulation and partials through its module.  To do this, you'll need to prepare the patch first.  See Section~\ref{creatingmacros} for an extensive discussion of the process.
 
-\subsubsection{Tuning Parameters}
+\subsubsection{Naming Patches}
+
+Patches have four pieces of auxiliary text information stored in them: a {\it patch name}, a {\it patch author}, a {\it patch version}, and some {\it patch info}.  You can put whatever you like in these four text boxes: just choose {\bf Patch Info...} from the {\bf Play} menu.
+
+A patch doesn't need to have an author, version, or info: but it ought to have a name.  This is because if you load a patch as a Macro, the Macro's module will be titled with the patch name so you can tell what it is.  If you save a patch that has no name (yet), {\name} will set the patch name to the filename (minus the extension).
+
+\subsection{Tuning Parameters}
 {\name} is very computationally expensive and benefits from some tuning.  If you select {\bf Tuning Parameters} from the {\bf Play} menu, you can at present change three parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session. 
 
 \begin{itemize}
 \item {\bf Polyphony} (1--16, default: 8)\qquad This is the number of voices the synthesizer can play at once.  More voices incurs a higher load.
 \item {\bf Audio Buffer Size} (default: 2048)\qquad This is the size of the audio buffer that {\name} keeps filled for your operating system to tap into to generate sounds.  Some operating systems require a large buffer size: for example, OS X technically can run with a buffer of only 1024, but on my laptop realistically {\name} name requires a buffer larger than that (1536 or 2048 seem to work).  Large buffers incur significantly higher latency, which you don't want. On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{audioloopback} for more information.  I can't help you much regarding Windows.
 \item {\bf Partials} (64--256, default: 128)\qquad This is the number of partials passed around from module to module.  More partials will produce a richer sound, particularly in bass notes, but incur a much higher performance penalty.
-}
 \end{itemize}
 
 \bump
@@ -678,17 +683,11 @@ So far so good.  But how about feeding partials and modulation signals {\it into
 
 Macro, like other partials shapers, can be constrained.
 
-\paragraph{Naming Things}
+\subsubsection{Naming Things}
 
-When you save a patch, you're asked to give it a name.  You might ask: why?  The main reason for this is that a Macro module doesn't say ``Macro'' in its title bar.  Instead it'll display the patch name you provided.
-
-You can also rename the input and output partials and modulation ports of your Macro.  This is accomplished by renaming their compatriots in your In and Out modules.  Note that, unlike in other modules, the ports in your In and Out modules have {\bf underlined labels}.  Just click on a label and you'll be asked to give it a new name.
+You can rename the input and output partials and modulation ports of your Macro.  This is accomplished by renaming their compatriots in your In and Out modules.  Note that, unlike in other modules, the ports in your In and Out modules have {\bf underlined labels}.  Just click on a label and you'll be asked to give it a new name.
 
 Note that although you can have as many In modules as you like, and they will all work, only the ports of the first one will be used to rename ports in the Macro.  (Of course, as mentioned before, while you can have multiple Out modules, only the last one will function at all, and this includes naming ports).
-
-
-
-
 
 
 
@@ -765,7 +764,7 @@ And indeed this is how the Swing event thread (if you have a GUI) interacts with
 
 \item {\tt voicesPerThread}\qquad If you have a high thread context switching overhead, you can assign more than one voice to a single thread.  For example, if {\tt voicesPerThread} was equal to 2, then you'd have 4 threads handling your 8 voices.  If you don't have 8 cores, you might wish to do this.  However keep in mind that the total number of modules your voice can have is bounded by a single core: if you have two voices on a thread, they will share that core and your total number will be halved.  By default this value is 1.
 
-\item {\tt NUM_OUTPUTS_PER_THRES}\qquad Affects the number of output threads generated to convert the partial results into the sound.  Fewer threads, and you've got more work being done by a single processor (which may not be able to take the load); but more threads means more total work given the thread context switching.  By default this is 2, which seems to work well on my laptop.
+\item {\tt NUM\_OUTPUTS\_PER\_THREAD}\qquad Affects the number of output threads generated to convert the partial results into the sound.  Fewer threads, and you've got more work being done by a single processor (which may not be able to take the load); but more threads means more total work given the thread context switching.  By default this is 2, which seems to work well on my laptop.
 
 \end{itemize}
 
@@ -1192,11 +1191,14 @@ Third: you might also change your module, which causes problems when trying to b
 \paragraph{The Current Patch Format}  The format is in JSON and is as follows:
 
 \begin{itemize}
-\item {\tt \{  "flow":{\it file-format-version},\quad "name":{\it patch-name},\quad "modules":{\it modules} \} }
-\item {\it file-format-version:}\quad an integer \(\geq 0\) indicating the version of Flow which created this file.  Presently 0. 
-\item {\it patch-name:}\quad a string. 
+\item {\tt \{  "flow":{\it flow-version}, "name":{\it patch-name}, "by":{\it patch-author}, "info":{\it patch-info}, \rule[0in]{0in}{0in}~\hspace{\fill}\hbox{"v":{\it patch-version},}  "modules":{\it modules} \} }
+\item {\it flow-version:}\quad an integer \(\geq 0\) indicating the version of Flow which created this file.  Presently 0. 
+\item {\it patch-name:}\quad The name of the patch, as stipulated by the patch creator.  A string. 
+\item {\it patch-author:}\quad The patch creator.  A string.  
+\item {\it patch-info:}\quad Useful information about the patch, as stipulated by the patch creator.  A string.  
+\item {\it patch-version:}\quad The version of the patch, as stipulated by the patch creator.  A string. 
 \item {\it modules:}\quad {\tt [ {\it module,*} ] }
-\item {\it module:}\quad {\tt \{ "v":{\it module-version}\quad "class":{\it module-classname}\quad "id":{\it module-id}\quad "opt":{\it options}\\\hspace{\fill}\quad "unit":{\it unit-inputs}\quad "mod":{\it modulation-inputs} \quad{\it optional-data} \}}
+\item {\it module:}\quad {\tt \{ "v":{\it module-version} "class":{\it module-classname} "id":{\it module-id} "opt":{\it options} \rule[0in]{0in}{0in}~\hspace{\fill} "unit":{\it unit-inputs} "mod":{\it modulation-inputs} {\it optional-data} \}}
 \item {\it module-version:}\quad the version of this kind of module.  An integer \(\geq 0\).  Modules are presently largely at 0.
 \item {\it module-classname:}\quad the class name of this module.  A string.
 \item {\it id:}\quad A unique identifier of this module, which is referenced by other modules when they state that they are connected to it.  A string.

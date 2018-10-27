@@ -226,31 +226,67 @@ public class Sound
         obj.put("modules", array);
         }
         
-    /** Stores the patch version to the given object. */
-    public static void savePatchVersion(JSONObject obj) throws JSONException
-        {
-        obj.put("flow", Flow.VERSION);
-        }
-        
     /** Stores the patch name to the given object. */
     public static void saveName(String name, JSONObject obj) throws JSONException
         {
         obj.put("name", name);
         }
                 
+    /** Loads the patch name from the given object. */
+    public static String loadName(JSONObject obj) throws JSONException
+        {
+        return obj.optString("name", "Untitled");
+        }
+                
+    /** Stores the patch version to the given object. */
+    public static void savePatchVersion(String name, JSONObject obj) throws JSONException
+        {
+        obj.put("v", name);
+        }
+                
     /** Loads the patch version from the given object. */
-    public static int loadPatchVersion(JSONObject obj) throws JSONException
+    public static String loadPatchVersion(JSONObject obj) throws JSONException
+        {
+        return obj.optString("v", "");
+        }
+                
+    /** Stores the patch version to the given object. */
+    public static void savePatchAuthor(String name, JSONObject obj) throws JSONException
+        {
+        obj.put("by", name);
+        }
+                
+    /** Loads the patch version from the given object. */
+    public static String loadPatchAuthor(JSONObject obj) throws JSONException
+        {
+        return obj.optString("by", "");
+        }
+                
+    /** Stores the patch version to the given object. */
+    public static void savePatchInfo(String name, JSONObject obj) throws JSONException
+        {
+        obj.put("info", name);
+        }
+                
+    /** Loads the patch version from the given object. */
+    public static String loadPatchInfo(JSONObject obj) throws JSONException
+        {
+        return obj.optString("info", "");
+        }
+                
+    /** Stores the patch version to the given object. */
+    public static void saveFlowVersion(JSONObject obj) throws JSONException
+        {
+        obj.put("flow", Flow.VERSION);
+        }
+        
+    /** Loads the patch version from the given object. */
+    public static int loadFlowVersion(JSONObject obj) throws JSONException
         {
         int version = obj.optInt("flow", -1);
         if (version == -1)      // it's old
             return obj.getInt("v");
         else return version;
-        }
-                
-    /** Loads the patch name from the given object. */
-    public static String loadName(JSONObject obj) throws JSONException
-        {
-        return obj.optString("name", "Untitled");
         }
                 
     /** Loads all the modules from the given JSONObject, and returns them.
