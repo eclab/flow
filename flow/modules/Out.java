@@ -100,15 +100,15 @@ public class Out extends Unit
             pushFrequencies(0);
             pushOrders(0);                      // already pushed in super.go()
 
-			copyAmplitudes(0);
-			double[] amplitudes = getAmplitudes(0);
-			for(int i = 0; i < amplitudes.length; i++)
-				amplitudes[i] *= gain;
-				
-			// provide for auxillary display
-			pushFrequencies(1, 1);
-			pushAmplitudes(1, 1);
-			pushOrders(1, 1);
+            copyAmplitudes(0);
+            double[] amplitudes = getAmplitudes(0);
+            for(int i = 0; i < amplitudes.length; i++)
+                amplitudes[i] *= gain;
+                                
+            // provide for auxillary display
+            pushFrequencies(1, 1);
+            pushAmplitudes(1, 1);
+            pushOrders(1, 1);
             }
         else
             {

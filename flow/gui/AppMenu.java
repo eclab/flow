@@ -96,7 +96,7 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-				String[] result = Rack.showPatchDialog(rack, rack.getPatchName(), rack.getPatchAuthor(), rack.getPatchVersion(), rack.getPatchInfo());
+                String[] result = Rack.showPatchDialog(rack, rack.getPatchName(), rack.getPatchAuthor(), rack.getPatchVersion(), rack.getPatchInfo());
                 rack.setPatchName(result[0]);
                 rack.setPatchAuthor(result[1]);
                 rack.setPatchVersion(result[2]);
@@ -143,9 +143,9 @@ public class AppMenu
                     JSONObject obj = new JSONObject();
                     Sound.saveName(rack.getPatchName(), obj);
                     Sound.saveFlowVersion(obj);
-					Sound.savePatchVersion(rack.getPatchVersion(), obj);
-					Sound.savePatchInfo(rack.getPatchInfo(), obj);
-					Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
+                    Sound.savePatchVersion(rack.getPatchVersion(), obj);
+                    Sound.savePatchInfo(rack.getPatchInfo(), obj);
+                    Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
 
                     PrintWriter p = null;
                     FileOutputStream os = null;
@@ -245,9 +245,9 @@ public class AppMenu
                     Sound.saveName(removeExtension(f.getName()), obj);
                 else
                     Sound.saveName(rack.getPatchName(), obj);
-				Sound.savePatchVersion(rack.getPatchVersion(), obj);
-				Sound.savePatchInfo(rack.getPatchInfo(), obj);
-				Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
+                Sound.savePatchVersion(rack.getPatchVersion(), obj);
+                Sound.savePatchInfo(rack.getPatchInfo(), obj);
+                Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
                 Sound.saveFlowVersion(obj);
                 os = new FileOutputStream(f);
                 rack.output.lock();

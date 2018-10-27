@@ -824,15 +824,15 @@ public class Rack extends JPanel
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-	        JPanel p = new JPanel();
-    	    p.setLayout(new BorderLayout());
-        	p.add(new JLabel("    "), BorderLayout.NORTH);
-		if (message != null)
-			{
-        	p.add(new JLabel(message), BorderLayout.CENTER);
-        	p.add(new JLabel("    "), BorderLayout.SOUTH);
-        	}
-        	panel.add(p, BorderLayout.NORTH);
+        JPanel p = new JPanel();
+        p.setLayout(new BorderLayout());
+        p.add(new JLabel("    "), BorderLayout.NORTH);
+        if (message != null)
+            {
+            p.add(new JLabel(message), BorderLayout.CENTER);
+            p.add(new JLabel("    "), BorderLayout.SOUTH);
+            }
+        panel.add(p, BorderLayout.NORTH);
         panel.add(list, BorderLayout.CENTER);
         if (buttons == null || buttons.length == 0)
             {
@@ -895,12 +895,12 @@ public class Rack extends JPanel
 
 
     public static final int LABEL_MAX_LENGTH = 32;
-	public static String[] showPatchDialog(JComponent root, String name, String author, String version, String info)
-		{
-		if (name == null) name = "";
-		if (author == null) author = "";
-		if (version == null) version = "";
-		if (info == null) info = "";
+    public static String[] showPatchDialog(JComponent root, String name, String author, String version, String info)
+        {
+        if (name == null) name = "";
+        if (author == null) author = "";
+        if (version == null) version = "";
+        if (info == null) info = "";
 
         JTextField n = new JTextField(LABEL_MAX_LENGTH);
         n.setText(name);
@@ -925,11 +925,11 @@ public class Rack extends JPanel
             new String[] { "Okay", "Cancel" });
             
         if (result == 1)  // cancel
-        	return new String[] { name, author, version, info };
+            return new String[] { name, author, version, info };
         else
-        	return new String[] { n.getText(), a.getText(), v.getText(), i.getText() };
-		}
-		
+            return new String[] { n.getText(), a.getText(), v.getText(), i.getText() };
+        }
+                
 
 
     /// Drag-and-drop data flavor

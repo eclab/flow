@@ -513,7 +513,7 @@ public class Output
             if (ca[oi] > WELL_ABOVE_SUBNORMALS || amplitude * PARTIALS_INTERPOLATION_ALPHA > WELL_ABOVE_SUBNORMALS)
                 ca[oi] = ca[oi] * (1.0 - PARTIALS_INTERPOLATION_ALPHA) + amplitude * PARTIALS_INTERPOLATION_ALPHA;
             else if (ca[oi] != 0)
-            	{
+                {
                 ca[oi] = 0;
                 }
             amplitude = ca[oi];

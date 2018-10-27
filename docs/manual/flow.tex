@@ -1202,7 +1202,7 @@ Third: you might also change your module, which causes problems when trying to b
 \item {\it module-version:}\quad the version of this kind of module.  An integer \(\geq 0\).  Modules are presently largely at 0.
 \item {\it module-classname:}\quad the class name of this module.  A string.
 \item {\it id:}\quad A unique identifier of this module, which is referenced by other modules when they state that they are connected to it.  A string.
-\item {\it optional-data:}\quad A JSON object in the form {\tt \{...\}} which the module may use as it likes to store additional data.  This object does not need to appear in the patch at all.  See Wavetable and Draw for examples of usage of optional data.
+\item {\it optional-data:}\quad A JSON object in the form {\tt "data":\{...\}} which the module may use as it likes to store additional data.  This object does not need to appear in the patch at all.  See Wavetable and Draw for examples of usage of optional data.
 \item {\it options:}\quad {\tt \{ {\it option-name}:{\it option-value*} \}}
 \item {\it option-name:}\quad An option name (a string).  Normally this is the same as returned by {\tt getOptionName(...)}.
 \item {\it option-value:}\quad The value of the option (an integer). 
