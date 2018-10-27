@@ -302,15 +302,7 @@ public class Morph extends Unit
                 
         if (morphFrequency)
             {
-            if (ramp == 0)
-                {
-                System.arraycopy(p1frequencies, 0, frequencies, 0, frequencies.length);
-                }
-            else if (ramp == 1)
-                {
-                System.arraycopy(p2frequencies, 0, frequencies, 0, frequencies.length);
-                }
-            else for(int i = 0; i < p1frequencies.length; i++)
+             for(int i = 0; i < p1frequencies.length; i++)
                      {
                      frequencies[i] = (p2frequencies[morphTo[i]] * ramp) + (p1frequencies[i] * (1.0 - ramp));
                      }
@@ -322,15 +314,7 @@ public class Morph extends Unit
                 
         if (morphAmplitude)
             {
-            if (ramp == 0)
-                {
-                System.arraycopy(p1amplitudes, 0, amplitudes, 0, amplitudes.length);
-                }
-            else if (ramp == 1)
-                {
-                System.arraycopy(p2amplitudes, 0, amplitudes, 0, amplitudes.length);
-                }
-            else for(int i = 0; i < p1amplitudes.length; i++)
+            for(int i = 0; i < p1amplitudes.length; i++)
                      {
                      amplitudes[i] = (p2amplitudes[morphTo[i]] * ramp) + (p1amplitudes[i] * (1.0 - ramp));
                      }

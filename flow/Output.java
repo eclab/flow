@@ -476,7 +476,7 @@ public class Output
     
     /** A value that's significantly higher than IEEE 754 subnormals, used by Output.java and Smooth.java
         to make sure they're not dropping into subnormal math. */
-    public static final double WELL_ABOVE_SUBNORMALS = 1.0e-100;
+    public static final double WELL_ABOVE_SUBNORMALS = 1.0e-200;
     
     // Builds a single sample from the partials.  ALPHA is the current interpolation
     // factor (from 0...1) 
@@ -512,8 +512,10 @@ public class Output
             // we just shut ca[0] straight to 0 to skip the whole subnormal range.
             if (ca[oi] > WELL_ABOVE_SUBNORMALS || amplitude * PARTIALS_INTERPOLATION_ALPHA > WELL_ABOVE_SUBNORMALS)
                 ca[oi] = ca[oi] * (1.0 - PARTIALS_INTERPOLATION_ALPHA) + amplitude * PARTIALS_INTERPOLATION_ALPHA;
-            else
+            else if (ca[oi] != 0)
+            	{
                 ca[oi] = 0;
+                }
             amplitude = ca[oi];
             /// End Difficult Bug
                                 
