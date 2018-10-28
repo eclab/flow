@@ -1,5 +1,5 @@
 # Flow 
-Modular, Polyphonic, Additive Synthesizer (Version 0)
+A Polyphonic Modular Additive Synthesizer (Version 0)
  
 By Sean Luke (sean@cs.gmu.edu) \
 With Help from Bryan Hoyle \
