@@ -29,9 +29,7 @@ developed on a 2.8Ghz i7 2015 Macbook Pro Retina).
 
 * One of Flow's modules is a wavetable synth.  It's designed to load wavetables built with WaveEdit, and there are [quite a number to choose from on their website.](https://waveeditonline.com/)
 
-## To Do
-
-Interested in helping out on Flow?  Our [To Do list](TODO.md) lists current open issues and bugs.
+* Interested in helping out on Flow?  Our [To Do list](TODO.md) lists current open issues and bugs.
 
 ## Install and Run Flow
 
