@@ -23,10 +23,11 @@ Flow has about 50 modules of different shapes and sizes, and currently supports 
 quite warm and your fan busy.  You need to have some fairly good hardware to run Flow successfully (for reference, Flow was 
 developed on a 2.8Ghz i7 2015 Macbook Pro Retina).
 
-## Manual
+## Resources
 
-Flow has an [extensive manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf) which discusses additive synthesis, 
-Flow's modular approach, how to run it, how to integrate it with controllers and DAWs, and how to build new modules.
+* Flow has an [extensive manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf) which discusses additive synthesis, Flow's modular approach, how to run it, how to integrate it with controllers and DAWs, and how to build new modules.
+
+* One of Flow's modules is a wavetable synth.  It's designed to load wavetables built with WaveEdit, and there are [quite a number to choose from on their website.](https://waveeditonline.com/)
 
 ## To Do
 
