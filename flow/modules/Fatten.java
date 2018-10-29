@@ -17,13 +17,14 @@ public class Fatten extends Unit
     {
     private static final long serialVersionUID = 1;
 
-    public static final int MOD_DETUNE = 0;
+    public static final int MOD_WET = 0;
+    public static final int MOD_DETUNE = 1;
 
     public Fatten(Sound sound)
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Detune" });
+        defineModulations(new Constant[] { Constant.ONE, Constant.ZERO }, new String[] { "Wet", "Detune" });
         }
                 
     double lastCents = Double.NaN;
@@ -42,6 +43,8 @@ public class Fatten extends Unit
             lastCents = cents;
             factor = Math.pow(2.0, (cents / 1200.0));
             }
+            
+        double wet = modulate(MOD_WET);
                                         
         // This tells us the cents increase.  I don't know if we should also drop by the same amount
         // or by some log difference.  For now I'm just increasing by cents
@@ -63,6 +66,7 @@ public class Fatten extends Unit
         for(int i = 0; i < frequencies.length; i += 2)
             {
             frequencies[i + 1] = frequencies[i] * factor;
+            amplitudes[i + 1] *= wet;
             if (!needToSort && (i + 2 < frequencies.length) && frequencies[i + 2] <= frequencies[i + 1])
                 needToSort = true;
             }
@@ -78,12 +82,12 @@ public class Fatten extends Unit
 
     public String getModulationValueDescription(int modulation)
         {
-        if (isModulationConstant(modulation))
+        if (modulation == MOD_DETUNE && isModulationConstant(modulation))
             {
             double c = makeVerySensitive(modulate(MOD_DETUNE)) * 100;
             return String.format("%.2f", c) + " Cents";
             }
-        else return "";
+        else return super.getModulationValueDescription(modulation);
         }
 
     }
