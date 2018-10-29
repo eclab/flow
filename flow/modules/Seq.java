@@ -145,7 +145,8 @@ public class Seq extends Modulation
         super.reset();
         state = 0;
         setModulationOutput(0, modulate(state));
-        didTrigger = true;
+//        didTrigger = true;		// this creates beeps when resetting, bad
+		gated = false;
         }
                 
     public void gate()
