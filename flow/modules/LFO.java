@@ -314,7 +314,7 @@ public class LFO extends Modulation implements ModSource
         double scale = modulate(MOD_SCALE);
         double shift = modulate(MOD_SHIFT);
 
-        // Update the current state.  This is complicated if we changed the rate;  jumps in
+        // Update the current state.  This is complicated if we changed the rate; jumps in
         // the rate will cause eccentricities in the waveform because we're basing this on
         // the position of the wave from the start, not the relative change.
                 
@@ -348,7 +348,7 @@ public class LFO extends Modulation implements ModSource
             }
         else if (halfTrigger && (lastState < 0.5 && state >= 0.5))
             {
-            updateTrigger(0);
+        	updateTrigger(0);
             }
         lastState = state;
 

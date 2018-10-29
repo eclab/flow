@@ -73,11 +73,13 @@ public class Seq extends Modulation
 
     public static final int MOD_STEPS = 32;
     public static final int MOD_TRIGGER = 33;
+
     public static final int NUM_STATES = 32;
         
     int state = 0;
     boolean free = false;
     boolean sample = true;
+    boolean gated = false;
 
     public boolean getFree() { return free; }
     public void setFree(boolean val) { free = val; }
@@ -111,7 +113,7 @@ public class Seq extends Modulation
     public Seq(Sound sound)
         {
         super(sound);
-        defineOptions(new String[] { "Free", "Sample" }, new String[][] { { "Free" }, { "Sample" } });
+        defineOptions(new String[] { "Free", "Sample", }, new String[][] { { "Free" }, { "Sample" } });
         defineModulations(new Constant[] 
             { Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
               Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
@@ -135,28 +137,42 @@ public class Seq extends Modulation
                 });
         }
 
+	// go() automatically clears the trigger so we need to set it a different way
+	boolean didTrigger;
+	
     public void reset()
         {
-        super.gate();
+        super.reset();
         state = 0;
         setModulationOutput(0, modulate(state));
-        updateTrigger(0);
+        didTrigger = true;
         }
                 
     public void gate()
         {
         super.gate();
+        gated = true;
         if (!free) 
             {
             state = 0;
             setModulationOutput(0, modulate(state));
-            updateTrigger(0);
+            didTrigger = true;
             }
         }
+    
+    public void release()
+    	{
+    	gated = false;
+    	}
         
     public void go()
         {
         super.go();
+        if (didTrigger) updateTrigger(0);
+        didTrigger = false;
+
+        if (!gated && !free)  
+        	return;      
         
         if (isTriggered(MOD_TRIGGER))
             {
