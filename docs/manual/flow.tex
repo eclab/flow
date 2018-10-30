@@ -329,9 +329,9 @@ A patch is most useful as a Macro if it's been wired up to send and receive modu
 
 \subsubsection{Naming Patches}
 
-Patches have four pieces of auxiliary text information stored in them: a {\it patch name}, a {\it patch author}, a {\it patch version}, and some {\it patch info}.  You can put whatever you like in these four text boxes: just choose {\bf Patch Info...} from the {\bf Play} menu.
+Patches have four pieces of auxiliary text information stored in them: a {\it patch name}, a {\it patch author}, a {\it patch date}, a {\it patch version}, and some {\it patch info}.  You can put whatever you like in these four text boxes: just choose {\bf Patch Info...} from the {\bf Play} menu.
 
-A patch doesn't need to have an author, version, or info: but it ought to have a name.  This is because if you load a patch as a Macro, the Macro's module will be titled with the patch name so you can tell what it is.  If you save a patch that has no name (yet), {\name} will set the patch name to the filename (minus the extension).
+A patch doesn't need to have an author, date, version, or info: but it ought to have a name.  This is because if you load a patch as a Macro, the Macro's module will be titled with the patch name so you can tell what it is.  If you save a patch that has no name (yet), {\name} will set the patch name to the filename (minus the extension).
 
 \subsection{Tuning Parameters}
 {\name} is very computationally expensive and benefits from some tuning.  If you select {\bf Tuning Parameters} from the {\bf Play} menu, you can at present change three parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session. 
@@ -431,7 +431,6 @@ See also {\bf MIDIIn}, previous.
 \item {\bf threshold}\quad If \(A \geq B\), returns 1, else returns 0.
 \end{itemize}
 
-\\
 \noindent Additionally, there are a number of logical operators on triggers.
 
 \begin{itemize}
@@ -1189,30 +1188,31 @@ Second: the key for each modulation input/output, each unit input/output, and ea
 
 Third: you might also change your module, which causes problems when trying to be backward-compatible during loading.  If you update your module, you might override your modulation version in {\tt getVersion(...)}.  If you've changed your options, modulation inputs/outputs, and unit inputs/outputs, perhaps adding a new one or deleting some, you might need to check for this immediately before and/or immediately after they are loaded and set automatically, so as to revise them.  The methods {\tt preprocessLoad(...)} and {\tt postprocessLoad(...)} may be helpful.  You could completely override everything, if you wanted, by overriding the methods {\tt loadModulations(...)} or {\tt loadOptions(...)} etc..   Or you could just override {\t load(...)}.
 
-\paragraph{The Current Patch Format}  The format is in JSON and is as follows:
+\paragraph{The Current Patch Format}  The format is in GZipped JSON and is as follows:
 
 \begin{itemize}
-\item {\tt \{  "flow":{\it flow-version}, "name":{\it patch-name}, "by":{\it patch-author}, "info":{\it patch-info}, \rule[0in]{0in}{0in}~\hspace{\fill}\hbox{"v":{\it patch-version},}  "modules":{\it modules} \} }
+\item {\tt \{  "flow":{\it flow-version}, "name":{\it patch-name}, "by":{\it patch-author}, "on":{\it patch-date}, \rule[0in]{0in}{0in}~\hspace{\fill}\hbox{ "info":{\it patch-info}, "v":{\it patch-version},}  "modules":{\it modules} \} }
 \item {\it flow-version:}\quad an integer \(\geq 0\) indicating the version of Flow which created this file.  Presently 0. 
 \item {\it patch-name:}\quad The name of the patch, as stipulated by the patch creator.  A string. 
 \item {\it patch-author:}\quad The patch creator.  A string.  
+\item {\it patch-date:}\quad The patch creation date.  A string.  
 \item {\it patch-info:}\quad Useful information about the patch, as stipulated by the patch creator.  A string.  
 \item {\it patch-version:}\quad The version of the patch, as stipulated by the patch creator.  A string. 
 \item {\it modules:}\quad {\tt [ {\it module,*} ] }
-\item {\it module:}\quad {\tt \{ "v":{\it module-version} "class":{\it module-classname} "id":{\it module-id} "opt":{\it options} \rule[0in]{0in}{0in}~\hspace{\fill} "unit":{\it unit-inputs} "mod":{\it modulation-inputs} {\it optional-data} \}}
+\item {\it module:}\quad {\tt \{ "v":{\it module-version}, "class":{\it module-classname}, "id":{\it module-id}, "opt":{\it options}, \rule[0in]{0in}{0in}~\hspace{\fill} "unit":{\it unit-inputs}, "mod":{\it modulation-inputs}, {\it optional-data} \}}
 \item {\it module-version:}\quad the version of this kind of module.  An integer \(\geq 0\).  Modules are presently largely at 0.
 \item {\it module-classname:}\quad the class name of this module.  A string.
 \item {\it id:}\quad A unique identifier of this module, which is referenced by other modules when they state that they are connected to it.  A string.
 \item {\it optional-data:}\quad A JSON object in the form {\tt "data":\{...\}} which the module may use as it likes to store additional data.  This object does not need to appear in the patch at all.  See Wavetable and Draw for examples of usage of optional data.
-\item {\it options:}\quad {\tt \{ {\it option-name}:{\it option-value*} \}}
+\item {\it options:}\quad {\tt \{ {\it option-name}:{\it option-value,*} \}}
 \item {\it option-name:}\quad An option name (a string).  Normally this is the same as returned by {\tt getOptionName(...)}.
 \item {\it option-value:}\quad The value of the option (an integer). 
-\item {\it modulation-inputs:}\quad {\tt \{ {\it modulation-input-name}:{\it modulation-input*} \}}
+\item {\it modulation-inputs:}\quad {\tt \{ {\it modulation-input-name}:{\it modulation-input,*} \}}
 \item {\it modulation-input-name:}\quad A modulation input name (a string).  Normally this is the same as returned by {\tt getModulationName(...)}.
 \item {\it modulation-input-value:}\quad Either a double between 0.0 or 1.0 representing the modulation dial value, or a {\it modulation-output}. 
 \item {\it modulation-output:}\quad {\tt \{ "at":{\it modulation-output-name}, "id":{\it id} \}}\qquad The id is for the attached module.
 \item {\it modulation-output-name:}\quad A modulation output name (a string).  Normally this is the same as returned by {\tt getModulationOutputName(...)}.
-\item {\it unit-inputs:}\quad {\tt \{ {\it unit-input-name}:{\it unit-input*} \}}
+\item {\it unit-inputs:}\quad {\tt \{ {\it unit-input-name}:{\it unit-input,*} \}}
 \item {\it unit-input-name:}\quad A unit input name (a string).  Normally this is the same as returned by {\tt getInputName(...)}.
 \item {\it unit-input-value:}\quad{\tt \{ "at":{\it unit-output-name}, "id":{\it id} \}}\qquad The id is for the attached module.
 \item {\it unit-output-name:}\quad A unit output name (a string).  Normally this is the same as returned by {\tt getOutputName(...)}.
