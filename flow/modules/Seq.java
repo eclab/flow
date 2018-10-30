@@ -8,95 +8,49 @@ import flow.*;
 import flow.gui.*;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
+
+/**
+   A Modulation which provides a simple step sequencer of up to 32 steps.  You specify
+   the number of steps with the "steps" knob.  Each step changes the output modulation
+   to a specified value.
+   
+   <p>If "free" is true, then steps are updated every time Seq receives a trigger.
+   If "free" is false, then steps are updated every time Seq receives a trigger, but only
+   when a note is pressed; as soon as it is released, Seq stops updating.
+   
+   <p>If "sample" is false, then you can change any of the step modulations in real
+   time: for example, if Seq is in step 5, and you change the knob of step 5, then Seq's
+   modulation will change as well.  You may or may not want this.  If "sample" is true,
+   then Seq samples the next step's modulation when the trigger arrives, then only outputs
+   that modulation value during the step.
+   
+   <p>Seq is designed to output modulation values: but you can set it up to effectively
+   output notes.  To do this, attach Seq's output as the "shift" modulation for a Shift,
+   and have Shift change the pitch of your sound.  Make sure Shift's type is set to "Pitch"
+   and Bound = 1.0.  To make setting notes easier, if you
+   double-click on a Seq dial, a keyboard will pop up which maps notes to modulation
+   values: Middle C is equivalent to no shift.
+*/
 
 public class Seq extends Modulation
     {       
     private static final long serialVersionUID = 1;
 
-    public static final String[] PITCH_NAMES = new String[]
-    {
-    "C  -12",
-    "Db -11",
-    "D  -10",
-    "Eb -9",
-    "E  -8",
-    "F  -7",
-    "Gb -6",
-    "G  -5",
-    "Ab -4",
-    "A  -3",
-    "Bb -2",
-    "B  -1",
-    "C  0",
-    "Db 1",
-    "D  2",
-    "Eb 3",
-    "E  4",
-    "F  5",
-    "Gb 6",
-    "G  7",
-    "Ab 8",
-    "A  9",
-    "Bb 10",
-    "B  11",
-    "C  12",
-    };
-        
-    public static final double[] PITCHES = new double[]
-    {
-    (1.0 - 24/12.0) / 4.0 + 0.25,
-    (1.0 - 23/12.0) / 4.0 + 0.25,
-    (1.0 - 22/12.0) / 4.0 + 0.25,
-    (1.0 - 21/12.0) / 4.0 + 0.25,
-    (1.0 - 20/12.0) / 4.0 + 0.25,
-    (1.0 - 19/12.0) / 4.0 + 0.25,
-    (1.0 - 18/12.0) / 4.0 + 0.25,
-    (1.0 - 17/12.0) / 4.0 + 0.25,
-    (1.0 - 16/12.0) / 4.0 + 0.25,
-    (1.0 - 15/12.0) / 4.0 + 0.25,
-    (1.0 - 14/12.0) / 4.0 + 0.25,
-    (1.0 - 13/12.0) / 4.0 + 0.25,
-    (1.0 - 12/12.0) / 4.0 + 0.25,
-    (1.0 - 11/12.0) / 4.0 + 0.25,
-    (1.0 - 10/12.0) / 4.0 + 0.25,
-    (1.0 - 9/12.0) / 4.0 + 0.25,
-    (1.0 - 8/12.0) / 4.0 + 0.25,
-    (1.0 - 7/12.0) / 4.0 + 0.25,
-    (1.0 - 6/12.0) / 4.0 + 0.25,
-    (1.0 - 5/12.0) / 4.0 + 0.25,
-    (1.0 - 4/12.0) / 4.0 + 0.25,
-    (1.0 - 3/12.0) / 4.0 + 0.25,
-    (1.0 - 2/12.0) / 4.0 + 0.25,
-    (1.0 - 2/12.0) / 4.0 + 0.25,
-    (1) / 4.0 + 0.25,
-    (1.0 + 1/12.0) / 4.0 + 0.25,
-    (1.0 + 2/12.0) / 4.0 + 0.25,
-    (1.0 + 3/12.0) / 4.0 + 0.25,
-    (1.0 + 4/12.0) / 4.0 + 0.25,
-    (1.0 + 5/12.0) / 4.0 + 0.25,
-    (1.0 + 6/12.0) / 4.0 + 0.25,
-    (1.0 + 7/12.0) / 4.0 + 0.25,
-    (1.0 + 8/12.0) / 4.0 + 0.25,
-    (1.0 + 9/12.0) / 4.0 + 0.25,
-    (1.0 + 10/12.0) / 4.0 + 0.25,
-    (1.0 + 11/12.0) / 4.0 + 0.25,
-    (1.0 + 12/12.0) / 4.0 + 0.25,
-    (1.0 + 13/12.0) / 4.0 + 0.25,
-    (1.0 + 14/12.0) / 4.0 + 0.25,
-    (1.0 + 15/12.0) / 4.0 + 0.25,
-    (1.0 + 16/12.0) / 4.0 + 0.25,
-    (1.0 + 17/12.0) / 4.0 + 0.25,
-    (1.0 + 18/12.0) / 4.0 + 0.25,
-    (1.0 + 19/12.0) / 4.0 + 0.25,
-    (1.0 + 20/12.0) / 4.0 + 0.25,
-    (1.0 + 21/12.0) / 4.0 + 0.25,
-    (1.0 + 22/12.0) / 4.0 + 0.25,
-    (1.0 + 23/12.0) / 4.0 + 0.25,
-    (1.0 + 24/12.0) / 4.0 + 0.25,
-    };
-
     public static final int MOD_STEPS = 32;
     public static final int MOD_TRIGGER = 33;
+
+	// Pitch equivalence mappings.  24 = centered (0.5), 0 = 2 octaves down (0.0), 48 = two octaves up (1.0)
+    public static final double[] PITCHES = new double[49];
+    
+    static
+    	{
+    	for(int i = 0; i < PITCHES.length; i++)
+    		{
+    		PITCHES[i] = (1.0 - (i - 24)/12.0) / 4.0 + 0.25;
+    		}
+    	};
+
 
     public static final int NUM_STATES = 32;
         
@@ -226,6 +180,7 @@ public class Seq extends Modulation
         else return "";
         }
 
+
     public ModulePanel getPanel()
         {
         return new ModulePanel(Seq.this)
@@ -244,6 +199,8 @@ public class Seq extends Modulation
                     Box box2 = new Box(BoxLayout.X_AXIS);
                     for(int j = i; j < i + 4; j++)
                         {
+
+						// You'll notice a lot of code here is the same as in Shift
                         final ModulationInput[] m = new ModulationInput[1];
                         m[0] = new ModulationInput(mod, j, this)
                             {
@@ -259,18 +216,30 @@ public class Seq extends Modulation
                             			}
                             		};
                             	pop.add(display);
+
+							String[] options = getOptions();
+							for(int i = 0; i < options.length; i++)
+								{
+								JMenuItem menu = new JMenuItem(options[i]);
+								menu.setFont(Style.SMALL_FONT());
+								final int _i = i;
+								menu.addActionListener(new ActionListener()
+									{
+									public void actionPerformed(ActionEvent e)      
+										{
+										double val = convert(_i);
+										if (val >= 0 && val <= 1)
+											setState(val);
+										}       
+									});     
+								pop.add(menu);
+								}    
+								
                             	return pop;
                             	}
-                            	
-                            /*
-                            public String[] getOptions() { return PITCH_NAMES; }
-                            public double convert(int elt) 
-                                {
-                                return PITCHES[elt];
-                                }
-                            */
                             };
-                        m[0].getData().setPreferredSize(example.getMinimumSize());
+//                        m[0].getData().setPreferredSize(example.getPreferredSize());
+                        m[0].getData().setMinimumSize(example.getPreferredSize());
                         box2.add(m[0]);
                         }
                     box.add(box2);

@@ -36,37 +36,7 @@ public class NRPN extends Modulation implements ModSource
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO },
             new String[] { "MSB", "LSB", "MSB", "LSB", "MSB", "LSB", "MSB", "LSB", "MSB", "LSB", "MSB", "LSB", });
         defineModulationOutputs( new String[] { "", "", "", "", "", "" });
-        /*
-          String[] opt = new String[NUM_NRPN];
-          String[][] optValues = new String[NUM_NRPN][];
-          for(int i = 0; i < opt.length; i++)
-          {
-          opt[i] = "Coarse";
-          optValues[i] = new String[] { "Coarse" };
-          }
-          defineOptions(opt, optValues);
-        */
         }
-
-/*
-  public static final int OPTION_COARSE = 0;
-
-  public boolean coarse;
-  public boolean getCoarse() { return coarse; }
-  public void setCoarse(boolean val) { coarse = val; }
-        
-  public int getOptionValue(int option) 
-  {
-  if (option == OPTION_COARSE) return getCoarse() ? 1 : 0;
-  else throw new RuntimeException("No such option " + option);
-  }
-                
-  public void setOptionValue(int option, int value)
-  { 
-  if (option == OPTION_COARSE) setCoarse(value != 0);
-  else throw new RuntimeException("No such option " + option);
-  }
-*/
 
     public void go()
         {
@@ -76,16 +46,7 @@ public class NRPN extends Modulation implements ModSource
         for(int i = 0; i < NUM_NRPN; i++)
             {
             int val = sound.getOutput().getInput().getNRPN(((int)modulate(i * 2) * 127 * 128) + (int)(modulate(i * 2 + 1) * 127));
-            /*
-              if (coarse)
-              {
-              setModulationOutput(i, (val / 128) / 127.0);    // note integer division
-              }
-              else
-            */
-                {
-                setModulationOutput(i, (val / 128.0) / 127.0);
-                }
+            setModulationOutput(i, (val / 128.0) / 127.0);
             }
         }
 
@@ -121,7 +82,6 @@ public class NRPN extends Modulation implements ModSource
                 Modulation mod = getModulation();
 
                 Box box = new Box(BoxLayout.Y_AXIS);
-                // box.add(new OptionsChooser(mod, OPTION_COARSE));
                 for(int i = 0; i < NUM_NRPN; i++)
                     {
                     final int _i = i;

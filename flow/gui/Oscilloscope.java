@@ -101,7 +101,12 @@ public class Oscilloscope extends JComponent
         int width = getWidth();
         g.setColor(Color.BLACK);
         g.fill(new Rectangle2D.Double(0, 0, width, height));
-        
+
+        // draw axis                                        
+        g.setColor(trig ? DARK_BLUE : DARK_GREEN);
+        g.draw(new Line2D.Double(BORDER, BORDER + WAVE_HEIGHT / 2.0, WAVE_SIZE + BORDER, BORDER + WAVE_HEIGHT / 2.0));
+        g.draw(new Line2D.Double(BORDER + WAVE_SIZE / 2.0, BORDER, BORDER + WAVE_SIZE / 2.0, WAVE_HEIGHT + BORDER));
+
         // Draw the wave
         g.setColor(Color.WHITE);
         g.setStroke(stroke);
@@ -118,10 +123,5 @@ public class Oscilloscope extends JComponent
             p++;
             if (p >= WAVE_SIZE) p = 0;
             }
-
-        // draw axis                                        
-        g.setColor(trig ? DARK_BLUE : DARK_GREEN);
-        g.draw(new Line2D.Double(BORDER, BORDER + WAVE_HEIGHT / 2.0, WAVE_SIZE + BORDER, BORDER + WAVE_HEIGHT / 2.0));
-        g.draw(new Line2D.Double(BORDER + WAVE_SIZE / 2.0, BORDER, BORDER + WAVE_SIZE / 2.0, WAVE_HEIGHT + BORDER));
         }
     }

@@ -431,7 +431,6 @@ See also {\bf MIDIIn}, previous.
 \item {\bf threshold}\quad If \(A \geq B\), returns 1, else returns 0.
 \end{itemize}
 
-\noindent {\it Tip\quad} Occasionally you may find that you need a module which allows you to control several modulations at once by dragging a single dial.  You can easily do this in Mod Math: for example, you could choose \(\boldsymbol{+}\) , set Signal B to 0, hook up the output modulation to your various input modulations to control, and drag the Signal A dial.\\
 \\
 \noindent Additionally, there are a number of logical operators on triggers.
 
@@ -460,10 +459,12 @@ See also {\bf MIDIIn}, previous.
 
 If {\it Free} is true, then the sequencer is free-running and ignores note-on.  If {\it Sample} is true, then {\it Mod} outputs the value of the current step as sampled immediately when transitioned to that step; but if {\it Sample} is false, then the value of the current step may be changed in real-time, and {\it Mod} will output whatever its current value is.
 
-In addition to sequencing modulation signals, Seq can also be used in combination with {\bf Shift} to sequence note values.  To do this, attach {\it Mod} to Shift's {\it Shift} port, and set Shift's {\it Bound} to 1.0 and its {\it Type} to {\it Pitch}.  Feed the sound into Shift's {\it Input}, and the result in Shift's {\it Out}.  In this arrangement, each of Seq's modulation dials ranges from two octaves below to two octaves above.  To make things easier, if you double-click on a modulation dial, the pop-up menu is set up to present you with notes from one octave below to one octave above (keyed in C, but it'll be relative to whatever the current pitch is).  See also {\bf Shift}.
+In addition to sequencing modulation signals, Seq can also be used in combination with {\bf Shift} to sequence note values.  To do this, attach {\it Mod} to Shift's {\it Shift} port, and set Shift's {\it Bound} to 1.0 and its {\it Type} to {\it Pitch}.  Feed the sound into Shift's {\it Input}, and the result in Shift's {\it Out}.  In this arrangement, each of Seq's modulation dials ranges from two octaves below to two octaves above.  To make things easier, if you double-click on a modulation dial, you'll get a pop-up menu with a keyboard, from two octaves below to two octaves above.  ``Middle C'' is 0.5 (the keyboard is keyed in C, but it'll be relative to whatever the current pitch is).  See also {\bf Shift}.
 
 \paragraph{Soften}  A modulation signal smoother.\footnote{So why isn't this called Smooth?  Because there's another module called Smooth: see later in Section~\ref{unitshapers}}  Takes an incoming modulation signal and a degree with which to smooth it.  You can also specify whether or not Soften is free-running or always resets on gate.   Because softening will often significantly reduce the amplitude of a signal, Soften has an additional modulation, {\it Scale}, which lets you scale it back up.
 
+
+\paragraph{User}  A tool for user control over modulation signals, mostly for testing.  User contains four modulation inputs, each of which is simply directly connected to a modulation output.  Thus if you connect the modulation output to multiple items, you can change all of them by changing the single input knob. Additionally there are four trigger buttons: pressing a button will issue a trigger to the associated modulation output.
 
 %\begin{figure}[t]
 %\begin{center}\includegraphics[width=6in]{UnitSources1}\end{center}
@@ -574,7 +575,7 @@ You have the option of normalizing the resulting partials.
 
 \paragraph{Dilate} If a partial has a neighbor partial which is {\it larger} than it, then its amplitude is increased towards its neighbor: this change trickles down to its further (smaller) neighbors as well.  This has the effect of boosting neighboring partials until ultimately all partials are the same amplitude.  {\it Boost} is the amount to increase.  See also {\bf Skeletonize} (which is not quite the opposite concept).
 
-\paragraph{Fatten}  The top half partials are discarded and reused to create detuned versions of the lower half partials.  The detuning amount is specified.
+\paragraph{Fatten}  The top half partials are discarded and reused to create detuned versions of the lower half partials.  The detuning amount is specified as well as the wet/dry ratio.
 
 \paragraph{Fill}  Given two incoming sources \(A\) and \(B\), this module first adds all of the non-zero-partials of \(A\) to the output; any remaining partials are filled from non-zero amplitude partials in \(B\), starting at its lowest frequency partials and working up.  You can scale (down) the amplitude of each of the incoming sources.  This module is particularly useful with {\bf Noise}.  See also {\bf Combine} and {\bf Mix} and {\bf Morph}.
 

@@ -5,6 +5,10 @@
 package flow.modules;
 
 import flow.*;
+import flow.gui.*;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 
 /**
    A Unit which shifts the frequency of all partials.  There are three
@@ -20,7 +24,11 @@ import flow.*;
    
    The degree of shifting depends on the SHIFT modulation, bounded by the
    BOUND modulation.
-*/
+   
+   <P>To make pitch shifting a bit easier, if you doiuble-click on a Shift dial,
+   a keyboard will pop up which provides translation equivalents (when Bound is 1.0): 
+   Middle C is equivalent to no shift.
+   */
 
 public class Shift extends Unit
     {
@@ -147,5 +155,69 @@ public class Shift extends Unit
             return String.format("%.4f", 2 * (value - 0.5));
         else return super.getModulationValueDescription(modulation, value, isConstant);
         }
+        
+    public ModulePanel getPanel()
+        {
+        ///.... all this work, just to add a keyboard to the popup menu ...
+        return new ModulePanel(Shift.this)
+            {
+            public JComponent buildPanel()
+                {
+                Unit unit = (Unit) getModulation();
+                Box box = new Box(BoxLayout.Y_AXIS);
+                box.add(new UnitOutput(unit, 0, this));
+                box.add(new UnitInput(unit, 0, this));
 
+				final ModulationInput[] m = new ModulationInput[1];
+				m[0] = new ModulationInput(unit, MOD_SHIFT, this)
+					{
+					public JPopupMenu getPopupMenu()
+						{
+						final JPopupMenu pop = new JPopupMenu();
+						KeyDisplay display = new KeyDisplay(null, Color.RED, 36, 84, 60, 0)
+							{
+							public void setState(int state)
+								{
+								pop.setVisible(false);
+								m[0].setState(Seq.PITCHES[state - 60 + 24]);
+								}
+							};
+						pop.add(display);
+
+						String[] options = getOptions();
+						for(int i = 0; i < options.length; i++)
+							{
+							JMenuItem menu = new JMenuItem(options[i]);
+							menu.setFont(Style.SMALL_FONT());
+							final int _i = i;
+							menu.addActionListener(new ActionListener()
+								{
+								public void actionPerformed(ActionEvent e)      
+									{
+									double val = convert(_i);
+									if (val >= 0 && val <= 1)
+										setState(val);
+									}       
+								});     
+							pop.add(menu);
+							}    
+
+						return pop;
+						}
+					};
+				box.add(m[0]);
+				box.add(new ModulationInput(unit, MOD_BOUND, this));
+				
+                for(int i = 0; i < unit.getNumOptions(); i++)
+                    {
+                    box.add(new OptionsChooser(unit, i));
+                    }
+                    
+                box.add(new ConstraintsChooser(unit, this));
+
+                return box;
+                }
+            };
+        }
+	
     }

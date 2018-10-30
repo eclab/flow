@@ -847,6 +847,7 @@ public class AppMenu
     flow.modules.Swap.class,
     flow.modules.Tinkle.class,
     flow.modules.Triangle.class,
+    flow.modules.User.class,
     flow.modules.VCA.class,
     flow.modules.WaveTable.class,
     };      
