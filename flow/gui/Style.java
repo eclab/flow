@@ -46,6 +46,13 @@ public class Style
     /** The stroke for the unset region in Dials etc. */
     public static BasicStroke DIAL_THICK_STROKE() { return new BasicStroke(DIAL_STROKE_WIDTH(), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL); }
 
+    /////// KEYBOARD CONSTANTS
+    public static Color KEYBOARD_WHITE_COLOR() { return Color.WHITE; }
+    public static Color KEYBOARD_BLACK_COLOR() { return Color.BLACK; }
+    public static Color KEYBOARD_DYNAMIC_COLOR() { return DYNAMIC_COLOR(); }
+    public static int KEYBOARD_DEFAULT_WHITE_KEY_WIDTH() { return 12; }
+    public static int KEYBOARD_DEFAULT_WHITE_KEY_HEIGHT() { return 48; }
+    
 
     /////// GRAPHICS PREPARATION
         

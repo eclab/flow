@@ -64,7 +64,7 @@ public class ModulationInput extends InputOutput implements Rebuildable
         }
         
     // Sets the current modulation value to a Constant.
-    protected void setState(double state)
+    public void setState(double state)
         {
         // distribute to all sounds
         Output output = modulation.getSound().getOutput();
@@ -190,7 +190,29 @@ public class ModulationInput extends InputOutput implements Rebuildable
     String[] options = new String[] { "0", "1/4", "1/3", "1/2", "2/3", "3/4", "1" };
     public String[] getOptions() { return options; }
     public void setOptionsAndConversions( String[] options, double[] conversions) { this.options = options; this.conversions = conversions; }
-        
+      
+    public JPopupMenu getPopupMenu()
+    	{
+		JPopupMenu pop = new JPopupMenu();
+            String[] options = getOptions();
+            for(int i = 0; i < options.length; i++)
+                {
+                JMenuItem menu = new JMenuItem(options[i]);
+                menu.setFont(Style.SMALL_FONT());
+                final int _i = i;
+                menu.addActionListener(new ActionListener()
+                    {
+                    public void actionPerformed(ActionEvent e)      
+                        {
+                        double val = convert(_i);
+                        if (val >= 0 && val <= 1)
+                            setState(val);
+                        }       
+                    });     
+                pop.add(menu);
+                }    
+            return pop;	
+        }  
         
     // ModulationInput uses this class rather than a Jack to be a combination Jack and Dial.
     
@@ -301,24 +323,7 @@ public class ModulationInput extends InputOutput implements Rebuildable
             this.staticColor = staticColor;
             this.modulationInput = modulationInput;
 
-            JPopupMenu pop = new JPopupMenu();
-            String[] options = getOptions();
-            for(int i = 0; i < options.length; i++)
-                {
-                JMenuItem menu = new JMenuItem(options[i]);
-                menu.setFont(Style.SMALL_FONT());
-                final int _i = i;
-                menu.addActionListener(new ActionListener()
-                    {
-                    public void actionPerformed(ActionEvent e)      
-                        {
-                        double val = convert(_i);
-                        if (val >= 0 && val <= 1)
-                            setState(val);
-                        }       
-                    });     
-                pop.add(menu);
-                }
+            JPopupMenu pop = getPopupMenu();
 
             addMouseWheelListener(new MouseWheelListener()
                 {

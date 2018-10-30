@@ -130,7 +130,7 @@ public class NRPN extends Modulation implements ModSource
                     ModulationOutput output = new ModulationOutput(mod, i, this);
                     ModulationInput msb = new ModulationInput(mod, i * 2, this)
                         {
-                        protected void setState(double state)
+                        public void setState(double state)
                             {
                             super.setState(state);
                             lsbLabels[_i].setText("  " + ((((int)(msbInputs[_i].getState() * 127)) * 128) + (int)(lsbInputs[_i].getState() * 127)));
@@ -142,7 +142,7 @@ public class NRPN extends Modulation implements ModSource
                     box.add(hbox);
                     ModulationInput lsb = new ModulationInput(mod, i * 2 + 1, this)
                         {
-                        protected void setState(double state)
+                        public void setState(double state)
                             {
                             super.setState(state);
                             lsbLabels[_i].setText("  " + ((((int)(msbInputs[_i].getState() * 127)) * 128) + (int)(lsbInputs[_i].getState() * 127)));

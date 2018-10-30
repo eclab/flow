@@ -44,6 +44,18 @@ public class Seq extends Modulation
         
     public static final double[] PITCHES = new double[]
     {
+    (1.0 - 24/12.0) / 4.0 + 0.25,
+    (1.0 - 23/12.0) / 4.0 + 0.25,
+    (1.0 - 22/12.0) / 4.0 + 0.25,
+    (1.0 - 21/12.0) / 4.0 + 0.25,
+    (1.0 - 20/12.0) / 4.0 + 0.25,
+    (1.0 - 19/12.0) / 4.0 + 0.25,
+    (1.0 - 18/12.0) / 4.0 + 0.25,
+    (1.0 - 17/12.0) / 4.0 + 0.25,
+    (1.0 - 16/12.0) / 4.0 + 0.25,
+    (1.0 - 15/12.0) / 4.0 + 0.25,
+    (1.0 - 14/12.0) / 4.0 + 0.25,
+    (1.0 - 13/12.0) / 4.0 + 0.25,
     (1.0 - 12/12.0) / 4.0 + 0.25,
     (1.0 - 11/12.0) / 4.0 + 0.25,
     (1.0 - 10/12.0) / 4.0 + 0.25,
@@ -69,6 +81,18 @@ public class Seq extends Modulation
     (1.0 + 10/12.0) / 4.0 + 0.25,
     (1.0 + 11/12.0) / 4.0 + 0.25,
     (1.0 + 12/12.0) / 4.0 + 0.25,
+    (1.0 + 13/12.0) / 4.0 + 0.25,
+    (1.0 + 14/12.0) / 4.0 + 0.25,
+    (1.0 + 15/12.0) / 4.0 + 0.25,
+    (1.0 + 16/12.0) / 4.0 + 0.25,
+    (1.0 + 17/12.0) / 4.0 + 0.25,
+    (1.0 + 18/12.0) / 4.0 + 0.25,
+    (1.0 + 19/12.0) / 4.0 + 0.25,
+    (1.0 + 20/12.0) / 4.0 + 0.25,
+    (1.0 + 21/12.0) / 4.0 + 0.25,
+    (1.0 + 22/12.0) / 4.0 + 0.25,
+    (1.0 + 23/12.0) / 4.0 + 0.25,
+    (1.0 + 24/12.0) / 4.0 + 0.25,
     };
 
     public static final int MOD_STEPS = 32;
@@ -220,16 +244,34 @@ public class Seq extends Modulation
                     Box box2 = new Box(BoxLayout.X_AXIS);
                     for(int j = i; j < i + 4; j++)
                         {
-                        ModulationInput m = new ModulationInput(mod, j, this)
+                        final ModulationInput[] m = new ModulationInput[1];
+                        m[0] = new ModulationInput(mod, j, this)
                             {
+                            public JPopupMenu getPopupMenu()
+                            	{
+                            	final JPopupMenu pop = new JPopupMenu();
+                            	KeyDisplay display = new KeyDisplay(null, Color.RED, 36, 84, 60, 0)
+                            		{
+                            		public void setState(int state)
+                            			{
+                            			pop.setVisible(false);
+                            			m[0].setState(PITCHES[state - 60 + 24]);
+                            			}
+                            		};
+                            	pop.add(display);
+                            	return pop;
+                            	}
+                            	
+                            /*
                             public String[] getOptions() { return PITCH_NAMES; }
                             public double convert(int elt) 
                                 {
                                 return PITCHES[elt];
                                 }
+                            */
                             };
-                        m.getData().setPreferredSize(example.getMinimumSize());
-                        box2.add(m);
+                        m[0].getData().setPreferredSize(example.getMinimumSize());
+                        box2.add(m[0]);
                         }
                     box.add(box2);
                     }

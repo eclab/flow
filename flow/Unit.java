@@ -993,13 +993,10 @@ public class Unit extends Modulation
         
         if (inputs == null || inputs.length == 0)
             return false;
-                
-        Unit source = getInput(0);
-        int index = getInputIndex(0);
-        
-        double[] sourcefrequencies = getFrequenciesIn(index);
-        double[] sourceamplitudes = getAmplitudesIn(index);
-        byte[] sourceorders = getOrdersIn(index);
+                        
+        double[] sourcefrequencies = getFrequenciesIn(0);
+        double[] sourceamplitudes = getAmplitudesIn(0);
+        byte[] sourceorders = getOrdersIn(0);
                 
         if (invertConstraints)
             {

@@ -680,7 +680,7 @@ public class Output
                     if (available >= bufferSize - 128)
                         {
                         glitched = true;
-                        System.err.println("Glitch " + available);
+                        //System.err.println("Glitch " + available);
                         }
                         
                     if (samples.length != getNumSounds())
