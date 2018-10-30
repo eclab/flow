@@ -142,6 +142,7 @@ Modules
 * Swap
 * Tinkle
 * Triangle
+* User
 * VCA
 * Viewer
   - This needs to be cleaned up a bit

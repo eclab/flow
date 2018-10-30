@@ -36,6 +36,7 @@ public class Rack extends JPanel
     Output output;
     String patchName = null;
     String patchAuthor = null;
+    String patchDate = null;
     String patchVersion = null;
     String patchInfo = null;
     boolean addModulesAfter;
@@ -164,6 +165,9 @@ public class Rack extends JPanel
 
     public String getPatchAuthor() { return patchAuthor; }
     public void setPatchAuthor(String val) { patchAuthor = val; }
+
+    public String getPatchDate() { return patchDate; }
+    public void setPatchDate(String val) { patchDate = val; }
 
     public String getPatchVersion() { return patchVersion; }
     public void setPatchVersion(String val) { patchVersion = val; }
@@ -895,10 +899,11 @@ public class Rack extends JPanel
 
 
     public static final int LABEL_MAX_LENGTH = 32;
-    public static String[] showPatchDialog(JComponent root, String name, String author, String version, String info)
+    public static String[] showPatchDialog(JComponent root, String name, String author, String date, String version, String info)
         {
         if (name == null) name = "";
         if (author == null) author = "";
+        if (date == null) date = "";
         if (version == null) version = "";
         if (info == null) info = "";
 
@@ -907,6 +912,9 @@ public class Rack extends JPanel
 
         JTextField a = new JTextField(LABEL_MAX_LENGTH);
         a.setText(author);
+
+        JTextField d = new JTextField(LABEL_MAX_LENGTH);
+        d.setText(author);
 
         JTextField v = new JTextField(LABEL_MAX_LENGTH);
         v.setText(version);
@@ -919,15 +927,15 @@ public class Rack extends JPanel
         pane.setBorder(v.getBorder());
 
         int result = showMultiOption(root, 
-            new String[] { "Patch Name", "Author", "Version", "Patch Info" }, 
-            new JComponent[] { n, a, v, pane }, 
+            new String[] { "Patch Name", "Author", "Date", "Version", "Patch Info" }, 
+            new JComponent[] { n, a, d, v, pane }, 
             "Patch Info", null,
             new String[] { "Okay", "Cancel" });
             
         if (result == 1)  // cancel
-            return new String[] { name, author, version, info };
+            return new String[] { name, author, date, version, info };
         else
-            return new String[] { n.getText(), a.getText(), v.getText(), i.getText() };
+            return new String[] { n.getText(), a.getText(), d.getText(), v.getText(), i.getText() };
         }
                 
 

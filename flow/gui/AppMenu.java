@@ -96,11 +96,12 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-                String[] result = Rack.showPatchDialog(rack, rack.getPatchName(), rack.getPatchAuthor(), rack.getPatchVersion(), rack.getPatchInfo());
+                String[] result = Rack.showPatchDialog(rack, rack.getPatchName(), rack.getPatchAuthor(), rack.getPatchDate(), rack.getPatchVersion(), rack.getPatchInfo());
                 rack.setPatchName(result[0]);
                 rack.setPatchAuthor(result[1]);
-                rack.setPatchVersion(result[2]);
-                rack.setPatchInfo(result[3]);
+                rack.setPatchDate(result[2]);
+                rack.setPatchVersion(result[3]);
+                rack.setPatchInfo(result[4]);
                 }
             });
         return name;
@@ -364,6 +365,7 @@ public class AppMenu
                             rack.setPatchVersion(Sound.loadPatchVersion(obj));
                             rack.setPatchInfo(Sound.loadPatchInfo(obj));
                             rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
+                            rack.setPatchDate(Sound.loadPatchDate(obj));
                             rack.checkOrder();
                             }
                         finally 

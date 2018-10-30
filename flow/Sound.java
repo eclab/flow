@@ -251,6 +251,18 @@ public class Sound
         }
                 
     /** Stores the patch version to the given object. */
+    public static void savePatchDate(String name, JSONObject obj) throws JSONException
+        {
+        obj.put("on", name);
+        }
+                
+    /** Loads the patch version from the given object. */
+    public static String loadPatchDate(JSONObject obj) throws JSONException
+        {
+        return obj.optString("on", "");
+        }
+                
+    /** Stores the patch version to the given object. */
     public static void savePatchAuthor(String name, JSONObject obj) throws JSONException
         {
         obj.put("by", name);
