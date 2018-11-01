@@ -147,6 +147,7 @@ public class AppMenu
                     Sound.savePatchVersion(rack.getPatchVersion(), obj);
                     Sound.savePatchInfo(rack.getPatchInfo(), obj);
                     Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
+                    Sound.savePatchDate(rack.getPatchDate(), obj);
 
                     PrintWriter p = null;
                     FileOutputStream os = null;

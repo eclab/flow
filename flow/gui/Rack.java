@@ -914,7 +914,7 @@ public class Rack extends JPanel
         a.setText(author);
 
         JTextField d = new JTextField(LABEL_MAX_LENGTH);
-        d.setText(author);
+        d.setText(date);
 
         JTextField v = new JTextField(LABEL_MAX_LENGTH);
         v.setText(version);
