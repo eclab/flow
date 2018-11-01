@@ -31,6 +31,10 @@ developed on a 2.8Ghz i7 2015 Macbook Pro Retina).
 
 * Interested in helping out on Flow?  Our [To Do list](TODO.md) lists current open issues and bugs.
 
+## Demos
+[!["Hello World" Demo](docs/web/HelloWorldDemo.png)](https://www.youtube.com/watch?v=w3aao8Sp0sQ "Hello World emo")
+
+
 ## Install and Run Flow
 
 Flow is cross-platform and will run on a variety of platforms (Windows, Linux) but we are personally developing on and for
@@ -71,7 +75,7 @@ Flow makes heavy use of Java preferences.  There is a longstanding Java/Windows 
 
 ### Installation and Running on Linux
 
-Flow should work fine if you have installed *Java 8*.
+Flow should work fine if you have installed at least *Java 8*.
 
 1. Install at least Java 8 (openjdk).
 
