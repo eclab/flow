@@ -31,11 +31,14 @@ developed on a 2.8Ghz i7 2015 Macbook Pro Retina).
 
 * Interested in helping out on Flow?  Our [To Do list](TODO.md) lists current open issues and bugs.
 
-## Video Demos
+### Video Demos
 * ["Hello World" Demo](https://www.youtube.com/watch?v=w3aao8Sp0sQ).  This is a short tutorial on loading, setting up, and wiring modules for a basic patch.
 
 * [Family Portrait](https://www.youtube.com/watch?v=TClQupjaBHE).  This is a scrolling screen shot, so to speak, of all of Flow's modules.
 
+### Patches
+
+* Flow's Patches are located [here](flow/patches).  You can get a zip file of all of them [here](flow/patches.zip).
 
 ## Install and Run Flow
 
