@@ -18,7 +18,7 @@ Flow is in **prerelease**.  This means that changes will be made to it in succes
 compatible.  These changes may and likely will break patches you made with earlier versions.  We make no guarantees of 
 consistency at this stage.
 
-Flow has about 50 modules of different shapes and sizes, and currently supports up to 16 voices at up to 256 partials and 44.1KHz with a rate of one new partial update every 32 samples.  Flow is a very computationally expensive program and will keep your laptop 
+Flow has about [50 modules](https://www.youtube.com/watch?v=TClQupjaBHE) of different shapes and sizes, and currently supports up to 16 voices at up to 256 partials and 44.1KHz with a rate of one new partial update every 32 samples.  Flow is a very computationally expensive program and will keep your laptop 
 quite warm and your fan busy.  You need to have some fairly good hardware to run Flow successfully (for reference, Flow was 
 developed on a 2.8Ghz i7 2015 Macbook Pro Retina).
 
