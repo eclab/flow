@@ -25,12 +25,12 @@ public class KeyDisplay extends JPanel
     public void redoTitle(int state)
         {
         if (label != null && title != null)
-        	{
-			if (state < minKey || state > maxKey)
-				label.setText(title);
-			else
-				label.setText(title + ":   " + state + "   " + getNote(state));
-			}
+            {
+            if (state < minKey || state > maxKey)
+                label.setText(title);
+            else
+                label.setText(title + ":   " + state + "   " + getNote(state));
+            }
         }
 
     public static final String[] KEYS = new String[] { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
@@ -79,14 +79,14 @@ public class KeyDisplay extends JPanel
         
     int state = -1;
     public void setState(int state)
-    	{
-    	this.state = state;
-    	}
+        {
+        this.state = state;
+        }
     
     public int getState()
-    	{
-    	return state;
-    	}
+        {
+        return state;
+        }
         
     void mouseReleased(MouseEvent e)
         {                       
@@ -112,13 +112,13 @@ public class KeyDisplay extends JPanel
         
         setLayout(new BorderLayout());
         if (title != null)
-        	{
-        	label = new JLabel(title);
-        	label.setFont(Style.SMALL_FONT());
-        	label.setBackground(Style.BACKGROUND_COLOR()); // TRANSPARENT);
-        	label.setForeground(Style.TEXT_COLOR());
-        	add(label, BorderLayout.SOUTH);  
-        	}  
+            {
+            label = new JLabel(title);
+            label.setFont(Style.SMALL_FONT());
+            label.setBackground(Style.BACKGROUND_COLOR()); // TRANSPARENT);
+            label.setForeground(Style.TEXT_COLOR());
+            add(label, BorderLayout.SOUTH);  
+            }  
         add(new KeyDisplay.Inner(), BorderLayout.CENTER); 
         setBackground(Style.BACKGROUND_COLOR()); // TRANSPARENT);
 
@@ -400,12 +400,12 @@ public class KeyDisplay extends JPanel
                     graphics.draw(r);
                     }
                 else if (blackKeyVals[i] == midKey)
-                	{
+                    {
                     graphics.setPaint(Color.GRAY);
                     graphics.fill(r);
                     graphics.setPaint(Style.KEYBOARD_BLACK_COLOR());
                     graphics.draw(r);
-                	}
+                    }
                 else
                     {
                     graphics.fill(r);

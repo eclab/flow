@@ -76,7 +76,7 @@ public class Fatten extends Unit
 
     // We have to customize here because we have a "last cents", because it is so costly to compute it.
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-    	{
+        {
         if (modulation == MOD_DETUNE && isModulationConstant(modulation))
             {
             double c = makeVerySensitive(modulate(MOD_DETUNE)) * 100;

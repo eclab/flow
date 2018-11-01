@@ -215,7 +215,7 @@ public class WaveTable extends Unit implements UnitSource
                                 System.arraycopy(done[i], 0, waveTable[i], 0, Math.min(done[i].length, waveTable[i].length));
                                 }
 
-                        	distributeToAllSounds(waveTable);
+                            distributeToAllSounds(waveTable);
                             }
                         finally 
                             {

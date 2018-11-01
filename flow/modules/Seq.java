@@ -40,16 +40,16 @@ public class Seq extends Modulation
     public static final int MOD_STEPS = 32;
     public static final int MOD_TRIGGER = 33;
 
-	// Pitch equivalence mappings.  24 = centered (0.5), 0 = 2 octaves down (0.0), 48 = two octaves up (1.0)
+    // Pitch equivalence mappings.  24 = centered (0.5), 0 = 2 octaves down (0.0), 48 = two octaves up (1.0)
     public static final double[] PITCHES = new double[49];
     
     static
-    	{
-    	for(int i = 0; i < PITCHES.length; i++)
-    		{
-    		PITCHES[i] = (1.0 - (i - 24)/12.0) / 4.0 + 0.25;
-    		}
-    	};
+        {
+        for(int i = 0; i < PITCHES.length; i++)
+            {
+            PITCHES[i] = (1.0 - (i - 24)/12.0) / 4.0 + 0.25;
+            }
+        };
 
 
     public static final int NUM_STATES = 32;
@@ -115,16 +115,16 @@ public class Seq extends Modulation
                 });
         }
 
-	// go() automatically clears the trigger so we need to set it a different way
-	boolean didTrigger;
-	
+    // go() automatically clears the trigger so we need to set it a different way
+    boolean didTrigger;
+        
     public void reset()
         {
         super.reset();
         state = 0;
         setModulationOutput(0, modulate(state));
-//        didTrigger = true;		// this creates beeps when resetting, bad
-		gated = false;
+//        didTrigger = true;            // this creates beeps when resetting, bad
+        gated = false;
         }
                 
     public void gate()
@@ -140,9 +140,9 @@ public class Seq extends Modulation
         }
     
     public void release()
-    	{
-    	gated = false;
-    	}
+        {
+        gated = false;
+        }
         
     public void go()
         {
@@ -151,7 +151,7 @@ public class Seq extends Modulation
         didTrigger = false;
 
         if (!gated && !free)  
-        	return;      
+            return;      
         
         if (isTriggered(MOD_TRIGGER))
             {
@@ -200,43 +200,43 @@ public class Seq extends Modulation
                     for(int j = i; j < i + 4; j++)
                         {
 
-						// You'll notice a lot of code here is the same as in Shift
+                        // You'll notice a lot of code here is the same as in Shift
                         final ModulationInput[] m = new ModulationInput[1];
                         m[0] = new ModulationInput(mod, j, this)
                             {
                             public JPopupMenu getPopupMenu()
-                            	{
-                            	final JPopupMenu pop = new JPopupMenu();
-                            	KeyDisplay display = new KeyDisplay(null, Color.RED, 36, 84, 60, 0)
-                            		{
-                            		public void setState(int state)
-                            			{
-                            			pop.setVisible(false);
-                            			m[0].setState(PITCHES[state - 60 + 24]);
-                            			}
-                            		};
-                            	pop.add(display);
+                                {
+                                final JPopupMenu pop = new JPopupMenu();
+                                KeyDisplay display = new KeyDisplay(null, Color.RED, 36, 84, 60, 0)
+                                    {
+                                    public void setState(int state)
+                                        {
+                                        pop.setVisible(false);
+                                        m[0].setState(PITCHES[state - 60 + 24]);
+                                        }
+                                    };
+                                pop.add(display);
 
-							String[] options = getOptions();
-							for(int i = 0; i < options.length; i++)
-								{
-								JMenuItem menu = new JMenuItem(options[i]);
-								menu.setFont(Style.SMALL_FONT());
-								final int _i = i;
-								menu.addActionListener(new ActionListener()
-									{
-									public void actionPerformed(ActionEvent e)      
-										{
-										double val = convert(_i);
-										if (val >= 0 && val <= 1)
-											setState(val);
-										}       
-									});     
-								pop.add(menu);
-								}    
-								
-                            	return pop;
-                            	}
+                                String[] options = getOptions();
+                                for(int i = 0; i < options.length; i++)
+                                    {
+                                    JMenuItem menu = new JMenuItem(options[i]);
+                                    menu.setFont(Style.SMALL_FONT());
+                                    final int _i = i;
+                                    menu.addActionListener(new ActionListener()
+                                        {
+                                        public void actionPerformed(ActionEvent e)      
+                                            {
+                                            double val = convert(_i);
+                                            if (val >= 0 && val <= 1)
+                                                setState(val);
+                                            }       
+                                        });     
+                                    pop.add(menu);
+                                    }    
+                                                                
+                                return pop;
+                                }
                             };
 //                        m[0].getData().setPreferredSize(example.getPreferredSize());
                         m[0].getData().setMinimumSize(example.getPreferredSize());

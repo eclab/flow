@@ -348,7 +348,7 @@ public class LFO extends Modulation implements ModSource
             }
         else if (halfTrigger && (lastState < 0.5 && state >= 0.5))
             {
-        	updateTrigger(0);
+            updateTrigger(0);
             }
         lastState = state;
 

@@ -192,26 +192,26 @@ public class ModulationInput extends InputOutput implements Rebuildable
     public void setOptionsAndConversions( String[] options, double[] conversions) { this.options = options; this.conversions = conversions; }
       
     public JPopupMenu getPopupMenu()
-    	{
-		JPopupMenu pop = new JPopupMenu();
-            String[] options = getOptions();
-            for(int i = 0; i < options.length; i++)
+        {
+        JPopupMenu pop = new JPopupMenu();
+        String[] options = getOptions();
+        for(int i = 0; i < options.length; i++)
+            {
+            JMenuItem menu = new JMenuItem(options[i]);
+            menu.setFont(Style.SMALL_FONT());
+            final int _i = i;
+            menu.addActionListener(new ActionListener()
                 {
-                JMenuItem menu = new JMenuItem(options[i]);
-                menu.setFont(Style.SMALL_FONT());
-                final int _i = i;
-                menu.addActionListener(new ActionListener()
+                public void actionPerformed(ActionEvent e)      
                     {
-                    public void actionPerformed(ActionEvent e)      
-                        {
-                        double val = convert(_i);
-                        if (val >= 0 && val <= 1)
-                            setState(val);
-                        }       
-                    });     
-                pop.add(menu);
-                }    
-            return pop;	
+                    double val = convert(_i);
+                    if (val >= 0 && val <= 1)
+                        setState(val);
+                    }       
+                });     
+            pop.add(menu);
+            }    
+        return pop; 
         }  
         
     // ModulationInput uses this class rather than a Jack to be a combination Jack and Dial.

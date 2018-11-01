@@ -320,9 +320,9 @@ public class Morph extends Unit
                 }
             }
         else 
-        	{
-        	System.arraycopy(p1amplitudes, 0, amplitudes, 0, amplitudes.length);
-        	}
+            {
+            System.arraycopy(p1amplitudes, 0, amplitudes, 0, amplitudes.length);
+            }
                 
         constrain();
             
