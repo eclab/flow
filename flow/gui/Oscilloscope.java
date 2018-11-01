@@ -57,6 +57,7 @@ public class Oscilloscope extends JComponent
                 
     public Dimension getMinimumSize() { return new Dimension(WAVE_SIZE + BORDER * 2, WAVE_HEIGHT + BORDER * 2); }
     public Dimension getPreferredSize() { return new Dimension(WAVE_SIZE + BORDER * 2, WAVE_HEIGHT + BORDER * 2); }
+    public Dimension getMaximumSize() { return new Dimension(WAVE_SIZE + BORDER * 2, WAVE_HEIGHT + BORDER * 2); }
     
     public void paintComponent(Graphics graphics)
         {

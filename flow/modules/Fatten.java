@@ -76,18 +76,13 @@ public class Fatten extends Unit
 
     // We have to customize here because we have a "last cents", because it is so costly to compute it.
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-        {
-        return String.format("%.2f", makeVerySensitive(value) * 100) + " Cents";
-        }
-
-    public String getModulationValueDescription(int modulation)
-        {
+    	{
         if (modulation == MOD_DETUNE && isModulationConstant(modulation))
             {
             double c = makeVerySensitive(modulate(MOD_DETUNE)) * 100;
             return String.format("%.2f", c) + " Cents";
             }
-        else return super.getModulationValueDescription(modulation);
+        else return super.getModulationValueDescription(modulation, value, isConstant);
         }
 
     }
