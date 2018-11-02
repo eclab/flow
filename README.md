@@ -68,7 +68,7 @@ Now you should be able to run Flow.  Let us know if this all works.
 
 The following should work (but has not been tested):
 
-1. [Download and install Java 9](https://www.oracle.com/technetwork/java/javase/downloads).  The JRE should work fine.
+1. [Download and install at least Java 11](https://www.oracle.com/technetwork/java/javase/downloads).  The JRE should work fine.  Earlier versions of Java have a bug which causes Java apps (like Flow) to make teeny tiny windows on the latest high-resolution screens.
 
 2. Download Flow's jar file, called [flow.jar](https://cs.gmu.edu/~eclab/projects/flow/flow.jar).
 
