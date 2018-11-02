@@ -153,9 +153,21 @@ MIDI Features&MPE, Clock, Channel and Polyphonic Aftertouch, Pitch Bend, NRPN, R
 \bump
 \section{Using {\name}}
 
-After you fire up {\name}, you're presented with a near-empty {\bf rack} and can start adding {\bf modules} to it.  Then you tweak the parameters of modules and wire them up by dragging from output jacks to input jacks or to dials.  The result might look something like the example patch in Figure~\ref{screenshot}.
+After you fire up {\name}, you're presented with a near-empty {\bf rack} (except for the {\bf Out} module) and can start adding {\bf modules} to it.  Then you tweak the parameters of modules and wire them up by dragging from output jacks to input jacks or to dials.  The result might look something like the example patch in Figure~\ref{screenshot}.
 
 If you look carefully at Figure~\ref{screenshot}, you'll see that there are not only twelve modules, but also two wide black rectangular regions called {\bf displays}, and two small squarish black regions called {\bf oscilloscopes}.  Displays show partials in the same manner as Figure~\ref{partials}, and oscilloscopes display modulation signals.
+
+\subsection{Tuning Parameters}
+First things first.  {\name} is very computationally expensive and benefits from tuning for your computer speed.  If your computer can't keep up with Flow's demands, you'll hear a {\bf glitch}.  This is a pop or a buzz in the audio stream, and will be accompanied by the {\bf Out} module (the top-right module shown in Figure \ref{screenshot}) coloring its black title bar red and saying ``Glitch''.  A glitch occurs when Flow can't keep the audio buffer filled enough, so your computer is forced to start filling it with zeros.  You don't want that.
+
+How do we tamp down glitches?  By playing with a few parameters. If you select {\bf Tuning Parameters} from the {\bf Play} menu, you can at present change three parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session. 
+
+\begin{itemize}
+\item {\bf Polyphony} (1--16, default: 8)\qquad This is the number of voices the synthesizer can play at once.  More voices incurs a higher load.
+\item {\bf Audio Buffer Size} (default: 2048, which is crummy)\qquad This is the size of the audio buffer that {\name} keeps filled for your operating system to tap into to generate sounds.  You want a low buffer if you can (much less latency); but a bigger buffer makes it easier for Flow to keep up.  Some operating systems require a large buffer size: for example, OS X technically can run with a buffer of only 1024, but on my laptop realistically {\name} name requires a buffer larger than that (1536 or 2048 seem to work). On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{audioloopback} for more information.  I can't help you much regarding Windows.
+\item {\bf Partials} (64--256, default: 128)\qquad This is the number of partials passed around from module to module.  More partials will produce a richer sound, particularly in bass notes, but incur a much higher load.
+\end{itemize}
+
 
 \subsection{Adding, Moving, Copying, and Closing Modules}  Modules are added to the rack by choosing them from the {\bf Modules} menu.  You can move a module to another location by dragging its title bar.  You can also copy a module to another location by dragging its title bar while holding the Control key (on the Mac, you can also hold the Option key).  Finally, you can delete a module by clicking on its close box: the little white dot to the left of its title.
 
@@ -332,15 +344,6 @@ A patch is most useful as a Macro if it's been wired up to send and receive modu
 Patches have four pieces of auxiliary text information stored in them: a {\it patch name}, a {\it patch author}, a {\it patch date}, a {\it patch version}, and some {\it patch info}.  You can put whatever you like in these four text boxes: just choose {\bf Patch Info...} from the {\bf Play} menu.
 
 A patch doesn't need to have an author, date, version, or info: but it ought to have a name.  This is because if you load a patch as a Macro, the Macro's module will be titled with the patch name so you can tell what it is.  If you save a patch that has no name (yet), {\name} will set the patch name to the filename (minus the extension).
-
-\subsection{Tuning Parameters}
-{\name} is very computationally expensive and benefits from some tuning.  If you select {\bf Tuning Parameters} from the {\bf Play} menu, you can at present change three parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session. 
-
-\begin{itemize}
-\item {\bf Polyphony} (1--16, default: 8)\qquad This is the number of voices the synthesizer can play at once.  More voices incurs a higher load.
-\item {\bf Audio Buffer Size} (default: 2048)\qquad This is the size of the audio buffer that {\name} keeps filled for your operating system to tap into to generate sounds.  Some operating systems require a large buffer size: for example, OS X technically can run with a buffer of only 1024, but on my laptop realistically {\name} name requires a buffer larger than that (1536 or 2048 seem to work).  Large buffers incur significantly higher latency, which you don't want. On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{audioloopback} for more information.  I can't help you much regarding Windows.
-\item {\bf Partials} (64--256, default: 128)\qquad This is the number of partials passed around from module to module.  More partials will produce a richer sound, particularly in bass notes, but incur a much higher performance penalty.
-\end{itemize}
 
 \bump
 \section{The Modules}

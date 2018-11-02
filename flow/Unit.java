@@ -1279,14 +1279,45 @@ public class Unit extends Modulation
         for(int i = 0; i < getNumInputs(); i++)
             {
             Unit input = getInput(i);
-            int inputIndex = getInputIndex(i);
-            JSONObject m = new JSONObject();
-            m.put("id", input.getID());
-            m.put("at", input.getKeyForOutput(inputIndex));
-            inputs.put(getKeyForInput(i), m);
+            if (!(input instanceof Nil))
+            	{
+	            int inputIndex = getInputIndex(i);
+	            JSONObject m = new JSONObject();
+	            m.put("id", input.getID());
+	            m.put("at", input.getKeyForOutput(inputIndex));
+	            inputs.put(getKeyForInput(i), m);
+	            }
             }
         obj.put("unit", inputs);
 
+
+        // constraints are optional, we only write them if there's something useful to write
+        if (!(getConstraintIn() instanceof Nil) ||
+        	getConstraint() != CONSTRAINT_NONE)
+        	{
+        	JSONObject constraints = new JSONObject();
+        	Unit unit = getConstraintIn();
+        	
+        	// optionally write out "id"= ...., "at"= ...
+        	if (!(unit instanceof Nil))
+        		{
+        		constraints.put("id", unit.getID());
+        		constraints.put("at", unit.getKeyForOutput(getConstraintIndex()));
+        		}
+        	
+        	// optionally write out "type"=....
+        	if (getConstraint() != CONSTRAINT_NONE)
+        		{
+        		constraints.put("type", getConstraint());
+        		}
+        	
+        	// optionally write out "not"=....
+        	if (getInvertConstraints())
+        		{
+        		constraints.put("not", getInvertConstraints());
+        		}
+        	obj.put("constrain", constraints);
+        	}
         return obj;
         }
 
@@ -1298,9 +1329,10 @@ public class Unit extends Modulation
             JSONObject m = inputs.optJSONObject(getKeyForInput(i));
             if (m == null)
                 {
-                System.err.println("WARNING: Could not load unit " + getKeyForInput(i) + " in " + this);
+                //System.err.println("WARNING: Could not load unit " + getKeyForInput(i) + " in " + this);
+                setInput(Unit.NIL, i, 0);
                 }
-            else if (m.getString("id").equals("null"))
+            else if (m.optString("id") == null || m.getString("id").equals("null"))
                 {
                 setInput(Unit.NIL, i, 0);
                 } 
@@ -1311,7 +1343,7 @@ public class Unit extends Modulation
                 }
             }       
         }
-                
+
     public void load(JSONObject obj, HashMap<String, Modulation> ids, int patchVersion) throws Exception
         {
         super.load(obj, ids, patchVersion);
@@ -1322,5 +1354,31 @@ public class Unit extends Modulation
         // inputs
         JSONObject inputs = obj.getJSONObject("unit");
         loadUnits(inputs, ids, moduleVersion, patchVersion);
+        
+        // constraints
+        JSONObject constraints = obj.optJSONObject("constrain");
+        if (constraints != null)
+        	{
+        	// first get the unit input  "id" = ... , "at" = ...
+        	String str = constraints.optString("id");
+        	if (str != null && !str.equals("null") && !str.equals(""))
+        		{
+	        	Unit unit = (Unit)(ids.get(str));
+                setConstraintIn(unit, unit.getOutputForKey(constraints.getString("at")));
+	        	}
+	        
+	        // next get the constraint type "type" = ...
+	        int val = constraints.optInt("type", -1);
+	        if (val != -1)
+	        	{
+	        	setConstraint(val);
+	        	}
+	        
+	        // finally get the inversion "not" = ...
+	        if (constraints.opt("not") != null)
+	        	{
+		        setInvertConstraints(constraints.getBoolean("not"));
+		        }
+        	}
         }
     }
