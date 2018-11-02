@@ -179,8 +179,6 @@ public class Input
         {
         ArrayList<Midi.MidiDeviceWrapper> devices = (ArrayList<Midi.MidiDeviceWrapper>)(midi.getInDevices().clone());
         devices.add(0, new Midi.MidiDeviceWrapper(null));  // a "None"
-        for(Midi.MidiDeviceWrapper m : devices)
-        	System.err.println(m.toLongString() + "\n\n");
         return devices;
         }
 
@@ -319,7 +317,7 @@ public class Input
     // Processes a NOTE ON message.
     void processNoteOn(ShortMessage sm)
         {
-        Sound sound = null;
+        Sound sound = null; 
         synchronized(lock)
             {
             if (output.getOnlyPlayFirstSound())
