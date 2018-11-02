@@ -179,6 +179,8 @@ public class Input
         {
         ArrayList<Midi.MidiDeviceWrapper> devices = (ArrayList<Midi.MidiDeviceWrapper>)(midi.getInDevices().clone());
         devices.add(0, new Midi.MidiDeviceWrapper(null));  // a "None"
+        for(Midi.MidiDeviceWrapper m : devices)
+        	System.err.println(m.toLongString() + "\n\n");
         return devices;
         }
 

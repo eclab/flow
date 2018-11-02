@@ -43,6 +43,17 @@ public class Midi
             this.device = device;
             }
         
+        public String toLongString()
+        	{
+        	if (device == null)
+        		return "No Device";
+        	return "Desc: " + device.getDeviceInfo().getDescription() +
+        		"\nName: " + device.getDeviceInfo().getName() + 
+        		"\nVend: " + device.getDeviceInfo().getVendor() + 
+        		"\nVers: " + device.getDeviceInfo().getVersion() +
+        		"\nStri: " + device.getDeviceInfo().toString();
+        	}
+        
         /** Returns a useful name to display to represent the MIDI Device in question. */        
         public String toString() 
             { 
@@ -107,7 +118,6 @@ public class Midi
             midiDevices = MidiSystem.getMidiDeviceInfo();
             //System.err.println("Couldn't load CoreMIDI4J.  Falling back on standard Java Midi.");
             }
-        midiDevices = MidiSystem.getMidiDeviceInfo();
 
         ArrayList allDevices = new ArrayList();
         for(int i = 0; i < midiDevices.length; i++)

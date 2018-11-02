@@ -88,34 +88,35 @@ public class Utility
     // This should remove some of the weirdness in the LPF sounds
     public static double hybridpow(final double a, final double b) 
         {
-        //if (Math.abs(b) < 1.0)
-        //    return Math.pow(a, b);
+        if (Math.abs(b) < 1.0)
+            return Math.pow(a, b);
         return fastpow(a, b);
-       //   return Math.pow(a, b);
         }
 
 
     //// FastSin and FastCos are from
     //// https://github.com/Bukkit/mc-dev/blob/master/net/minecraft/server/MathHelper.java
-    static double[] sinTable = new double[65536];
+    static final int SIN_TABLE_LENGTH = 65536;
+    static final double SIN_MULTIPLIER = SIN_TABLE_LENGTH / Math.PI / 2;
+    static double[] sinTable = new double[SIN_TABLE_LENGTH];
 
     /** A fast approximation of Sine using a lookup table 64K in size. */
     public static final double fastSin(double f) 
         {
-        return sinTable[(int) (f * 10430.378F) & '\uffff'];   // seriously.  He's ANDing with a char.  Go figure.
+        return sinTable[(int) (f * SIN_MULTIPLIER) & (SIN_TABLE_LENGTH - 1)];
         }
 
     /** A fast approximation of Cosine using a lookup table 64K in size. */
     public static final double fastCos(double f) 
         {
-        return sinTable[(int) (f * 10430.378F + 16384.0F) & '\uffff'];      // seriously.  He's ANDing with a char.  Go figure.
+        return sinTable[(int) (f * SIN_MULTIPLIER + 16384) & (SIN_TABLE_LENGTH - 1)];      // seriously.  He's ANDing with a char.  Go figure.
         }
 
     static 
         {
-        for (int i = 0; i < 65536; ++i) 
+        for (int i = 0; i < SIN_TABLE_LENGTH; ++i) 
             {
-            sinTable[i] = Math.sin((double) i * 3.141592653589793D * 2.0D / 65536.0D);
+            sinTable[i] = Math.sin((double) i * Math.PI * (2.0D / SIN_TABLE_LENGTH));
             }
                 
         for (int i = 0; i < 65536; ++i) 
