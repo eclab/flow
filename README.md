@@ -78,7 +78,7 @@ The following should work (but has not been tested):
 
 #### Note
 
-Flow makes heavy use of Java preferences.  There is a longstanding Java/Windows bug, not fixed as of Java 8, which breaks Java preferences.  This was supposedly slated to be fixed in Java 9, but we have not verified it.  If it's not working yet, Flow will still work, but you won't have any persistent preferences (you'll have to set it up every time).
+Flow makes heavy use of Java preferences.  There is a longstanding Java/Windows bug which breaks Java preferences and will cause Flow to be unable to make any of your preferences persistent.  In Java 11 the bug should be fixed, but if it's not, please let us know.
 
 
 ### Installation and Running on Linux
