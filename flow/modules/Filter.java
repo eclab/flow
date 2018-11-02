@@ -79,8 +79,9 @@ public class Filter extends Unit
                 for(int i = 0; i < amplitudes.length; i++)
                     {
                     if (frequencies[i] > cutoffdivpitch)
-                        // Maybe use Apache Commons FastMath?  Maybe use Utilities.fastmath etc.?
-                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (frequencies[i] - cutoffdivpitch));
+                        {
+                        amplitudes[i] = amplitudes[i] * Utility.fastpow(drop, (frequencies[i] - cutoffdivpitch));
+                        }
                     }
                 }
             break;
@@ -89,8 +90,7 @@ public class Filter extends Unit
                 for(int i = 0; i < amplitudes.length; i++)
                     {
                     if (frequencies[i] < cutoffdivpitch)
-                        // Maybe use Apache Commons FastMath?  Maybe use Utilities.fastmath etc.?
-                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (cutoffdivpitch - frequencies[i]));
+                        amplitudes[i] = amplitudes[i] * Utility.fastpow(drop, (cutoffdivpitch - frequencies[i]));
                     }
                 }
             break;
@@ -99,11 +99,10 @@ public class Filter extends Unit
                 for(int i = 0; i < amplitudes.length; i++)
                     {
                     if (frequencies[i] > cutoffdivpitch)
-                        // Maybe use Apache Commons FastMath?  Maybe use Utilities.fastmath etc.?
-                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (frequencies[i] - cutoffdivpitch));
+                        amplitudes[i] = amplitudes[i] * Utility.fastpow(drop, (frequencies[i] - cutoffdivpitch));
                     else if (frequencies[i] < cutoffdivpitch)
                         {
-                        amplitudes[i] = amplitudes[i] * Utility.hybridpow(drop, (cutoffdivpitch - frequencies[i]));
+                        amplitudes[i] = amplitudes[i] * Utility.fastpow(drop, (cutoffdivpitch - frequencies[i]));
                         }
                     }
                 }
@@ -113,11 +112,10 @@ public class Filter extends Unit
                 for(int i = 0; i < amplitudes.length; i++)
                     {
                     if (frequencies[i] > cutoffdivpitch)
-                        // Maybe use Apache Commons FastMath?  Maybe use Utilities.fastmath etc.?
-                        amplitudes[i] = amplitudes[i] * (1.0 - Utility.hybridpow(drop, (frequencies[i] - cutoffdivpitch)));
+                        amplitudes[i] = amplitudes[i] * (1.0 - Utility.fastpow(drop, (frequencies[i] - cutoffdivpitch)));
                     else if (frequencies[i] < cutoffdivpitch)
                         {
-                        amplitudes[i] = amplitudes[i] * (1.0 - Utility.hybridpow(drop, (cutoffdivpitch - frequencies[i])));
+                        amplitudes[i] = amplitudes[i] * (1.0 - Utility.fastpow(drop, (cutoffdivpitch - frequencies[i])));
                         }
                     }
                 }

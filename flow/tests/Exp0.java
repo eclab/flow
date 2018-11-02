@@ -9,7 +9,7 @@ import javax.sound.sampled.*;
 
 public class Exp0
     {
-    public static int LENGTH = 1;
+    public static int LENGTH = 2;
         
     public static void main(String[] args)
         {
@@ -25,8 +25,9 @@ public class Exp0
 
         Filter filter = new Filter(sound);
         filter.setInput(saw);
+        filter.setModulation(c, 0);
         //filter.setModulations(c, v.getModulation(0, "drop", 1.0));
-        filter.setType(Filter.TYPE_BP);
+        filter.setType(Filter.TYPE_LP);
 
         //v.setInput(filter);
         //sound.setEmits(v);

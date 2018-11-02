@@ -88,9 +88,10 @@ public class Utility
     // This should remove some of the weirdness in the LPF sounds
     public static double hybridpow(final double a, final double b) 
         {
-        if (Math.abs(b) < 1.0)
-            return Math.pow(a, b);
+        //if (Math.abs(b) < 1.0)
+        //    return Math.pow(a, b);
         return fastpow(a, b);
+       //   return Math.pow(a, b);
         }
 
 
