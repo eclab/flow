@@ -11,8 +11,8 @@ I (Sean) have been asked where my Patreon page is.  So, sure, here's my <a href=
 ## About
 
 Flow is a fully-modular polyphonic additive software synthesizer written in pure Java.  It runs on OS X, Linux, and Windows.
-Flow is an academic research project, and this version is an early prerelease and should be expected to have bugs.  Please
-let us know what you find.
+Flow is an experimental academic research project, and there are a number of rough edges.  This version is an early prerelease 
+and should be expected to have bugs.  Please let us know what you find.
 
 Flow is in **prerelease**.  This means that changes will be made to it in successive versions which could be entirely non-backward
 compatible.  These changes may and likely will break patches you made with earlier versions.  We make no guarantees of 
