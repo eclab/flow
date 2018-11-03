@@ -1,4 +1,4 @@
-![Flow Splash Banner](docs/manual/Banner.png)
+![Flow Splash Banner](docs/web/Banner.png)
 
 # Flow 
 A Polyphonic Modular Additive Synthesizer (Version 0)
