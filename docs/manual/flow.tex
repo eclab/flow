@@ -1,6 +1,6 @@
 %%%% Copyright 2017 by Sean Luke
 %%%% Distributed Under the Apache 2.0 License
-
+\synctex=1
 
 \documentclass{article}
 \usepackage{fullpage}
@@ -1169,8 +1169,17 @@ public void setPreset(int preset)
 That should do the job.  Of course, you might want to make a table of preset values and names instead of doing it this way.  But there you go.
 
 \paragraph{Test the Code}
-Now let's try it out.  Add the {\tt flow.modules.MyModulation.class} class to the list of modules called {\tt static final Class[] modules} in 
- {\tt additive/gui/AppMenu.java}.  Now create an empty patch, add an {\bf Out} and a {\bf MyModulation} to it, and hook up our {\it out} and {\it other} ports to Out's {\it 1} and {\it 2} dials.  Check ``free'', and you should start seeing stuff on the oscilloscopes.  Change the rate and see what happens.
+Now let's try it out.  Run Flow as:
+
+\vbox{\footnotesize
+\begin{verbatim}
+java -Dmodule=flow.modules.MyModulation flow.Flow
+\end{verbatim}
+}
+... and the MyModulation module should appear as a modulation in the menu.  Later you can make this permanent by adding the  {\tt flow.modules.MyModulation.class} class to the list of modules called {\tt static final Class[] modules} in 
+ {\tt additive/gui/AppMenu.java}.  
+ 
+ Now create an empty patch, add an {\bf Out} and a {\bf MyModulation} to it, and hook up our {\it out} and {\it other} ports to Out's {\it 1} and {\it 2} dials.  Check ``free'', and you should start seeing stuff on the oscilloscopes.  Change the rate and see what happens.
  
 There's one oddity: the title bar is pink, and it appeared in the ``Modulation Shapers'' menu, not the ``Modulation Sources'' menu.  This is because {\name} thinks that MyModulation is meant to revise or filter an incoming Modulation.  But of course it's not; MyModulation really is a modulation source.  Why does {\name} think this?  Because MyModulation has a modulation input port.  We can clue {\name} in by modifying MyModulation's class declaration as:
 
@@ -1203,10 +1212,13 @@ Third: you might also change your module, which causes problems when trying to b
 \item {\it patch-info:}\quad Useful information about the patch, as stipulated by the patch creator.  A string.  
 \item {\it patch-version:}\quad The version of the patch, as stipulated by the patch creator.  A string. 
 \item {\it modules:}\quad {\tt [ {\it module,*} ] }
-\item {\it module:}\quad {\tt \{ "v":{\it module-version}, "class":{\it module-classname}, "id":{\it module-id}, "opt":{\it options}, \rule[0in]{0in}{0in}~\hspace{\fill} "unit":{\it unit-inputs}, "mod":{\it modulation-inputs}, {\it optional-data} \}}
+\item {\it module:}\quad {\tt \{ "v":{\it module-version}, "class":{\it module-classname}, "id":{\it module-id}, "opt":{\it options}, \rule[0in]{0in}{0in}~\hspace{\fill} "unit":{\it unit-inputs}, "mod":{\it modulation-inputs}, {\it optional-constraints}, {\it optional-data} \}}
 \item {\it module-version:}\quad the version of this kind of module.  An integer \(\geq 0\).  Modules are presently largely at 0.
 \item {\it module-classname:}\quad the class name of this module.  A string.
 \item {\it id:}\quad A unique identifier of this module, which is referenced by other modules when they state that they are connected to it.  A string.
+\item {\it optional-constraints:}\quad A JSON object in the form:\quad {\tt "constrain":\{~"id"={\it id }, "at"={\it modulation-unit-name}, "type"={\it constraints-type}, "not"={\it constraints-inverse}~\}}\quad  This object does not need to appear in the patch at all.  Additionally, all of the elements inside the patch are optional: they may appear or they may not, except that {\tt "id"} and {\tt "at"} must appear together.
+\item {\it constraints-type:}\quad The value of the constraints type (an integer).
+\item {\it constraints-inverse:}\quad Whether or not the options is inversed (a boolean).
 \item {\it optional-data:}\quad A JSON object in the form {\tt "data":\{...\}} which the module may use as it likes to store additional data.  This object does not need to appear in the patch at all.  See Wavetable and Draw for examples of usage of optional data.
 \item {\it options:}\quad {\tt \{ {\it option-name}:{\it option-value,*} \}}
 \item {\it option-name:}\quad An option name (a string).  Normally this is the same as returned by {\tt getOptionName(...)}.
@@ -1540,6 +1552,17 @@ What's going on here is as follows.  Recall that the ModulePanel is associated w
 
 You want to do all this as fast as you can: holding the sound lock for very long can cause audio disruptions.
 
-\paragraph{Test the Code}  Try it out again!   And that concludes our little tutorial.
+
+\paragraph{Test the Code}  Once again, run Flow as:
+
+\vbox{\footnotesize
+\begin{verbatim}
+java -Dmodule=flow.modules.MyUnit flow.Flow
+\end{verbatim}
+}
+... and the MyUnit module should appear as a Partials in the menu.  Later you can make this permanent by adding the  {\tt flow.modules.MyModulation.class} class to the list of modules called {\tt static final Class[] modules} in 
+ {\tt additive/gui/AppMenu.java}.  
+ 
+Try it out!   And that concludes our little tutorial.
 
 \end{document}
