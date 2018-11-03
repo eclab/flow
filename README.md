@@ -44,7 +44,7 @@ developed on a 2.8Ghz i7 2015 Macbook Pro Retina).
 
 ### Patches
 
-* Flow's demo patches are located [here](flow/patches).   Contribute some!   You can get a zip file of all of them [here](https://github.com/eclab/flow/raw/master/flow/patches.zip).
+* Flow's demo patches are located [here](flow/patches).   Contribute some!   You can get a zip file of all of them [here](raw/master/flow/patches.zip).
 
 ## Install and Run Flow
 
