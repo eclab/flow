@@ -97,11 +97,10 @@ public class Utility
     //// FastSin and FastCos are from
     //// https://github.com/Bukkit/mc-dev/blob/master/net/minecraft/server/MathHelper.java
     
-    // It seems that to get decent *looking* (not just *sounding*) sawtooth waves, we need about 16 x 65536 slots in this table.
-    // For doubles, that comes to 8 megs.  :-(  For floats, it comes to 4 megs but is exactly 1/2 as fast.
-    // So we're sticking with doubles for now.
-    // Note that if we just used 65536 and stuck with crummy looking sawtooth waves, we'd be about 110% faster, probably due to caching.
-    static final int SIN_TABLE_LENGTH = 65536 * 16;
+    // The problem is that to get decent looking sawtooth and square and triangle waves etc., you need to have all
+    // your partials running at the same phase -- but making changes in frequency will change this.  I had thought
+    // the problem we were having was that SIN_TABLE_LENGTH was too short, but that's not it.
+    static final int SIN_TABLE_LENGTH = 65536; //  * 16;
     static final double SIN_MULTIPLIER = SIN_TABLE_LENGTH / Math.PI / 2;
     static double[] sinTable = new double[SIN_TABLE_LENGTH];
 
