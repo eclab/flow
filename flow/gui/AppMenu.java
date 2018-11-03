@@ -637,8 +637,8 @@ public class AppMenu
 
         for(int i = 0; i < modules.length; i++)
             {
-            JMenuItem m = menuFor(modules[i], rack);
             Class c = modules[i];
+            JMenuItem m = menuFor(c, rack);
                         
             if (c == flow.modules.Out.class)
                 { } // do nothing //outMenu = m;
@@ -653,6 +653,36 @@ public class AppMenu
             else  // Module
                 modShapers.add(m);
             }
+
+		// do the same thing for a module loaded on the command line
+		String modname = System.getProperty("module", null);
+		System.err.println(modname);
+		if (modname != null)
+			{
+			try
+				{
+				Class c = Class.forName(modname);
+            	JMenuItem m = menuFor(c, rack);
+
+				if (c == flow.modules.Out.class)
+					{ } // do nothing //outMenu = m;
+				else if (c == flow.modules.In.class)
+					inMenu = m;
+				else if (flow.UnitSource.class.isAssignableFrom(c))
+					unitSources.add(m);
+				else if (flow.ModSource.class.isAssignableFrom(c))
+					modSources.add(m);
+				else if (flow.Unit.class.isAssignableFrom(c))
+					unitShapers.add(m);
+				else  // Module
+					modShapers.add(m);
+				}
+			catch (Exception ex)
+				{
+				ex.printStackTrace();
+				}
+			}
+
                 
         //menu.add(outMenu);
         menu.add(inMenu);

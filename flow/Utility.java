@@ -100,13 +100,12 @@ public class Utility
     // It seems that to get decent *looking* (not just *sounding*) sawtooth waves, we need about 16 x 65536 slots in this table.
     // For doubles, that comes to 8 megs.  :-(  For floats, it comes to 4 megs but is exactly 1/2 as fast.
     // So we're sticking with doubles for now.
-    // Note that if we just used 65536 and stuck with crummy looking sawtooth waves, we'd be about 110% faster,
-    // probably due to caching.
+    // Note that if we just used 65536 and stuck with crummy looking sawtooth waves, we'd be about 110% faster, probably due to caching.
     static final int SIN_TABLE_LENGTH = 65536 * 16;
     static final double SIN_MULTIPLIER = SIN_TABLE_LENGTH / Math.PI / 2;
     static double[] sinTable = new double[SIN_TABLE_LENGTH];
 
-    /** A fast approximation of Sine using a lookup table 64K in size. */
+    /** A fast approximation of Sine using a lookup table. */
     public static final double fastSin(double f) 
         {
         /*
@@ -121,7 +120,7 @@ public class Utility
         return sinTable[(int) (f * SIN_MULTIPLIER) & (SIN_TABLE_LENGTH - 1)];
         }
 
-    /** A fast approximation of Cosine using a lookup table 64K in size. */
+    /** A fast approximation of Cosine using a lookup table. */
     public static final double fastCos(double f) 
         {
         return sinTable[(int) (f * SIN_MULTIPLIER + SIN_TABLE_LENGTH / 4) & (SIN_TABLE_LENGTH - 1)];      // seriously.  He's ANDing with a char.  Go figure.
