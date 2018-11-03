@@ -110,7 +110,7 @@ public class AppMenu
 
     static JMenuItem quitPatchMenu(Rack rack)
         {
-        JMenuItem quit = new JMenuItem("Quit");
+        JMenuItem quit = new JMenuItem("Exit");
 
         quit.addActionListener(new ActionListener()
             {

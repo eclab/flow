@@ -96,27 +96,42 @@ public class Utility
 
     //// FastSin and FastCos are from
     //// https://github.com/Bukkit/mc-dev/blob/master/net/minecraft/server/MathHelper.java
-    static final int SIN_TABLE_LENGTH = 65536;
+    
+    // It seems that to get decent *looking* (not just *sounding*) sawtooth waves, we need about 16 x 65536 slots in this table.
+    // For doubles, that comes to 8 megs.  :-(  For floats, it comes to 4 megs but is exactly 1/2 as fast.
+    // So we're sticking with doubles for now.
+    // Note that if we just used 65536 and stuck with crummy looking sawtooth waves, we'd be about 110% faster,
+    // probably due to caching.
+    static final int SIN_TABLE_LENGTH = 65536 * 16;
     static final double SIN_MULTIPLIER = SIN_TABLE_LENGTH / Math.PI / 2;
     static double[] sinTable = new double[SIN_TABLE_LENGTH];
 
     /** A fast approximation of Sine using a lookup table 64K in size. */
     public static final double fastSin(double f) 
         {
+        /*
+        // interpolating version -- seems to make little to no difference
+        double v = f * SIN_MULTIPLIER;
+        int conv = (int) v;
+        double alpha = v - conv;
+        int slot1 = conv & (SIN_TABLE_LENGTH - 1);
+        int slot2 = (slot1 + 1) & SIN_TABLE_LENGTH;
+        return sinTable[slot2] * alpha + sinTable[slot1] * (1.0 - alpha);
+        */
         return sinTable[(int) (f * SIN_MULTIPLIER) & (SIN_TABLE_LENGTH - 1)];
         }
 
     /** A fast approximation of Cosine using a lookup table 64K in size. */
     public static final double fastCos(double f) 
         {
-        return sinTable[(int) (f * SIN_MULTIPLIER + 16384) & (SIN_TABLE_LENGTH - 1)];      // seriously.  He's ANDing with a char.  Go figure.
+        return sinTable[(int) (f * SIN_MULTIPLIER + SIN_TABLE_LENGTH / 4) & (SIN_TABLE_LENGTH - 1)];      // seriously.  He's ANDing with a char.  Go figure.
         }
 
     static 
         {
         for (int i = 0; i < SIN_TABLE_LENGTH; ++i) 
             {
-            sinTable[i] = Math.sin((double) i * Math.PI * (2.0D / SIN_TABLE_LENGTH));
+            sinTable[i] = (double)Math.sin((double) i * Math.PI * (2.0 / SIN_TABLE_LENGTH));
             }
                 
         for (int i = 0; i < 65536; ++i) 
