@@ -30,7 +30,27 @@ public class Display extends JComponent
         {
         this(output, aux, false);
         }
-        
+    
+    void updatePitch(MouseEvent e)
+    	{
+		lastX = e.getX();
+		lastY = e.getY();
+		output.lock();    
+		try
+			{
+			Sound sound = output.getInput().getLastPlayedSound();
+			if (sound == null) 
+				sound = output.getSound(0);
+			if (sound == null)
+				lastPitch = -1;
+			else lastPitch = sound.getPitch();
+			}
+		finally 
+			{
+			output.unlock();
+			}
+    	}
+    	
     public Display(Output output, boolean aux, boolean allowMouse)
         {
         this.aux = aux;
@@ -46,30 +66,50 @@ public class Display extends JComponent
             });
         timer.start();
 
-        if (allowMouse)
-            {
             MouseAdapter ma = new MouseAdapter()
                 {
                 public void mouseDragged(MouseEvent e)
                     {
-                    updateFromMouse(mouseToFrequency(e.getX()), mouseToAmplitude(e.getY()), true);
+                    if (allowMouse) updateFromMouse(e, mouseToFrequency(e.getX()), mouseToAmplitude(e.getY()), true);
+                    else updatePitch(e); 
                     repaint();
                     }
                                 
                 public void mousePressed(MouseEvent e)
                     {
-                    updateFromMouse(mouseToFrequency(e.getX()), mouseToAmplitude(e.getY()), false);
-                    repaint();
+                    if (allowMouse) updateFromMouse(e, mouseToFrequency(e.getX()), mouseToAmplitude(e.getY()), false);
+                    else updatePitch(e); 
                     }
+                    
+                public void mouseMoved(MouseEvent e)
+                	{
+                    updatePitch(e); 
+                    repaint();
+                	}
+                
+                public void mouseEntered(MouseEvent e)
+                	{
+                    updatePitch(e); 
+                    repaint();
+                	}
+ 
+                public void mouseExited(MouseEvent e)
+                	{
+                	lastPitch = -1;
+                    repaint();
+                	}
                 };
                 
             addMouseListener(ma);
             addMouseMotionListener(ma);
             }
-        }
                 
     public static final double MAX_FREQUENCY = 150;
     public static final double MAX_AMPLITUDE = 1.0;
+    
+    double lastPitch = -1;
+    double lastX = -1;
+    double lastY = -1;
     
     static final int BORDER = 8;
     static final Color DARK_GREEN = new Color(0, 127, 0);
@@ -161,17 +201,55 @@ public class Display extends JComponent
         g.setColor(DARK_GREEN);
         xx = (width - BORDER * 2) / MAX_FREQUENCY * (1) + BORDER;
         g.draw(new Line2D.Double(xx, height, xx, 0));
-                
+        
+        int closestPartial = -1;
+        double mtf = mouseToFrequency(lastX);
+        double closestDiff = Double.POSITIVE_INFINITY;
+ 		if (lastPitch != -1)
+ 			{
+			 for(int i = 0; i < frequencies.length; i++)
+				{
+				double diff = Math.abs(mtf - frequencies[i]);
+				if (diff < closestDiff)
+					{
+					closestDiff = diff;
+					closestPartial = i;
+					}
+				}
+			}
+
         prepareColorsForPartials();
         for(int i = 0; i < frequencies.length; i++)
             {
             double x = (width - BORDER * 2) / MAX_FREQUENCY * frequencies[i] + BORDER;
             double y = (height - BORDER * 2) / MAX_AMPLITUDE * amplitudes[i];
                         
-            g.setColor(getColorForPartial(i, amplitudes[i]));
+            g.setColor(closestPartial == i ? Color.ORANGE : getColorForPartial(i, amplitudes[i]));
             g.draw(new Line2D.Double(x, height - BORDER, x, height - BORDER - y));
             }
-                
+        
+        String text = null;
+        if (lastPitch != -1)
+        	{
+        	g.setFont(Style.SMALL_FONT());
+        	g.setColor(Color.GRAY);
+        	FontMetrics fm = g.getFontMetrics();
+        	int hh = fm.getHeight();
+
+        	text = "partial " + closestPartial + " amp: " + String.format("%.2f", amplitudes[closestPartial]) +
+        		" freq: " + String.format("%.2f", frequencies[closestPartial] * lastPitch) + " (" + String.format("%.2f", frequencies[closestPartial]) + ")";
+        	Rectangle2D strbounds = fm.getStringBounds(text, g);
+        	g.drawString(text, (float)(getBounds().getWidth() - strbounds.getWidth() - 10), (float)(hh + 1));
+
+
+			double amp = mouseToAmplitude(lastY);
+        	text = "mouse   amp: " + String.format("%.2f", amp < 0 ? 0 : amp) +
+        			" freq: " + String.format("%.2f", mtf * lastPitch < 0 ? 0 : mtf * lastPitch) + " (" + String.format("%.2f", mtf < 0 ? 0 : mtf) + ")";
+
+        	strbounds = fm.getStringBounds(text, g);
+        	g.drawString(text, (float)(getBounds().getWidth() - strbounds.getWidth() - 10), (float)(hh + 1) * 2);
+        	
+        	}
         }
     
     /** A hook called before getColorForPartial(...) is called many times.
@@ -201,7 +279,7 @@ public class Display extends JComponent
         }
         
     // Called to update in response to a click or drag (continuation is true if a drag)
-    void updateFromMouse(double x, double y, boolean continuation)
+    void updateFromMouse(MouseEvent e, double x, double y, boolean continuation)
         {
         double[] amplitudes = null;
         double[] frequencies = null;
@@ -211,12 +289,14 @@ public class Display extends JComponent
             Sound sound = output.getInput().getLastPlayedSound();
             try 
                 {
-                if (sound == null) sound = output.getSound(0);
+                if (sound == null) 
+                	sound = output.getSound(0);
                 }
-            catch (Exception e)
+            catch (Exception ex)
                 {
                 sound = null;
                 }
+
             if (sound != null)
                 {
                 Unit unit = getUnit(sound);
@@ -227,7 +307,7 @@ public class Display extends JComponent
                     }
                                                         
                 // what's the closest partial?  Not sure if binary search is useful here
-                // since we only have 128 partials, so we just do an O(n) scan
+                // since we only have 256 or so partials, so we just do an O(n) scan
                 int partial = frequencies.length - 1;
                 for(int i = 0; i < frequencies.length - 1; i++)
                     {
@@ -239,6 +319,7 @@ public class Display extends JComponent
                         }
                     }
                 }
+            updatePitch(e); 
             }
         finally 
             {
@@ -259,6 +340,4 @@ public class Display extends JComponent
         int height = getHeight();        
         return 0 - (y - height + BORDER) * MAX_AMPLITUDE / (height - BORDER * 2);
         }
-
-                
     }
