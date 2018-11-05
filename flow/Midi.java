@@ -44,15 +44,15 @@ public class Midi
             }
         
         public String toLongString()
-        	{
-        	if (device == null)
-        		return "No Device";
-        	return "Desc: " + device.getDeviceInfo().getDescription() +
-        		"\nName: " + device.getDeviceInfo().getName() + 
-        		"\nVend: " + device.getDeviceInfo().getVendor() + 
-        		"\nVers: " + device.getDeviceInfo().getVersion() +
-        		"\nStri: " + device.getDeviceInfo().toString();
-        	}
+            {
+            if (device == null)
+                return "No Device";
+            return "Desc: " + device.getDeviceInfo().getDescription() +
+                "\nName: " + device.getDeviceInfo().getName() + 
+                "\nVend: " + device.getDeviceInfo().getVendor() + 
+                "\nVers: " + device.getDeviceInfo().getVersion() +
+                "\nStri: " + device.getDeviceInfo().toString();
+            }
         
         /** Returns a useful name to display to represent the MIDI Device in question. */        
         public String toString() 

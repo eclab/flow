@@ -32,25 +32,25 @@ public class Display extends JComponent
         }
     
     void updatePitch(MouseEvent e)
-    	{
-		lastX = e.getX();
-		lastY = e.getY();
-		output.lock();    
-		try
-			{
-			Sound sound = output.getInput().getLastPlayedSound();
-			if (sound == null) 
-				sound = output.getSound(0);
-			if (sound == null)
-				lastPitch = -1;
-			else lastPitch = sound.getPitch();
-			}
-		finally 
-			{
-			output.unlock();
-			}
-    	}
-    	
+        {
+        lastX = e.getX();
+        lastY = e.getY();
+        output.lock();    
+        try
+            {
+            Sound sound = output.getInput().getLastPlayedSound();
+            if (sound == null) 
+                sound = output.getSound(0);
+            if (sound == null)
+                lastPitch = -1;
+            else lastPitch = sound.getPitch();
+            }
+        finally 
+            {
+            output.unlock();
+            }
+        }
+        
     public Display(Output output, boolean aux, boolean allowMouse)
         {
         this.aux = aux;
@@ -66,43 +66,43 @@ public class Display extends JComponent
             });
         timer.start();
 
-            MouseAdapter ma = new MouseAdapter()
+        MouseAdapter ma = new MouseAdapter()
+            {
+            public void mouseDragged(MouseEvent e)
                 {
-                public void mouseDragged(MouseEvent e)
-                    {
-                    if (allowMouse) updateFromMouse(e, mouseToFrequency(e.getX()), mouseToAmplitude(e.getY()), true);
-                    else updatePitch(e); 
-                    repaint();
-                    }
+                if (allowMouse) updateFromMouse(e, mouseToFrequency(e.getX()), mouseToAmplitude(e.getY()), true);
+                else updatePitch(e); 
+                repaint();
+                }
                                 
-                public void mousePressed(MouseEvent e)
-                    {
-                    if (allowMouse) updateFromMouse(e, mouseToFrequency(e.getX()), mouseToAmplitude(e.getY()), false);
-                    else updatePitch(e); 
-                    }
+            public void mousePressed(MouseEvent e)
+                {
+                if (allowMouse) updateFromMouse(e, mouseToFrequency(e.getX()), mouseToAmplitude(e.getY()), false);
+                else updatePitch(e); 
+                }
                     
-                public void mouseMoved(MouseEvent e)
-                	{
-                    updatePitch(e); 
-                    repaint();
-                	}
+            public void mouseMoved(MouseEvent e)
+                {
+                updatePitch(e); 
+                repaint();
+                }
                 
-                public void mouseEntered(MouseEvent e)
-                	{
-                    updatePitch(e); 
-                    repaint();
-                	}
+            public void mouseEntered(MouseEvent e)
+                {
+                updatePitch(e); 
+                repaint();
+                }
  
-                public void mouseExited(MouseEvent e)
-                	{
-                	lastPitch = -1;
-                    repaint();
-                	}
-                };
+            public void mouseExited(MouseEvent e)
+                {
+                lastPitch = -1;
+                repaint();
+                }
+            };
                 
-            addMouseListener(ma);
-            addMouseMotionListener(ma);
-            }
+        addMouseListener(ma);
+        addMouseMotionListener(ma);
+        }
                 
     public static final double MAX_FREQUENCY = 150;
     public static final double MAX_AMPLITUDE = 1.0;
@@ -205,18 +205,18 @@ public class Display extends JComponent
         int closestPartial = -1;
         double mtf = mouseToFrequency(lastX);
         double closestDiff = Double.POSITIVE_INFINITY;
- 		if (lastPitch != -1)
- 			{
-			 for(int i = 0; i < frequencies.length; i++)
-				{
-				double diff = Math.abs(mtf - frequencies[i]);
-				if (diff < closestDiff)
-					{
-					closestDiff = diff;
-					closestPartial = i;
-					}
-				}
-			}
+        if (lastPitch != -1)
+            {
+            for(int i = 0; i < frequencies.length; i++)
+                {
+                double diff = Math.abs(mtf - frequencies[i]);
+                if (diff < closestDiff)
+                    {
+                    closestDiff = diff;
+                    closestPartial = i;
+                    }
+                }
+            }
 
         prepareColorsForPartials();
         for(int i = 0; i < frequencies.length; i++)
@@ -230,26 +230,26 @@ public class Display extends JComponent
         
         String text = null;
         if (lastPitch != -1)
-        	{
-        	g.setFont(Style.SMALL_FONT());
-        	g.setColor(Color.GRAY);
-        	FontMetrics fm = g.getFontMetrics();
-        	int hh = fm.getHeight();
+            {
+            g.setFont(Style.SMALL_FONT());
+            g.setColor(Color.GRAY);
+            FontMetrics fm = g.getFontMetrics();
+            int hh = fm.getHeight();
 
-        	text = "partial " + closestPartial + " amp: " + String.format("%.2f", amplitudes[closestPartial]) +
-        		" freq: " + String.format("%.2f", frequencies[closestPartial] * lastPitch) + " (" + String.format("%.2f", frequencies[closestPartial]) + ")";
-        	Rectangle2D strbounds = fm.getStringBounds(text, g);
-        	g.drawString(text, (float)(getBounds().getWidth() - strbounds.getWidth() - 10), (float)(hh + 1));
+            text = "partial " + closestPartial + " amp: " + String.format("%.2f", amplitudes[closestPartial]) +
+                " freq: " + String.format("%.2f", frequencies[closestPartial] * lastPitch) + " (" + String.format("%.2f", frequencies[closestPartial]) + ")";
+            Rectangle2D strbounds = fm.getStringBounds(text, g);
+            g.drawString(text, (float)(getBounds().getWidth() - strbounds.getWidth() - 10), (float)(hh + 1));
 
 
-			double amp = mouseToAmplitude(lastY);
-        	text = "mouse   amp: " + String.format("%.2f", amp < 0 ? 0 : amp) +
-        			" freq: " + String.format("%.2f", mtf * lastPitch < 0 ? 0 : mtf * lastPitch) + " (" + String.format("%.2f", mtf < 0 ? 0 : mtf) + ")";
+            double amp = mouseToAmplitude(lastY);
+            text = "mouse   amp: " + String.format("%.2f", amp < 0 ? 0 : amp) +
+                " freq: " + String.format("%.2f", mtf * lastPitch < 0 ? 0 : mtf * lastPitch) + " (" + String.format("%.2f", mtf < 0 ? 0 : mtf) + ")";
 
-        	strbounds = fm.getStringBounds(text, g);
-        	g.drawString(text, (float)(getBounds().getWidth() - strbounds.getWidth() - 10), (float)(hh + 1) * 2);
-        	
-        	}
+            strbounds = fm.getStringBounds(text, g);
+            g.drawString(text, (float)(getBounds().getWidth() - strbounds.getWidth() - 10), (float)(hh + 1) * 2);
+                
+            }
         }
     
     /** A hook called before getColorForPartial(...) is called many times.
@@ -290,7 +290,7 @@ public class Display extends JComponent
             try 
                 {
                 if (sound == null) 
-                	sound = output.getSound(0);
+                    sound = output.getSound(0);
                 }
             catch (Exception ex)
                 {
