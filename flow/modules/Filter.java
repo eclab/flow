@@ -71,7 +71,7 @@ public class Filter extends Unit
         double cutoff = modToFrequency(makeInsensitive(modulate(MOD_FREQUENCY)));
         double cutoffdivpitch = cutoff / pitch;
         double drop = modToFilterDropPerOctave(modulate(MOD_DROPOFF));
-                
+        
         switch (type)
             {
             case TYPE_LP:

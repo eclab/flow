@@ -465,7 +465,7 @@ public abstract class Modulation implements java.io.Serializable, Cloneable
         {
         if (mod != modToFrequency_lastMod)
             {
-            modToFrequency_lastFreq = Utility.hybridpow(2, makeSensitive(mod) * 14.428491035332245) - 1;
+            modToFrequency_lastFreq = Math.pow(2, makeSensitive(mod) * 14.428491035332245) - 1;
             modToFrequency_lastMod = mod;
             }
         return modToFrequency_lastFreq;
@@ -476,7 +476,7 @@ public abstract class Modulation implements java.io.Serializable, Cloneable
         {
         if (mod != modToFrequency_lastMod)
             {
-            modToFrequency_lastFreq = Utility.hybridpow(2, mod * 14.428491035332245) - 1;
+            modToFrequency_lastFreq = Math.pow(2, mod * 14.428491035332245) - 1;
             modToFrequency_lastMod = mod;
             }
         return modToFrequency_lastFreq;
@@ -490,10 +490,10 @@ public abstract class Modulation implements java.io.Serializable, Cloneable
         if (mod != modToSignedFrequency_lastMod)
             {
             if (mod >= 0.5)
-                modToSignedFrequency_lastFreq = Utility.hybridpow(2, (mod - 0.5) * 2 * 13.428491035332245) - 1;
+                modToSignedFrequency_lastFreq = Math.pow(2, (mod - 0.5) * 2 * 13.428491035332245) - 1;
             else
                 {
-                modToSignedFrequency_lastFreq = 0 - Utility.hybridpow(2, (0.5 - mod) * 2 * 13.428491035332245) - 1;
+                modToSignedFrequency_lastFreq = 0 - Math.pow(2, (0.5 - mod) * 2 * 13.428491035332245) - 1;
                 }
             modToSignedFrequency_lastMod = mod;
             }
@@ -519,7 +519,7 @@ public abstract class Modulation implements java.io.Serializable, Cloneable
         {
         if (mod != modToFilterDropPerOctave_lastMod)
             {
-            modToFilterDropPerOctave_lastDrop = Utility.hybridpow(10, (-1.2 * mod));
+            modToFilterDropPerOctave_lastDrop = Math.pow(10, (-1.2 * mod));
             modToFilterDropPerOctave_lastMod = mod;
             }
         return modToFilterDropPerOctave_lastDrop;

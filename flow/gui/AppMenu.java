@@ -1,3 +1,7 @@
+// Copyright 2018 by George Mason University
+// Licensed under the Apache 2.0 License
+
+
 package flow.gui;
 
 import flow.*;
@@ -635,6 +639,7 @@ public class AppMenu
         //JMenuItem outMenu = null;
         JMenuItem inMenu = null;
 
+		Class[] modules = Modules.getModules();
         for(int i = 0; i < modules.length; i++)
             {
             Class c = modules[i];
@@ -653,36 +658,6 @@ public class AppMenu
             else  // Module
                 modShapers.add(m);
             }
-
-        // do the same thing for a module loaded on the command line
-        String modname = System.getProperty("module", null);
-        System.err.println(modname);
-        if (modname != null)
-            {
-            try
-                {
-                Class c = Class.forName(modname);
-                JMenuItem m = menuFor(c, rack);
-
-                if (c == flow.modules.Out.class)
-                    { } // do nothing //outMenu = m;
-                else if (c == flow.modules.In.class)
-                    inMenu = m;
-                else if (flow.UnitSource.class.isAssignableFrom(c))
-                    unitSources.add(m);
-                else if (flow.ModSource.class.isAssignableFrom(c))
-                    modSources.add(m);
-                else if (flow.Unit.class.isAssignableFrom(c))
-                    unitShapers.add(m);
-                else  // Module
-                    modShapers.add(m);
-                }
-            catch (Exception ex)
-                {
-                ex.printStackTrace();
-                }
-            }
-
                 
         //menu.add(outMenu);
         menu.add(inMenu);
@@ -819,67 +794,4 @@ public class AppMenu
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         }
-
-
-    // A list of all the modules in the system which can appear in the
-    // Modules menu.
-    static final Class[] modules = new Class[]
-    {
-    flow.modules.All.class,
-    flow.modules.AmpMath.class,
-    flow.modules.Average.class,
-    flow.modules.Buffer.class,
-    flow.modules.Combine.class,
-    flow.modules.Compress.class,
-    flow.modules.DADSR.class,
-    flow.modules.Delay.class,
-    flow.modules.Dilate.class,
-    flow.modules.Draw.class,
-    flow.modules.Drawbars.class,
-    flow.modules.Envelope.class,
-    flow.modules.Fatten.class,
-    flow.modules.Fill.class,
-    flow.modules.Filter.class,
-    flow.modules.FlangeFilter.class,
-    flow.modules.In.class,
-    flow.modules.Harmonics.class,
-    flow.modules.Jitter.class,
-    flow.modules.KHarmonics.class,
-    flow.modules.LFO.class,
-    flow.modules.LinearFilter.class,
-    flow.modules.Map.class,
-    flow.modules.MIDIIn.class,
-    flow.modules.Mix.class,
-    flow.modules.ModMath.class,
-    flow.modules.Morph.class,
-    flow.modules.Normalize.class,
-    flow.modules.Noise.class,
-    flow.modules.NRPN.class,
-    flow.modules.Out.class,
-    flow.modules.PartialLab.class,
-    flow.modules.PartialMod.class,
-    flow.modules.PartialFilter.class,
-    flow.modules.Partials.class,
-    flow.modules.Rand.class,
-    flow.modules.Rectified.class,
-    flow.modules.SampleAndHold.class,
-    flow.modules.Sawtooth.class,
-    flow.modules.Scale.class,
-    flow.modules.Seq.class,
-    flow.modules.Shift.class,
-    flow.modules.Sine.class,
-    flow.modules.Skeletonize.class,
-    flow.modules.Smooth.class,
-    flow.modules.Soften.class,
-    flow.modules.Square.class,
-    flow.modules.Squish.class,
-    flow.modules.Stretch.class,
-    flow.modules.Sub.class,
-    flow.modules.Swap.class,
-    flow.modules.Tinkle.class,
-    flow.modules.Triangle.class,
-    flow.modules.User.class,
-    flow.modules.VCA.class,
-    flow.modules.WaveTable.class,
-    };      
     }
