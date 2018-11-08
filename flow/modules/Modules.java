@@ -83,6 +83,7 @@ public class Modules
     flow.modules.Soften.class,
     flow.modules.Square.class,
     flow.modules.Squish.class,
+    flow.modules.StateVariableFilter.class,
     flow.modules.Stretch.class,
     flow.modules.Sub.class,
     flow.modules.Swap.class,
