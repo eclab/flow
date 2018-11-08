@@ -26,12 +26,15 @@ public class StateVariableFilter extends Unit
     public static final int TYPE_BP = 2;
     public static final int TYPE_NOTCH = 3;
     
+    public static final double INVERSE_SQRT_2 = 1.0 / Math.sqrt(2.0);
+    public static final double MINIMUM_FREQUENCY = 0.000001;  // seems reasonable
+    
     public StateVariableFilter(Sound sound)
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineOptions(new String[] { "4-Pole" }, new String[][] { { "4-Pole"} });
-        defineModulations(new Constant[] { Constant.HALF, Constant.HALF, Constant.ZERO }, new String[] { "Cutoff", "State", "Resonance" });
+        defineModulations(new Constant[] { Constant.ONE, Constant.HALF, Constant.ZERO }, new String[] { "Cutoff", "State", "Resonance" });
         }
 
 	boolean pole4 = false;
@@ -148,10 +151,10 @@ public class StateVariableFilter extends Unit
         double[] frequencies = getFrequencies(0);
         double pitch = sound.getPitch();
                 
-        double cutoff = modToFrequency(makeInsensitive(modulate(MOD_CUTOFF)));
-        if (cutoff < 0.000001) cutoff = 0.000001;  // so we're never 0
+        double cutoff = modToFrequency(makeVeryInsensitive(modulate(MOD_CUTOFF)));
+        if (cutoff < MINIMUM_FREQUENCY) cutoff = MINIMUM_FREQUENCY;  // so we're never 0
         double state = modulate(MOD_STATE);    	
-        double resonance = 0.707 * Utility.fastpow(10, modulate(MOD_RESONANCE));
+        double resonance = INVERSE_SQRT_2 * Utility.fastpow(10, modulate(MOD_RESONANCE));
         boolean pole4 = get4Pole();
         
         for(int i = 0; i < amplitudes.length; i++)
