@@ -96,8 +96,8 @@ public class Jitter extends Unit
             {
             for(int i = 0; i < targets[FREQUENCY_VAR].length; i++)
                 {
-                targets[FREQUENCY_VAR][i] = (rand.nextDouble() * 2.0 - 1.0) * frequencyModulation;
-                targets[AMPLITUDE_VAR][i] = (rand.nextDouble() * 2.0 - 1.0) * modulate(MOD_AMP_VAR);
+                targets[FREQUENCY_VAR][i] = Math.max(0, (rand.nextDouble() * 2.0 - 1.0) * frequencyModulation);
+                targets[AMPLITUDE_VAR][i] = Math.max(0, (rand.nextDouble() * 2.0 - 1.0) * modulate(MOD_AMP_VAR));
                 }
             started = true;
             }
