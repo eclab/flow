@@ -158,7 +158,7 @@ After you fire up {\name}, you're presented with a near-empty {\bf rack} (except
 If you look carefully at Figure~\ref{screenshot}, you'll see that there are not only twelve modules, but also two wide black rectangular regions called {\bf displays}, and two small squarish black regions called {\bf oscilloscopes}.  Displays show partials in the same manner as Figure~\ref{partials}, and oscilloscopes display modulation signals.
 
 \subsection{Tuning Parameters}
-First things first.  {\name} is very computationally expensive and benefits from tuning for your computer speed.  If your computer can't keep up with Flow's demands, you'll hear a {\bf glitch}.  This is a pop or a buzz in the audio stream, and will be accompanied by the {\bf Out} module (the top-right module shown in Figure \ref{screenshot}) coloring its black title bar red and saying ``Glitch''.  A glitch occurs when Flow can't keep the audio buffer filled enough, so your computer is forced to start filling it with zeros.  You don't want that.
+First things first.  {\name} is very computationally expensive and benefits from tuning for your computer speed.  If your computer can't keep up with Flow's demands, you'll hear a {\bf glitch}.  This is a pop or a buzz in the audio stream, and will be accompanied by the {\bf Out} module (the top-right module shown in Figure \ref{screenshot}) coloring its black title bar red and saying ``Glitch''.  A glitch occurs when Flow can't keep the audio buffer filled fast enough, so your computer is forced to start filling it with zeros.  You don't want that.
 
 How do we tamp down glitches?  By playing with a few parameters. If you select {\bf Tuning Parameters} from the {\bf Play} menu, you can at present change three parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session. 
 
@@ -593,7 +593,7 @@ You have the option of normalizing the resulting partials.
 
 \paragraph{Fill}  Given two incoming sources \(A\) and \(B\), this module first adds all of the non-zero-partials of \(A\) to the output; any remaining partials are filled from non-zero amplitude partials in \(B\), starting at its lowest frequency partials and working up.  You can scale (down) the amplitude of each of the incoming sources.  This module is particularly useful with {\bf Noise}.  See also {\bf Combine} and {\bf Mix} and {\bf Morph}.
 
-\paragraph{Filter}  This simulates a low-pass, high-pass, band-pass, or notch filter with the given absolute frequency and dropoff (from 0 poles to 8 poles, with a 4-pole filter half-way).  This is a simple non-resonant filter: it needs to be improved.
+\paragraph{Filter}  This is a resonant state-variable 2- or 4-pole filter. You can sweep through High Pass (at 0.0) to Notch (at 0.25) to Low Pass (default, at 0.5), to Band Pass (at 0.75) and finally to High Pass again (at 1.0).  Resonance values currently range from no resonance (that is resonance \(Q=\frac{1}{\sqrt{2}}\)) at 0.0 to ten times that amount (\(Q =\frac{10}{\sqrt{2}}\))  at 1.0.  And you can, of course, set the cutoff frequency.
 
 %\begin{figure}[t]
 %\begin{center}\includegraphics[width=6in]{UnitShapers2}\end{center}
