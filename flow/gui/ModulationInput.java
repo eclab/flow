@@ -106,7 +106,8 @@ public class ModulationInput extends InputOutput implements Rebuildable
         try
             {
             Modulation connection = modulation.getModulation(number);
-                                
+            int outModNumber = modulation.getModulationIndex(number);
+
             disconnect();
                         
             // now reconnect
@@ -128,8 +129,6 @@ public class ModulationInput extends InputOutput implements Rebuildable
                 {
                 ModulePanel connectionPanel = rack.getModulePanel(index);
                 ModulationWire wire = new ModulationWire(rack);
-                                                
-                int outModNumber = modulation.getModulationIndex(number);
                 ModulationOutput outputModulation = connectionPanel.findModulationOutputForIndex(outModNumber);
                 wire.setStart(outputModulation);
                 wire.setEnd(this);
