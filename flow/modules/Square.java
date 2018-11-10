@@ -67,7 +67,7 @@ public class Square extends Unit implements UnitSource //, Parameterizable
                                 
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    amplitudes[i] = Math.abs(1.0 / (i+1) * Utility.fastSin(Math.PI * (i + 1) * mod));
+                    amplitudes[i] = (mod == 0 || mod == 1 ? 0 : Math.abs(1.0 / (i+1) * Utility.fastSin(Math.PI * (i + 1) * mod)));
                     }
                 }
                                 
