@@ -922,6 +922,7 @@ public class Rack extends JPanel
         JTextArea i = new JTextArea(5, LABEL_MAX_LENGTH);
         i.setText(info);
         i.setLineWrap(true);
+		i.setWrapStyleWord(true);
         JScrollPane pane = new JScrollPane(i);
         pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         pane.setBorder(v.getBorder());
