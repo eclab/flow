@@ -192,7 +192,7 @@ public class PartialLab extends Unit implements UnitSource
                         b = b * b;
                         b = b * b;
                         b = b * b;  // ^8
-                        amplitudes[partials[j]] = g * Math.pow(1.0 - x, b);
+                        amplitudes[partials[j]] = g * Utility.fastpow(1.0 - x, b);
                         }
                     break;
                     case TYPE_POW_OF_ONE_PLUS_X:
@@ -201,7 +201,7 @@ public class PartialLab extends Unit implements UnitSource
                         double b = (a - 1.0) * 4;
                         b = b * b;
                         b = b * b;  // ^4
-                        amplitudes[partials[j]] = g * Math.pow(1.0 + x, 0 - b);
+                        amplitudes[partials[j]] = g * Utility.fastpow(1.0 + x, 0 - b);
                         }
                     break;
                     case TYPE_ONE_MINUS_POW_OF_X:
@@ -210,7 +210,7 @@ public class PartialLab extends Unit implements UnitSource
                         double b = a;
                         b = b * b;
                         b = b * b;  // ^4
-                        amplitudes[partials[j]] = g * (1.0 - Math.pow(x, b * 16 + 0.01));
+                        amplitudes[partials[j]] = g * (1.0 - Utility.fastpow(x, b * 16 + 0.01));
                         }
                     break;
                     }
