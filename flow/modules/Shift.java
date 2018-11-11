@@ -78,7 +78,7 @@ public class Shift extends Unit
         defineOptions(new String[] { "Type" }, new String[][] { { "Pitch", "Frequency", "Partials" } } );
         }
         
-    public static final double MAX_BOUND = 4.0;
+    public static final double MAX_BOUND = 12.0;
         
     public void go()
         {
