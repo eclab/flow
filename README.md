@@ -2,7 +2,7 @@
 
 
 # Flow 
-A Polyphonic Modular Additive Synthesizer (Version 0)
+A Polyphonic Modular Additive Synthesizer (Version 1)
  
 By Sean Luke (sean@cs.gmu.edu) \
 With Help from Bryan Hoyle \
@@ -45,6 +45,11 @@ developed on a 2.8Ghz i7 2015 Macbook Pro Retina).
 ### Patches
 
 * Flow's demo patches are located [here](flow/patches).   Contribute some!   You can get a zip file of all of them [here](https://github.com/eclab/flow/blob/master/flow/patches.zip?raw=true).
+
+## Major Non-Backward Compatible Changes since Version 0 that will Break Your Patches
+
+* Filter is now a state-variable, Resonant filter.  It's totally different.
+* Shift has a much larger range now: its bound is 3x the previous size.  This means that to get Shift to work like it used to, set its bound to 1/3 what you used to have it (for convenience, if the bound used to be 1.0, just double-click on the dial and choose "1/3").
 
 ## Install and Run Flow
 
