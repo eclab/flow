@@ -74,12 +74,12 @@ import org.json.*;
    how to access these getters and setters in a consistent way.
 **/
 
-public abstract class Modulation implements java.io.Serializable, Cloneable
+public abstract class Modulation implements Cloneable
     {
     private static final long serialVersionUID = 1;
 
     /** The Modulation's sound backpointer. */
-    protected transient Sound sound;  // we don't want to serialize this
+    protected Sound sound;
         
     public Sound getSound() { return sound; }
     public void setSound(Sound sound) { this.sound = sound; }
@@ -877,7 +877,9 @@ public abstract class Modulation implements java.io.Serializable, Cloneable
                 JSONObject m = mods.optJSONObject(getKeyForModulation(i));
                 if (m == null)
                     {
-                    System.err.println("WARNING: Could not load modulation " + getKeyForModulation(i) + " in " + this);
+                    // probably a Macro
+                    //System.err.println("WARNING: Could not load modulation " + getKeyForModulation(i) + " in " + this);
+                	setModulation(new Constant(0), i);
                     }
                 else
                     {

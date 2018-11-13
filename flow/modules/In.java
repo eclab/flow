@@ -6,6 +6,7 @@ package flow.modules;
 
 import flow.*;
 import flow.gui.*;
+import org.json.*;
 
 /**
    A module which works with the Macro facility to route
@@ -28,8 +29,9 @@ public class In extends Unit
     public In(Sound sound)
         {
         super(sound);
-        defineModulationOutputs(MOD_NAMES);
-        defineOutputs(UNIT_NAMES);
+        // we want the original names around so we can refer to them later
+        defineModulationOutputs((String[])(MOD_NAMES.clone()));
+        defineOutputs((String[])(UNIT_NAMES.clone()));
         defineInputs(new Unit[0], new String[0]);
         standardizeFrequencies();
         setOrders();
@@ -71,8 +73,35 @@ public class In extends Unit
 
     public ModulePanel getPanel()
         {
-        ModulePanel panel = new ModulePanel(this)
+        final ModulePanel[] panel = new ModulePanel[1];
+        panel[0] = new ModulePanel(this)
             {
+            public void setRack(Rack rack)
+            	{
+            	super.setRack(rack);
+            	ModulePanel[] all = rack.getAllModulePanels();
+            	
+            	// are there any other Ins?  Find the first one
+            	for(int i = 0; i < all.length; i++)
+            		{
+            		if (all[i].getModulation() instanceof In && all[i] != panel[0])
+            			{
+            			// set me to the same values as the first one
+						ModulationOutput[] a = panel[0].getModulationOutputs();
+						ModulationOutput[] aa = all[i].getModulationOutputs();
+						for(int j = 0; j < a.length; j++)
+							a[j].setTitleText(aa[j].getTitleText());
+
+						UnitOutput[] b = panel[0].getUnitOutputs();
+						UnitOutput[] bb = all[i].getUnitOutputs();
+						for(int j = 0; j < b.length; j++)
+							b[j].setTitleText(bb[j].getTitleText());
+
+            			break;  // we're done, no more changing
+            			}
+            		}
+            	}
+            	
             public void updateTitleChange(InputOutput inout, int number, String newTitle)
                 {
                 // Here we're going to redistribute the title to all the Ins in the patch
@@ -106,16 +135,16 @@ public class In extends Unit
                     }
                 }
             };
-        
-        ModulationOutput[] a = panel.getModulationOutputs();
+            
+        ModulationOutput[] a = panel[0].getModulationOutputs();
         for(int i = 0; i < a.length; i++)
             a[i].setTitleCanChange(true);
 
-        UnitOutput[] b = panel.getUnitOutputs();
+        UnitOutput[] b = panel[0].getUnitOutputs();
         for(int i = 0; i < b.length; i++)
             b[i].setTitleCanChange(true);
 
-        return panel;
+        return panel[0];
         }
 
 
@@ -130,5 +159,44 @@ public class In extends Unit
         {
         if (output < NUM_UNIT_INPUTS) return UNIT_NAMES[output];
         else return super.getKeyForOutput(output);
+        }
+
+    public void setData(JSONObject data, int moduleVersion, int patchVersion) 
+    	{
+    	if (data == null)
+    		System.err.println("Empty Data for in.  That can't be right.");
+    	else
+    		{
+    		JSONArray array = data.getJSONArray("mod");
+    		for(int i = 0; i < array.length(); i++)
+    			{
+    			setModulationOutputName(i, array.getString(i));
+    			}
+    		array = data.getJSONArray("unit");
+    		for(int i = 0; i < array.length(); i++)
+    			{
+    			setOutputName(i, array.getString(i));
+    			}
+    		}
+    	}
+    
+    public JSONObject getData() 
+        { 
+        JSONObject obj = new JSONObject();
+        
+        JSONArray array = new JSONArray();
+
+        for(int i = 0; i < getNumModulationOutputs(); i++)
+            array.put(getModulationOutputName(i));
+                
+        obj.put("mod", array);
+
+        array = new JSONArray();
+
+        for(int i = 0; i < getNumOutputs(); i++)
+            array.put(getOutputName(i));
+                
+        obj.put("unit", array);
+        return obj;
         }
     }

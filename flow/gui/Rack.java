@@ -438,9 +438,9 @@ public class Rack extends JPanel
                     }
                 else if (allModulePanels.size() != output.getSound(i).getNumRegistered())
                     {
-                    System.err.println("Rack CHECK WARNING: Sound " + i + " differs in length from allModulePanels (" +
-                        output.getSound(i).getNumRegistered() + " vs " + 
-                        allModulePanels.size());
+//                    System.err.println("Rack CHECK WARNING: Sound " + i + " differs in length from allModulePanels (" +
+//                        output.getSound(i).getNumRegistered() + " vs " + 
+//                        allModulePanels.size());
                     //new Throwable().printStackTrace();
                     return;
                     }

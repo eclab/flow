@@ -355,12 +355,7 @@ public class AppMenu
                             Modulation[][] mods = new Modulation[rack.getOutput().getNumSounds()][];
                             for(int i = 0; i < mods.length; i++)
                                 {
-                                if (obj == null)
-                                    {
-                                    mods[i] = Macro.deserialize(f, patchName);              // old version
-                                    }
-                                else
-                                    mods[i] = Sound.loadModules(obj, flowVersion);
+                                mods[i] = Sound.loadModules(obj, flowVersion);
                                 }
                                                                                                 
                             // Create and update Modulations and create ModulePanels

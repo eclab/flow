@@ -214,6 +214,11 @@ public class Macro extends Unit implements Cloneable
         loadModules(modules, patchName);
         setSound(sound);  // distribute to modules
         }
+        
+    public Macro(Sound sound)
+    	{
+    	super(sound);
+    	}
                 
     public void loadModules(Modulation[] modules, String patchName)
         {
@@ -312,9 +317,9 @@ public class Macro extends Unit implements Cloneable
             }             
         }
     
-    public void setData(JSONObject data, int moduleVersion, int patchVersion) throws Exception
+    public void setData(JSONObject data, int moduleVersion, int flowVersion) throws Exception
         {
-        loadModules(Sound.loadModules(data, patchVersion), Sound.loadName(data));
+        loadModules(Sound.loadModules(data, flowVersion), Sound.loadName(data));
         }
 
     public JSONObject getData() 
@@ -338,22 +343,15 @@ public class Macro extends Unit implements Cloneable
         }
     
     
-    public static Macro loadMacro(Sound sound, File file)
+    public static Macro loadMacro(Sound sound, File file) throws Exception
         {
-        try 
-            { 
-            JSONObject obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
-            return new Macro(sound, 
-                Sound.loadModules(obj, Sound.loadFlowVersion(obj)), 
-                Sound.loadName(obj));
-            }
-        catch (Exception ex)
-            {
-            // try the old way
-            return deserializeAsMacro(sound, file);
-            }
+		JSONObject obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
+		return new Macro(sound, 
+			Sound.loadModules(obj, Sound.loadFlowVersion(obj)), 
+			Sound.loadName(obj));
         }
     
+    /*
     public static Macro deserializeAsMacro(Sound sound, File file)
         {
         String[] patchName = new String[1];
@@ -396,7 +394,8 @@ public class Macro extends Unit implements Cloneable
             return null;
             }
         }
-                        
+    */
+                 
     public ModulePanel getPanel()
         {
         return new ModulePanel(Macro.this)

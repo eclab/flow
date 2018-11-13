@@ -9,6 +9,7 @@ import flow.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import org.json.*;
 
 
 /**
@@ -76,9 +77,10 @@ public class Out extends Unit
     public Out(Sound sound)
         {
         super(sound);
-        defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, UNIT_NAMES);
+        // we clone so we can keep the original names around
+        defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[])UNIT_NAMES.clone());
         defineOutputs( new String[] { "A", "B" } );
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER }, MOD_NAMES);
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER }, (String[])MOD_NAMES.clone());
         if (sound != null) sound.setEmits(this);
         }
 
@@ -281,5 +283,44 @@ public class Out extends Unit
         {
         if (input < NUM_UNIT_OUTPUTS) return UNIT_NAMES[input];
         else return super.getKeyForInput(input);
+        }
+        
+    public void setData(JSONObject data, int moduleVersion, int patchVersion) 
+    	{
+    	if (data == null)
+    		System.err.println("Empty Data for Out.  That can't be right.");
+    	else
+    		{
+    		JSONArray array = data.getJSONArray("mod");
+    		for(int i = 0; i < array.length(); i++)
+    			{
+    			setModulationName(i, array.getString(i));
+    			}
+    		array = data.getJSONArray("unit");
+    		for(int i = 0; i < array.length(); i++)
+    			{
+    			setInputName(i, array.getString(i));
+    			}
+    		}
+    	}
+    
+    public JSONObject getData() 
+        { 
+        JSONObject obj = new JSONObject();
+        
+        JSONArray array = new JSONArray();
+
+        for(int i = 0; i < getNumModulations(); i++)
+            array.put(getModulationName(i));
+                
+        obj.put("mod", array);
+
+        array = new JSONArray();
+
+        for(int i = 0; i < getNumInputs(); i++)
+            array.put(getInputName(i));
+                
+        obj.put("unit", array);
+        return obj;
         }
     }

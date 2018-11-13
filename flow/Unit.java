@@ -81,7 +81,6 @@ public class Unit extends Modulation
         setOrders();
         }
         
-        
     ////// OPERATION
         
     boolean clearOnReset = true;
