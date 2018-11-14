@@ -32,6 +32,9 @@ public class Combine extends Unit
     public static final int MOD_SCALE_A = 0;
     public static final int MOD_SCALE_B = 1;
 
+	int[] outstandingOrders;
+	int[] outstandingOrderPositions;
+	
     /// Do we attempt to merge identical frequencies into one frequency, or load them independently?
     boolean merge = false;
     /// Do we guarantee that each incoming partials gets 1/2 of the final partials, or just load them both asynchronously until expended?
@@ -45,7 +48,6 @@ public class Combine extends Unit
         
     public static final int OPTION_MERGE = 0;
     public static final int OPTION_HALF = 1;
-
     public int getOptionValue(int option) 
         { 
         switch(option)
@@ -55,7 +57,7 @@ public class Combine extends Unit
             default: throw new RuntimeException("No such option " + option);
             }
         }
-                
+ 
     public void setOptionValue(int option, int value)
         { 
         switch(option)
@@ -75,6 +77,7 @@ public class Combine extends Unit
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL }, new String[] { "Input A", "Input B" });
         defineOptions(new String[] { "Merge", "Half" }, new String[][] { { "Merge" }, { "Half" } } );
         defineModulations(new Constant[] { Constant.ONE, Constant.ONE }, new String[] { "Scale A", "Scale B" });
+        setPushOrders(false);
         }
                         
     public void go()
@@ -83,64 +86,99 @@ public class Combine extends Unit
 
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
+		byte[] orders = getOrders(0);
+		
+		
+		// Combine is kind of a mess at preserving orders.  So we're doing it as follows:
+		// 1. All of A's orders are preserved
+		// 2. Any of B's orders which CAN be preserved without conflicting with #1 will be preserved
+		// 3. We arbitrarily assign the remainder
+		// To do this we need some arrays, and we'll have to allocate them every time or otherwise
+		// zero them out.  This allows us to avoid doing sorts, yay.
+		boolean[] filledOrders = new boolean[amplitudes.length];  // all false
+		boolean[] assignedPositions = new boolean[amplitudes.length];  // all false
+        if (outstandingOrders == null) outstandingOrders = new int[amplitudes.length];
+        if (outstandingOrderPositions == null) outstandingOrderPositions = new int[amplitudes.length];
                 
         boolean _merge = merge;
                 
-        int i0 = 0;
-        int i1 = 0;
-        double[] frequencies0 = getFrequenciesIn(UNIT_INPUT_A);
-        double[] amplitudes0 = getAmplitudesIn(UNIT_INPUT_A);
-        double[] frequencies1 = getFrequenciesIn(UNIT_INPUT_B);
-        double[] amplitudes1 = getAmplitudesIn(UNIT_INPUT_B);
+        int iA = 0;
+        int iB = 0;
+        int numOutstanding = 0;
+        double[] frequenciesA = getFrequenciesIn(UNIT_INPUT_A);
+        double[] amplitudesA = getAmplitudesIn(UNIT_INPUT_A);
+        double[] frequenciesB = getFrequenciesIn(UNIT_INPUT_B);
+        double[] amplitudesB = getAmplitudesIn(UNIT_INPUT_B);
+        byte[] ordersA = getOrdersIn(UNIT_INPUT_A);
+        byte[] ordersB = getOrdersIn(UNIT_INPUT_B);
         double f_out;
         
         double scaleA = modulate(MOD_SCALE_A);
         double scaleB = modulate(MOD_SCALE_B);
                 
-        double maxIncomingFreqLen = (half ? frequencies0.length / 2 : frequencies0.length);
-                
+        double maxIncomingFreqLen = (half ? frequenciesA.length / 2 : frequenciesA.length);
+
         for(int i = 0; i < frequencies.length; i++)
             {
-            if (_merge && i0 < maxIncomingFreqLen && i1 < maxIncomingFreqLen && frequencies0[i0] == frequencies1[i1])
+            if (_merge && iA < maxIncomingFreqLen && iB < maxIncomingFreqLen && frequenciesA[iA] == frequenciesB[iB])
                 {
-                frequencies[i] = frequencies0[i0];
-                amplitudes[i] = amplitudes0[i0] * scaleA + amplitudes1[i1] * scaleB;
-                i0++;
-                i1++;
+                frequencies[i] = frequenciesA[iA];
+                amplitudes[i] = amplitudesA[iA] * scaleA + amplitudesB[iB] * scaleB;
+                
+                // we'll assign the order from A
+                orders[i] = ordersA[iA];
+                int o = ordersA[iA];
+                if (o < 0) o += 256;
+                filledOrders[o] = true;		// this order is now used
+                iA++;
+                iB++;
                 }
-            else if (i0 < maxIncomingFreqLen && (i1 >= maxIncomingFreqLen || frequencies0[i0] <= frequencies1[i1]))  // notice <=
+            else if (iA < maxIncomingFreqLen && (iB >= maxIncomingFreqLen || frequenciesA[iA] <= frequenciesB[iB]))  // notice <=
                 {
-                frequencies[i] = frequencies0[i0];
-                amplitudes[i] = amplitudes0[i0] * scaleA;
-                i0++;
+                frequencies[i] = frequenciesA[iA];
+                amplitudes[i] = amplitudesA[iA] * scaleA;
+
+                // we'll assign the order from A
+                orders[i] = ordersA[iA];
+                int o = ordersA[iA];
+                if (o < 0) o += 256;
+                filledOrders[o] = true;		// this order is now used
+              	iA++;
                 }
-            else // if (i1 < maxIncomingFreqLen && (i0 >= maxIncomingFreqLen || frequencies1[i1] < frequencies0[i0]))
+            else // if (iB < maxIncomingFreqLen && (iA >= maxIncomingFreqLen || frequenciesB[iB] < frequenciesA[iA]))
                 {
-                frequencies[i] = frequencies1[i1];
-                amplitudes[i] = amplitudes1[i1] * scaleB;
-                i1++;
+                frequencies[i] = frequenciesB[iB];
+                amplitudes[i] = amplitudesB[iB] * scaleB;
+                
+                // we won't assign the order from B just yet, but we'll store it in the hopes that we can assign it later
+                int o = ordersB[iB];
+                if (o < 0) o += 256;
+                outstandingOrders[numOutstanding] = o;
+                outstandingOrderPositions[numOutstanding] = i;		// this basically says that partial i would *like* to have order o
+                numOutstanding++;
+                iB++;
                 }
             }
 
         // Now I just need to know what the frequency of the NEXT partial would have been
 
-        if (i0 >= frequencies.length || i1 >= frequencies.length)
+        if (iA >= frequencies.length || iB >= frequencies.length)
             {
             // do nothing
             }
-        else if (_merge && i0 >= frequencies0.length && i1 >= frequencies1.length)   // dunno
+        else if (_merge && iA >= frequenciesA.length && iB >= frequenciesB.length)   // dunno
             {
             // do nothing
             }
         else
             {
-            if (i0 < maxIncomingFreqLen && (i1 >= maxIncomingFreqLen || frequencies0[i0] <= frequencies1[i1]))  // notice <=
+            if (iA < maxIncomingFreqLen && (iB >= maxIncomingFreqLen || frequenciesA[iA] <= frequenciesB[iB]))  // notice <=
                 {
-                f_out = frequencies0[i0];
+                f_out = frequenciesA[iA];
                 }
-            else // if (i1 < maxIncomingFreqLen && (i0 >= maxIncomingFreqLen || frequencies1[i1] < frequencies0[i0]))
+            else // if (iB < maxIncomingFreqLen && (iA >= maxIncomingFreqLen || frequenciesB[iB] < frequenciesA[iA]))
                 {
-                f_out = frequencies1[i1];
+                f_out = frequenciesB[iB];
                 }
 
             // To make things relatively smooth, we ramp down the amplitude of the final partial based on
@@ -150,7 +188,34 @@ public class Combine extends Unit
             if ((f_out - frequencies[frequencies.length - 1]) != (f_out - frequencies[frequencies.length - 2]))
                 amplitudes[amplitudes.length - 1] *= (f_out - frequencies[frequencies.length - 1]) / (f_out - frequencies[frequencies.length - 2]);
             }
+
                 
+        // Fill in the outstanding orders that we can fill
+        for(int j = 0; j < numOutstanding; j++)
+        	{
+        	if (!filledOrders[outstandingOrders[j]]) // the requested order isn't being used yet, so we can use it
+        		{
+        		filledOrders[outstandingOrders[j]] = true;								// mark it used
+        		orders[outstandingOrderPositions[j]] = (byte)outstandingOrders[j];		// use it
+        		outstandingOrders[j] = -1;  											// eliminate it so we don't try to force it in the next pass
+        		}
+        	}
+        	
+        // Force the remaining orders
+        int nextOrder = 0;
+        for(int j = 0; j < numOutstanding; j++)
+        	{
+        	if (outstandingOrders[j] >= 0)  // still hasn't been filled, we need to force it to something
+        		{
+        		// find next unfilled order
+        		while(filledOrders[nextOrder]) nextOrder++;
+        		
+        		// fill
+        		filledOrders[nextOrder] = true;
+        		orders[nextOrder] = (byte)nextOrder;
+        		}
+        	}
+        	
         if (constrain()) simpleSort(0, false);
         }
     }
