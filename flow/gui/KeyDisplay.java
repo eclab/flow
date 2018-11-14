@@ -87,7 +87,10 @@ public class KeyDisplay extends JPanel
         {
         return state;
         }
-        
+    
+    public void setTranspose(int val) { transpose = val; }
+    public int getTranspose() { return transpose; }
+    
     void mouseReleased(MouseEvent e)
         {                       
         if (mouseDown)

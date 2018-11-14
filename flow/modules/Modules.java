@@ -51,6 +51,7 @@ public class Modules
     flow.modules.Fill.class,
     flow.modules.Filter.class,
     flow.modules.FlangeFilter.class,
+    flow.modules.Geiger.class,
     flow.modules.In.class,
     flow.modules.Harmonics.class,
     flow.modules.Jitter.class,
