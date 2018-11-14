@@ -158,30 +158,24 @@ public class WaveTable extends Unit implements UnitSource
                         }
                     else
                         {
-                        int MULTIPLES = 2;
                         ArrayList<double[]> buf = new ArrayList<>();
-                        double[] buffer = new double[256 * MULTIPLES];
-                        double[] lastFinished = null;
+                        double[] buffer = new double[256];
                         int count = 0;
                         while(true)
                             {
-                            double[] finished = new double[128 * MULTIPLES];
+                            double[] finished = new double[128];
         
                             // Read frames into buffer
-                            int framesRead = wavFile.readFrames(buffer, 256 * MULTIPLES);
-                            if (framesRead != 256 * MULTIPLES) break;
+                            int framesRead = wavFile.readFrames(buffer, 256);
+                            if (framesRead != 256) break;
                                 
                             // Note no window.  Should still be okay (I think?)
-                            double[] harmonics = FFT.getHarmonics(FFT.applyHanningWindow(buffer));
-                            for (int s = 1 ; s < harmonics.length / 2 + 1; s++)
+                            double[] harmonics = FFT.getHarmonics(buffer);
+                            for (int s=1 ; s<harmonics.length / 2 + 1; s++)
                                 {
                                 finished[s - 1] = (harmonics[s] >= MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
                                 }
-                            
-                            double[] f = new double[128];
-                            for(int i = 0; i < 128; i++)
-                            	f[i] = finished[i];
-                            buf.add(f);
+                            buf.add(finished);
                             }
 
                         double max = 0;
