@@ -19,7 +19,7 @@ public class Partials extends Unit implements UnitSource
     {
     private static final long serialVersionUID = 1;
         
-    public static final int NUM_PARTIALS = 8;
+    public static final int NUM_PARTIALS = 16;
 
     public Partials(Sound sound) 
         {
@@ -31,7 +31,7 @@ public class Partials extends Unit implements UnitSource
             con[i] = new Constant((i + 1) / (NUM_PARTIALS - 1));
             con[i + NUM_PARTIALS] = Constant.ZERO;
             str[i] = "Freq " + (i + 1);
-            str[i + NUM_PARTIALS] = "Amp";
+            str[i + NUM_PARTIALS] = "Amp " + (i + 1);
             }
         defineModulations(con, str);
         }
