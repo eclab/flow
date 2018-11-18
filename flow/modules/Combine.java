@@ -189,7 +189,8 @@ public class Combine extends Unit
                 amplitudes[amplitudes.length - 1] *= (f_out - frequencies[frequencies.length - 1]) / (f_out - frequencies[frequencies.length - 2]);
             }
 
-                
+        
+        /*
         // Fill in the outstanding orders that we can fill
         for(int j = 0; j < numOutstanding; j++)
         	{
@@ -200,6 +201,7 @@ public class Combine extends Unit
         		outstandingOrders[j] = -1;  											// eliminate it so we don't try to force it in the next pass
         		}
         	}
+        */
         	
         // Force the remaining orders
         int nextOrder = 0;
@@ -212,7 +214,7 @@ public class Combine extends Unit
         		
         		// fill
         		filledOrders[nextOrder] = true;
-        		orders[nextOrder] = (byte)nextOrder;
+        		orders[outstandingOrderPositions[j]] = (byte)nextOrder;
         		}
         	}
         	
