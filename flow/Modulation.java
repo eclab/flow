@@ -679,6 +679,12 @@ public abstract class Modulation implements Cloneable
             return (s == sound);
         }
 
+	/** For debugging... */
+	protected void print(String str)
+		{
+		if (isFirstSound()) System.err.println(str);
+		}
+
     /** Returns the ModulePanel associated with this Modulation.  Use the default here, or override this to create your own ModulePanel. */
     public ModulePanel getPanel()
         {
