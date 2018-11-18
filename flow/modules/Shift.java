@@ -78,17 +78,13 @@ public class Shift extends Unit
         defineOptions(new String[] { "Type" }, new String[][] { { "Pitch", "Frequency", "Partials" } } );
         }
         
-    public static final double MAX_BOUND = 12.0;
+    public static final double MAX_PITCH_BOUND = 12.0;
+    public static final double MAX_PARTIALS_BOUND = 128.0;
         
     public void go()
         {
         super.go();
                 
-        copyFrequencies(0);
-        pushAmplitudes(0);
-
-        double[] frequencies = getFrequencies(0);
-        
         double shift = modulate(MOD_SHIFT);
         double bound = modulate(MOD_BOUND);
                 
@@ -96,8 +92,13 @@ public class Shift extends Unit
             {
             case TYPE_PITCH:
                 {
+				copyFrequencies(0);
+				pushAmplitudes(0);
+
+				double[] frequencies = getFrequencies(0);
+        
                 // If it's not Math.pow, but hybridpow, we get weird jumps
-                double multiplier = Math.pow(2, (shift - 0.5) * bound * MAX_BOUND);
+                double multiplier = Math.pow(2, (shift - 0.5) * bound * MAX_PITCH_BOUND);
 
                 for(int i = 0; i < frequencies.length; i++)
                     {
@@ -108,6 +109,11 @@ public class Shift extends Unit
                         
             case TYPE_FREQUENCY:
                 {
+				copyFrequencies(0);
+				pushAmplitudes(0);
+
+				double[] frequencies = getFrequencies(0);
+        
                 double delta = modToSignedFrequency(shift) * bound / sound.getPitch();
 
                 for(int i = 0; i < frequencies.length; i++)
@@ -121,24 +127,32 @@ public class Shift extends Unit
                         
             case TYPE_PARTIALS:
                 {
-                double[] frequenciesIn = getFrequenciesIn(0);
-                shift = (shift - 0.5) * 2 * bound;
-                                
-                if (shift < 0)
-                    {
-                    shift = -shift;
-                    for(int i = 1; i < frequencies.length; i++)
-                        {
-                        frequencies[i] = frequenciesIn[i] * (1.0 - shift) + frequenciesIn[i - 1] * shift;
-                        }
-                    }
-                else if (shift > 0)
-                    {
-                    for(int i = 0; i < frequencies.length - 1; i++)
-                        {
-                        frequencies[i] = frequenciesIn[i] * (1.0 - shift) + frequenciesIn[i + 1] * shift;
-                        }
-                    }
+				pushFrequencies(0);
+				copyAmplitudes(0);
+
+				double[] amplitudes = getAmplitudes(0);
+        
+                int delta = (int)((shift - 0.5) * 2 * bound * MAX_PARTIALS_BOUND);
+                
+                if (delta > 0)
+                	{
+					for(int i = amplitudes.length - 1; i >= 0; i--)
+						{
+						int j = i - delta;
+						if (j < 0) amplitudes[i] = 0;
+						else amplitudes[i] = amplitudes[j];
+						}
+                	}
+                else if (delta < 0)
+                	{
+					for(int i = 0; i < amplitudes.length; i++)
+						{
+						int j = i - delta;
+						if (j >= amplitudes.length) amplitudes[i] = 0;
+						else amplitudes[i] = amplitudes[j];
+						}
+                	}
+                	
                 }
             break;
             }
