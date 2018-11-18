@@ -39,7 +39,7 @@ public class Fill extends Unit
         copyAmplitudes(0);
 
         double[] amplitudes = getAmplitudes(0);         // INPUT_A was copied over
-        double[] frequencies = getFrequencies(0);               // INPUT_A was copied over
+        double[] frequencies = getFrequencies(0);       // INPUT_A was copied over
         double[] amp2 = getAmplitudesIn(UNIT_INPUT_B);
         double[] freq2 = getFrequenciesIn(UNIT_INPUT_B);
         double scaleA = modulate(MOD_SCALE_A);
