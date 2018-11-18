@@ -534,7 +534,7 @@ In addition to sequencing modulation signals, Seq can also be used in combinatio
 
 %\paragraph{Wavetable}  A wavetable from the set of Microwave II/XT waves with a modulatable position.  Note that Waldorf asked us to not include this data; and although they likely don't hold IP over these, we have elected to do as they wished.  We are looking for public domain wavetables we might use instead.
 
-\paragraph{Wavetable}  Lets you load wavetables (as ``.WAV'' files) from https:/\!/waveeditonline.com/, then wander through them using the provided modulation.
+\paragraph{Wavetable}  Lets you load wavetables (as ``.WAV'' files) from https:/\!/waveeditonline.com/, then wander through them using the provided modulation.  You have the option of turning off interpolation between waves.
 }
 
 \subsection{Partials Shapers}
@@ -707,8 +707,34 @@ You can rename the input and output partials and modulation ports of your Macro.
 
 Note that although you can have as many In modules as you like, and they will all work, only the ports of the first one will be used to rename ports in the Macro.  (Of course, as mentioned before, while you can have multiple Out modules, only the last one will function at all, and this includes naming ports).
 
+\subsection{Mixing Strategies}
+
+Ordinarily if you wanted to mix two sources into one stream, you'd imagine you could just lump all the partials together and be done with it.  But there are two catches.  First, {\name} has a fixed number of partials: so if you lump the partials from two sources together, half of them must be eliminated.  Second, partials are each associated with a sine wave oscillator in the output (that's the partial's {\it order}): when two sets of partials are mixed, you'll often have the situation where partials from each set are competing for that oscillator, and in the end only one can have it.  So it's a little more complex than you'd think.
+
+{\name} has several modules which implement various strategies for mixing, depending on your needs: {\it Amp Math}, {\it Morph}, {\it Mix}, {\it Combine}, and {\it Fill}.  It's useful to understand how these strategies differ from one another.
+
+First some terminology.  Let the two sets of partials from incoming partials be \(A\) and \(B\), and the resulting outputted by the mixing module be \(O\).   Sets of partials are actually arrays (lists).  Thus each partial has a {\it position} in the list: {\name} requires that lower-frequency partials have lower positions than higher-frequency partials.  Partial \(O_i\) is the \(i\)th partial in the list for output \(O\) (similarly \(A_i\) and \(B_i\)).  Each partial has an {\it amplitude}, a {\it frequency}, and an {\it order} (the oscillator ultimately used to output the partial).  We'll call these amp(\(O_i)\), freq(\(O_i\)), and ord(\(O_i\)) (and similarly for \(A\) and \(B\)).  The order is a unique integer but it's not the same thing as \(i\): as partials change their frequencies, they can get rearranged in a list but maintain their respective order tags.
+
+\begin{itemize}
+\item {\bf Amp Math} and {\bf Mix} both just line up the corresponding partials and perform a function on their amplitudes.  That is, \(\text{amp}(O_i) = f(\text{amp}(A_i), \text{amp}(B_i))\) for some function \(f(...)\), but \(\text{freq}(O_i) = \text{freq}(A_i)\) and  \(\text{ord}(O_i) = \text{ord}(A_i)\).  
+
+This can produce some surprises.  Let's say you made a sawtooth wave and detuned it in some way, then mixed it (as source B) with another plane-Jane sawtooth.  All of your careful detuning will disappear!  This is because the frequencies of the outgoing partials are set to those of \(A\): in essence the partials of \(B\) will have their frequencies lined with \(A\) before the mix occurs.
+
+\item {\bf Combine (non-``Half'')} throws all the partials from both sources together into a big bin, sorts them all by frequency (lowest to highest), then takes the lowest half, discarding the upper half.  If {\it Merge} is true, then if any partials have the exact same frequency, then they are unified into one partial: this means that potentially more than half of the total partials may be ultimately used.  
+
+The big challenge with Combine is in the orders.  Combine allows all the partials originating from \(A\) to retain their original orders; then partials from \(B\) get to retain their orders if they're available (usually they're not); then the rest of the \(B\) partials are assigned new orders.  Reassigning the orders of partials is not a big problem: but if a partial changes its frequency relative to another, it's possible that its reassigned order may be abruptly changed.  This can cause a pop or buzz because the sine wave oscillator is being changed all of the sudden.  You might be able to help things by switching to the ``Half'' version of Combine (see below).
+
+Combine (non-``Half'') works well for many things but not if you're mixing together a source with lots of high-frequency stuff plus a source with lots of low-frequency stuff, because only the low-frequency stuff will surprise.  Instead, use ``Half'' in this case. 
+
+\item {\bf Combine (``Half'')} cuts each of the incoming source partials in half (eliminating the highest frequency partials), then puts them together. This guarantees that each source has at least half of its partials in the final mix.  ``Half'' is not good if you want to mix one source with lots of partials with another source with only one or two partials.
+
+\item {\bf Fill} adds to \(O\) all the non-zero amplitude partials of \(A\).  Any remaining partials come from the lowest non-zero partials of \(B\).  Fill is particularly useful when mixing in Noise from a limited number of partials: set \(A\) to the noise.  Fill also works great if both sources (or at least \(A\)) have lots of empty partials.  At present orders come from \(A\): orders in \(B\) are reassigned.  This could potentially create the same pop/buzz situation as discussed in Combine.
+
+\item {\bf Morph} lines up partials in \(A\) and \(B\) according to some map and interpolates their frequencies and amplitudes.  Orders come from \(A\).  Because of interpolation, this is unlikely to create pops or buzzes in most situations.  But of course, 
 
 
+
+\end{itemize}
 
 \bump
 \section{Developing Modules}

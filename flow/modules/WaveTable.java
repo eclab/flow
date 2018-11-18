@@ -40,6 +40,7 @@ public class WaveTable extends Unit implements UnitSource
     public String name = null;
 
     int currentPos = -1;
+    boolean interpolate = true;
         
     double[][] waveTable;
         
@@ -58,6 +59,7 @@ public class WaveTable extends Unit implements UnitSource
         {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Position" });
+        defineOptions(new String[] { "Interpolate" }, new String[][] { { "Interpolate" } });
         setClearOnReset(false);
         waveTable = new double[2][NUM_PARTIALS];
         waveTable[0][0] = 1;
@@ -66,6 +68,29 @@ public class WaveTable extends Unit implements UnitSource
             {
             waveTable[0][i] = 0;
             waveTable[1][i] = 0;
+            }
+        }
+
+	public boolean getInterpolate() { return interpolate; }
+	public void setInterpolate(boolean val) { interpolate = val; }
+	
+    public static final int OPTION_INTERPOLATE = 0;
+
+    public int getOptionValue(int option) 
+        { 
+        switch(option)
+            {
+            case OPTION_INTERPOLATE: return getInterpolate() ? 1 : 0;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+                
+    public void setOptionValue(int option, int value)
+        { 
+        switch(option)
+            {
+            case OPTION_INTERPOLATE: setInterpolate(value != 0); return;
+            default: throw new RuntimeException("No such option " + option);
             }
         }
 
@@ -86,12 +111,22 @@ public class WaveTable extends Unit implements UnitSource
                 double d = mod * (waveTable.length - 1);
                 int wave = (int) d;
                 double alpha = (d - wave);
-                double[] wt0 = waveTable[wave];
-                double[] wt1 = waveTable[wave + 1];
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = wt0[i] * (1-alpha) + wt1[i] * alpha;
-                    }
+                if (interpolate)
+                	{
+                	double[] wt0 = waveTable[wave];
+                	double[] wt1 = waveTable[wave + 1];
+	                for(int i = 0; i < amplitudes.length; i++)
+	                    {
+	                    amplitudes[i] = wt0[i] * (1-alpha) + wt1[i] * alpha;
+	                    }
+	                }
+	            else
+	            	{
+	            	double[] wt = waveTable[wave];
+	            	if (alpha >= 0.5)
+	            		wt = waveTable[wave + 1];
+	            	System.arraycopy(wt, 0, amplitudes, 0, amplitudes.length);
+	            	}
                 }
             }
         }
@@ -142,6 +177,7 @@ public class WaveTable extends Unit implements UnitSource
                             }
                         }
                     });
+				box.add(new OptionsChooser(unit, 0));
                 return box;
                 }
 
