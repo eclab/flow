@@ -382,7 +382,12 @@ public class Unit extends Modulation
         The output array may then be written to. */
     public void copyFrequencies(int input, int output)
         {
-        System.arraycopy(inputs[input].frequencies[inputIndexes[input]], 0, frequencies[output], 0, frequencies[output].length);
+        double[] f1 = inputs[input].frequencies[inputIndexes[input]];
+        double[] f2 = frequencies[output];
+        if (f1 == f2) 
+        	frequencies[output] = (double[])(f1.clone());
+		else
+	        System.arraycopy(f1, 0, f2, 0, f2.length);
         }
 
     /** Copies the amplitudes array of Unit Output Port OUTPUT from 
@@ -390,7 +395,12 @@ public class Unit extends Modulation
         The output array may then be written to. */
     public void copyAmplitudes(int input, int output)
         {
-        System.arraycopy(inputs[input].amplitudes[inputIndexes[input]], 0, amplitudes[output], 0, amplitudes[output].length);
+        double[] f1 = inputs[input].amplitudes[inputIndexes[input]];
+        double[] f2 = amplitudes[output];
+        if (f1 == f2) 
+        	amplitudes[output] = (double[])(f1.clone());
+		else
+	        System.arraycopy(f1, 0, f2, 0, f2.length);
         }
                 
     /** Copies the orders array of Unit Output Port OUTPUT from 
@@ -398,7 +408,12 @@ public class Unit extends Modulation
         The output array may then be written to. */
     public void copyOrders(int input, int output)
         {
-        System.arraycopy(inputs[input].orders[inputIndexes[input]], 0, orders[output], 0, orders[output].length);
+        byte[] f1 = inputs[input].orders[inputIndexes[input]];
+        byte[] f2 = orders[output];
+        if (f1 == f2) 
+        	orders[output] = (byte[])(f1.clone());
+		else
+	        System.arraycopy(f1, 0, f2, 0, f2.length);
         }
 
     /** Sets the frequencies array of Unit Output Port #0 to 
