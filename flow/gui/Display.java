@@ -229,7 +229,7 @@ public class Display extends JComponent
             }
         
         String text = null;
-        if (lastPitch != -1)
+        if (lastPitch != -1 && closestPartial != -1)
             {
             g.setFont(Style.SMALL_FONT());
             g.setColor(Color.GRAY);
