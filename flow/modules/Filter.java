@@ -151,7 +151,7 @@ public class Filter extends Unit
         double[] frequencies = getFrequencies(0);
         double pitch = sound.getPitch();
                 
-        double cutoff = modToFrequency(makeVeryInsensitive(modulate(MOD_CUTOFF)));
+        double cutoff = modToFrequency(makeVeryInsensitive(modulate(MOD_CUTOFF))); // Note that this is in angular frequency, but we don't divide by 2 PI to get Hertz because that's done at the end of the day when we add up the sine waves
         if (cutoff < MINIMUM_FREQUENCY) cutoff = MINIMUM_FREQUENCY;  // so we're never 0
         double state = modulate(MOD_STATE);    	
         double resonance = INVERSE_SQRT_2 * Utility.fastpow(10, modulate(MOD_RESONANCE));
