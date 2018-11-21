@@ -58,14 +58,18 @@ public class Seq extends Modulation
     boolean free = false;
     boolean sample = true;
     boolean gated = false;
+    boolean guided = false;
 
     public boolean getFree() { return free; }
     public void setFree(boolean val) { free = val; }
     public boolean getSample() { return sample; }
     public void setSample(boolean val) { sample = val; }
+    public boolean getGuided() { return guided; }
+    public void setGuided(boolean val) { guided = val; }
         
     public static final int OPTION_FREE = 0;
     public static final int OPTION_SAMPLE = 1;
+    public static final int OPTION_GUIDED = 2;
 
     public int getOptionValue(int option) 
         { 
@@ -73,6 +77,7 @@ public class Seq extends Modulation
             {
             case OPTION_FREE: return (getFree() ? 1 : 0);
             case OPTION_SAMPLE: return (getSample() ? 1 : 0);
+            case OPTION_GUIDED: return (getGuided() ? 1 : 0);
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -83,6 +88,7 @@ public class Seq extends Modulation
             {
             case OPTION_FREE: setFree(value != 0); return;
             case OPTION_SAMPLE: setSample(value != 0); return;
+            case OPTION_GUIDED: setGuided(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -91,7 +97,7 @@ public class Seq extends Modulation
     public Seq(Sound sound)
         {
         super(sound);
-        defineOptions(new String[] { "Free", "Sample", }, new String[][] { { "Free" }, { "Sample" } });
+        defineOptions(new String[] { "Free", "Sample", "Guided" }, new String[][] { { "Free" }, { "Sample" }, { "Guided" } });
         defineModulations(new Constant[] 
             { Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
               Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
@@ -155,9 +161,18 @@ public class Seq extends Modulation
         
         if (isTriggered(MOD_TRIGGER))
             {
-            state++;
-            int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
-            if (state >= maxState) state = 0;
+	        int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
+            if (guided)
+            	{
+            	state = (int)(modulate(MOD_TRIGGER) * maxState);
+            	if (state == maxState) state--;
+            	System.err.println(state);
+            	}
+            else
+            	{
+            	state++;
+	            if (state >= maxState) state = 0;
+	            }
             setModulationOutput(0, modulate(state));
             updateTrigger(0);
             }
