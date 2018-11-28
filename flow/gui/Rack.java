@@ -97,7 +97,7 @@ public class Rack extends JPanel
         display2 = new Display(output, true);
         display2.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, new JLabel().getBackground()));
         pane2.add(display2);
-        
+                
         add(pane2, BorderLayout.NORTH);
 
         setTransferHandler(new ModulePanelTransferHandler());

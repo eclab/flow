@@ -11,6 +11,7 @@ import java.awt.event.*;
 import javax.swing.event.*;
 import java.awt.geom.*;
 import javax.swing.*;
+import java.awt.image.*;
 
 /**
    Draws a set of partials in a pleasing manner.  Can also be used to edit partials.
@@ -50,7 +51,9 @@ public class Display extends JComponent
             output.unlock();
             }
         }
-        
+    
+    boolean timesup = false;
+    
     public Display(Output output, boolean aux, boolean allowMouse)
         {
         this.aux = aux;
@@ -60,6 +63,7 @@ public class Display extends JComponent
             {
             public void actionPerformed(ActionEvent e)
                 {
+                timesup = true;
                 repaint();
                 SwingUtilities.invokeLater(new Runnable() { public void run() { } });
                 }
@@ -104,7 +108,11 @@ public class Display extends JComponent
         addMouseMotionListener(ma);
         }
 
-
+	BufferedImage buffer = null;
+	boolean waterfall = false;
+	public void setWaterfall(boolean val) { waterfall = val; }
+	public boolean isWaterfall() { return waterfall; }
+	
 	public static final Color COLOR_BEYOND_NYQUIST = new Color(175, 175, 175);
     public static final double DEFAULT_MAX_FREQUENCY = 150;
     public static final double DEFAULT_MIN_FREQUENCY = 1.0 / 16.0;
@@ -135,7 +143,7 @@ public class Display extends JComponent
     
     static final int BORDER = 8;
     static final Color DARK_GREEN = new Color(0, 127, 0);
-    static final Color DARK_BLUE = new Color(0, 0, 180);
+    static final Color DARK_BLUE = new Color(0, 0, 255);
         
     public Dimension getPreferredSize() { return new Dimension(600, 100); }
     
@@ -172,6 +180,48 @@ public class Display extends JComponent
 		return fundamental + (logFrequency ? Math.log(frequency) : frequency - 1.0);
     	}
     
+    public Graphics2D prepareBuffer()
+    	{
+    	if (buffer == null || buffer.getWidth() != getWidth() || buffer.getHeight() != getHeight())
+    		{
+    		// prep a new buffer
+    		buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+    		Graphics2D g = (Graphics2D)(buffer.getGraphics());
+    		g.setColor(Color.BLACK);
+    		g.fillRect(0, 0, buffer.getWidth(), buffer.getHeight());
+    		}
+    	
+    	BufferedImage old = buffer;
+    	buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+    	Graphics2D g = (Graphics2D)(buffer.getGraphics());
+    	g.drawImage(old, 0, -1, null);
+    	
+    	return g;
+    	}
+    
+    public static Color[] colors;
+    public static final int NUM_COLORS = 256;
+    	
+	public Color getColorForAmplitude(double amplitude)
+		{
+		if (colors == null)
+			{
+			colors = new Color[NUM_COLORS];
+			for(int i = 0; i < NUM_COLORS; i++)
+				colors[i] = new Color(i, i, i);
+			}
+		amplitude = Math.log(1.0 + amplitude) * (1.0 / 0.6931471805599453);  // so amplitude = 2.0 goes to 1.0
+
+		if (amplitude > 1.0) amplitude = 1.0;
+		if (amplitude < 0.0) amplitude = 0.0;
+		
+		amplitude = 1 - amplitude;
+		amplitude = amplitude * amplitude * amplitude * amplitude * amplitude;
+		amplitude = 1 - amplitude;
+		
+		return colors[(int) (Math.min(amplitude * NUM_COLORS, 255))];
+		}
+
     public void paintComponent(Graphics graphics)
         {
         double[] amplitudes = null;
@@ -255,13 +305,6 @@ public class Display extends JComponent
         	} 
                     
         double nyquist = (Output.SAMPLING_RATE / 2.0) / pitch;
-        g.setColor(DARK_BLUE);
-        double xx = (width - BORDER * 2) / range * normalizedFrequency(nyquist, fundamental) + BORDER;
-        g.draw(new Line2D.Double(xx, height, xx, 0));
-                
-        g.setColor(DARK_GREEN);
-        xx = (width - BORDER * 2) / range * normalizedFrequency(1.0, fundamental) + BORDER;
-        g.draw(new Line2D.Double(xx, height, xx, 0));
         
         int closestPartial = -1;
         double mtf = mouseToFrequency(lastX);
@@ -279,20 +322,82 @@ public class Display extends JComponent
                 }
             }
             
-        prepareColorsForPartials();
-        for(int i = 0; i < frequencies.length; i++)
-            {
-            double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) + BORDER;
-            double y = (height - BORDER * 2) / maxAmplitude * amplitudes[i];
-                        
-            if (x >= 0 && x <= width)
-            	{
-            	g.setColor(closestPartial == i ? Color.ORANGE : 
-            				(frequencies[i] > nyquist ? COLOR_BEYOND_NYQUIST : 
-            					getColorForPartial(i, amplitudes[i])));
-	            g.draw(new Line2D.Double(x, height - BORDER, x, height - BORDER - y));
-	            }
-            }
+        if (!waterfall)
+        	{
+        	buffer = null;
+        	
+			g.setColor(DARK_BLUE);
+			double xx = (width - BORDER * 2) / range * normalizedFrequency(nyquist, fundamental) + BORDER;
+			g.draw(new Line2D.Double(xx, height, xx, 0));
+				
+			g.setColor(DARK_GREEN);
+			xx = (width - BORDER * 2) / range * normalizedFrequency(1.0, fundamental) + BORDER;
+			g.draw(new Line2D.Double(xx, height, xx, 0));
+
+			prepareColorsForPartials();
+			for(int i = 0; i < frequencies.length; i++)
+				{
+				double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) + BORDER;
+				double y = (height - BORDER * 2) / maxAmplitude * amplitudes[i];
+						
+				if (x >= 0 && x <= width)
+					{
+					g.setColor(closestPartial == i ? Color.ORANGE : 
+								(frequencies[i] > nyquist ? COLOR_BEYOND_NYQUIST : 
+									getColorForPartial(i, amplitudes[i])));
+					g.draw(new Line2D.Double(x, height - BORDER, x, height - BORDER - y));
+					}
+				}
+			}
+		else
+			{
+			Graphics2D gb = null;
+			if (timesup)
+				{
+				gb = prepareBuffer();
+				}
+
+			double closestX = -1;
+			for(int i = 0; i < frequencies.length; i++)
+				{
+				double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) + BORDER;
+				double y = (height - BORDER * 2) / maxAmplitude * amplitudes[i];
+					
+				if (x >= 0 && x <= width)
+					{
+					if (closestPartial == i)
+						{
+						closestX = x;
+						}
+					
+					if (timesup)
+						{
+						gb.setColor(frequencies[i] > nyquist ? Color.BLACK : getColorForAmplitude(amplitudes[i]));
+						gb.draw(new Line2D.Double(x, height - 1, x, height - 2));
+						}
+					}
+				}
+				
+			timesup = false;
+				
+			if (buffer != null)
+				g.drawImage(buffer, 0, 0, width, height, null);
+
+			if (closestX != -1)
+				{
+				g.setColor(Color.ORANGE);
+				g.draw(new Line2D.Double(closestX, height, closestX, 0));
+				}
+							
+			g.setColor(DARK_BLUE);
+			double xx = (width - BORDER * 2) / range * normalizedFrequency(nyquist, fundamental) + BORDER;
+			g.draw(new Line2D.Double(xx, height, xx, 0));
+				
+			g.setColor(DARK_GREEN);
+			xx = (width - BORDER * 2) / range * normalizedFrequency(1.0, fundamental) + BORDER;
+			g.draw(new Line2D.Double(xx, height, xx, 0));
+
+			}
         
         String text = null;
         if (lastPitch != -1 && closestPartial != -1)

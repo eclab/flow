@@ -518,6 +518,24 @@ public class AppMenu
         }
         
 
+    static JMenuItem waterfallDisplay(Rack rack)
+        {
+        final JCheckBoxMenuItem waterfall = new JCheckBoxMenuItem("Waterfall Display");
+        waterfall.setSelected(Prefs.getWaterfallDisplay());
+        rack.display1.setWaterfall(waterfall.isSelected());
+        rack.display2.setWaterfall(waterfall.isSelected());
+        waterfall.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+				rack.display1.setWaterfall(waterfall.isSelected());
+				rack.display2.setWaterfall(waterfall.isSelected());
+                Prefs.setWaterfallDisplay(waterfall.isSelected());
+                }
+            });
+        return waterfall;
+        }
+
     static JMenuItem logAxisDisplay(Rack rack)
         {
         final JCheckBoxMenuItem log = new JCheckBoxMenuItem("Log-Axis Display");
@@ -741,6 +759,7 @@ public class AppMenu
         JMenu menu = new JMenu("Options");
 
         menu.add(logAxisDisplay(rack));
+        menu.add(waterfallDisplay(rack));
         menu.add(maxDisplayedHarmonic(rack));
         menu.add(minDisplayedHarmonic(rack));
         menu.addSeparator();
