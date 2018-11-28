@@ -103,13 +103,35 @@ public class Display extends JComponent
         addMouseListener(ma);
         addMouseMotionListener(ma);
         }
-                
-    public static final double MAX_FREQUENCY = 150;
-    public static final double MAX_AMPLITUDE = 1.0;
+
+
+	public static final Color COLOR_BEYOND_NYQUIST = new Color(175, 175, 175);
+    public static final double DEFAULT_MAX_FREQUENCY = 150;
+    public static final double DEFAULT_MIN_FREQUENCY = 1.0 / 16.0;
+    public static final double DEFAULT_MAX_AMPLITUDE = 1.0;
+    
+    boolean logFrequency = false;
+    boolean boundPartials = false;
+    double maxFrequency = DEFAULT_MAX_FREQUENCY;
+    double minFrequency = DEFAULT_MIN_FREQUENCY;
+    double maxAmplitude = DEFAULT_MAX_AMPLITUDE;
+    public double getMaxFrequency() { return maxFrequency; }
+    public void setMaxFrequency(double v) { maxFrequency = v; }
+    public double getMinFrequency() { return minFrequency; }
+    public void setMinFrequency(double v) { minFrequency = v; }
+    public double getMaxAmplitude() { return maxAmplitude; }
+    public void setMaxAmplitude(double v) { maxAmplitude = v; }
+    public boolean getLogFrequency() { return logFrequency; }
+    public void setLogFrequency(boolean v) { logFrequency = v; }
+    public boolean getBoundPartials() { return boundPartials; }
+    public void setBoundPartials(boolean v) { boundPartials = v; }
     
     double lastPitch = -1;
     double lastX = -1;
     double lastY = -1;
+    
+    double boundMax = 1;
+    double boundMin = 0;
     
     static final int BORDER = 8;
     static final Color DARK_GREEN = new Color(0, 127, 0);
@@ -131,6 +153,24 @@ public class Display extends JComponent
             }
         else return null;
         }
+        
+        
+	 double invNormalizedFrequency(double nFrequency, double fundamental)
+    	{
+        if (logFrequency)
+        	{
+        	return Math.exp(nFrequency - fundamental);
+        	}
+        else
+        	{
+        	return (nFrequency - fundamental) + 1;
+        	}
+    	}
+
+    double normalizedFrequency(double frequency, double fundamental)
+    	{
+		return fundamental + (logFrequency ? Math.log(frequency) : frequency - 1.0);
+    	}
     
     public void paintComponent(Graphics graphics)
         {
@@ -193,13 +233,34 @@ public class Display extends JComponent
         // now display only if the sound isn't null etc.
         if (sound == null) return;
         if (amplitudes == null) return;
-                        
+        
+        double max = maxFrequency;
+        double min = minFrequency;
+        if (boundPartials)
+        	{
+        	min = frequencies[0];
+        	max = frequencies[frequencies.length - 1];
+        	boundMin = min;
+        	boundMax = max;
+        	}
+		if (max < min) { double temp = max; max = min; min = temp; }
+		if (max == min) max = max + 1.0;
+        double fundamental = 1.0 / max;
+        double range = max - min;
+        if (logFrequency)
+        	{
+        	double m = Math.abs(Math.log(min));
+        	range = Math.abs(Math.log(max)) + m;
+        	fundamental = m;  // this is the zero point
+        	} 
+                    
+        double nyquist = (Output.SAMPLING_RATE / 2.0) / pitch;
         g.setColor(DARK_BLUE);
-        double xx = (width - BORDER * 2) / MAX_FREQUENCY * (Output.SAMPLING_RATE / 2.0) / pitch + BORDER;
+        double xx = (width - BORDER * 2) / range * normalizedFrequency(nyquist, fundamental) + BORDER;
         g.draw(new Line2D.Double(xx, height, xx, 0));
                 
         g.setColor(DARK_GREEN);
-        xx = (width - BORDER * 2) / MAX_FREQUENCY * (1) + BORDER;
+        xx = (width - BORDER * 2) / range * normalizedFrequency(1.0, fundamental) + BORDER;
         g.draw(new Line2D.Double(xx, height, xx, 0));
         
         int closestPartial = -1;
@@ -217,15 +278,20 @@ public class Display extends JComponent
                     }
                 }
             }
-
+            
         prepareColorsForPartials();
         for(int i = 0; i < frequencies.length; i++)
             {
-            double x = (width - BORDER * 2) / MAX_FREQUENCY * frequencies[i] + BORDER;
-            double y = (height - BORDER * 2) / MAX_AMPLITUDE * amplitudes[i];
+            double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) + BORDER;
+            double y = (height - BORDER * 2) / maxAmplitude * amplitudes[i];
                         
-            g.setColor(closestPartial == i ? Color.ORANGE : getColorForPartial(i, amplitudes[i]));
-            g.draw(new Line2D.Double(x, height - BORDER, x, height - BORDER - y));
+            if (x >= 0 && x <= width)
+            	{
+            	g.setColor(closestPartial == i ? Color.ORANGE : 
+            				(frequencies[i] > nyquist ? COLOR_BEYOND_NYQUIST : 
+            					getColorForPartial(i, amplitudes[i])));
+	            g.draw(new Line2D.Double(x, height - BORDER, x, height - BORDER - y));
+	            }
             }
         
         String text = null;
@@ -330,14 +396,35 @@ public class Display extends JComponent
     // Returns the frequency associated with an x coordinate
     double mouseToFrequency(double x)
         {
-        int width = getWidth();
-        return (x - BORDER) * MAX_FREQUENCY  / (width - BORDER * 2);
+        double d = (x - BORDER) / (getWidth() - BORDER * 2);
+
+		double max = maxFrequency;
+		double min = minFrequency;
+
+        if (boundPartials)
+        	{
+        	min = boundMin;
+        	max = boundMax;
+        	}
+
+		if (max < min) { double temp = max; max = min; min = temp; }
+		if (max == min) max = max + 1.0;
+        double fundamental = 1.0 / max;
+        double range = max - min;
+        if (logFrequency)
+        	{
+        	double m = Math.abs(Math.log(min));
+        	range = Math.abs(Math.log(max)) + m;
+        	fundamental = m;  // this is the zero point
+        	} 
+
+		return invNormalizedFrequency(d * range, fundamental);
         }
         
     // Returns the amplitude associated with a y coordinate
     double mouseToAmplitude(double y)
         {
         int height = getHeight();        
-        return 0 - (y - height + BORDER) * MAX_AMPLITUDE / (height - BORDER * 2);
+        return 0 - (y - height + BORDER) * maxAmplitude / (height - BORDER * 2);
         }
     }

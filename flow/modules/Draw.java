@@ -192,8 +192,11 @@ public class Draw extends Unit implements UnitSource
                         }
                     }
                 }
-            public Dimension getPreferredSize() { return new Dimension(300, 200); }
+            public Dimension getPreferredSize() { return new Dimension(600, 200); }
             };
+            
+        display.setLogFrequency(false);
+        display.setBoundPartials(true);
         
         ModulePanel p = new ModulePanel(Draw.this)
             {

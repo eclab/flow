@@ -41,6 +41,11 @@ public class Rack extends JPanel
     String patchInfo = null;
     boolean addModulesAfter;
     
+    public Display display1;
+    public Display display2;
+    public Oscilloscope osc1;
+    public Oscilloscope osc2;
+    
     // A list of all current module panels.  Note that this isn't all the
     // *Modulations* in use -- Constants and NILs don't get panels.  But they're
     // also not registered with Sounds.
@@ -80,18 +85,18 @@ public class Rack extends JPanel
         add(pane, BorderLayout.CENTER);
         
         Box pane2 = new Box(BoxLayout.X_AXIS);
-        Display display = new Display(output, false);
-        display.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
-        pane2.add(display);
-        Oscilloscope display2 = new Oscilloscope(output, false);
-        display2.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
+        display1 = new Display(output, false);
+        display1.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
+        pane2.add(display1);
+        osc1 = new Oscilloscope(output, false);
+        osc1.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
+        pane2.add(osc1);
+        osc2 = new Oscilloscope(output, true);
+        osc2.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
+        pane2.add(osc2);
+        display2 = new Display(output, true);
+        display2.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, new JLabel().getBackground()));
         pane2.add(display2);
-        display2 = new Oscilloscope(output, true);
-        display2.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
-        pane2.add(display2);
-        display = new Display(output, true);
-        display.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, new JLabel().getBackground()));
-        pane2.add(display);
         
         add(pane2, BorderLayout.NORTH);
 
@@ -113,15 +118,7 @@ public class Rack extends JPanel
         frame.getContentPane().setLayout(new BorderLayout());
         frame.getContentPane().add(this, BorderLayout.CENTER);
         
-        JMenuBar menubar = new JMenuBar();
-        menubar.add(AppMenu.provideFileMenu(this));
-        menubar.add(AppMenu.providePlayMenu(this));
-        menubar.add(AppMenu.provideModuleMenu(this));
-        if (Style.isWindows() || Style.isUnix())
-            {
-            menubar.add(AppMenu.provideWindowsAboutMenu(this));
-            }
-        frame.setJMenuBar(menubar);
+        frame.setJMenuBar(AppMenu.provideMenuBar(this));
 
         frame.addWindowListener(new java.awt.event.WindowAdapter() 
             {

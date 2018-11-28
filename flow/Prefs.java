@@ -4,6 +4,7 @@
 package flow;
 
 import java.util.prefs.*;
+import flow.gui.*;
 
 /** 
     A simple cover class for Java's preferences system.
@@ -253,6 +254,40 @@ public class Prefs
             }
         catch (NumberFormatException e) { }
         return Unit.DEFAULT_NUM_PARTIALS;                       
+        }
+
+    public static void setLogAxisDisplay(boolean val) { setLastX("" + val, "LogAxisDisplay"); }
+    public static boolean getLogAxisDisplay() 
+        { 
+        String s = getLastX("LogAxisDisplay"); 
+        return Boolean.parseBoolean(s);         // default is FALSE
+        }
+
+
+    public static void setMaxDisplayedHarmonic(int num) { setLastX("" + num, "MaxDisplayedHarmonic"); }
+    public static int getMaxDisplayedHarmonic() 
+        { 
+        String s = getLastX("MaxDisplayedHarmonic"); 
+        try
+            {
+            if (s != null)
+                return Integer.parseInt(s);
+            }
+        catch (NumberFormatException e) { }
+        return AppMenu.DEFAULT_MAX_DISPLAYED_HARMONIC;                       
+        }
+
+    public static void setMinDisplayedHarmonic(int num) { setLastX("" + num, "MinDisplayedHarmonic"); }
+    public static int getMinDisplayedHarmonic() 
+        { 
+        String s = getLastX("MinDisplayedHarmonic"); 
+        try
+            {
+            if (s != null)
+                return Integer.parseInt(s);
+            }
+        catch (NumberFormatException e) { }
+        return AppMenu.DEFAULT_MIN_DISPLAYED_HARMONIC;                       
         }
 
     public static void setLastOneVoice(boolean val) { setLastX("" + val, "OneVoice"); }
