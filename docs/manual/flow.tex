@@ -54,7 +54,7 @@ Department of Computer Science\\[0.25em]
 George Mason University\\[0.2em]
 sean@cs.gmu.edu}
 
-\vspace{2em}
+\vspace{1em}
 %\setcounter{tocdepth}{1}
 \tableofcontents
 
@@ -161,7 +161,7 @@ If you look carefully at Figure~\ref{screenshot}, you'll see that there are not 
 \subsection{Tuning Parameters}
 First things first.  {\name} is very computationally expensive and benefits from tuning for your computer speed.  If your computer can't keep up with Flow's demands, you'll hear a {\bf glitch}.  This is a pop or a buzz in the audio stream, and will be accompanied by the {\bf Out} module (the top-right module shown in Figure \ref{screenshot}) coloring its black title bar red and saying ``Glitch''.  A glitch occurs when Flow can't keep the audio buffer filled fast enough, so your computer is forced to start filling it with zeros.  You don't want that.
 
-How do we tamp down glitches?  By playing with a few parameters. If you select {\bf Tuning Parameters} from the {\bf Play} menu, you can at present change three parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session. 
+How do we tamp down glitches?  By playing with a few parameters. If you select {\bf Tuning Parameters} from the {\bf Options} menu, you can at present change three parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session. 
 
 \begin{itemize}
 \item {\bf Polyphony} (1--16, default: 8)\qquad This is the number of voices the synthesizer can play at once.  More voices incurs a higher load.
@@ -171,6 +171,8 @@ How do we tamp down glitches?  By playing with a few parameters. If you select {
 
 
 \subsection{Adding, Moving, Copying, and Closing Modules}  Modules are added to the rack by choosing them from the {\bf Modules} menu.  You can move a module to another location by dragging its title bar.  You can also copy a module to another location by dragging its title bar while holding the Control key (on the Mac, you can also hold the Option key).  Finally, you can delete a module by clicking on its close box: the little white dot to the left of its title.
+
+By default, modules are added to the beginning of the rack.  You might find this annoying.  If you would prefer modules to be added to the end of the rack (just before the Out module), choose {\bf Add Modules At End} from the {\bf Options} menu.
 
 \subsection{Partial and Modulation Signals}  Modules can send and receive two kinds of signals.  First, a module can send or receive {\bf sets of partials} to/from other modules.  Since this is an additive synthesizer, a set of partials is essentially a sound being emitted from a module.  Additionally, a module can send or receive a {\bf modulation signal}.  This is a single number, ranging from 0 to 1, which can change over time.  Modulation signals are used to change parameters in modules in real time.  
 
@@ -250,6 +252,12 @@ Mouse  Amp: {\it amp}  Freq: {\it absolute-freq} ({\it relative-freq})\\
 
 What this is saying is that the nearest partial to the mouse pointer (the one in orange) is partial number {\it partial}, and it has a given amplitude and relative frequency (where the fundamental would have frequency 1.0).  Multiplied against the current note pitch gives the provided absolute frequency.  Moreover, the mouse pointer is currently pointing to a spot which would be a certain amplitude, relative frequency, and absolute frequency as well.
 
+
+\paragraph{Optional Display Features}
+By default, partial frequencies are displayed linearly.  You can change this to a logarithmic plot by choosing {\bf Log-Axis Display} in the {\bf Options} menu.  There are two scaling options as well.  You can instruct Flow to provide enough room to display up to some \(N\) number of harmonics to the right of the fundamental by choosing the appropriate value under {\bf Max Displayed Harmonic} in the {\bf Options} menu.  The default is 150. If you're doing a logarithmic plot (this won't affect a linear display), you can also select how much room should be provided to the left of the fundamental by selecting {\bf Min Displayed Harmonic} from the {\bf Options} menu.  The default is 1/16.
+
+Displays can also be set to {\it Waterfall Mode}, where the partials become dots (brighter dots are higher amplitude) rather than lines, and scroll by in time.  To try this out, choose {\bf Waterfall Display} in the {\bf Options} menu.
+
 \begin{wrapfigure}{r}{1in}
 \vspace{-1em}
 \includegraphics[height=1in]{oscilloscope}
@@ -258,6 +266,7 @@ What this is saying is that the nearest partial to the mouse pointer (the one in
 \label{oscilloscope}
 \end{wrapfigure}
 
+\paragraph{Oscilloscopes}
 You might also find the oscilloscopes handy to understand what a modulation signal looks like.  The left oscilloscope shows the modulation signal of anything connected to the {\it 1 (Scope)} jack in {\bf Out}.  Notice for example, that in Figure~\ref{simplepatch}, the LFO is wired up to modulate the {\it 1 (Scope)} jack: this will cause it to be displayed in the left oscilloscope display.  Similarly, the right oscilloscope shows the modulation signal of anything connected to the {\it 2 (Aux)} jack.  Oscilloscopes have axes (the horizontal axis passes through the 0.5 position).  These axes change colors from blue to green (or from green to blue) any time the modulation triggers.
 
 Oscillators don't currently display any text when you hover over them.  Maybe they should!
@@ -268,7 +277,7 @@ If you directly connect a partials source to your Out module, it'll start playin
 
 Ultimately you'll probably set things up with a {\bf VCA} (see the last entry in Section~\ref{unitshapers}) which won't play the sound unless a key is pressed and an {\bf Envelope} (typically a {\bf DADSR Envelope}: see Section~\ref{modsources}) sends the appropriate modulation signal.  That way different voices are played when you play different keys.  At this point you'll want to uncheck {\bf Play 1 Voice Only} so you can play more than one voice.
 
-So how do you play a using keyboard?  You attach it to {\name} by selecting {\bf MIDI and Audio Preferences} in the {\bf Play} menu, then choosing the appropriate MIDI channel (or ``All Channels'') and MIDI device.  Similarly you can choose the appropriate output audio device for your computer, if you have multiple ones.
+So how do you play a using keyboard?  You attach it to {\name} by selecting {\bf MIDI and Audio Preferences} in the {\bf Options} menu, then choosing the appropriate MIDI channel (or ``All Channels'') and MIDI device.  Similarly you can choose the appropriate output audio device for your computer, if you have multiple ones.
 
 \subsubsection{Using MPE}
 
@@ -392,7 +401,7 @@ The {\it On Tr} option restarts the envelope whenever it receives a trigger (as 
 
 The oscillator can run free, you can invert the wave.    The LFO triggers on completion of one full wave, or one-half wave if half trigger is set.  The waves can be sine, triangle, saw up, square, random, and random sample and hold.   You can request that the LFO sync to MIDI when the synthesizer is set to MIDI (otherwise it's based on time as usual).  And finally, you can indicate that the rate dial should be linear and not exponential (which is useful when modulating an LFO with another LFO).
 
-Random works as follows: a random new target Y position is set and the LFO spends {\it rate} time to get there.  Once it reaches the point, it picks a new random target Y position and repeats.  The sample and hold version is similar except that the wave does not move to the target Y position, but rather immediately jumps to it and stays there for {\it rate} time.   If the seed is set to 0, then the random waves are fully random; but if the seed is \(\neq 0\), then every time a gate occurs (assuming the LFO is not free), the LFO's random behavior will be exactly the same as before, so you can make a predictable ``random'' sound.
+Random works as follows: a random new target Y position is set and the LFO spends {\it rate} time to get there.  Once it reaches the point, it picks a new random target Y position and repeats.  The sample and hold version is similar except that the wave does not move to the target Y position, but rather immediately jumps to it and stays there for {\it rate} time.   {\it Scale} indicates how big a typical random jump is.  If the seed is set to 0, then the random waves are fully random; but if the seed is \(\neq 0\), then every time a gate occurs (assuming the LFO is not free), the LFO's random behavior will be exactly the same as before, so you can make a predictable ``random'' sound.
 
 The {\it On Tr} option restarts the LFO whenever it receives a trigger (as if a Note-On happened).  This is an auxiliary trigger: don't use it to trigger on a note-on directly (as in from the MIDIIn module).  The LFO does that by default already.  Furthermore, if you connect to the On Tr port, then the LFO will {\it only} restart when a trigger occurs: it will {\it not} restart on a Note On.
 
@@ -474,7 +483,7 @@ See also {\bf MIDIIn}, previous.
 
 \paragraph{Seq}  A step sequencer of up to 32 steps, as specified by {\it Steps}.  Each step is a modulation value which you can set.  On gate (note-on), the sequencer resets itself to step 1, and the step increments each time the {\it Trigger} is fired.  The value of the current step is outputted as {\it Mod}.  Additionally, {\it Mod} outputs a trigger each time the step is incremented: you could use this to reset a sound to its start, for example. 
 
-If {\it Free} is true, then the sequencer is free-running and ignores note-on.  If {\it Sample} is true, then {\it Mod} outputs the value of the current step as sampled immediately when transitioned to that step; but if {\it Sample} is false, then the value of the current step may be changed in real-time, and {\it Mod} will output whatever its current value is.
+If {\it Free} is true, then the sequencer is free-running and ignores note-on.  If {\it Sample} is true, then {\it Mod} outputs the value of the current step as sampled immediately when transitioned to that step; but if {\it Sample} is false, then the value of the current step may be changed in real-time, and {\it Mod} will output whatever its current value is.  If {\it Guided} is true, then the {\it Trigger} not only specifies when a step occurs, but its modulation value also specifies {\it which} step is performed, rather than incrementing the step as normal.
 
 In addition to sequencing modulation signals, Seq can also be used in combination with {\bf Shift} to sequence note values.  To do this, attach {\it Mod} to Shift's {\it Shift} port, and set Shift's {\it Bound} to 1/3 and its {\it Type} to {\it Pitch}.  Feed the sound into Shift's {\it Input}, and the result in Shift's {\it Out}.  In this arrangement, each of Seq's modulation dials ranges from two octaves below to two octaves above.  To make things easier, if you double-click on a modulation dial, you'll get a pop-up menu with a keyboard, from two octaves below to two octaves above.  ``Middle C'' is 0.5 (the keyboard is keyed in C, but it'll be relative to whatever the current pitch is).  See also {\bf Shift}.
 
