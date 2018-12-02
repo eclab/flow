@@ -722,8 +722,9 @@ public class Output
                             blockOutputUntil(snd, false);
                             }
                         }
-                                                        
-                    freeverb.setWet(with.reverbWet);
+                                              
+                    float wet = with.reverbWet;  
+                    freeverb.setWet(wet);
                     freeverb.setRoomSize(with.reverbRoomSize);
                     freeverb.setDamp(with.reverbDamp);
 
@@ -753,9 +754,22 @@ public class Output
                             clipped = true;
                             }
                         
-                        freeverbInput[0][0] = (float)d;
-                        freeverb.compute(1, freeverbInput, freeverbOutput);
-                        d = freeverbOutput[0][0];
+                        // add reverb?
+                        if (with.reverbWet > 0.0f)
+                        	{
+                        	// I think freeverb sounds better going in both channels and taking
+                        	// both channel results.  But you may have a different opinion, in
+                        	// which I think you do: 
+                        	//
+	                        //freeverbInput[0][0] = (float)d;
+	                        //freeverb.compute(1, freeverbInput, freeverbOutput);
+	                        //d = freeverbOutput[0][0]; 
+	                        
+	                        freeverbInput[0][0] = (float)d;
+	                        freeverbInput[1][0] = (float)d;
+	                        freeverb.compute(1, freeverbInput, freeverbOutput);
+	                        d = (freeverbOutput[0][0] + freeverbOutput[1][0]) / 2; 
+	                        }
                             
                         int val = (int)(d);
                         audioBuffer[skipPos * 2 + 1] = (byte)((val >> 8) & 255);

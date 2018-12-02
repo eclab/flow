@@ -210,6 +210,7 @@ public class DADSR extends Modulation implements ModSource
     
     void doRelease()
         {
+        if (oneshot) return;
         if (ignoreRelease) level[RELEASE] = getModulationOutput(0);
         
         state = RELEASE;
