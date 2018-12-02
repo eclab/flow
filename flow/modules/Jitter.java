@@ -21,6 +21,7 @@ public class Jitter extends Unit
     public static final int FREQUENCY_VAR = 0;
     public static final int AMPLITUDE_VAR = 1;
 
+	
     public static final int MOD_FREQ_VAR = 0;
     public static final int MOD_AMP_VAR = 1;
     public static final int MOD_TRIGGER = 2;
@@ -30,6 +31,32 @@ public class Jitter extends Unit
     public boolean started = false;
     public Random random = null;
         
+        
+    boolean nonZero = true;
+    public boolean getNonZero() { return nonZero; }
+    public void setNonZero(boolean val) { nonZero = val; }
+    
+    public static final int OPTION_NONZERO = 0;
+
+    public int getOptionValue(int option) 
+        { 
+        switch(option)
+            {
+            case OPTION_NONZERO: return getNonZero() ? 1 : 0;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+                
+    public void setOptionValue(int option, int value)
+        { 
+        switch(option)
+            {
+            case OPTION_NONZERO: setNonZero(value != 0); return;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+
+
     public Object clone()
         {
         Jitter obj = (Jitter)(super.clone());
@@ -45,6 +72,7 @@ public class Jitter extends Unit
         {
         super(sound);
 
+        defineOptions( new String[] { "Non-Zero" }, new String[][] { { "Non-Zero" } });
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ONE }, 
             new String[] { "Freq Var", "Amp Var", "Trigger", "Seed" });
@@ -104,10 +132,18 @@ public class Jitter extends Unit
                         
         for(int i = 0; i < targets[FREQUENCY_VAR].length; i++)
             {
-            double f = inputs0frequencies[i] + targets[FREQUENCY_VAR][i] * 20;
-            if (f >= 0) frequencies[i] = f;
-            double a = inputs0amplitudes[i] + targets[AMPLITUDE_VAR][i] / 4;
-            if (a >= 0) amplitudes[i] = a;
+            if (!nonZero || inputs0amplitudes[i] > 0)
+            	{
+            	double f = inputs0frequencies[i] + targets[FREQUENCY_VAR][i] * 20;
+            	if (f >= 0) frequencies[i] = f;
+            	double a = inputs0amplitudes[i] + targets[AMPLITUDE_VAR][i] / 4;
+            	if (a >= 0) amplitudes[i] = a;
+            	}
+            else
+            	{
+            	frequencies[i] = inputs0frequencies[i];
+            	amplitudes[i] = 0;
+            	}
             }
 
         constrain();

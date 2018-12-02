@@ -36,6 +36,7 @@ public class Envelope extends Modulation implements ModSource
         
     public static final int MOD_GATE_TR = NUM_STATES * 2;
     public static final int MOD_REL_TR = NUM_STATES * 2 + 1;
+    public static final int MOD_START_LEVEL = NUM_STATES * 2 + 2;
 
     public static final int SUSTAIN = 0;
     public static final int SUSTAIN_LOOPING = 1;
@@ -123,7 +124,7 @@ public class Envelope extends Modulation implements ModSource
             new String[] { "Curve", "Type", "Gate Reset", "MIDI Sync" }, 
             new String[][] { { "Linear", "x^2", "x^4", "x^8", "Jump", "Wait" }, TYPE_NAMES, { "Gate Reset" }, { "MIDI Sync" } } );        
 
-        Constant[] mods = new Constant[NUM_STATES * 2 + 2];
+        Constant[] mods = new Constant[NUM_STATES * 2 + 3];
         for(int i = 0; i < mods.length; i++)
             mods[i] = Constant.ZERO;
         String[] names = new String[]
@@ -136,7 +137,8 @@ public class Envelope extends Modulation implements ModSource
             "Sus 3", "Level",
             "Rel 1", "Level",
             "Rel 2", "Level",
-            "On Tr", "Off Tr"
+            "On Tr", "Off Tr",
+            "Start"
             };
         defineModulations(mods, names);
         setModulationOutput(0, 0);  
@@ -179,7 +181,7 @@ public class Envelope extends Modulation implements ModSource
                 
         if (gateReset)
             {
-            firstLevel = 0;
+            firstLevel = modulate(MOD_START_LEVEL);
             }
         else
             {
@@ -443,7 +445,12 @@ public class Envelope extends Modulation implements ModSource
                 
                 Box box = new Box(BoxLayout.Y_AXIS);
                 Modulation mod = getModulation();
-                box.add(new ModulationOutput(mod, 0, this));
+                
+                Box box1 = new Box(BoxLayout.X_AXIS);
+                box1.add(new ModulationInput(mod, MOD_START_LEVEL, this));
+                box1.add(box1.createGlue());
+                box1.add(new ModulationOutput(mod, 0, this));
+                box.add(box1);
                                 
                 for(int i = 0; i < NUM_STATES; i++)
                     {
@@ -492,7 +499,7 @@ public class Envelope extends Modulation implements ModSource
     "Sus 3", "Level 6",
     "Rel 1", "Level 7",
     "Rel 2", "Level 8",
-    "On Tr", "Off Tr"
+    "On Tr", "Off Tr", "Start"
     };
 
     //// SERIALIZATION STUFF

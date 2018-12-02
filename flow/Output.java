@@ -7,6 +7,7 @@ package flow;
 import javax.sound.sampled.*;
 import java.util.*;
 import flow.modules.*;
+import flow.utilities.*;
 
 /**
    Output is the root singleton object of the synthesizer.  It is responsible for
@@ -424,7 +425,10 @@ public class Output
         byte[][] orders;
         double[] pitches;
         double[] velocities;
-                
+        float reverbWet = 0.5f;
+        float reverbRoomSize = 0.5f;
+        float reverbDamp = 0.5f;
+              
         public Swap()
             {
             count = 1;
@@ -467,6 +471,10 @@ public class Output
             }
         }
         
+        
+    float[][] freeverbInput = new float[2][1];
+    float[][] freeverbOutput = new float[2][1];
+    FreeVerb freeverb = new FreeVerb();
 
     /// Current positions of the sine wave functions (from 0 ... 2PI)
     double[][] positions;
@@ -715,6 +723,10 @@ public class Output
                             }
                         }
                                                         
+                    freeverb.setWet(with.reverbWet);
+                    freeverb.setRoomSize(with.reverbRoomSize);
+                    freeverb.setDamp(with.reverbDamp);
+
                     for (int skipPos = 0; skipPos < SKIP; skipPos++)
                         {
                         double d = 0;
@@ -729,7 +741,7 @@ public class Output
                                 d += samples[snd][skipPos];
                                 }
                             }
-                                
+                                                            
                         if (d > 32767)
                             {
                             d = 32767;
@@ -740,6 +752,10 @@ public class Output
                             d = -32768;
                             clipped = true;
                             }
+                        
+                        freeverbInput[0][0] = (float)d;
+                        freeverb.compute(1, freeverbInput, freeverbOutput);
+                        d = freeverbOutput[0][0];
                             
                         int val = (int)(d);
                         audioBuffer[skipPos * 2 + 1] = (byte)((val >> 8) & 255);
@@ -991,6 +1007,14 @@ public class Output
                 swap.pitches[i] = sounds[i].getPitch();
                 swap.velocities[i] = sounds[i].getVelocity();
                 }
+                
+            if (e instanceof Out)
+            	{
+            	Out out = (Out)e;
+            	swap.reverbWet = (float)(out.modulate(out.MOD_REVERB_WET));
+            	swap.reverbDamp = (float)(out.modulate(out.MOD_REVERB_DAMP));
+            	swap.reverbRoomSize = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE));
+            	}
             }
         finally 
             {

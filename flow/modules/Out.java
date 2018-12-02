@@ -35,12 +35,15 @@ public class Out extends Unit
     public static final int NUM_MOD_OUTPUTS = 4;
     public static final int NUM_UNIT_OUTPUTS = 4;
     public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
-    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4", "Gain" };
+    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4", "Gain", "Wet", "Damp", "Size" };
 
     public static final int MOD_OSC_1 = 0;
     public static final int MOD_OSC_2 = 1;
     public static final int MOD_GAIN = NUM_MOD_OUTPUTS;
-        
+    public static final int MOD_REVERB_WET = NUM_MOD_OUTPUTS + 1;
+    public static final int MOD_REVERB_DAMP = NUM_MOD_OUTPUTS + 2;
+    public static final int MOD_REVERB_ROOM_SIZE = NUM_MOD_OUTPUTS + 3;
+
     public static final int UNIT_DISPLAY_1 = 0;
     public static final int UNIT_DISPLAY_2 = 1;
         
@@ -80,7 +83,7 @@ public class Out extends Unit
         // we clone so we can keep the original names around
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[])UNIT_NAMES.clone());
         defineOutputs( new String[] { "A", "B" } );
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER }, (String[])MOD_NAMES.clone());
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER, Constant.ZERO, Constant.HALF, Constant.HALF }, (String[]) MOD_NAMES.clone());
         if (sound != null) sound.setEmits(this);
         }
 
@@ -236,7 +239,7 @@ public class Out extends Unit
             };
             
         ModulationInput[] a = panel[0].getModulationInputs();
-        for(int i = 0; i < a.length; i++)
+        for(int i = 0; i < NUM_MOD_OUTPUTS; i++)
             a[i].setTitleCanChange(true);
 
         UnitInput[] b = panel[0].getUnitInputs();

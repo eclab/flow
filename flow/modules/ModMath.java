@@ -188,7 +188,7 @@ public class ModMath extends Modulation
                     }
                 else
                     {
-                    val = ((int) (mod0 * d)) / (double)d;
+                    val = ((int) Math.round((mod0 * d))) / (double)d;
                     }
                 }
             break;
