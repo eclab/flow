@@ -490,22 +490,17 @@ public class Output
     // factor (from 0...1) 
     double buildSample(int s, double[][] currentAmplitudes)
         {
-        double[] pa = null;
-
         // build the sample
         double sample = 0;
-        
-        int start = 0;
-        int end = numSounds;
-        
-        double[] amp = with.amplitudes[s];
-        double[] freq = with.frequencies[s];
-        byte[] orders = with.orders[s];
+        Swap _with = with;
+        double[] amp = _with.amplitudes[s];
+        double[] freq = _with.frequencies[s];
+        byte[] orders = _with.orders[s];
         double[] pos = positions[s];
         double[] ca = currentAmplitudes[s];
-        double v = with.velocities[s];
-        double pitch = with.pitches[s];
-        double tr = pitch * Math.PI * 2 * Output.INV_SAMPLING_RATE;
+        double v = _with.velocities[s];
+        double pitch = _with.pitches[s];
+        double tr = pitch * Math.PI * 2 * INV_SAMPLING_RATE;
             
         for (int i = 0; i < pos.length; i++)
             {
@@ -520,7 +515,7 @@ public class Output
             // we just shut ca[0] straight to 0 to skip the whole subnormal range.
             if (ca[oi] > WELL_ABOVE_SUBNORMALS || amplitude * PARTIALS_INTERPOLATION_ALPHA > WELL_ABOVE_SUBNORMALS)
                 ca[oi] = ca[oi] * (1.0 - PARTIALS_INTERPOLATION_ALPHA) + amplitude * PARTIALS_INTERPOLATION_ALPHA;
-            else if (ca[oi] != 0)
+            else //if (ca[oi] != 0)
                 {
                 ca[oi] = 0;
                 }
@@ -536,21 +531,23 @@ public class Output
                     {
                     break;          // continue;
                     }
+                
                 if (absoluteFrequency <= 0.0)  // don't bother, though this shouldn't happen (well, it might be 0.0)
                     {
                     continue;
                     }
-                    
-                pos[oi] += frequency * tr;
-                if (pos[oi] >= Math.PI * 2)
+                
+                double position = pos[oi] + frequency * tr;
+                if (position >= Math.PI * 2)
                     {
-                    pos[oi] = pos[oi] - (Math.PI * 2);
+                    position = position - (Math.PI * 2);
                             
-                    if (pos[oi] >= Math.PI * 2)
+                    if (position >= Math.PI * 2)
                         {
-                        pos[oi] = pos[oi] % (Math.PI * 2);
+                        position = position % (Math.PI * 2);
                         }
                     }
+                pos[oi] = position;
 
                 // For some crazy reason, if I do buildSample too fast, and thus the
                 // output sound thread loops too fast, it significantly slows down
@@ -561,7 +558,7 @@ public class Output
                 // single stupidest approach -- just do the full multi-voice computation here
                 // but only load the voice 1 samples into the sound output.
 
-                double smp = Utility.fastSin(pos[oi]) * amplitude * v;
+                double smp = Utility.fastSin(position) * amplitude * v;
                 sample += smp;
                 }
             }
@@ -1022,7 +1019,7 @@ public class Output
                 swap.velocities[i] = sounds[i].getVelocity();
                 }
                 
-            if (e instanceof Out)
+            if (e instanceof Out) 	// we're only doing this for ONE sound, namely sounds[0]
             	{
             	Out out = (Out)e;
             	swap.reverbWet = (float)(out.modulate(out.MOD_REVERB_WET));

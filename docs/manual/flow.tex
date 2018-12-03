@@ -511,7 +511,7 @@ In addition to sequencing modulation signals, Seq can also be used in combinatio
 
 \paragraph{Drawbars}   Produces the sine wave equivalents of the drawbars of a classic tone wheel organ.  There are a number of preset options.
 
-\paragraph{Harmonics}  Outputs the first 16 harmonics, whose amplitude you can define independently.  See also {\bf Partials}.
+\paragraph{Harmonics}  Outputs the first 16 harmonics, whose amplitude you can define independently.  You optionally can load these harmonics from a source. See also {\bf Partials}.
 
 \paragraph{KHarmonics}  Produces a wide range of partials drawn from patches from the Kawai K5 synthesizer, including both factory patches (with Kawai's permission) and various patches in the public domain.  You have the additional option of {\it Normalizing} the partials.
 
@@ -522,7 +522,7 @@ In addition to sequencing modulation signals, Seq can also be used in combinatio
 
 \paragraph{Noise}  Random noise, hiss, etc.  This is done by creating and immediately destroying entirely random partials independent of the pitch.  You can specify the number of partials being used (you can get away with surprisingly few to make a good hiss).   To change the color of the partials: you can also specify the high and low frequency bounds for the partials; you can create a ramp in amplitude from the low to high partials; and you can specify the degree of variance in amplitude among the random partials.  Finally, you can set the average volume (the gain) of the hiss.  This module is designed to merge with other sources to add hiss to them: most commonly, you would use it as the primary source in the {\bf Fill} module.  To make this convenient, by default the partials used are the highest numbered ones: the lower ones are all set to amplitude 0 and frequency 0.0.  However if you use this in combination with a merging option like {\bf Combine} which steals from the high partials, or other adjusters like {\bf Fatten}, you'd want the low partials to be used.  By setting {\it Top} to false, you can cause the low partials to be used for the hiss, with the remainder set to amplitude 0 and a frequency somewhat beyond the high frequency bound.
 
-\paragraph{Partials}  Outputs 16 partials whose amplitude and frequency you can define independently.  See also {\bf Harmonics}.
+\paragraph{Partials}  Outputs 16 partials whose amplitude and frequency you can define independently.  You optionally can load these partials from a source.  See also {\bf Harmonics}.
 
 \paragraph{PartialLab}  Allows you to describe a sound as a combination of three mathematical functions operating on your harmonics.  For each of the three, you can define the function type, a function parameter, the gain of the function, and the harmonics the function manipulates.  When multiple functions manipulate the same harmonic, the earlier function takes precedence.  {\bf Important Note 1}\quad Unlike standard constraints menus, PartialLab's constraints menus include ``All'' at the end.  {\bf Important Note 2}\quad This is a costly module if you are modulating any of these values in real time, perhaps by an LFO (there are many calls to \(x^y\)): you can do it, but it'll keep your laptop warm.
 
@@ -689,7 +689,7 @@ Every useful patch has to have an Out module, since it provides the facility for
 
 \paragraph{Audio Generation}  Out is responsible for converting your partials into sound.  To do this, connect your final partials to the port on Out normally labelled {\bf A}: it's the topmost port in the module.  You can adjust the volume of this port by changing the {\it Gain} knob.
 
-\paragraph{Reverb} Flow sports a simple implementation of the Freeverb algorithm\footnote{A well regarded reverb algorithm in the public domain by ``Jezar at Dreampoint''.}  This algorithm has three parameters.  {\it Wet} is the dry/wet knob for the algorithm (0 is fully dry).  {\it Damp} is the damping: basically a low-pass filter applied to the reflected signals.  {\it Size} is the room size, which translates roughly into the reverb decay.
+\paragraph{Reverb} Flow sports a simple implementation of the Freeverb algorithm\footnote{A well regarded reverb algorithm in the public domain by ``Jezar at Dreampoint''.}  This algorithm has three parameters.  {\it Wet} is the dry/wet knob for the algorithm (0 is fully dry).  {\it Damp} is the damping: basically a low-pass filter applied to the reflected signals.  {\it Size} is the room size, which translates roughly into the reverb decay.  Note only a single sound (voice \#0) controls the modulation of Wet, Damp, and Size.  This means that if you attach an Envelope etc. to any of these modules, it may not respond in exactly the way you think.  It's probably best to keep them as knobs rather than attaching a modulation source.
 
 \paragraph{Partials Visualization}  When you connect to the {\bf A} port, the resulting partials are also displayed on the left partials display in your rack.  The {\bf B} port is also useful for displaying partials (it shows them on the right partials display).  
 
@@ -704,7 +704,7 @@ There's no reason you can't insert multiple Out modules into your patch: but onl
 \subsubsection{Creating a Macro with the \textit{In}, \textit{Out,} and \textit{Macro} Modules}
 \label{creatingmacros}
 
-Once you have saved your patch, you can reload it as a {\bf Macro} in a higher-level patch of your design: it will appear as a module like any other.  The partials fed into the ({\bf A}) port of your Out module, normally used to produce audio, will be available to feed into other modules. When used in a macro, Out's Gain and Reverb are disabled.
+Once you have saved your patch, you can reload it as a {\bf Macro} in a higher-level patch of your design: it will appear as a module like any other.  The partials fed into the ({\bf A}) port of your Out module, normally used to produce audio, will be available to feed into other modules. When used in a macro, Out's Reverb is disabled.
 
 But that's not all.  Your patch can in fact output {\it four} partials streams, by default called {\bf A}, {\bf B}, {\bf C}, and {\bf D}.  And you can also output {\it four} modulation signals, called {\bf 1}, {\bf 2}, {\bf 3}, and {\bf 4}.  Just connect to them in the Out module of your original patch, and when you load it as a Macro, they're all available as outputs in the Macro module to feed into other modules. 
 
