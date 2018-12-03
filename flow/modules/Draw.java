@@ -47,8 +47,6 @@ public class Draw extends Unit implements UnitSource
     
     public static final String FILENAME_EXTENSION = ".partials";
 
-    boolean doSnapshot = false;
-        
     public transient double[] backupFrequencies;
     public transient double[] backupAmplitudes;
         
@@ -68,11 +66,6 @@ public class Draw extends Unit implements UnitSource
         backupAmplitudes = getAmplitudes(0).clone();
         }
         
-    public void takeSnapshot()
-        {
-        doSnapshot = true;
-        }
-        
     public Draw(Sound sound) 
         {
         super(sound);
@@ -82,17 +75,25 @@ public class Draw extends Unit implements UnitSource
     
     public boolean isConstrainable() { return false; }
     
-    public void go()
-        {
-        super.go();
-        
-        if (doSnapshot)
-            {
-            copyFrequencies(0);
-            copyAmplitudes(0);
-            doSnapshot = false;
-            }
-        }
+    public void takeSnapshot()
+    	{
+		copyFrequencies(0);
+		copyAmplitudes(0);
+    	}
+            
+    public void restoreFromBackup()
+    	{
+		double[] amplitudes = getAmplitudes(0);
+		double[] frequencies = getFrequencies(0);
+		double[] tempAmp = new double[amplitudes.length];
+		double[] tempFreq = new double[frequencies.length];
+		System.arraycopy(amplitudes, 0, tempAmp, 0, tempAmp.length);
+		System.arraycopy(frequencies, 0, tempFreq, 0, tempFreq.length);
+		System.arraycopy(backupAmplitudes, 0, amplitudes, 0, amplitudes.length);
+		System.arraycopy(backupFrequencies, 0, frequencies, 0, frequencies.length);
+		backupFrequencies = tempFreq;
+		backupAmplitudes = tempAmp;
+		}
 
     void distributeToAllSounds()
         {
@@ -204,11 +205,12 @@ public class Draw extends Unit implements UnitSource
                 {
                 try
                     {
-                    Scanner scanner = new Scanner(file);
+                     Draw draw = (Draw)(getModulation());
+                   Scanner scanner = new Scanner(file);
                     getRack().getOutput().lock();
                     try
                         {
-                        backup();
+                        draw.backup();
                         double[] frequencies = ((Unit)getModulation()).getFrequencies(0);
                         double[] amplitudes = ((Unit)getModulation()).getAmplitudes(0);
                         for(int i = 0; i < frequencies.length; i++)
@@ -226,7 +228,6 @@ public class Draw extends Unit implements UnitSource
                         getRack().getOutput().unlock();
                         }
                     scanner.close();
-                    Draw draw = (Draw)(getModulation());
                     draw.distributeToAllSounds();
                     }
                 catch (FileNotFoundException ex)
@@ -235,7 +236,7 @@ public class Draw extends Unit implements UnitSource
                     }
                 }                   
                 
-            public void doSave(JComponent root) 
+            public void doSave(JComponent root, Draw draw) 
                 { 
                 FileDialog fd = new FileDialog((Frame)(SwingUtilities.getRoot(root)), "Save Partials...", FileDialog.SAVE);
                 
@@ -257,7 +258,7 @@ public class Draw extends Unit implements UnitSource
                         getRack().getOutput().lock();
                         try
                             {
-                            backup();
+                            draw.backup();
                             double[] frequencies = ((Unit)getModulation()).getFrequencies(0);
                             double[] amplitudes = ((Unit)getModulation()).getAmplitudes(0);
                             for(int i = 0; i < frequencies.length; i++)
@@ -303,16 +304,8 @@ public class Draw extends Unit implements UnitSource
                                     {
                                     if (backupFrequencies != null)
                                         {
-                                        double[] amplitudes = getAmplitudes(0);
-                                        double[] frequencies = getFrequencies(0);
-                                        double[] tempAmp = new double[amplitudes.length];
-                                        double[] tempFreq = new double[frequencies.length];
-                                        System.arraycopy(amplitudes, 0, tempAmp, 0, tempAmp.length);
-                                        System.arraycopy(frequencies, 0, tempFreq, 0, tempFreq.length);
-                                        System.arraycopy(backupAmplitudes, 0, amplitudes, 0, amplitudes.length);
-                                        System.arraycopy(backupFrequencies, 0, frequencies, 0, frequencies.length);
-                                        backupFrequencies = tempFreq;
-                                        backupAmplitudes = tempAmp;
+                                        draw.restoreFromBackup();
+	                                    draw.distributeToAllSounds();
                                         }
                                     }
                                 finally 
@@ -326,10 +319,10 @@ public class Draw extends Unit implements UnitSource
                                 getRack().getOutput().lock();
                                 try
                                     {
-                                    backup();
-                                    draw.takeSnapshot();
+                                    draw.backup();
+                                    draw.takeSnapshot();  // this doesn't distribute right now; we'll do it later
                                     draw.distributeToAllSounds();
-                                    }
+                                   }
                                 finally 
                                     {
                                     getRack().getOutput().unlock();
@@ -341,7 +334,7 @@ public class Draw extends Unit implements UnitSource
                                 getRack().getOutput().lock();
                                 try
                                     {
-                                    backup();
+                                    draw.backup();
                                     draw.standardizeFrequencies();
                                     draw.distributeToAllSounds();
                                     }
@@ -356,7 +349,7 @@ public class Draw extends Unit implements UnitSource
                                 getRack().getOutput().lock();
                                 try
                                     {
-                                    backup();
+                                    draw.backup();
                                     draw.normalizeAmplitudes();
                                     draw.distributeToAllSounds();
                                     }
@@ -371,7 +364,7 @@ public class Draw extends Unit implements UnitSource
                                 getRack().getOutput().lock();
                                 try
                                     {
-                                    backup();
+                                    draw.backup();
                                     double[] amplitudes = getAmplitudes(0);
                                     double max = amplitudes[getLoudestPartial(0)];
                                     if (max == 0) return;
@@ -393,7 +386,7 @@ public class Draw extends Unit implements UnitSource
                                 getRack().getOutput().lock();
                                 try
                                     {
-                                    backup();
+                                    draw.backup();
                                     double[] amplitudes = getAmplitudes(0);
                                     for(int i = 0; i < amplitudes.length; i++)
                                         {
@@ -409,7 +402,7 @@ public class Draw extends Unit implements UnitSource
                                 }
                             case DO_SAVE:
                                 {
-                                doSave(panel);
+                                doSave(panel, draw);
                                 break;
                                 }
                             case DO_LOAD:
