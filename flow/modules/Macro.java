@@ -167,7 +167,7 @@ public class Macro extends Unit implements Cloneable
                 
         if (out != null)
             {
-            int len = out.getNumModulations() - 1;  // skip gain
+            int len = Out.NUM_MOD_OUTPUTS;  // skip gain etc.
             for(int i = 0; i < len; i++)
                 {
                 setModulationOutput(i, out.modulate(i));
