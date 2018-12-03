@@ -60,7 +60,7 @@ public class In extends Unit
                 byte[] orders = getOrders(i);
 
                 System.arraycopy(macro.getAmplitudesIn(i), 0, amplitudes, 0, amplitudes.length);
-                System.arraycopy(macro.getFrequencies(i), 0, frequencies, 0, frequencies.length);
+                System.arraycopy(macro.getFrequenciesIn(i), 0, frequencies, 0, frequencies.length);
                 System.arraycopy(macro.getOrdersIn(i), 0, orders, 0, orders.length);
                 }
             else
