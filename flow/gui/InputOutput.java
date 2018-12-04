@@ -135,7 +135,7 @@ public abstract class InputOutput extends JPanel
     public static final int LABEL_MAX_LENGTH = 32;
     public static String showTextDialog(Rack rack, JComponent root, String title, String label, String originalText)
         {
-        JTextField text = new JTextField(LABEL_MAX_LENGTH);
+        final JTextField text = new JTextField(LABEL_MAX_LENGTH);
         text.setText(originalText);
                 
         Box box = new Box(BoxLayout.Y_AXIS);

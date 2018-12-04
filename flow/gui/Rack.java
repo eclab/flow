@@ -448,7 +448,7 @@ public class Rack extends JPanel
                 Modulation mod = output.getSound(0).getRegistered(j);
                 if (mod != allModulePanels.get(j).getModulation())
                     {
-                    System.err.println("Rack CHECK WARNING: Modulation " + j + " in Sound " + 0 + 
+                    System.err.println("WARNING(flow/modules/Rack.java) Rack check: Modulation " + j + " in Sound " + 0 + 
                         " is a " + mod + " but associated panel doesn't point to the same object.  It points to " + allModulePanels.get(j).getModulation());
                     //new Throwable().printStackTrace();
                     return;                                 
@@ -462,7 +462,7 @@ public class Rack extends JPanel
                     Modulation mod = output.getSound(i).getRegistered(j);
                     if (mod.getClass() != allModulePanels.get(j).getModulation().getClass())
                         {
-                        System.err.println("Rack CHECK WARNING: Modulation " + j + " in Sound " + i + 
+                        System.err.println("WARNING(flow/modules/Rack.java) Rack check: Modulation " + j + " in Sound " + i + 
                             " is " + mod + " but associated panel holds " + allModulePanels.get(j).getModulation());
                         //new Throwable().printStackTrace();
                         return;                                 
@@ -486,7 +486,7 @@ public class Rack extends JPanel
                 }
             if (!found)
                 {
-                System.err.println("Rack CHECK WARNING: UnitWire  " + j + " has as start nonexistent ModPanel " +
+                System.err.println("WARNING(flow/modules/Rack.java) Rack check: UnitWire  " + j + " has as start nonexistent ModPanel " +
                     wire.getStart().getModulePanel() + " " + wire.getStart().number);
                 //new Throwable().printStackTrace();
                 return;
@@ -500,7 +500,7 @@ public class Rack extends JPanel
                 }
             if (!found)
                 {
-                System.err.println("Rack CHECK WARNING: UnitWire  " + j + " has as end nonexistent ModPanel " +
+                System.err.println("WARNING(flow/modules/Rack.java) Rack check: UnitWire  " + j + " has as end nonexistent ModPanel " +
                     wire.getEnd().getModulePanel() + " " + wire.getStart().number);
                 //new Throwable().printStackTrace();
                 return;
@@ -518,7 +518,7 @@ public class Rack extends JPanel
                 }
             if (!found)
                 {
-                System.err.println("Rack CHECK WARNING: UnitWire  " + j + " has as start nonexistent ModPanel " +
+                System.err.println("WARNING(flow/modules/Rack.java) Rack check: UnitWire  " + j + " has as start nonexistent ModPanel " +
                     wire.getStart().getModulePanel() + " " + wire.getStart().number);
                 //new Throwable().printStackTrace();
                 return;
@@ -532,7 +532,7 @@ public class Rack extends JPanel
                 }
             if (!found)
                 {
-                System.err.println("Rack CHECK WARNING: UnitWire  " + j + " has as end nonexistent ModPanel " +
+                System.err.println("WARNING(flow/modules/Rack.java) Rack check: UnitWire  " + j + " has as end nonexistent ModPanel " +
                     wire.getEnd().getModulePanel() + " " + wire.getEnd().number);
                 //new Throwable().printStackTrace();
                 return;
@@ -1053,7 +1053,7 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                     Rectangle paneBounds = rack.pane.getBounds();
                     if (p.y <= paneBounds.y + TOP_SLOP || p.y >= paneBounds.y + paneBounds.height - SCROLLBAR_SLOP)
                         {
-                        System.err.println("Drag failed");  // display region
+                        //System.err.println("Drag failed");  // display region
                         return;
                         }
                     else
@@ -1066,17 +1066,17 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                     }
                 else
                     {
-                    System.err.println("Drag failed");  // wasn't a mod panel I guess
+                    //System.err.println("Drag failed");  // wasn't a mod panel I guess
                     return;
                     }
                                 
                 if (removed == -1)
                     {
-                    System.err.println("ModulePanelDropTargetListener WARNING: no such removed panel " + droppedPanel);
+                    System.err.println("WARNING(flow/modules/Rack.java) ModulePanelDropTargetListener: no such removed panel " + droppedPanel);
                     }
                 else if (added == -1)
                     {
-                    System.err.println("ModulePanelDropTargetListener WARNING: no such added panel relative to " + comp);
+                    System.err.println("WARNING(flow/modules/Rack.java) ModulePanelDropTargetListener: no such added panel relative to " + comp);
                     }
                 else
                     {
@@ -1120,7 +1120,7 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                     Rectangle paneBounds = rack.pane.getBounds();
                     if (p.y <= paneBounds.y + TOP_SLOP || p.y >= paneBounds.y + paneBounds.height - SCROLLBAR_SLOP)
                         {
-                        System.err.println("Drag failed");  // display region
+                        //System.err.println("Drag failed");  // display region
                         return;
                         }
                     else
@@ -1131,17 +1131,17 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                     }
                 else
                     {
-                    System.err.println("Drag failed");  // wasn't a mod panel I guess
+                    //System.err.println("Drag failed");  // wasn't a mod panel I guess
                     return;
                     }
                                 
                 if (removed == -1)
                     {
-                    System.err.println("ModulePanelDropTargetListener WARNING: no such removed panel " + droppedPanel);
+                    System.err.println("WARNING(flow/modules/Rack.java) ModulePanelDropTargetListener: no such removed panel " + droppedPanel);
                     }
                 else if (added == -1)
                     {
-                    System.err.println("ModulePanelDropTargetListener WARNING: no such added panel relative to " + comp);
+                    System.err.println("WARNING(flow/modules/Rack.java) ModulePanelDropTargetListener: no such added panel relative to " + comp);
                     }
                 else
                     {

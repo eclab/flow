@@ -131,7 +131,7 @@ public class UnitInput extends InputOutput implements Rebuildable
 
     /** Constructor, given an owning unit and ModPanel, plus which unit input number we are in our owner. 
         If number is ConstraintsChooser.INDEX, then we draw somewhat differently.  */
-    public UnitInput(Unit unit, int number, ModulePanel modPanel)
+    public UnitInput(final Unit unit, final int number, ModulePanel modPanel)
         {
         this.unit = unit;
         this.number = number;

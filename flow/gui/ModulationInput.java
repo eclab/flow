@@ -322,14 +322,14 @@ public class ModulationInput extends InputOutput implements Rebuildable
             this.staticColor = staticColor;
             this.modulationInput = modulationInput;
 
-            JPopupMenu pop = getPopupMenu();
+            final JPopupMenu pop = getPopupMenu();
 
             addMouseWheelListener(new MouseWheelListener()
                 {
                 public void mouseWheelMoved(MouseWheelEvent e) 
                     {
                     disconnect();
-                    double val = getState() - e.getWheelRotation() / 2;
+                    double val = getState() - e.getWheelRotation() / 2.0;
                     if (val > 1) val = 1;
                     if (val < 0) val = 0;
 

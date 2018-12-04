@@ -49,19 +49,13 @@ public class UnitOutput extends InputOutput
         }
     
     /** Constructor, given an owning unit and ModPanel, plus which unit output number we are in our owner. */
-    public UnitOutput(Unit unit, int number, ModulePanel modPanel)
+    public UnitOutput(Unit unit, int number, final ModulePanel modPanel)
         {
         this.unit = unit;
         this.number = number;
         this.modPanel = modPanel;
         
-        jack = new Jack(true)
-            {
-            public Paint getColor()
-                {
-                return Style.UNIT_COLOR;
-                }
-            };
+        jack = new Jack(true);
 
         title = new JLabel(unit.getOutputName(number) + " ", SwingConstants.RIGHT);
         title.setFont(Style.SMALL_FONT());

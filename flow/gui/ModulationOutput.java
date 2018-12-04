@@ -48,7 +48,7 @@ public class ModulationOutput extends InputOutput
         }
     
     /** Constructor, given an owning modulation and ModPanel, plus which moduation output number we are in our owner. */
-    public ModulationOutput(Modulation modulation, int number, ModulePanel modPanel)
+    public ModulationOutput(Modulation modulation, int number, final ModulePanel modPanel)
         {
         this.modulation = modulation;
         this.number = number;

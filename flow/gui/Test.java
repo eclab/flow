@@ -71,7 +71,7 @@ public class Test
 
             Filter lpf = new Filter(sound);
             lpf.setInput(saw);
-            lpf.setType(Filter.TYPE_LP);
+//            lpf.setType(Filter.TYPE_LP);
 
             lpf.setModulations(
                 f_dadsr,

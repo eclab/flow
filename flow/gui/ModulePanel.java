@@ -537,7 +537,7 @@ public class ModulePanel extends JPanel implements Transferable
 
     /** A convenience method for loading a file in a ModulePanel.  Calls doLoad(...) to actually load the file if
         the user decides to do so.  */
-    public File doLoad(String title, String filenameExtension)
+    public File doLoad(String title, final String filenameExtension)
         {
         Rack rack = getRack();
         FileDialog fd = new FileDialog((JFrame)(SwingUtilities.getRoot(rack)), title, FileDialog.LOAD);
