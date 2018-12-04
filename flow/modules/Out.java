@@ -210,7 +210,7 @@ public class Out extends Unit
             public JLabel getAuxUnitInputTitle(int number)
                 {
                 JLabel label = null;
-                if (number > UNIT_DISPLAY_2) return label;
+                if (number > UNIT_DISPLAY_2) return null;
                 else if (number == UNIT_DISPLAY_1) label = new JLabel("  (Audio)");
                 else if (number == UNIT_DISPLAY_2) label = new JLabel("  (Aux)");
                 label.setPreferredSize(example.getPreferredSize());
@@ -221,7 +221,7 @@ public class Out extends Unit
             public JLabel getAuxModulationInputTitle(int number)
                 {
                 JLabel label = null;
-                if (number > MOD_OSC_2) return label;
+                if (number > MOD_OSC_2) return null;
                 else if (number == MOD_OSC_1) label = new JLabel("  (Scope)");
                 else if (number == MOD_OSC_2) label = new JLabel("  (Aux)");
                 label.setPreferredSize(example.getPreferredSize());
@@ -260,7 +260,7 @@ public class Out extends Unit
                     oldClipped[0] = clipped;
                     oldGlitched[0] = glitched;
                     
-                    JComponent title = panel[0].getTitle();
+
                     panel[0].getTitlePanel().setBackground(glitched ? Color.RED : (clipped ? Color.YELLOW : Color.BLACK));
                     panel[0].getTitleLabel().setForeground(glitched ? Color.WHITE : (clipped ? Color.BLACK : Color.WHITE));
                     panel[0].getTitleLabel().setText(glitched ? "  Glitch" : (clipped ? "  Clip" : "  Out"));

@@ -213,6 +213,11 @@ public class PartialLab extends Unit implements UnitSource
                         amplitudes[partials[j]] = g * (1.0 - Utility.fastpow(x, b * 16 + 0.01));
                         }
                     break;
+                    default:
+                    	{
+                    	System.err.println("WARNING(modules/PartialLab.java): default occurred when it shouldn't be possible");
+                    	break;
+                    	}
                     }
                 }
             }

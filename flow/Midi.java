@@ -695,6 +695,10 @@ public class Midi
                 case ShortMessage.SYSTEM_RESET: type = "System Reset"; c = -1; break;
                 case ShortMessage.TIMING_CLOCK: type = "Timing Clock"; c = -1; break;
                 case ShortMessage.TUNE_REQUEST: type = "Tune Request"; c = -1; break;
+                default:	// should not happen
+                	{
+                	System.err.println("WARNING(Midi.java): unknown message status " + s.getStatus());
+                	}
                 }
             return type + (c == -1 ? "" : (" (Channel " + c + ")"));
             }
@@ -712,7 +716,7 @@ public class Midi
             return manufacturers;
                         
         manufacturers = new HashMap();
-        Scanner scan = new Scanner(Midi.class.getResourceAsStream("Manufacturers.txt"));
+        Scanner scan = new Scanner(Midi.class.getResourceAsStream("Manufacturers.txt"), "US-ASCII");
         while(scan.hasNextLine())
             {
             String nextLine = scan.nextLine().trim();
@@ -730,7 +734,7 @@ public class Midi
                 {
                 id = one;
                 }
-            manufacturers.put(new Integer(id), scan.nextLine().trim());
+            manufacturers.put(Integer.valueOf(id), scan.nextLine().trim());
             }
         return manufacturers;
         }
@@ -744,19 +748,19 @@ public class Midi
         HashMap map = getManufacturers();
         if (data[0 + offset] == (byte)0x7D)             // educational use
             {
-            return (String)(map.get(new Integer(data[0 + offset]))) + 
+            return (String)(map.get(Integer.valueOf(data[0 + offset]))) + 
                 "\n\nNote that unregistered manufacturers or developers typically\n use this system exclusive region.";
             }
         else if (data[0 + offset] == (byte)0x00)
             {
-            return (String)(map.get(new Integer(
+            return (String)(map.get(Integer.valueOf(
                         0x00 + 
                         ((data[1 + offset] < 0 ? data[1 + offset] + 256 : data[1 + offset]) << 8) + 
                         ((data[2 + offset] < 0 ? data[2 + offset] + 256 : data[2 + offset]) << 16))));
             }
         else
             {
-            return (String)(map.get(new Integer(data[0 + offset])));
+            return (String)(map.get(Integer.valueOf(data[0 + offset])));
             }
         }
 

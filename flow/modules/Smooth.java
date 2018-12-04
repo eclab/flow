@@ -34,9 +34,9 @@ public class Smooth extends Unit
     public Object clone()
         {
         Smooth obj = (Smooth)(super.clone());
-        obj.smoothedFrequencies = (double[])(obj.smoothedFrequencies);
-        obj.smoothedAmplitudes = (double[])(obj.smoothedAmplitudes);
-        obj.smoothedOrders = (byte[])(obj.smoothedOrders);
+        obj.smoothedFrequencies = (double[])(obj.smoothedFrequencies.clone());
+        obj.smoothedAmplitudes = (double[])(obj.smoothedAmplitudes.clone());
+        obj.smoothedOrders = (byte[])(obj.smoothedOrders.clone());
         return obj;
         }
 

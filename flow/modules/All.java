@@ -20,7 +20,6 @@ public class All extends Unit implements UnitSource
         super(sound);
         
         double[] amplitudes = getAmplitudes(0);
-        double[] frequencies = getFrequencies(0);
                 
         setClearOnReset(false);
         for(int i = 0; i < amplitudes.length; i++)

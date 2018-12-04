@@ -214,7 +214,7 @@ public class Envelope extends Modulation implements ModSource
         released = true;
         start = getSyncTick(sync);
         firstLevel = getModulationOutput(0);            // so we change from there when we start
-        state = SUSTAIN_END_STATE;
+        state = SUSTAIN_END_STATE;// so we start sustain findNextState() next
         state = findNextState();
         if (state != DONE)
             {

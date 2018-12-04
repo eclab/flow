@@ -54,13 +54,7 @@ public class ModulationOutput extends InputOutput
         this.number = number;
         this.modPanel = modPanel;
         
-        jack = new Jack(false)       
-            {
-            public Paint getColor()
-                {
-                return Style.MOD_COLOR;
-                }
-            };
+        jack = new Jack(false);      
 
         title = new JLabel(modulation.getModulationOutputName(number) + " ", SwingConstants.RIGHT);
         title.setFont(Style.SMALL_FONT());

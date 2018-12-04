@@ -109,8 +109,7 @@ public class MidiClock
     double currentPulseRealTick;
     double smoothedMidiTickTarget;
     
-    // how fast we think the pulses are coming on average 
-    double rateEstimate = 0;
+
     static final double DIFF_ALPHA = 0.5;
     static final double MIDI_TICK_ALPHA = 0.1;
         

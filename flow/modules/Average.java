@@ -57,7 +57,6 @@ public class Average extends Unit
         super.go();
                 
         double[] amplitudes = getAmplitudes(0);
-        double[] frequencies = getFrequencies(0);
                 
         double mod = modulate(MOD_SCALE);
         copyFrequencies(0);

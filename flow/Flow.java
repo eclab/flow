@@ -28,7 +28,7 @@ public class Flow
             {
             Sound sound = new Sound(output);
             if (i == 0) sound0 = sound;
-            Out out = new Out(sound);
+			Out out = new Out(sound);		// findBugs thinks this is a dead store.  It isn't.
             sound.reset();
             }
 

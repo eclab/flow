@@ -47,7 +47,7 @@ public class WaveTable extends Unit implements UnitSource
     public Object clone()
         {
         WaveTable obj = (WaveTable)(super.clone());
-        obj.waveTable = (double[][])(obj.waveTable);
+        obj.waveTable = (double[][])(obj.waveTable.clone());
         for(int i = 0; i < obj.waveTable.length; i++)
             {
             obj.waveTable[i] = (double[])(obj.waveTable[i].clone());
@@ -261,7 +261,7 @@ public class WaveTable extends Unit implements UnitSource
                     }
                 catch (Exception ex)
                     {
-                    ex.printStackTrace();
+                    System.err.println("WARNING(modules/WaveTable.java): IOException in loading file: " + ex);                    ex.printStackTrace();
                     }
                 }
             };

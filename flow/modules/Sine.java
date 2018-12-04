@@ -23,7 +23,6 @@ public class Sine extends Unit implements UnitSource
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Frequency" });
 
         double[] amplitudes = getAmplitudes(0);
-        double[] frequencies = getFrequencies(0);
         
         setClearOnReset(false);
         sine = 0;

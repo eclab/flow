@@ -42,7 +42,7 @@ public class Tinkle extends Unit implements UnitSource
     public Object clone()
         {
         Tinkle obj = (Tinkle)(super.clone());
-        obj.currentAmplitudes = (double[])(obj.currentAmplitudes);
+        obj.currentAmplitudes = (double[])(obj.currentAmplitudes.clone());
         if (obj.random != null)
             obj.random = new Random();  // will be reset on gate()
         return obj;

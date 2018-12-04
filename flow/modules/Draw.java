@@ -181,7 +181,7 @@ public class Draw extends Unit implements UnitSource
                     amp = 0;
                     }
                                         
-                Output output = getSound().getOutput();
+
                 // Display has already grabbed the lock
                     {
                     if (!continuation)
@@ -206,7 +206,7 @@ public class Draw extends Unit implements UnitSource
                 try
                     {
                      Draw draw = (Draw)(getModulation());
-                   Scanner scanner = new Scanner(file);
+                   Scanner scanner = new Scanner(file, "US-ASCII");
                     getRack().getOutput().lock();
                     try
                         {
@@ -293,7 +293,7 @@ public class Draw extends Unit implements UnitSource
                     public void perform(int val)
                         {
                         Draw draw = (Draw)(getModulation());
-                        Output output = draw.getSound().getOutput();
+
                                                 
                         switch(val)
                             {
@@ -410,6 +410,11 @@ public class Draw extends Unit implements UnitSource
                                 doLoad("Load Partials...", FILENAME_EXTENSION);
                                 break;
                                 }
+                            default:
+                            	{
+                            	System.err.println("WARNING(modules/Draw.java): default occured when it shouldn't be possible");
+                            	break;
+                            	}
                             }
                         }
                     };

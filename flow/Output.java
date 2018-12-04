@@ -412,7 +412,7 @@ public class Output
 
 
     // Contains the latest partials for the Output Thread to emit.  
-    class Swap
+    static class Swap
         {
         int count;
         int reads;
@@ -893,7 +893,7 @@ public class Output
         }
 
 
-    int totalPartialsCount;
+
     int totalPartialsTicks;
     int totalPartialsWaits;
 	int totalOutputTicks;

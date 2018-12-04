@@ -114,7 +114,6 @@ public class AmpMath extends Unit
         super.go();
 
         double[] amplitudes = getAmplitudes(0);
-        double[] frequencies = getFrequencies(0);
                 
         double[] inputs0amplitudes = getAmplitudesIn(UNIT_INPUT_A);
         double[] inputs1amplitudes = getAmplitudesIn(UNIT_INPUT_B);

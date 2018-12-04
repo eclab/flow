@@ -119,7 +119,7 @@ public class Jitter extends Unit
                                 
         double frequencyModulation = modulate(MOD_FREQ_VAR);
         frequencyModulation = frequencyModulation * frequencyModulation * frequencyModulation * frequencyModulation;
-        double amplitudeModulationModulation = modulate(MOD_AMP_VAR);
+
         if (!started || isTriggered(MOD_TRIGGER))
             {
             for(int i = 0; i < targets[FREQUENCY_VAR].length; i++)

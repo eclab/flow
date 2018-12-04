@@ -179,6 +179,7 @@ public class ModMath extends Modulation
                 {
                 val = Math.min(1.0, mod1 + mod0 * mod0 * mod0);
                 }
+            break;
             case DISCRETIZE:
                 {
                 int d = (int)(mod1 * DISCRETIZATION);
@@ -196,14 +197,21 @@ public class ModMath extends Modulation
                 {
                 val = (1.0 - mod1) * mod0 + mod1;
                 }
+            break;
             case AVERAGE:
                 {
                 val = (mod1 + mod0) / 2.0;
                 }
+            break;
             case THRESHOLD:
                 {
                 val = (mod0 >= mod1 ? 1.0 : 0.0);
                 }
+            default:
+            	{
+            	System.err.println("WARNING(modules/ModMath.java): default occurred when it shouldn't be possible");
+            	val = 0;
+            	}
             }
                 
         if (val > 1)

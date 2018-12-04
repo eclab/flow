@@ -149,9 +149,6 @@ public class Noise extends Unit implements UnitSource
             if (amplitudes[j] > max) max = amplitudes[j];
             }
         
-        double invtotal = 1.0 / total;
-        double invmax = 1.0 / max;
-        
         // normalize
         for(int j = start; j < end; j++)
             {

@@ -384,8 +384,15 @@ public class ModulationInput extends InputOutput implements Rebuildable
                         if (result == JOptionPane.OK_OPTION)
                             {
                             double d = 0;
-                            try { d = Double.parseDouble(field.getText()); }
-                            catch (Exception ex) { }
+                            try 
+                            { 
+                            d = Double.parseDouble(field.getText()); 
+                            }
+                            catch (Exception ex) 
+                            	{ 
+                            	// ignore
+                            	}
+                            	
                             if (d >= 0 && d <= 1)
                                 {
                                 setState(d);

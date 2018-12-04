@@ -154,10 +154,7 @@ public class AppMenu
                     Sound.savePatchDate(rack.getPatchDate(), obj);
 
                     PrintWriter p = null;
-                    FileOutputStream os = null;
-                    try
-                        {
-                        os = new FileOutputStream(file);
+
                         rack.output.lock();
                         try
                             {
@@ -177,11 +174,6 @@ public class AppMenu
                             {
                             rack.output.unlock();
                             }
-                        }
-                    catch (FileNotFoundException ex)
-                        {
-                        ex.printStackTrace();
-                        }
                     }
                 else
                     {
@@ -239,10 +231,9 @@ public class AppMenu
         rack.enableMenuBar();
                 
         File f = null; // make compiler happy
-        FileOutputStream os = null;
+
         PrintWriter p = null;
         if (fd.getFile() != null)
-            try
                 {
                 f = new File(fd.getDirectory(), ensureFileEndsWith(fd.getFile(), PATCH_EXTENSION));
                 
@@ -255,13 +246,13 @@ public class AppMenu
                 Sound.savePatchInfo(rack.getPatchInfo(), obj);
                 Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
                 Sound.saveFlowVersion(obj);
-                os = new FileOutputStream(f);
+
                 rack.output.lock();
                 try
                     {
                     rack.output.getSound(0).saveModules(obj);
                     p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(f)));
-                    System.out.println(obj);
+                    System.err.println(obj);
                     p.println(obj);
                     p.flush();
                     p.close();
@@ -279,10 +270,6 @@ public class AppMenu
                 file = f;
                 dirFile = f;
                 rack.setPatchName(removeExtension(f.getName()));
-                }
-            catch (FileNotFoundException ex)
-                {
-                ex.printStackTrace();
                 }
         }
 
@@ -360,10 +347,13 @@ public class AppMenu
                                                                                                 
                             // Create and update Modulations and create ModulePanels
                             load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
-                            rack.setPatchVersion(Sound.loadPatchVersion(obj));
-                            rack.setPatchInfo(Sound.loadPatchInfo(obj));
-                            rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
-                            rack.setPatchDate(Sound.loadPatchDate(obj));
+                            if (obj != null)
+                            	{
+                            	rack.setPatchVersion(Sound.loadPatchVersion(obj));
+                            	rack.setPatchInfo(Sound.loadPatchInfo(obj));
+                            	rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
+                            	rack.setPatchDate(Sound.loadPatchDate(obj));
+                            	}
                             rack.checkOrder();
                             }
                         finally 

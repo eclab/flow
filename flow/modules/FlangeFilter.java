@@ -169,6 +169,11 @@ public class FlangeFilter extends Unit
                     else
                         gain = (1 - (2 * p - 1) * (2 * p - 1) * (2 * p - 1)) / 2;
                     }
+                default:
+                	{
+                	System.err.println("WARNING(modules/FlangeFilter.java): default occurred when it shouldn't be possible");
+                	break;
+                	}
                 }
 
             // Gain is right now 0...1.  We need to make it 0...2 centered at 1 with a variable modulation

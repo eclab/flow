@@ -55,7 +55,7 @@ public class Sound
     // The current note release velocity
     volatile double releaseVelocity = DEFAULT_RELEASE_VELOCITY;
     // Current cc values
-    volatile byte[] cc = new byte[128];
+    byte[] cc = new byte[128];
     // The channel assigned to this Sound.  Normally this should be exactly the same as
     // Input.channel, but MPE will assign this specially.  We'll assign this during
     // voice allocation in Input.java 
@@ -142,9 +142,9 @@ public class Sound
     public double getNote() { return note; }
     
     /** Sets the current value for a given CC */
-    public void setCC(int num, int val) { cc[num] = (byte)val; }
+    public void setCC(int num, int val) { synchronized(cc) { cc[num] = (byte)val; } }
     /** Returns the current value for a given CC */
-    public int getCC(int num) { return cc[num]; }
+    public int getCC(int num) { synchronized(cc) { return cc[num]; } }
         
     /** Sets the Aftertouch (0.0 ... 1.0)*/
     public void setAftertouch(double val) { aftertouch = val; }

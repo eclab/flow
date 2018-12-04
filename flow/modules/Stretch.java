@@ -76,7 +76,7 @@ public class Stretch extends Unit
         { 
         switch(option)
             {
-            case OPTION_STYLE: setStyle(value);
+            case OPTION_STYLE: setStyle(value); return;
             case OPTION_TARGET: setTarget(value); return;
             default: throw new RuntimeException("No such option " + option);
             }
@@ -141,6 +141,11 @@ public class Stretch extends Unit
                 case STYLE_X_TIMES_X_TIMES_X_LOCKED: case STYLE_X_TIMES_X_TIMES_X_FREE:
                     m = m * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS)));
                     break;
+                default: // never happens
+                	{
+                	System.err.println("WARNING(modules/Stretch.java): default should never occur");
+                	break;
+                	}
                 }
             if (locked)
                 {

@@ -78,7 +78,7 @@ public class Delay extends Unit
         super.go();
                 
         double[] amplitudes = getAmplitudes(0);
-        double[] frequencies = getFrequencies(0);
+
                 
         double wet = modulate(MOD_WET);
         int initialDelay = (int)(makeSensitive(modulate(MOD_INITIAL_DELAY)) * MAX_INITIAL_DELAY_LENGTH) + 1;  // so we can't have zero

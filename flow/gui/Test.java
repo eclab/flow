@@ -25,9 +25,6 @@ public class Test
 
         Output output = new Output();
 
-
-        double samples = Output.SAMPLING_RATE * LENGTH;
-        double increment = 1.0 / samples;
         Sound[] sounds = new Sound[Output.getNumVoices()];
 
 

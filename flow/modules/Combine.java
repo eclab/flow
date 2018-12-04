@@ -96,7 +96,7 @@ public class Combine extends Unit
 		// To do this we need some arrays, and we'll have to allocate them every time or otherwise
 		// zero them out.  This allows us to avoid doing sorts, yay.
 		boolean[] filledOrders = new boolean[amplitudes.length];  // all false
-		boolean[] assignedPositions = new boolean[amplitudes.length];  // all false
+
         if (outstandingOrders == null) outstandingOrders = new int[amplitudes.length];
         if (outstandingOrderPositions == null) outstandingOrderPositions = new int[amplitudes.length];
                 

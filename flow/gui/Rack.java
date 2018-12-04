@@ -153,7 +153,7 @@ public class Rack extends JPanel
         patchName = val; 
         String p = patchName;
         if (p == null) p = "Untitled";
-        Object frame = ((JFrame)(SwingUtilities.getWindowAncestor(this)));
+        Object frame = SwingUtilities.getWindowAncestor(this);
         if (frame != null && frame instanceof JFrame)
             {
             ((JFrame) frame).setTitle(p);
@@ -768,7 +768,7 @@ public class Rack extends JPanel
         
         Mixer.Info[] mixers = output.getSupportedMixers();
         String[] mixerNames = new String[mixers.length];
-        Mixer.Info mixer = output.getMixer();
+
         for(int i = 0; i < mixers.length; i++)
             {
             mixerNames[i] = mixers[i].getName();

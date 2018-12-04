@@ -473,21 +473,21 @@ public class Display extends JComponent
                 Unit unit = getUnit(sound);
                 if (unit != null)
                     {
-                    amplitudes = unit.getAmplitudes(0);
+ 
                     frequencies = unit.getFrequencies(0);
-                    }
                                                         
-                // what's the closest partial?  Not sure if binary search is useful here
-                // since we only have 256 or so partials, so we just do an O(n) scan
-                int partial = frequencies.length - 1;
-                for(int i = 0; i < frequencies.length - 1; i++)
-                    {
-                    if (x >= frequencies[i] && x <= frequencies[i + 1])
-                        {
-                        if (Math.abs(x - frequencies[i]) < Math.abs(x - frequencies[i + 1]))
-                            { updatePartial(i, y, continuation); break; }
-                        else { updatePartial(i + 1, y, continuation); break; }
-                        }
+					// what's the closest partial?  Not sure if binary search is useful here
+					// since we only have 256 or so partials, so we just do an O(n) scan
+
+					for(int i = 0; i < frequencies.length - 1; i++)
+						{
+						if (x >= frequencies[i] && x <= frequencies[i + 1])
+							{
+							if (Math.abs(x - frequencies[i]) < Math.abs(x - frequencies[i + 1]))
+								{ updatePartial(i, y, continuation); break; }
+							else { updatePartial(i + 1, y, continuation); break; }
+							}
+						}
                     }
                 }
             updatePitch(e); 

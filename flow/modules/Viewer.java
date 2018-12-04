@@ -27,7 +27,7 @@ public class Viewer extends Unit
     {
     private static final long serialVersionUID = 1;
 
-    int q = 0;
+
         
     JLabel[] label = new JLabel[8];
     JSlider[] slider = new JSlider[8];

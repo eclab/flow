@@ -73,7 +73,7 @@ public class KHarmonics extends Unit implements UnitSource
         if (done) return;
         done = true;
         
-        Scanner scan = new Scanner(Harmonics.class.getResourceAsStream("waves/kharmonics.out"));
+        Scanner scan = new Scanner(Harmonics.class.getResourceAsStream("waves/kharmonics.out"), "US-ASCII");
         for(int i = 0; i < 484; i++)
             {
             NAMES[i] = scan.nextLine();
