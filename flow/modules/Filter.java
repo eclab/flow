@@ -25,7 +25,8 @@ public class Filter extends Unit
     public static final int TYPE_HP = 1;
     public static final int TYPE_BP = 2;
     public static final int TYPE_NOTCH = 3;
-    
+
+	public static final double MIDDLE_C_FREQUENCY = 261.6256;    
     public static final double INVERSE_SQRT_2 = 1.0 / Math.sqrt(2.0);
     public static final double MINIMUM_FREQUENCY = 0.000001;  // seems reasonable
     
@@ -33,7 +34,7 @@ public class Filter extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineOptions(new String[] { "4-Pole" }, new String[][] { { "4-Pole"} });
+        defineOptions(new String[] { "4-Pole" , "Relative" }, new String[][] { { "4-Pole"} , {"Relative"}});
         defineModulations(new Constant[] { Constant.ONE, Constant.HALF, Constant.ZERO }, new String[] { "Cutoff", "State", "Resonance" });
         }
 
@@ -41,13 +42,19 @@ public class Filter extends Unit
 	public boolean get4Pole() { return pole4; }
 	public void set4Pole(boolean val) { pole4 = val; }
 	
+	boolean relative = false;
+	public boolean getRelative() { return relative; }
+	public void setRelative(boolean val) { relative = val; }
+	
     public static final int OPTION_4POLE = 0;
+    public static final int OPTION_RELATIVE = 1;
 
     public int getOptionValue(int option) 
         { 
         switch(option)
             {
             case OPTION_4POLE: return get4Pole() ? 1 : 0;
+            case OPTION_RELATIVE: return getRelative() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -57,6 +64,7 @@ public class Filter extends Unit
         switch(option)
             {
             case OPTION_4POLE: set4Pole(value != 0); return;
+            case OPTION_RELATIVE: setRelative(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -153,6 +161,12 @@ public class Filter extends Unit
                 
         double cutoff = modToFrequency(makeVeryInsensitive(modulate(MOD_CUTOFF))); // Note that this is in angular frequency, but we don't divide by 2 PI to get Hertz because that's done at the end of the day when we add up the sine waves
         if (cutoff < MINIMUM_FREQUENCY) cutoff = MINIMUM_FREQUENCY;  // so we're never 0
+        
+        if (relative)
+        	{
+        	cutoff = cutoff / MIDDLE_C_FREQUENCY * pitch;
+        	}
+        	
         double state = modulate(MOD_STATE);    	
         double resonance = INVERSE_SQRT_2 * Utility.fastpow(10, modulate(MOD_RESONANCE));
         boolean pole4 = get4Pole();

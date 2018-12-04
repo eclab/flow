@@ -29,6 +29,7 @@ public class LinearFilter extends Unit
 
     public int MAX_NODES = 8;
     public double MAX_BASE_FREQUENCY = Output.SAMPLING_RATE / 20.0;
+	public static final double MIDDLE_C_FREQUENCY = 261.6256;    
         
     double[] nodeGain = new double[MAX_NODES];
     double[] nodeFreq = new double[MAX_NODES];
@@ -46,7 +47,8 @@ public class LinearFilter extends Unit
         super(sound);
                 
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations( new Constant[] { Constant.ONE, Constant.ZERO,
+        defineOptions(new String[] {"Relative" }, new String[][] {{"Relative"}});
+        defineModulations( new Constant[] { Constant.ONE, Constant.HALF,
                                             Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO,
                                             Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE }, 
             new String[] { "Nodes", 
@@ -75,6 +77,30 @@ public class LinearFilter extends Unit
                 }
         }
 
+	boolean relative = false;
+	public boolean getRelative() { return relative; }
+	public void setRelative(boolean val) { relative = val; }
+	
+    public static final int OPTION_RELATIVE = 0;
+
+    public int getOptionValue(int option) 
+        { 
+        switch(option)
+            {
+            case OPTION_RELATIVE: return getRelative() ? 1 : 0;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+                
+    public void setOptionValue(int option, int value)
+        { 
+        switch(option)
+            {
+            case OPTION_RELATIVE: setRelative(value != 0); return;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+
     public void go()
         {
         super.go();
@@ -85,6 +111,12 @@ public class LinearFilter extends Unit
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
         double pitch = sound.getPitch();
+
+        if (relative)
+        	{
+        	pitch = MIDDLE_C_FREQUENCY;
+        	}
+        	
         
         int numNodes = (int)(modulate(MOD_NODES) * MAX_NODES);
         int baseFreq = (int)((modulate(MOD_BASE) * 2 - 1.0) * MAX_BASE_FREQUENCY);
@@ -199,6 +231,8 @@ public class LinearFilter extends Unit
                     box2.add(new ModulationInput(unit, i + 2 + MAX_NODES, this));
                     box.add(box2);
                     }
+
+				box.add(new OptionsChooser(unit, OPTION_RELATIVE));
 
                 box.add(new ConstraintsChooser(unit, this));
 

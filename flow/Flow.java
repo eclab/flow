@@ -16,7 +16,7 @@ import java.util.*;
 
 public class Flow
     {
-    public static int VERSION = 1;
+    public static int VERSION = 2;
     
     public static int LENGTH = 1;
 

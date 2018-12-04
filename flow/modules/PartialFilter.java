@@ -16,9 +16,9 @@ import flow.gui.*;
    filter partials amplitudes.  Partials less than the minimum filter partial or greater than the maximum filter
    partial are simply filtered using those partials
    
-   <p>The filter partials can be FIXED or not.  If the partials are NOT FIXED, then the frequencies they
+   <p>The filter partials can be RELATIVE or not.  If the partials are RELATIVE, then the frequencies they
    filter are the standard frequencies of the partials (mutiplied as usual against the current pitch).  Thus
-   as the note changes so do the filter frequencies.  If the partials are FIXED, then their frequencies do not
+   as the note changes so do the filter frequencies.  If the partials are NOT RELATIVE, then their frequencies do not
    change with the pitch: specifically, a partial of partial-frequency 1.0 (typically the fundamental is this
    partial-frequency) is set to a filter frequency of 0Hz.  A partial of partial-frequency 2.0 is set to a 
    filter frequency of 100Hz.  A partial of partial-frequency 3.0 is set to a frequency of 200Hz, and so on,
@@ -41,23 +41,21 @@ public class PartialFilter extends Unit
         
     public static String getName() { return "Partial Filter"; }
 
-    boolean fixed;
-    public boolean isFixed() { return fixed; }
-    public void setFixed(boolean val) { fixed = val; }
+	public static final int FREQ_RELATIVE = 0;
+	public static final int FREQ_FIXED = 1;
+	public static final int FREQ_DOUBLE = 2;
 
-    boolean _double;
-    public boolean getDouble() { return _double; }
-    public void setDouble(boolean val) { _double = val; }
-
-    public static final int OPTION_FIXED = 0;
-    public static final int OPTION_DOUBLE = 1;
+	int freq = FREQ_RELATIVE;
+	public int getFreq() { return freq; }
+	public void setFreq(int val) { freq = val; }
+	
+    public static final int OPTION_FREQ = 0;
     
     public int getOptionValue(int option) 
         { 
         switch(option)
             {
-            case OPTION_FIXED: return isFixed() ? 1 : 0;
-            case OPTION_DOUBLE: return getDouble() ? 1 : 0;
+            case OPTION_FREQ: return getFreq();
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -66,8 +64,7 @@ public class PartialFilter extends Unit
         { 
         switch(option)
             {
-            case OPTION_FIXED: setFixed(value != 0); return;
-            case OPTION_DOUBLE: setDouble(value != 0); return;
+            case OPTION_FREQ: setFreq(value); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -77,7 +74,7 @@ public class PartialFilter extends Unit
         super(sound);
                 
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL }, new String[] { "Input", "Partials" });
-        defineOptions( new String[] { "Fixed", "Double" }, new String[][] { { "Fixed" }, { "Double" } });
+        defineOptions( new String[] { "Frequencies" }, new String[][] { { "Relative", "Fixed", "Double" } });
         }
     
     public void go()
@@ -92,9 +89,20 @@ public class PartialFilter extends Unit
         double[] nodeFreq = getFrequenciesIn(UNIT_PARTIALS);
         double[] nodeGain = getAmplitudesIn(UNIT_PARTIALS);
         
-        double pitch = sound.getPitch();
-        double scale = (_double ? 200.0 : 100.0);               // each frequency integer represents 100HZ or 200Hz
-        if (!fixed) { scale = 1.0; pitch = 1.0; }
+        // default values for FREQ_RELATIVE
+        double pitch = 1.0;
+        double scale = 1.0;
+        
+        if (freq == FREQ_FIXED)
+        	{
+        	pitch = sound.getPitch();
+        	scale = 100.0;				// 100Hz per frequency integer
+        	}
+        else if (freq == FREQ_DOUBLE)
+        	{
+         	pitch = sound.getPitch();
+        	scale = 200.0;				// 200Hz per frequency integer
+	       	}
         
         int node = 0;
         for(int i = 0; i < amplitudes.length; i++)
