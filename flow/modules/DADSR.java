@@ -349,7 +349,6 @@ public class DADSR extends Modulation implements ModSource
             }
         double levels = (1 - alpha) * firstLevel + alpha * level[state];
         setModulationOutput(0, levels);
-        System.err.println(state);
         }
     
 
