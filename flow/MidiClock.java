@@ -226,7 +226,7 @@ public class MidiClock
                 smoothedMidiTickTarget = (1 - MIDI_TICK_ALPHA) * smoothedMidiTickTarget + MIDI_TICK_ALPHA * midiTickTarget;
             else if (midiTickTarget < smoothedMidiTickTarget - BIG_CHANGE) // big drop in value
                 {
-                System.err.println("MidiClock locked to: " + (smoothedMidiTickTarget - midiTickTarget));
+                System.err.println("WARNING(MidiClock.java): Clock locked to " + (smoothedMidiTickTarget - midiTickTarget));
                 // lock it
                 smoothedMidiTickTarget = midiTickTarget;
                 }

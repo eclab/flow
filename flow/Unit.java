@@ -1343,7 +1343,6 @@ public class Unit extends Modulation
             JSONObject m = inputs.optJSONObject(getKeyForInput(i));
             if (m == null)
                 {
-                //System.err.println("WARNING: Could not load unit " + getKeyForInput(i) + " in " + this);
                 setInput(Unit.NIL, i, 0);
                 }
             else if (m.optString("id") == null || m.getString("id").equals("null"))

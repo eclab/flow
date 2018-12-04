@@ -111,12 +111,10 @@ public class Midi
         try
             {
             midiDevices = uk.co.xfactorylibrarians.coremidi4j.CoreMidiDeviceProvider.getMidiDeviceInfo();
-            //System.err.println("Loaded CoreMIDI4J.");
             }
         catch (Exception ex)
             {
             midiDevices = MidiSystem.getMidiDeviceInfo();
-            //System.err.println("Couldn't load CoreMIDI4J.  Falling back on standard Java Midi.");
             }
 
         ArrayList allDevices = new ArrayList();
@@ -619,7 +617,7 @@ public class Midi
         public CCData handleNRPN(int channel, int controllerNumber, int _controllerValueLSB, int _controllerValueMSB, boolean validLSB, boolean validMSB)
             {
             if (_controllerValueLSB < 0 || _controllerValueMSB < 0)
-                System.err.println("WARNING, LSB or MSB < 0.  RPN: " + controllerNumber + "   LSB: " + _controllerValueLSB + "  MSB: " + _controllerValueMSB);
+                System.err.println("WARNING(Midi.java): LSB or MSB < 0.  RPN: " + controllerNumber + "   LSB: " + _controllerValueLSB + "  MSB: " + _controllerValueMSB);
             CCData data =  new CCData(CCData.TYPE_NRPN, controllerNumber, _controllerValueLSB | (_controllerValueMSB << 7), channel, false);
             data.validMSB = validMSB;
             data.validLSB = validLSB;
@@ -636,7 +634,7 @@ public class Midi
         public CCData handleRPN(int channel, int controllerNumber, int _controllerValueLSB, int _controllerValueMSB, boolean validLSB, boolean validMSB)
             {
             if (_controllerValueLSB < 0 || _controllerValueMSB < 0)
-                System.err.println("WARNING, LSB or MSB < 0.  RPN: " + controllerNumber + "   LSB: " + _controllerValueLSB + "  MSB: " + _controllerValueMSB);
+                System.err.println("WARNING(Midi.java): LSB or MSB < 0.  RPN: " + controllerNumber + "   LSB: " + _controllerValueLSB + "  MSB: " + _controllerValueMSB);
             CCData data =  new CCData(CCData.TYPE_RPN, controllerNumber, _controllerValueLSB | (_controllerValueMSB << 7), channel, false);
             data.validMSB = validMSB;
             data.validLSB = validLSB;

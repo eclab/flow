@@ -112,15 +112,18 @@ public class Output
     // The current number of voices spawned so far.  This increases as sounds register themselves.
     // This is will be threadsafe even though we increment it with ++ because that's only done in one thread.
     volatile int numSounds = 0;   
-            
-    public Output()
-        {
+    
+    static
+    	{
         // Load preferences
         numVoices = Prefs.getLastNumVoices();
         numVoicesPerThread = Prefs.getLastNumVoicesPerThread();
         bufferSize = Prefs.getLastBufferSize();
-        //skip = Prefs.getLastSkip();
-                
+        //skip = Prefs.getLastSkip();   
+    	}
+    	
+    public Output()
+        {
         // We do NOT set this here because it confuse people doing Output programmatically.
         // Instead, we set it in AppMenu.playFirstMenu()
         // onlyPlayFirstSound = Prefs.getLastOneVoice();
@@ -179,7 +182,6 @@ public class Output
             sdl.open(audioFormat, bufferSize);
             sdl.start();
             this.mixer = mixer;
-            //System.err.println("Setting Mixer to " + this.mixer.getName());
             }
         catch (LineUnavailableException ex) { throw new RuntimeException(ex); }
         }
@@ -195,7 +197,6 @@ public class Output
             Mixer m = AudioSystem.getMixer(info[i]);
             if (m.isLineSupported(lineInfo)) 
                 {
-                //System.err.println("Supported: " + m.getMixerInfo());
                 count++;
                 }
             }
@@ -288,10 +289,7 @@ public class Output
     */
     public void lock() 
         { 
-//      System.err.println("?" + Thread.currentThread());
         soundLock.lock(); 
-//      System.err.println("+ " + Thread.currentThread() + " " + soundLock.getHoldCount());
-//      new Throwable().printStackTrace();
         }
     
     
@@ -318,8 +316,6 @@ public class Output
     public void unlock() 
         {
         soundLock.unlock();
-//      System.err.println("- " + Thread.currentThread() + " " + soundLock.getHoldCount());
-//      new Throwable().printStackTrace();
         }
         
     // Sounds register themselves with the Output using this method.
@@ -634,7 +630,7 @@ public class Output
                 {
                 /// The last amplitudes (used for interpolation between the past partials and new ones)
                 /// Note that these are indexed by ORDER, not by actual index position
-                double[][] currentAmplitudes = new double[numVoices][Unit.NUM_PARTIALS];
+                final double[][] currentAmplitudes = new double[numVoices][Unit.NUM_PARTIALS];
   
                 lightweightOutputSemaphores = new boolean[MAX_VOICES];
                 outputLocks = new Object[MAX_VOICES];
@@ -685,7 +681,6 @@ public class Output
                     if (available >= bufferSize - 128)
                         {
                         glitched = true;
-                        //System.err.println("Glitch " + available);
                         }
                         
                     if (samples.length != getNumSounds())
@@ -901,8 +896,8 @@ public class Output
     int totalPartialsCount;
     int totalPartialsTicks;
     int totalPartialsWaits;
-    volatile int totalOutputTicks;
-    volatile int totalOutputWaits;
+	int totalOutputTicks;
+ 	int totalOutputWaits;
 
     static final int NUM_TICKS_PER_PRINT = 1024 * 5;
     int avgTimeTick = 0;

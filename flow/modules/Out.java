@@ -291,7 +291,7 @@ public class Out extends Unit
     public void setData(JSONObject data, int moduleVersion, int patchVersion) 
     	{
     	if (data == null)
-    		System.err.println("Empty Data for Out.  That can't be right.  Old patch?");
+    		System.err.println("WARNING(flow/modules/Out.java): Empty Data for Out.  That can't be right.  Old patch?");
     	else
     		{
     		JSONArray array = data.getJSONArray("mod");

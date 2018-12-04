@@ -166,7 +166,6 @@ public class Seq extends Modulation
             	{
             	state = (int)(modulate(MOD_TRIGGER) * maxState);
             	if (state == maxState) state--;
-            	System.err.println(state);
             	}
             else
             	{

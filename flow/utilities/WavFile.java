@@ -254,7 +254,8 @@ public class WavFile
                 // Account for number of format bytes and then skip over
                 // any extra format bytes
                 numChunkBytes -= 16;
-                if (numChunkBytes > 0) wavFile.iStream.skip(numChunkBytes);
+                if (numChunkBytes > 0) 
+                	wavFile.iStream.skip(numChunkBytes);	// result ignored
                 }
             else if (chunkID == DATA_CHUNK_ID)
                 {
@@ -696,11 +697,11 @@ public class WavFile
 
     public void display(PrintStream out)
         {
-        out.printf("File: %s\n", file);
-        out.printf("Channels: %d, Frames: %d\n", numChannels, numFrames);
-        out.printf("IO State: %s\n", ioState);
-        out.printf("Sample Rate: %d, Block Align: %d\n", sampleRate, blockAlign);
-        out.printf("Valid Bits: %d, Bytes per sample: %d\n", validBits, bytesPerSample);
+        out.printf("File: %s%n", file);
+        out.printf("Channels: %d, Frames: %d%n", numChannels, numFrames);
+        out.printf("IO State: %s%n", ioState);
+        out.printf("Sample Rate: %d, Block Align: %d%n", sampleRate, blockAlign);
+        out.printf("Valid Bits: %d, Bytes per sample: %d%n", validBits, bytesPerSample);
         }
 
     public static void main(String[] args)
@@ -738,7 +739,7 @@ public class WavFile
                     {
                     framesRead = readWavFile.readFrames(buffer, BUF_SIZE);
                     framesWritten = writeWavFile.writeFrames(buffer, BUF_SIZE);
-                    System.out.printf("%d %d\n", framesRead, framesWritten);
+                    System.out.printf("%d %d%n", framesRead, framesWritten);
                     }
                 while (framesRead != 0);
                                 

@@ -164,7 +164,7 @@ public class In extends Unit
     public void setData(JSONObject data, int moduleVersion, int patchVersion) 
     	{
     	if (data == null)
-    		System.err.println("Empty Data for in.  That can't be right.");
+    		System.err.println("WARNING(flow/modules/In.java): Empty Data for In.  That can't be right.");
     	else
     		{
     		JSONArray array = data.getJSONArray("mod");

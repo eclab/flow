@@ -132,7 +132,6 @@ public class Input
             }
         currentWrapper = mididevicewrapper;
         midi.setInReceiver(mididevicewrapper);
-        //        System.err.println("Setting MIDI to " + mididevicewrapper + " at Channel " + (channel == CHANNEL_OMNI ? "Omni" : (channel + 1)));
         }
 
     private void setupMPEArray() 
@@ -378,7 +377,7 @@ public class Input
 
             if (sound == null)
                 {
-                System.err.println("Couldn't find the sound to turn off!!!");
+                System.err.println("WARNING(Input.java): Couldn't find the sound to turn off!!!");
                 }
             else
                 {

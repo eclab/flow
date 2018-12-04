@@ -33,7 +33,7 @@ public class Modules
 		
     // A list of all the modules in the system which can appear in the
     // Modules menu.
-    static final Class[] modules = new Class[]
+    public static final Class[] modules = new Class[]
     {
     flow.modules.All.class,
     flow.modules.AmpMath.class,

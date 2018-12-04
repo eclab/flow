@@ -859,7 +859,7 @@ public abstract class Modulation implements Cloneable
             int val = options.optInt(getKeyForOption(i), -1);
             if (val == -1)
                 {
-                System.err.println("WARNING: Could not load option " + getKeyForOption(i) + " in " + this);
+                System.err.println("WARNING(Modulation.java): Could not load option " + getKeyForOption(i) + " in " + this);
                 }
             else
                 {
@@ -884,7 +884,6 @@ public abstract class Modulation implements Cloneable
                 if (m == null)
                     {
                     // probably a Macro
-                    //System.err.println("WARNING: Could not load modulation " + getKeyForModulation(i) + " in " + this);
                 	setModulation(new Constant(0), i);
                     }
                 else

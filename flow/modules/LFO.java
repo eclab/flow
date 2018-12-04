@@ -353,17 +353,6 @@ public class LFO extends Modulation implements ModSource
         lastState = state;
 
         
-        /*
-          count++;
-          Output o = sound.getOutput();
-          if (count > 1000 && sound == o.getSoundUnsafe(0))
-          {        
-          System.err.println(sound + " " + (currentTick - countTick));
-          countTick = currentTick;
-          count = 0;      
-          }
-        */
-                        
         // Okay here we go
         double output = 0;
         switch (type)
