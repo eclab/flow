@@ -47,7 +47,7 @@
 
 \noindent {\Huge\bf {\name}}\\[0.5em]
 {\large \bf An Open-source Fully Modular Additive Synthesizer\\[0.2em]
-Version 1\\[0.2em]
+Version 2\\[0.2em]
 https://github.com/eclab/flow\\\\[0.2em]
 By Sean Luke\\[0.2em]
 Department of Computer Science\\[0.25em]
@@ -607,6 +607,8 @@ You have the option of normalizing the resulting partials.
 
 \paragraph{Filter}  This is a resonant state-variable 2- or 4-pole filter. You can sweep through High Pass (at 0.0) to Notch (at 0.25) to Low Pass (the default, at 0.5), to Band Pass (at 0.75) and finally to High Pass again (at~1.0).  Resonance values currently range from no resonance (that is resonance \(Q=\frac{1}{\sqrt{2}}\)) at 0.0 to ten times that amount (\(Q =\frac{10}{\sqrt{2}}\))  at 1.0.  And you can, of course, set the cutoff frequency.
 
+Filter can be set to be {\it Relative}.  This means that the filter cutoff frequency is set to be relative to Middle C.  If you're playing a higher note, the cutoff frequency will automatically be set higher to match; similarly if you're playing a lower note, the cutoff frequency will be automatically lower.
+
 %\begin{figure}[t]
 %\begin{center}\includegraphics[width=6in]{UnitShapers2}\end{center}
 %\caption{Partials Shapers (2)}
@@ -617,7 +619,9 @@ You have the option of normalizing the resulting partials.
 
 \paragraph{Shift} This shifts all the partials in your input in a certain way.  {\it Shift} specifies by how much (this is easily modulated), and {\it Bound} scales the shifting.  There are three ways you can shift.  First you can shift the {\it Pitch}: this is essentially multiplying the partials by a certain amount.  Second, you can shift the {\it Frequency}: this {\it adds} a certain amount to the partials, which creates an inharmonic shift effect.  Third, you can shift the {\it Partials}: this shifts the whole partial amplitude array up or down.  See also {\bf Seq}.
 
-\paragraph{Linear Filter} This is a filter where you can specify up to 8 nodes (points of change) in terms of frequency and gain.  The filter then just draws lines attaching the nodes, and this becomes the filter frequency function.  Nodes are always sorted first by frequency.  {\it Num Nodes} is the number of nodes being used.  See also {\bf Partial Filter}.
+\paragraph{Linear Filter} This is a filter where you can specify up to 8 nodes (points of change) in terms of frequency and gain.  The filter then just draws lines attaching the nodes, and this becomes the filter frequency function.  Nodes are always sorted first by frequency.  {\it Num Nodes} is the number of nodes being used.
+
+Linear Filter can be set to be {\it Relative}.  This means that the filter cutoff frequency is set to be relative to Middle C.  If you're playing a higher note, the cutoff frequency will automatically be set higher to match; similarly if you're playing a lower note, the cutoff frequency will be automatically lower.  See also {\bf Partial Filter}.
 
 \paragraph{Jitter} You can add jitter to either the frequencies or the amplitudes (or both) of your partials.  The amount of noise is controlled by {\it Freq Var} and {\it Amp Var} respectively.  The {\it Trigger} informs the module to add noise to its current jitter configuration.  You can also specify that Jitter should {\it only} apply to non-zero partials this is useful when using Jitter along with Fill.
 
@@ -647,15 +651,15 @@ Second, normally every Partial \(i\) in the first Input is paired up with the sa
 
 Finally, if {\it Free} is set, then Morph doesn't reset to Inputs A and B every time you press a note\,---\,it keeps morphing from wherever it left off.  See also  {\bf Combine} and {\bf Fill} and {\bf Mix}.
 
-\vbox{
 \paragraph{Normalize} This {\it normalizes} the input (scales it so that the amplitudes all sum to 1.0, creating a relatively consistent volume) and/or {\it standardizes} it (sets all the frequencies to standard harmonic values).
 
-\paragraph{Partial Filter} This is a filter based on the partials of an incoming signal.  The partials form nodes in the filter, and the filter function interpolates between them.  Try drawing partials with {\bf Draw} and feeding them into Partial Filter to filter some sound to get the idea.  The partials in question can be interpreted as fixed frequencies or as frequencies in the same scale as the incoming sound (that is, they're scaled by the current pitch just like the input is).  If they're interpreted as fixed frequencies, then a partial at position 1.0 (where the fundamental normally is), or indeed \(\leq 1.0\), would represent 0Hz, a partial at 2.0 would represent 100Hz, a partial at 3.0 would represent 200Hz, and so on.  Typical standardized partials (going from 1 to 128) would thus cover 0Hz to 12.7KHz.  That may not be far enough for you; but you can easily {\it double} this scale, so 1.0 is 0Hz, 2.0 is 200Hz, etc., clear up to 128.0 being 25.4KHz.\footnote{You could have stretched this with {\bf Scale} or {\bf Shift} too of course.}
+\paragraph{Partial Filter} This is a filter based on the partials of an incoming signal.  The partials form nodes in the filter, and the filter function interpolates between them.  Try drawing partials with {\bf Draw} and feeding them into Partial Filter to filter some sound to get the idea.  
+
+Partial Filter can be set to be {\it Relative}.  When relative, the partials are simply filtering their equivalent frequencies in the incoming sound.  When {\it not} relative, then the partial frequencies are fixed as follows.  A partial at position 1.0 (where the fundamental normally is), or indeed \(\leq 1.0\), would represent 0Hz, a partial at 2.0 would represent 100Hz, a partial at 3.0 would represent 200Hz, and so on.  Typical standardized partials (going from 1 to 128) would thus cover 0Hz to 12.7KHz.  That may not be far enough for you; but you can easily {\it double} this scale, so 1.0 is 0Hz, 2.0 is 200Hz, etc., clear up to 128.0 being 25.4KHz.\footnote{You could have stretched this with {\bf Scale} or {\bf Shift} too of course.}  See also {\bf Linear Filter}.
 
 \paragraph{Pitch Shift} Pitch Shift scales the frequency of all the partials so that the sound is a higher pitch.  This is a multiplying effect, as opposed to PartialsShift, which is largely an additive effect.    {\it Shift} specifies by how much (this is easily modulated), and {\it Bound} scales the shifting.  See also {\bf Partials Shift} and  {\bf Scale}.
 
 \paragraph{Scale} This scales the frequency of all the partials but keeps the pitch the same: it ``stretches'' the partials out away from frequency 1.0, or compacts them towards it.  A {\it Scale} value of 0.5 is no scaling: larger values stretch the partials, and smaller values compact them.   See also  {\bf Pitch Shift} and  {\bf Partials Shift}.
-}
 
 \paragraph{Skeletonize} If a partial has a neighbor partial which is {\it larger} than it, then its amplitude is cut by a percentage.  The percentage is a power of the distance of the partial to the peak partial on the left or right, whichever is further.  This has the effect of stripping partials out and only leaving the locally highest partials.  {\it Cut} is the base percentage.  See also {\bf Dilate}, which is almost, but not quite the opposite concept.
 
