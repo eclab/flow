@@ -653,7 +653,7 @@ public class AppMenu
 
     static JMenuItem playFirstMenu(Rack rack)
         {
-        final JCheckBoxMenuItem playFirst = new JCheckBoxMenuItem("Play One Voice Only");
+        final JCheckBoxMenuItem playFirst = new JCheckBoxMenuItem("Monophonic");
         playFirst.setSelected(Prefs.getLastOneVoice());
         rack.getOutput().setOnlyPlayFirstSound(playFirst.isSelected());
         playFirst.addActionListener(new ActionListener()

@@ -619,6 +619,13 @@ public class Output
     // long lastTimeFoo = 0;
     // int timeCountFoo = 0;
     
+    /*
+    double filter = 0;
+    double filter2 = 0;
+    double filter3 = 0;
+    double filter4 = 0;
+    */
+    
     double samples[][] = new double[0][SKIP];
 
     // Starts the output thread.  Called from the constructor.
@@ -763,6 +770,17 @@ public class Output
 	                        d = (freeverbOutput[0][0] + freeverbOutput[1][0]) / 2; 
 	                        }
                             
+                        /*
+                        filter = (1 - 0.5) * filter + 0.5 * d;
+                        d = filter;
+                        filter2 = (1 - 0.5) * filter2 + 0.5 * d;
+                        d = filter2;
+                        filter3 = (1 - 0.5) * filter3 + 0.5 * d;
+                        d = filter3;
+                        filter4 = (1 - 0.5) * filter4 + 0.5 * d;
+                        d = filter4;
+                    	*/
+                        
                         int val = (int)(d);
                         audioBuffer[skipPos * 2 + 1] = (byte)((val >> 8) & 255);
                         audioBuffer[skipPos * 2] = (byte)(val & 255);

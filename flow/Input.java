@@ -18,6 +18,8 @@ public class Input
     MidiClock midiClock;
     Output output;
 
+	public static final int CC_SUSTAIN_PEDAL = 64;
+
     /** The value which represents OMNI for incoming MIDI channels */
     public static final int MPE_CONFIGURATION_RPN_NUMBER = 6;
     public static final int CHANNEL_NONE = -4;
@@ -79,6 +81,10 @@ public class Input
     LinkedList<Sound> notesOn = new LinkedList<Sound>();
     // List of sounds with a note-off
     LinkedList<Sound> notesOff = new LinkedList<Sound>();
+    // List of keystrokes currently held down, in order
+    LinkedList<Integer>notesOnMono = new LinkedList<Integer>();
+
+	boolean sustain = false;
 
     /** returns true if we are in MPE mode **/
     public boolean isMPE() { return channel == CHANNEL_LOWER_ZONE  || channel == CHANNEL_UPPER_ZONE; }
@@ -207,7 +213,8 @@ public class Input
     void processCC(ShortMessage sm)
         {
         Midi.CCData ccdata = midi.getParser().processCC(sm, false, false);
-        if(ccdata == null){
+        if(ccdata == null)
+        {
             return;
             }
         if (ccdata.type == Midi.CCData.TYPE_RAW_CC)
@@ -242,7 +249,16 @@ public class Input
                             sound.setCC(ccdata.number, ccdata.value);
                             }
                         }
-                    }
+
+					// We'll handle the sustain pedal for both MPE and standard.
+					// Should MPE support sustain globally?  Maybe?
+
+					if (ccdata.number == CC_SUSTAIN_PEDAL)
+						{
+						sustain = (ccdata.value >= 64);
+						}
+
+                    }            
                 }
             finally
                 {
@@ -305,6 +321,7 @@ public class Input
                     sound.release();
                     notesOff.add(sound);
                     }
+                notesOnMono.clear();
                 }
             finally
                 {
@@ -316,16 +333,22 @@ public class Input
     // Processes a NOTE ON message.
     void processNoteOn(ShortMessage sm)
         {
+        boolean noteCurrentlyOn = false;
+
         Sound sound = null; 
+        int i = sm.getData1();
         synchronized(lock)
             {
             if (output.getOnlyPlayFirstSound())
                 {
+                notesOnMono.add(Integer.valueOf(i));
                 sound = output.getSoundUnsafe(0);  // I think I can do this because they're not changing at this point
+                
                 // Find Sound 0 and remove it from wherever it is
                 if (!notesOff.remove(sound))
                     {
                     notesOn.remove(sound);
+                    noteCurrentlyOn = true;
                     }
                 }
             else if (notesOff.isEmpty())
@@ -338,7 +361,7 @@ public class Input
                 }
             notesOn.addFirst(sound);
             }
-        int i = sm.getData1();
+            
         double d = Math.pow(2.0, (double)(i - 69) / 12.0) * 440.0;
 
         output.lock();
@@ -349,7 +372,7 @@ public class Input
             sound.setMIDINote(i);
             sound.setVelocity((double)sm.getData2() / 127.0);
             sound.setBend(globalBend);
-            sound.gate();
+            if (!noteCurrentlyOn) sound.gate();
             lastSound = sound;
             }
         finally
@@ -365,6 +388,7 @@ public class Input
         int i = sm.getData1();
         synchronized(lock)
             {
+            notesOnMono.remove(Integer.valueOf(i));
             Iterator iterator = notesOn.iterator();
             while (true)
                 {
@@ -374,26 +398,47 @@ public class Input
                 sound = sound1;
                 break;
                 }
-
-            if (sound == null)
-                {
-                System.err.println("WARNING(Input.java): Couldn't find the sound to turn off!!!");
-                }
-            else
-                {
-                output.lock();
+            
+            output.lock();
                 try
                     {
-                    sound.release();
-                    sound.setReleaseVelocity((double)sm.getData2() / 127.0);
-                    }
-                finally
-                    {
-                    output.unlock();
-                    }
-                notesOn.remove(sound);
-                notesOff.addFirst(sound);
-                }
+                    boolean monoIsEmpty = notesOnMono.isEmpty();
+                    boolean onlyPlayFirstSound = output.getOnlyPlayFirstSound();
+					if (sound == null)
+						{
+						//System.err.println("WARNING(Input.java): Couldn't find the sound to turn off!!!");
+						}
+					else
+						{
+						if (!onlyPlayFirstSound || monoIsEmpty)		// release our sound
+							{
+							if (!sustain)
+								{
+								sound.release();
+								notesOn.remove(sound);
+								notesOff.addFirst(sound);
+								}
+							}
+						else		// just reassign the sound
+							{
+							int j = i;
+							i = notesOnMono.getLast().intValue();
+							double d = Math.pow(2.0, (double)(i - 69) / 12.0) * 440.0;
+            				sound.setChannel(sm.getChannel());
+							sound.setNote(d);
+							sound.setMIDINote(i);
+							}
+
+						// either way, let's set the release velocity
+						sound.setReleaseVelocity((double)sm.getData2() / 127.0);
+
+						lastSound = sound;
+						}
+				}
+			finally
+				{
+				output.unlock();
+				}
             }
         }
 

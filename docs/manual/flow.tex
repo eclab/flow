@@ -273,7 +273,7 @@ Oscillators don't currently display any text when you hover over them.  Maybe th
 
 \subsection{Playing Sounds}
 
-If you directly connect a partials source to your Out module, it'll start playing.  In fact, {\bf all voices} might start playing: there's nothing to stop them!  It won't sound good.   Probably at this point you're just testing your patch and want to hear just a single voice.  To do this, select the menu option {\bf Play 1 Voice Only} in the {\bf Play} menu.
+If you directly connect a partials source to your Out module, it'll start playing.  In fact, {\bf all voices} might start playing: there's nothing to stop them!  It won't sound good.   Probably at this point you're just testing your patch and want to hear just a single voice.  To do this, select the menu option {\bf Monophonic} in the {\bf Play} menu.\footnote{You might also choose {\bf Monophonic} if you'd like a monophonic synth.  Flow does {\it last note priority}, meaning that if, while playing monophonically, you hold down note A, then hold down note B, then hold down note C, then let go of C, then B will begin to sound, and if you let go of B, then A will begin to sound.}
 
 Ultimately you'll probably set things up with a {\bf VCA} (see the last entry in Section~\ref{unitshapers}) which won't play the sound unless a key is pressed and an {\bf Envelope} (typically a {\bf DADSR Envelope}: see Section~\ref{modsources}) sends the appropriate modulation signal.  That way different voices are played when you play different keys.  At this point you'll want to uncheck {\bf Play 1 Voice Only} so you can play more than one voice.
 
