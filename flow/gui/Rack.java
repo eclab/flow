@@ -129,7 +129,7 @@ public class Rack extends JPanel
             });
 
         frame.pack();
-        frame.show();
+        frame.setVisible(true);
         
         return frame;
         }
