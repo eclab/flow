@@ -427,12 +427,11 @@ public class Input
             				sound.setChannel(sm.getChannel());
 							sound.setNote(d);
 							sound.setMIDINote(i);
+							lastSound = sound;
 							}
 
 						// either way, let's set the release velocity
 						sound.setReleaseVelocity((double)sm.getData2() / 127.0);
-
-						lastSound = sound;
 						}
 				}
 			finally

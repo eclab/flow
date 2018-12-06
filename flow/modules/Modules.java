@@ -35,6 +35,7 @@ public class Modules
     // Modules menu.
     static final Class[] modules = new Class[]
     {
+    flow.modules.AHR.class,
     flow.modules.All.class,
     flow.modules.AmpMath.class,
     flow.modules.Average.class,

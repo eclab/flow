@@ -83,7 +83,6 @@ public class DADSR extends Modulation implements ModSource
     public static final int CURVE_X_4 = 2;
     public static final int CURVE_X_8 = 3;
     public static final int CURVE_JUMP = 4;
-    public static final int CURVE_WAIT = 5;
         
     public static final int MOD_DELAY_TIME = 0;
     public static final int MOD_DELAY_LEVEL = 1;
@@ -163,9 +162,11 @@ public class DADSR extends Modulation implements ModSource
     public DADSR(Sound sound)
         {
         super(sound);
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.ONE, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
             new String[] {  "Delay Time", "Delay Level", "Attack Time", "Attack Level", "Decay Time", "Sustain Level", "Release Time", "Release Level", "On Tr", "Off Tr" });
-        defineOptions(new String[] { "Curve", "One Shot", "Gate Reset", "MIDI Sync", "Quick Rel" }, new String[][] { { "Linear", "x^2", "x^4", "x^8", "Jump", "Wait" }, { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" }, { "No Release" } } );
+        defineOptions(new String[] { "Curve", "One Shot", "Gate Reset", "MIDI Sync", "Fast Release" }, 
+        			new String[][] { { "Linear", "x^2", "x^4", "x^8", "Jump" }, 
+        			{ "One Shot" }, { "Gate Reset" }, { "MIDI Sync" }, { "No Release" } } );
         setModulationOutput(0, 0);  
         }
 
@@ -335,11 +336,6 @@ public class DADSR extends Modulation implements ModSource
             case CURVE_JUMP:
                 {
                 alpha = 1.0;
-                }
-            break;
-            case CURVE_WAIT:
-                {
-                alpha = 0.0;
                 }
             break;
             default:

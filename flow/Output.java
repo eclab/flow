@@ -451,7 +451,7 @@ public class Output
     void checkAndSwap()
         {
         // notice that we're effectively spin-waiting here.  
-        totalOutputTicks++;
+//        totalOutputTicks++;
         if (emitsReady)
             {
             Swap temp = swap;
@@ -462,8 +462,8 @@ public class Output
             }
         else
             {
-            //Thread.currentThread().yield();
-            totalOutputWaits++;
+            Thread.currentThread().yield();
+//            totalOutputWaits++;
             }
         }
         
@@ -505,7 +505,7 @@ public class Output
             if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
                 
             // This was a difficult bug to nail down.  Because we're using our (1-alpha) trick, if we
-            // slowly drop to zero, we'll find our way into subnormals, it appears that subnormals are handled
+            // slowly drop to zero, we'll find our way into subnormals, and it appears that subnormals are handled
             // by Java in *software*, resulting in a radical slowdown in this region.  Subnormals show up around
             // e^-308, so here if both ca[i] or what we're dropping to is even close to subnormals,
             // we just shut ca[0] straight to 0 to skip the whole subnormal range.
@@ -912,14 +912,13 @@ public class Output
 
 
 
-    int totalPartialsTicks;
-    int totalPartialsWaits;
-	int totalOutputTicks;
- 	int totalOutputWaits;
-
-    static final int NUM_TICKS_PER_PRINT = 1024 * 5;
-    int avgTimeTick = 0;
-    long lastTime = -1;
+//    int totalPartialsTicks;
+//    int totalPartialsWaits;
+//	int totalOutputTicks;
+// 	int totalOutputWaits;
+//    static final int NUM_TICKS_PER_PRINT = 1024 * 5;
+//    int avgTimeTick = 0;
+//    long lastTime = -1;
     
     double[] zeroAmplitudes = new double[Unit.NUM_PARTIALS];
     double[] zeroFrequencies = new double[Unit.NUM_PARTIALS];
@@ -997,10 +996,10 @@ public class Output
             }
 
         // Spin-wait.  It's both faster and more efficient than a mutex in this case, but it eats up cycles
-        totalPartialsTicks++;
+//        totalPartialsTicks++;
         if (emitsReady)
             {
-            totalPartialsWaits++;
+//            totalPartialsWaits++;
             Thread.currentThread().yield();
             }
         while(emitsReady)
@@ -1047,7 +1046,7 @@ public class Output
             
         swap.count++;
         emitsReady = true;
-
+/*
         avgTimeTick++;
         if (avgTimeTick == NUM_TICKS_PER_PRINT)
             {
@@ -1064,6 +1063,6 @@ public class Output
                 lastTime = time;
                 }
             } 
-
+*/
         }       
     }
