@@ -2,7 +2,7 @@
 
 
 # Flow 
-A Polyphonic Modular Additive Synthesizer (Version 1)
+A Polyphonic Modular Additive Synthesizer (Version 2)
  
 By Sean Luke (sean@cs.gmu.edu) \
 With Help from Bryan Hoyle \
