@@ -895,8 +895,23 @@ public class Rack extends JPanel
         }       
 
 
+	public boolean doPatchDialog(String title)
+		{
+		String[] result = Rack.showPatchDialog(this, title, getPatchName(), getPatchAuthor(), getPatchDate(), getPatchVersion(), getPatchInfo());
+		if (result == null) return false;
+		else
+			{
+			setPatchName(result[0]);
+			setPatchAuthor(result[1]);
+			setPatchDate(result[2]);
+			setPatchVersion(result[3]);
+			setPatchInfo(result[4]);
+			return true; 
+			}
+		}
+
     public static final int LABEL_MAX_LENGTH = 32;
-    public static String[] showPatchDialog(JComponent root, String name, String author, String date, String version, String info)
+    public static String[] showPatchDialog(JComponent root, String title, String name, String author, String date, String version, String info)
         {
         if (name == null) name = "";
         if (author == null) author = "";
@@ -927,11 +942,11 @@ public class Rack extends JPanel
         int result = showMultiOption(root, 
             new String[] { "Patch Name", "Author", "Date", "Version", "Patch Info" }, 
             new JComponent[] { n, a, d, v, pane }, 
-            "Patch Info", null,
+            title, null,
             new String[] { "Okay", "Cancel" });
             
         if (result == 1)  // cancel
-            return new String[] { name, author, date, version, info };
+            return null;
         else
             return new String[] { n.getText(), a.getText(), d.getText(), v.getText(), i.getText() };
         }

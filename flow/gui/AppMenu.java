@@ -101,12 +101,7 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-                String[] result = Rack.showPatchDialog(rack, rack.getPatchName(), rack.getPatchAuthor(), rack.getPatchDate(), rack.getPatchVersion(), rack.getPatchInfo());
-                rack.setPatchName(result[0]);
-                rack.setPatchAuthor(result[1]);
-                rack.setPatchDate(result[2]);
-                rack.setPatchVersion(result[3]);
-                rack.setPatchInfo(result[4]);
+                rack.doPatchDialog("Patch Info");
                 }
             });
         return name;
@@ -204,6 +199,13 @@ public class AppMenu
         
     static void doSaveAs(Rack rack)
         {
+		if (rack.getPatchName() == null || rack.getPatchName().trim().equals(""))
+			{
+			if (!rack.doPatchDialog("Patch Information Prior to Saving"))
+				return;		// failed
+			}
+
+
         Modulation[] mods = new Modulation[rack.allModulePanels.size()];
         for(int i = 0; i < mods.length; i++)
             {
@@ -239,7 +241,8 @@ public class AppMenu
                 f = new File(fd.getDirectory(), ensureFileEndsWith(fd.getFile(), PATCH_EXTENSION));
                 
                 JSONObject obj = new JSONObject();
-                if (rack.getPatchName() == null)
+
+                if (rack.getPatchName() == null || rack.getPatchName().trim().equals(""))
                     Sound.saveName(removeExtension(f.getName()), obj);
                 else
                     Sound.saveName(rack.getPatchName(), obj);
@@ -361,6 +364,7 @@ public class AppMenu
                             {
                             rack.output.unlock();
                             }
+						rack.scrollToRight();
                         }
                     catch(Exception ex) { ex.printStackTrace(); showSimpleError("Patch Reading Error", "The patch could not be loaded", rack); }
                     file = f;
