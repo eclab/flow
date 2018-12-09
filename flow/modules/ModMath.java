@@ -189,7 +189,9 @@ public class ModMath extends Modulation
                     }
                 else
                     {
-                    val = ((int) Math.round((mod0 * d))) / (double)d;
+                    int f = (int)(mod0 * (d + 1));
+                    if (f > d) f = d;
+                    val = f / (double) d;
                     }
                 }
             break;
@@ -207,6 +209,7 @@ public class ModMath extends Modulation
                 {
                 val = (mod0 >= mod1 ? 1.0 : 0.0);
                 }
+            break;
             default:
             	{
             	System.err.println("WARNING(modules/ModMath.java): default occurred when it shouldn't be possible");
