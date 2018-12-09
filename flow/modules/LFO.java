@@ -365,7 +365,7 @@ public class LFO extends Modulation implements ModSource
             case RANDOM_SAMPLE_AND_HOLD: output = modulateRandom(scale, shift, wrapped, true); break;
             default: // cannot happen
             	{
-            	System.err.println("WARNING(modules/LFO.java): Impossible default in switch");
+            	warn("modules/LFO.java", "Impossible default in switch");
             	output = 0; 
             	break;
             	}

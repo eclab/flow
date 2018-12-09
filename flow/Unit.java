@@ -1352,7 +1352,16 @@ public class Unit extends Modulation
             else
                 {
                 Unit unit = (Unit)(ids.get(m.getString("id")));
-                setInput(unit, i, unit.getOutputForKey(m.getString("at")));
+                if (unit != null)
+                	{
+                	int unitOutput = unit.getOutputForKey(m.getString("at"));
+                	if (unitOutput >= 0 && unitOutput < unit.getNumOutputs())
+                		{
+		                setInput(unit, i, unitOutput);
+		                }
+		            	else warnAlways("Unit.java", "invalid unit output (" + unitOutput + ") for id " + id + " in " + this);
+					}
+				else warnAlways("Unit.java", "no unit for id " + id + " in " + this);
                 }
             }       
         }

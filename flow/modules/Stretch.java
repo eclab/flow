@@ -143,7 +143,7 @@ public class Stretch extends Unit
                     break;
                 default: // never happens
                 	{
-                	System.err.println("WARNING(modules/Stretch.java): default should never occur");
+                	warn("modules/Stretch.java", "default should never occur");
                 	break;
                 	}
                 }

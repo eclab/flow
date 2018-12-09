@@ -212,7 +212,7 @@ public class ModMath extends Modulation
             break;
             default:
             	{
-            	System.err.println("WARNING(modules/ModMath.java): default occurred when it shouldn't be possible");
+            	warn("modules/ModMath.java", "default occurred when it shouldn't be possible");
             	val = 0;
             	}
             }

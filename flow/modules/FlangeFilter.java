@@ -172,7 +172,7 @@ public class FlangeFilter extends Unit
                 break;
                 default:
                 	{
-                	System.err.println("WARNING(modules/FlangeFilter.java): default occurred when it shouldn't be possible");
+                	warn("modules/FlangeFilter.java", "default occurred when it shouldn't be possible");
                 	break;
                 	}
                 }

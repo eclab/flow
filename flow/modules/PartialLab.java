@@ -215,7 +215,7 @@ public class PartialLab extends Unit implements UnitSource
                     break;
                     default:
                     	{
-                    	System.err.println("WARNING(modules/PartialLab.java): default occurred when it shouldn't be possible");
+                    	warn("modules/PartialLab.java", "default occurred when it shouldn't be possible");
                     	break;
                     	}
                     }

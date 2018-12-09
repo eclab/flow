@@ -412,7 +412,7 @@ public class Draw extends Unit implements UnitSource
                                 }
                             default:
                             	{
-                            	System.err.println("WARNING(modules/Draw.java): default occured when it shouldn't be possible");
+                            	warn("modules/Draw.java", "default occured when it shouldn't be possible");
                             	break;
                             	}
                             }

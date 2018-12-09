@@ -142,7 +142,7 @@ public class Squish extends Unit
                     break;
                 default:
                 	{
-                	System.err.println("WARNING(modules/Squish.java): default occurred when it should not have been able to.");
+                	warn("modules/Squish.java", "default occurred when it should not have been able to.");
                 	break;
                 	}
                 }

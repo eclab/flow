@@ -685,6 +685,16 @@ public abstract class Modulation implements Cloneable
 		if (isFirstSound()) System.err.println(str);
 		}
 
+   protected void warn(String where, String what)
+   		{
+   		print("WARNING (" + where + "): " + what);
+   		}
+
+   protected void warnAlways(String where, String what)
+   		{
+   		System.err.println("WARNING (" + where + "): " + what);
+   		}
+   	         
     /** Returns the ModulePanel associated with this Modulation.  Use the default here, or override this to create your own ModulePanel. */
     public ModulePanel getPanel()
         {
@@ -859,7 +869,7 @@ public abstract class Modulation implements Cloneable
             int val = options.optInt(getKeyForOption(i), -1);
             if (val == -1)
                 {
-                System.err.println("WARNING(Modulation.java): Could not load option " + getKeyForOption(i) + " in " + this);
+                warnAlways("Modulation.java", "Could not load option " + getKeyForOption(i) + " in " + this);
                 }
             else
                 {
@@ -867,7 +877,7 @@ public abstract class Modulation implements Cloneable
                 }
             }
         }
-                
+   
     /** Loads modulation inputs from the given JSON Object representing the modulation storage. */
     public void loadModulations(JSONObject mods, HashMap<String, Modulation> ids, int moduleVersion, int patchVersion)
         {
@@ -889,7 +899,16 @@ public abstract class Modulation implements Cloneable
                 else
                     {
                     Modulation mod = ids.get(m.getString("id"));
-                    setModulation(mod, i, mod.getModulationOutputForKey(m.getString("at")));
+                    if (mod != null)
+                    	{
+                    	int modOutput = mod.getModulationOutputForKey(m.getString("at"));
+                    	if (modOutput >= 0 && modOutput < mod.getNumModulations())
+                    		{
+		                    setModulation(mod, i, modOutput);
+		                    }
+		            	else warnAlways("Modulation.java", "invalid mod output (" + modOutput + ") for id " + id + " in " + this);
+		                }
+		            else warnAlways("Modulation.java", "no modulation for id " + id + " in " + this);
                     }
                 }
             }

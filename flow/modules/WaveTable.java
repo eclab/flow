@@ -261,7 +261,8 @@ public class WaveTable extends Unit implements UnitSource
                     }
                 catch (Exception ex)
                     {
-                    System.err.println("WARNING(modules/WaveTable.java): IOException in loading file: " + ex);                    ex.printStackTrace();
+                    warnAlways("modules/WaveTable.java", "IOException in loading file: " + ex);
+                    ex.printStackTrace();
                     }
                 }
             };
