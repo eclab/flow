@@ -169,6 +169,7 @@ public class FlangeFilter extends Unit
                     else
                         gain = (1 - (2 * p - 1) * (2 * p - 1) * (2 * p - 1)) / 2;
                     }
+                break;
                 default:
                 	{
                 	System.err.println("WARNING(modules/FlangeFilter.java): default occurred when it shouldn't be possible");
