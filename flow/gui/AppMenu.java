@@ -95,6 +95,7 @@ public class AppMenu
     static JMenuItem namePatchMenu(Rack rack)
         {
         JMenuItem name = new JMenuItem("Patch Info...");
+        name.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
         name.addActionListener(new ActionListener()
             {
