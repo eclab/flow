@@ -56,8 +56,8 @@ public class Fatten extends Unit
         for(int i = frequencies.length - 1; i >= 0; i -= 2)
             {
             frequencies[i - 1] = frequencies[(i - 1)/2];
-            amplitudes[i] = amplitudes[(i - 1)/2] / 2;
-            amplitudes[i - 1] = amplitudes[(i - 1)/2] / 2;
+            amplitudes[i] = amplitudes[(i - 1)/2];
+            amplitudes[i - 1] = amplitudes[(i - 1)/2];
             }
                         
         boolean needToSort = false;

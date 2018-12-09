@@ -100,7 +100,7 @@ public class Delay extends Unit
         // next load the laterDelay
         loadpos = laterDelayPos - 1;
         if (loadpos < 0) loadpos += laterDelay;
-                
+        
         double[] d = laterDelayBuf[loadpos];
         double[] d2 = initialDelayBuf[initialDelayPos];
         for(int i = 0; i < amps.length; i++)
