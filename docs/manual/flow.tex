@@ -226,9 +226,17 @@ Though modules such as envelopes (or LFOs) already know that notes have been pla
 
 \subsection{Options and Constraints}
 
+\begin{wrapfigure}{r}{1.3in}
+\vspace{-1.2em}{\setlength\fboxsep{0in}\framebox{\includegraphics[width=1.3in]{constrain.png}}}
+\vspace{-2em}
+\caption{Constraints}
+\vspace{-1em}
+\label{constraintfacility}
+\end{wrapfigure}
+
 In addition to input and output jacks and dials, modules also sport options in the form of pop-up combobox menus and check boxes.  For example, on the LFO you can choose a wave {\it Type} (currently set to ``Sine'').  You can also click a checkbox to {\it Invert} the wave among other features.  Another checkbox option on the LFO, {\it Half Trigger}, tells it to send triggers every half of a wave rather than every full wave.
 
-Some modules are outfitted with {\bf Constraints}: for example the {\bf Filter} module has a jack called {\it Only}, a checkbox called {\it Not}, and an unlabelled combobox (presently set to ``None'').  The constraints facility allows you to constrain which partials are being modified by the module and which are just passed through unchanged.  For more information on how constraints work, see Section~\ref{unitshapers}.
+Some modules are outfitted with {\bf Constraints}: for example the {\bf Filter} module has a jack called {\it Only}, a checkbox called {\it Not}, and an unlabelled combobox (presently set to ``None'').  The constraints facility allows you to constrain which partials are being modified by the module and which are just passed through unchanged. 
 
 \subsection{Partials Displays and Oscilloscopes}
 
@@ -256,7 +264,7 @@ What this is saying is that the nearest partial to the mouse pointer (the one in
 \paragraph{Optional Display Features}
 By default, partial frequencies are displayed linearly.  You can change this to a logarithmic plot by choosing {\bf Log-Axis Display} in the {\bf Options} menu.  There are two scaling options as well.  You can instruct Flow to provide enough room to display up to some \(N\) number of harmonics to the right of the fundamental by choosing the appropriate value under {\bf Max Displayed Harmonic} in the {\bf Options} menu.  The default is 150. If you're doing a logarithmic plot (this won't affect a linear display), you can also select how much room should be provided to the left of the fundamental by selecting {\bf Min Displayed Harmonic} from the {\bf Options} menu.  The default is 1/16.
 
-Displays can also be set to {\it Waterfall Mode}, where the partials become dots (brighter dots are higher amplitude) rather than lines, and scroll by in time.  To try this out, choose {\bf Waterfall Display} in the {\bf Options} menu.
+Displays can also be set to {\it Waterfall Mode}, where the partials become dots (brighter dots are higher amplitude) and scroll by in time.  To try this out, choose {\bf Waterfall Display} in the {\bf Options} menu.
 
 \begin{wrapfigure}{r}{1in}
 \includegraphics[height=1in]{oscilloscope}
@@ -311,7 +319,6 @@ This procedure will create a bunch of of virtual devices with names like {\tt Vi
 \label{audioloopback}
 
 \begin{wrapfigure}{r}{3in}
-\vspace{-3em}
 \begin{center}\vspace{-2em}\includegraphics[width=3in]{loopbackaudio}\end{center}
 \vspace{-1em}
 \caption{An Audio loopback connecting {\name} to a Digital Audio Workstation.  Compare to Figure~\ref{loopbackmidi}.}\label{loopbackaudio}
@@ -322,7 +329,7 @@ Note that {\name} is a standalone application, not a VST or AU.  By default it s
 
 \paragraph{Making an Audio Loopback Device}  This varies depending on your operating system.
 \begin{itemize}
-\item {\bf On the Mac}\quad Unlike for MIDI, there's no built-in audio loopback facility.  You'll need to install a program which does audio loopbacks.  There is an open-source driver called {\it SoundFlower}\footnote{https:/\!/github.com/mattingalls/Soundflower/releases/\qquad Note that installation of SoundFlower fails on High Sierra even if you have given permission per the instructions on the website.  But installing via the Terminal seems to work.  Do the following:
+\item {\bf On the Mac}\quad Unlike for MIDI, there's no built-in audio loopback facility on the Mac.  You'll need to install a program which does audio loopbacks.  There is an open-source driver called {\it SoundFlower}\footnote{https:/\!/github.com/mattingalls/Soundflower/releases/\qquad Note that installation of SoundFlower fails on High Sierra even if you have given permission per the instructions on the website.  But installing via the Terminal seems to work.  Do the following:
 
 \begin{enumerate}
 \item Unpack the {\tt Soundflower-2.0b2.dmg} disk image.
@@ -337,7 +344,7 @@ Note that {\name} is a standalone application, not a VST or AU.  By default it s
 \item At this point, SoundFlower 2ch and 64ch will appear as audio devices.  You want SoundFlower 2ch.  You can configure it further in Audio MIDI Setup if you like, or just use it straight.
 \end{enumerate}
 }
-which seems to work fine.  If you'd like support and a much better user experience, I recommend the commercial product {\it Loopback} by Rogue Amoeba.\footnote{https:/\!/rogueamoeba.com/loopback/}  It works very well, and if you're poor you can try it in unfettered trial mode for about 20 minutes, then quit it and start it again for another 20, etc.   Note that there are also various tools built around the {\it Jack} framework: but Jack seems to be break all Java Audio applications: you probably won't be able to run {\name} at all after installing Jack.  And furthermore, Jack's installer is seriously broken: it doesn't remove the necessary files and you'll be permanently unable to run anything that needs Java Audio (including {\name}).  {\color{red}\bf Do not install Jack on OS X.}  You will regret it.\footnote{In fact, after I reported this, Jack's administrators seem to be leaning towards eliminating Jack on OS X entirely.  Oh well.  If you screwed up and installed Jack on OS X, the following URL contains a list of all the files you'll need to remove manually (as administrator): https:/\!/github.com/jackaudio/jack2/issues/379}
+which seems to work fine.  If you'd like support and a better user experience, I recommend the commercial product {\it Loopback} by Rogue Amoeba.\footnote{https:/\!/rogueamoeba.com/loopback/}  It works very well, and if you're poor you can try it in unfettered trial mode for about 20 minutes, quit it, and start it again for another 20, etc.   There are also various tools built around the {\it Jack} framework: but Jack seems to be break all Java Audio applications: you won't be able to run {\name} at all after installing Jack.  And furthermore, Jack's {\it uninstaller} is seriously broken: it doesn't remove the necessary files and you'll be permanently unable to run anything that needs Java Audio (including {\name}).  {\color{red}\bf Do not install Jack on OS X.}  You will regret it.\footnote{In fact, after I reported this, Jack's administrators seem to be leaning towards eliminating Jack on OS X entirely.  Oh well.  If you screwed up and installed Jack on OS X, the following URL contains a list of all the files you'll need to remove manually (as administrator): https:/\!/github.com/jackaudio/jack2/issues/379}
 
 \item {\bf On Windows}\quad I can't help you here.
 
@@ -553,14 +560,6 @@ In addition to sequencing modulation signals, Seq can also be used in combinatio
 \label{unitshapers}
 
 
-\begin{wrapfigure}{r}{1.2in}
-\vspace{-1em}{\setlength\fboxsep{0in}\framebox{\includegraphics[width=1.2in]{constrain.png}}}
-\vspace{-2em}
-\caption{Constraint Facility}
-\vspace{-1em}
-\label{constraintfacility}
-\end{wrapfigure}
-
 All of the shapers have the ability of being {\bf constrained}.  This means that you can tell the shaper to {\it only} perform its operation on certain partials; the others should be left as they are.\footnote{If a shaper has multiple partials sources, then ``left as they are'' means that they should be reverted to whatever values they had in the first partials source.  For example, in Amp Math the first partials source is A.}  The constraint facility (Figure~\ref{constraintfacility}) is at the bottom of the shapers and consists of three widgets.  First, there is a pop-up menu (combobox) where you can specify common constraints.  Above it is a checkbox labelled {\bf Not}, where you can optionally flip things: that is, specify that you want to perform the operation on everything {\it but} the partials in question.  Finally, there is a {\it constraint partials source}, labelled {\bf Only}. If you attach a unit's output to this, then its incoming partials indicate what the constraint should be: specifically, the partials that will be constrained will be those whose positions match up with non-zero amplitude partials coming into the constraint partials source. For example if the constraint partials source has non-zero amplitudes for partials 4, 7, and 9, then this tells the shaper to constrain its outputted partials 4, 7, and 9.  The constraint partials source overrides the pop-up menu.
 
 Okay, here we go.
@@ -590,13 +589,13 @@ Okay, here we go.
 \item {\bf scaleup}\quad Does \(A_i \times (M + 1)\)
 \end{itemize}
 
-You have the option of normalizing the resulting partials.
+You have the option of normalizing the resulting partials.   Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Combine} and {\bf Fill} and {\bf Mix} and {\bf Morph}.
 
 \paragraph{Average}  Computes the average amplitude of all the partials, then nudges the amplitudes of all the partials towards the average.  The amount of nudging is an incoming modulation.  You can specify whether to include the zero-amplitude partials in the average.
 
 \paragraph{Buffer}  This is a sort of Sample and Hold for partials.  Every time Buffer receives an incoming trigger, it takes a snapshot of its input and uses that snapshot for its output.  Buffer can be constrained, which means that it outputs its snapshot for certain partials, while outputting the current source partials for the remainder.
 
-\paragraph{Combine} The partials from two sources are merged by throwing together all the partials from both sources.  Then we take the lowest frequency partials, over both sources, then the next lowest frequency partials, and so on, until we have enough partials.  The remaining (higher frequency) partials are discarded.  You can scale (down) the amplitude of each of the incoming sources.  Combine has two options.  First, you can indicate that partials of identical frequency aren't added separately but are rather merged together (their amplitudes are added), which allows us to include more partials but tends to create unusual discontinuities if the sources are changing in frequency relative to one another.  Second, you can indicate that exactly half of the chosen partials must come from each source.  This is useful if the two sources differ greatly in frequency, so one will dominate the combination.  See also {\bf Fill} and {\bf Mix} and {\bf Morph}.
+\paragraph{Combine} The partials from two sources are merged by throwing together all the partials from both sources.  Then we take the lowest frequency partials, over both sources, then the next lowest frequency partials, and so on, until we have enough partials.  The remaining (higher frequency) partials are discarded.  You can scale (down) the amplitude of each of the incoming sources.  Combine has two options.  First, you can indicate that partials of identical frequency aren't added separately but are rather merged together (their amplitudes are added), which allows us to include more partials but tends to create unusual discontinuities if the sources are changing in frequency relative to one another.  Second, you can indicate that exactly half of the chosen partials must come from each source.  This is useful if the two sources differ greatly in frequency, so one will dominate the combination.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}, particularly if you're hearing pops.  See also {\bf Amp Math} and {\bf Fill} and {\bf Mix} and {\bf Morph}.
 
 \paragraph{Compress}  The amplitude of every partial is raised to a certain power, controlled by the {\it Scale} modulation.  If Scale is greater than 0.5 (the mid-point), then the amplitude is raised and compressed more and more, resulting in them getting louder and with less difference among them.  If Scale is less than 0.5, then the opposite happens: the amplitudes are {\it expanded}, resulting in a larger difference among them, and with them all getting quieter.
 
@@ -606,7 +605,7 @@ You have the option of normalizing the resulting partials.
 
 \paragraph{Fatten}  The top half partials are discarded and reused to create detuned versions of the lower half partials.  The detuning amount is specified as well as the wet/dry ratio.
 
-\paragraph{Fill}  Given two incoming sources \(A\) and \(B\), this module first adds all of the non-zero-partials of \(A\) to the output; any remaining partials are filled from non-zero amplitude partials in \(B\), starting at its lowest frequency partials and working up.  You can scale (down) the amplitude of each of the incoming sources.  This module is particularly useful with {\bf Noise}.  See also {\bf Combine} and {\bf Mix} and {\bf Morph}.
+\paragraph{Fill}  Given two incoming sources \(A\) and \(B\), this module first adds all of the non-zero-partials of \(A\) to the output; any remaining partials are filled from non-zero amplitude partials in \(B\), starting at its lowest frequency partials and working up.  You can scale (down) the amplitude of each of the incoming sources.  This module is particularly useful with {\bf Noise}.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Amp Math} and {\bf Combine} and {\bf Mix} and {\bf Morph}.
 
 \paragraph{Filter}  This is a resonant state-variable 2- or 4-pole filter. You can sweep through High Pass (at 0.0) to Notch (at 0.25) to Low Pass (the default, at 0.5), to Band Pass (at 0.75) and finally to High Pass again (at~1.0).  Resonance values currently range from no resonance (that is resonance \(Q=\frac{1}{\sqrt{2}}\)) at 0.0 to ten times that amount (\(Q =\frac{10}{\sqrt{2}}\))  at 1.0.  And you can, of course, set the cutoff frequency.
 
@@ -628,7 +627,7 @@ Linear Filter can be set to be {\it Relative}.  This means that the filter cutof
 
 \paragraph{Jitter} You can add jitter to either the frequencies or the amplitudes (or both) of your partials.  The amount of noise is controlled by {\it Freq Var} and {\it Amp Var} respectively.  The {\it Trigger} informs the module to add noise to its current jitter configuration.  You can also specify that Jitter should {\it only} apply to non-zero partials this is useful when using Jitter along with Fill.
 
-\paragraph{Mix} This is a straightforward mixer: the amplitudes of the partials of four different inputs can be mixed, with their respective gains.  The {\it frequencies} of the partials of the first input are used for the frequencies of the final partials.  In most cases, it's likely that all four inputs have partials with the same frequency, so it wouldn't matter.  See also {\bf Combine} and {\bf Fill} and {\bf Morph.}
+\paragraph{Mix} This is a straightforward mixer: the amplitudes of the partials of four different inputs can be mixed, with their respective gains.  The {\it frequencies} of the partials of the first input are used for the frequencies of the final partials.  In most cases, it's likely that all four inputs have partials with the same frequency, so it wouldn't matter.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Amp Math} and {\bf Combine} and {\bf Fill} and {\bf Morph.}
 
 \paragraph{Morph} This module morphs (interpolates) between two or more inputs.  In the most basic configuration, when two signals are morphed together, the amplitudes of their partials are weighted and averaged, and the frequencies of their partials are {\it also} weighted and averaged.  The weighting constant \(\alpha\) is controlled by the {\it Interpolation} knob.  For example, consider Inputs X and Y.  For each pair of partials \(\langle P^X_i, P^Y_i\rangle\) in X and Y respectively, with frequencies \(\langle F^X_i, F^Y_i\rangle\) and amplitudes \(\langle A^X_i, A^Y_i\rangle\), we produce a final partial \(P_i\) whose frequency \(F_i = (1-\alpha) F^X_i + \alpha F^Y_i\) and whose amplitude \(A_i = (1-\alpha) A^X_i + \alpha A^Y_i\).
 
@@ -643,7 +642,7 @@ Second, normally every Partial \(i\) in the first Input is paired up with the sa
 \item {\bf Random}\qquad Partials are paired up at random with ``nearby'' partials.  The definition of how far away nearby could be is specified by the {\it Variance} knob.  The pairing is randomized every time a new note is played, or every time the {\it Variance} is modified.
 \item {\bf 2-Pair, 4-Pair, 8-Pair}\qquad Partials are paired up in groups with other partials 2, 4, or 8 away from them.
 \item {\bf Increasing}\qquad The first partials are paired.  Then the next two partials are paired in 2-pair fashion.  Then the next 4 partials are paired in 4-pair fashion, and so on.
-\item {\bf Rand \textit{N}}\qquad Random fixed presets of different variance, carefully chosen to be provide almost exact variance settings.  These sound random, but the pairings don't change every time you play a note, so you get the same effect each time (unlike {\bf Random}, where the effect changes every note).
+%\item {\bf Rand \textit{N}}\qquad Random fixed presets of different variance, carefully chosen to be provide almost exact variance settings.  These sound random, but the pairings don't change every time you play a note, so you get the same effect each time (unlike {\bf Random}, where the effect changes every note).
 \end{itemize}
 
 %\begin{figure}[t]
@@ -652,7 +651,7 @@ Second, normally every Partial \(i\) in the first Input is paired up with the sa
 %\end{figure}
 
 
-Finally, if {\it Free} is set, then Morph doesn't reset to Inputs A and B every time you press a note\,---\,it keeps morphing from wherever it left off.  See also  {\bf Combine} and {\bf Fill} and {\bf Mix}.
+Finally, if {\it Free} is set, then Morph doesn't reset to Inputs A and B every time you press a note\,---\,it keeps morphing from wherever it left off.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Amp Math} and  {\bf Combine} and {\bf Fill} and {\bf Mix}.
 
 \paragraph{Normalize} This {\it normalizes} the input (scales it so that the amplitudes all sum to 1.0, creating a relatively consistent volume) and/or {\it standardizes} it (sets all the frequencies to standard harmonic values).
 
@@ -726,6 +725,7 @@ You can rename the input and output partials and modulation ports of your Macro.
 Note that although you can have as many In modules as you like, and they will all work, only the ports of the first one will be used to rename ports in the Macro.  (Of course, as mentioned before, while you can have multiple Out modules, only the last one will function at all, and this includes naming ports).
 
 \subsection{Mixing Strategies}
+\label{mixingstrategies}
 
 Ordinarily if you wanted to mix two sources into one stream, you'd imagine you could just lump all the partials together and be done with it.  But there are two catches.  First, {\name} has a fixed number of partials: so if you lump the partials from two sources together, half of them must be eliminated.  Second, partials are each associated with a sine wave oscillator in the output (that's the partial's {\it order}): when two sets of partials are mixed, you'll often have the situation where partials from each set are competing for that oscillator, and in the end only one can have it.  So it's a little more complex than you'd think.
 
@@ -740,7 +740,7 @@ This can produce some surprises.  Let's say you made a sawtooth wave and detuned
 
 \item {\bf Combine (non-``Half'')} throws all the partials from both sources together into a big bin, sorts them all by frequency (lowest to highest), then takes the lowest half, discarding the upper half.  If {\it Merge} is true, then if any partials have the exact same frequency, then they are unified into one partial: this means that potentially more than half of the total partials may be ultimately used.  
 
-The big challenge with Combine is in the orders.  Combine allows all the partials originating from \(A\) to retain their original orders; then partials from \(B\) get to retain their orders if they're available (usually they're not); then the rest of the \(B\) partials are assigned new orders.  Reassigning the orders of partials is not a big problem: but if a partial changes its frequency relative to another, it's possible that its reassigned order may be abruptly changed.  This can cause a pop or buzz because the sine wave oscillator is being changed all of the sudden.  You might be able to help things by switching to the ``Half'' version of Combine (see below).
+The big challenge with Combine is in the orders.  Combine allows all the partials originating from \(A\) to retain their original orders; then partials from \(B\) get to retain their orders if they're available (usually they're not); then the rest of the \(B\) partials are assigned new orders.  Reassigning the orders of partials is not a big problem: but if a partial changes its frequency relative to another, it's possible that its reassigned order may be abruptly changed.  This can cause a pop or buzz because the sine wave oscillator is being changed all of the sudden.  You might be able to help things by swapping Inputs A and B, or switching to the ``Half'' version of Combine (see below).
 
 Combine (non-``Half'') works well for many things but not if you're mixing together a source with lots of high-frequency stuff plus a source with lots of low-frequency stuff, because only the low-frequency stuff will surprise.  Instead, use ``Half'' in this case. 
 
