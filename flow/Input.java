@@ -260,21 +260,9 @@ public class Input
                         {
                         output.getSound(i).setCC(ccdata.number, ccdata.value);
                         }
-                    } 
-                else 
-                    {
-                    for (int i = 0; i < num; i++) 
-                        {
-                        Sound sound = output.getSound(i);
-                        if (sm.getChannel() == sound.getChannel() || sm.getChannel() == getMPEGlobalChannel()) 
-                            {
-                            sound.setCC(ccdata.number, ccdata.value);
-                            break;  // there can only be one
-                            }
-                        }
 
-					// We'll handle the sustain pedal for both MPE and standard.
-					// Should MPE support sustain globally?  Maybe?
+					// We'll handle the sustain pedal for non-MPE here.
+					// Should MPE support sustain globally maybe?
 
 					if (ccdata.number == CC_SUSTAIN_PEDAL)
 						{
@@ -293,6 +281,18 @@ public class Input
 							sustain = false;
 							}
 						}
+                    } 
+                else 
+                    {
+                    for (int i = 0; i < num; i++) 
+                        {
+                        Sound sound = output.getSound(i);
+                        if (sm.getChannel() == sound.getChannel() || sm.getChannel() == getMPEGlobalChannel()) 
+                            {
+                            sound.setCC(ccdata.number, ccdata.value);
+                            break;  // there can only be one
+                            }
+                        }
                     }            
                 }
             finally
