@@ -410,6 +410,15 @@ public class Output
     /** Sets whether we are only playing the first sound, or all sounds. */
     public void setOnlyPlayFirstSound(boolean val) { onlyPlayFirstSound = val; }
 
+	// notice that we're using lock() and unlock().  This is because velocitySensitive
+	// is checked directly when building the Swap and we're already inside lock() and unlock() at that point
+	// so we might as well use that.
+	boolean velocitySensitive;
+    /** Returns whether we are only playing the first sound, or all sounds. */
+    public boolean getVelocitySensitive() { lock(); try { return velocitySensitive; } finally { unlock(); } }
+    /** Sets whether we are only playing the first sound, or all sounds. */
+    public void setVelocitySensitive(boolean val) { lock(); try { velocitySensitive = val; } finally { unlock(); } }
+
 
     // Contains the latest partials for the Output Thread to emit.  
     static class Swap
@@ -1028,7 +1037,7 @@ public class Output
                     }
                     
                 swap.pitches[i] = sounds[i].getPitch();
-                swap.velocities[i] = sounds[i].getVelocity();
+                swap.velocities[i] = (velocitySensitive ? sounds[i].getVelocity() : Sound.DEFAULT_VELOCITY);
                 }
                 
             if (e instanceof Out) 	// we're only doing this for ONE sound, namely sounds[0]

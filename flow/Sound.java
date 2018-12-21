@@ -115,9 +115,9 @@ public class Sound
                 return i;
         return NOT_FOUND;
         }
-    
+        
     /** Sets the Pitch Bend.  The Bend is multiplied against the current note to determine the current pitch. */ 
-    public void setBend(double bend) { this.bend = bend; this.pitch = note * bend; }
+    public void setBend(double bend) { this.bend = bend; if (output.getInput().getRespondsToBend()) this.pitch = note * bend; }
     /** Returns the Pitch Bend.  The Bend is multiplied against the current note to determine the current pitch. */ 
     public double getBend() { return bend; }
      
@@ -137,7 +137,7 @@ public class Sound
     public int getMIDINote() { return midiNote; }
         
     /** Sets the Note (in Hz).  The Bend is multiplied against the current note to determine the current pitch.  */   
-    public void setNote(double note) { this.note = note; this.pitch = note * bend; }
+    public void setNote(double note) { this.note = note; if (output.getInput().getRespondsToBend()) this.pitch = note * bend; }
     /** Returns the Note (in Hz).  The Bend is multiplied against the current note to determine the current pitch.  */   
     public double getNote() { return note; }
     

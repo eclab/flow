@@ -131,6 +131,7 @@ public class MIDIIn extends Modulation implements ModSource
             double d = sound.getCC((int)(modulate(i) * 127))/127.0;
             if (d != lastCC[i])
                 {
+                System.err.println(d != lastCC[i]);
                 updateTrigger(MOD_CC + i);
                 setModulationOutput(MOD_CC + i, d);
                 lastCC[i] = d;

@@ -29,6 +29,7 @@ public class NRPN extends Modulation implements ModSource
 
     public static final int NUM_NRPN = 6;
 
+	double current[] = new double[NUM_NRPN];
     public NRPN(Sound sound)
         {
         super(sound);
@@ -45,8 +46,12 @@ public class NRPN extends Modulation implements ModSource
         Sound sound = getSound();        
         for(int i = 0; i < NUM_NRPN; i++)
             {
-            int val = sound.getOutput().getInput().getNRPN(((int)modulate(i * 2) * 127 * 128) + (int)(modulate(i * 2 + 1) * 127));
-            setModulationOutput(i, (val / 128.0) / 127.0);
+            Input in = sound.getOutput().getInput();
+            int num = ((int)modulate(i * 2) * 127 * 128) + (int)(modulate(i * 2 + 1) * 127);
+            int val = in.getNRPN(num);
+            if (!in.getMSBSentLast(num))				// it wasn't just an MSB, which we ignore
+            	current[i] = (val / 128.0) / 127.0;
+            setModulationOutput(i, current[i]);
             }
         }
 

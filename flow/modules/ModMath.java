@@ -60,6 +60,7 @@ public class ModMath extends Modulation
     public static final int MAP_HIGH = 9;           // MAP_LOW is otherwise known as MULTIPLY
     public static final int AVERAGE = 10;
     public static final int THRESHOLD = 11;
+    public static final int ADD_SUBTRACT = 12;
     
     public static final int TRIGGER_A = 0;
     public static final int TRIGGER_A_OR_B = 1;
@@ -85,7 +86,7 @@ public class ModMath extends Modulation
         
     public static final int DISCRETIZATION = 128;
         
-    public static final String[] OPERATION_NAMES = new String[] { "+", "-", "x", "min", "max", "square", "sqrt", "cube", "discretize", "map hi", "average", "threshold"  };
+    public static final String[] OPERATION_NAMES = new String[] { "+", "-", "x", "min", "max", "square", "sqrt", "cube", "discretize", "map hi", "average", "threshold", "+/-"  };
     public static final String[] TRIGGER_NAMES = new String[] { "A", "A or B", "A and B", "A but not B", "2 A", "3 A", "4 A", "5 A", "6 A", "7 A", "8 A", "9 A", "10 A", "11 A", "12 A", "16 A", "18 A", "24 A", "32 A", "36 A", "48 A", "64 A", "72 A", "96 A", "144 A", "192 A" };
     public static final int[] TRIGGER_DIVIDERS = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 18, 24, 32, 36, 48, 64, 72, 96, 144, 192 };
     int operation = ADD;
@@ -208,6 +209,11 @@ public class ModMath extends Modulation
             case THRESHOLD:
                 {
                 val = (mod0 >= mod1 ? 1.0 : 0.0);
+                }
+            break;
+            case ADD_SUBTRACT:
+                {
+                val = Math.max(0.0, Math.min(1.0, mod1 + mod0 - 0.5));
                 }
             break;
             default:

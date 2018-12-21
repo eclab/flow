@@ -691,10 +691,44 @@ public class AppMenu
         }
 
 
+    // Produces the Velocity Sensitive menu
+    static JMenuItem velMenu(Rack rack)
+        {
+        final JCheckBoxMenuItem vel = new JCheckBoxMenuItem("Velocity Sensitive");
+        vel.setSelected(Prefs.getVelocitySensitive());
+        rack.getOutput().setVelocitySensitive(vel.isSelected());
+        vel.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+                rack.getOutput().setVelocitySensitive(vel.isSelected());
+                Prefs.setVelocitySensitive(vel.isSelected());
+                }
+            });
+        return vel;
+        }
+
+    // Produces the Responds to Bend menu
+    static JMenuItem bendMenu(Rack rack)
+        {
+        final JCheckBoxMenuItem bend = new JCheckBoxMenuItem("Responds to Bend");
+        bend.setSelected(Prefs.getRespondsToBend());
+        rack.getOutput().getInput().setRespondsToBend(bend.isSelected());
+        bend.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+                rack.getOutput().getInput().setRespondsToBend(bend.isSelected());
+                Prefs.setRespondsToBend(bend.isSelected());
+                }
+            });
+        return bend;
+        }
+
     // Produces the Sync to MIDI Clock menu
     static JMenuItem syncMenu(Rack rack)
         {
-        final JCheckBoxMenuItem sync = new JCheckBoxMenuItem("Sync to MIDI Clock");
+        final JCheckBoxMenuItem sync = new JCheckBoxMenuItem("Synced to MIDI Clock");
         sync.setSelected(Prefs.getLastMIDISync());
         rack.getOutput().getInput().getMidiClock().setSyncing(sync.isSelected());
         sync.addActionListener(new ActionListener()
@@ -741,7 +775,10 @@ public class AppMenu
         JMenu menu = new JMenu("Play");
 
         menu.add(resetMenu(rack));
+        menu.addSeparator();
         menu.add(playFirstMenu(rack));
+        menu.add(bendMenu(rack));
+        menu.add(velMenu(rack));
         menu.add(syncMenu(rack));
         menu.addSeparator();
         menu.add(namePatchMenu(rack));

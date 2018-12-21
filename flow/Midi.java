@@ -344,6 +344,9 @@ public class Midi
         /** Is the RPN/NRPN LSB value valid?  That is, have we seen one yet? (When not valid, it's 0 by default) */
         public boolean validLSB = false;
         
+        /** Was the RPN/NRPN MSB just sent, or something else? */
+        public boolean msbSentLast = false;
+        
         /** If the data is NRPN or RPN, and the incoming signal was an INCREMENT or DECREMENT,
             then this flag is set.  In this case, the VALUE is no longer the absolute value, but
             is rather a DELTA to increment or decrement (if decrementing, the DELTA is negative). */
@@ -556,9 +559,9 @@ public class Midi
                     if (requireLSB && controllerValueLSB[channel] == -1)
                         return null;
                     if (status[channel] == NRPN_END)
-                        return handleNRPN(channel, controllerNumber, controllerValueLSB[channel] == -1 ? 0 : controllerValueLSB[channel], controllerValueMSB[channel], controllerValueLSB[channel] != -1, controllerValueMSB[channel] != -1 );
+                        return handleNRPN(channel, controllerNumber, controllerValueLSB[channel] == -1 ? 0 : controllerValueLSB[channel], controllerValueMSB[channel], controllerValueLSB[channel] != -1, controllerValueMSB[channel] != -1, true );
                     else
-                        return handleRPN(channel, controllerNumber, controllerValueLSB[channel] == -1 ? 0 : controllerValueLSB[channel], controllerValueMSB[channel], controllerValueLSB[channel] != -1, controllerValueMSB[channel] != -1 );
+                        return handleRPN(channel, controllerNumber, controllerValueLSB[channel] == -1 ? 0 : controllerValueLSB[channel], controllerValueMSB[channel], controllerValueLSB[channel] != -1, controllerValueMSB[channel] != -1, true );
                     }
                                                                                                                         
                 // Data Entry LSB for RPN, NRPN
@@ -568,9 +571,9 @@ public class Midi
                     if (requireMSB && controllerValueMSB[channel] == -1)
                         return null;          
                     if (status[channel] == NRPN_END)
-                        return handleNRPN(channel, controllerNumber, controllerValueLSB[channel], controllerValueMSB[channel] == -1 ? 0 : controllerValueMSB[channel], controllerValueLSB[channel] != -1 , controllerValueMSB[channel] != -1 );
+                        return handleNRPN(channel, controllerNumber, controllerValueLSB[channel], controllerValueMSB[channel] == -1 ? 0 : controllerValueMSB[channel], controllerValueLSB[channel] != -1 , controllerValueMSB[channel] != -1, false );
                     else
-                        return handleRPN(channel, controllerNumber, controllerValueLSB[channel], controllerValueMSB[channel] == -1 ? 0 : controllerValueMSB[channel], controllerValueLSB[channel] != -1 , controllerValueMSB[channel] != -1 );
+                        return handleRPN(channel, controllerNumber, controllerValueLSB[channel], controllerValueMSB[channel] == -1 ? 0 : controllerValueMSB[channel], controllerValueLSB[channel] != -1 , controllerValueMSB[channel] != -1, false );
                     }
                                                                                                                         
                 // Data Increment for RPN, NRPN
@@ -614,13 +617,14 @@ public class Midi
             }
         
         /** Parses an NRPN message */
-        public CCData handleNRPN(int channel, int controllerNumber, int _controllerValueLSB, int _controllerValueMSB, boolean validLSB, boolean validMSB)
+        public CCData handleNRPN(int channel, int controllerNumber, int _controllerValueLSB, int _controllerValueMSB, boolean validLSB, boolean validMSB, boolean msbSentLast)
             {
             if (_controllerValueLSB < 0 || _controllerValueMSB < 0)
-                System.err.println("WARNING(Midi.java): LSB or MSB < 0.  RPN: " + controllerNumber + "   LSB: " + _controllerValueLSB + "  MSB: " + _controllerValueMSB);
+                System.err.println("WARNING(Midi.java): LSB or MSB < 0.  NRPN: " + controllerNumber + "   LSB: " + _controllerValueLSB + "  MSB: " + _controllerValueMSB);
             CCData data =  new CCData(CCData.TYPE_NRPN, controllerNumber, _controllerValueLSB | (_controllerValueMSB << 7), channel, false);
             data.validMSB = validMSB;
             data.validLSB = validLSB;
+            data.msbSentLast = msbSentLast;
             return data;
             }
         
@@ -631,13 +635,14 @@ public class Midi
             }
 
         /** Parses an RPN message */
-        public CCData handleRPN(int channel, int controllerNumber, int _controllerValueLSB, int _controllerValueMSB, boolean validLSB, boolean validMSB)
+        public CCData handleRPN(int channel, int controllerNumber, int _controllerValueLSB, int _controllerValueMSB, boolean validLSB, boolean validMSB, boolean msbSentLast)
             {
             if (_controllerValueLSB < 0 || _controllerValueMSB < 0)
                 System.err.println("WARNING(Midi.java): LSB or MSB < 0.  RPN: " + controllerNumber + "   LSB: " + _controllerValueLSB + "  MSB: " + _controllerValueMSB);
             CCData data =  new CCData(CCData.TYPE_RPN, controllerNumber, _controllerValueLSB | (_controllerValueMSB << 7), channel, false);
             data.validMSB = validMSB;
             data.validLSB = validLSB;
+            data.msbSentLast = msbSentLast;
             return data;
             }
         

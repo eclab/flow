@@ -52,7 +52,10 @@ public class Input
 
     // The array of NRPN values
     short nrpn[];
+    boolean msbSentLast[];
 
+	public Midi getMidi() { return midi; }
+	
     public MidiClock getMidiClock() { return midiClock; }
 
     /** The default value for the bend range in octaves */
@@ -68,6 +71,16 @@ public class Input
         bendOctave = val;
         Prefs.setLastBendOctave(val);
         }
+
+
+    // Do we respond to pitch bend?
+    volatile boolean respondsToBend = true;
+
+    /** Sets whether we respond to Pitch Bend. */
+    public void setRespondsToBend(boolean val) { respondsToBend = val; }
+    /** Returns whether we respond to Pitch Bend. */
+    public boolean getRespondsToBend() { return respondsToBend; }
+    
 
     // The number of CC values.
     static final int NUM_CC = 128;
@@ -85,6 +98,7 @@ public class Input
     LinkedList<Integer>notesOnMono = new LinkedList<Integer>();
 
 	boolean sustain = false;
+	ArrayList<Sound> sustainQueue = new ArrayList<Sound>();
 
     /** returns true if we are in MPE mode **/
     public boolean isMPE() { return channel == CHANNEL_LOWER_ZONE  || channel == CHANNEL_UPPER_ZONE; }
@@ -99,6 +113,8 @@ public class Input
         channel = 0;
         cc = new byte[NUM_CC];
         nrpn = new short[NUM_NRPN];
+        msbSentLast = new boolean[NUM_NRPN];
+        
         for (int i = 0; i < NUM_CC; i++)
             cc[i] = UNSPECIFIED;
 
@@ -209,6 +225,12 @@ public class Input
         return nrpn[num];
         }
 
+    /** Returns the whether the most recent value of NRPN was due to an MSB. */
+    public boolean getMSBSentLast(int num)
+        {
+        return msbSentLast[num];
+        }
+
     // Processes an incoming CC message
     void processCC(ShortMessage sm)
         {
@@ -247,6 +269,7 @@ public class Input
                         if (sm.getChannel() == sound.getChannel() || sm.getChannel() == getMPEGlobalChannel()) 
                             {
                             sound.setCC(ccdata.number, ccdata.value);
+                            break;  // there can only be one
                             }
                         }
 
@@ -255,9 +278,21 @@ public class Input
 
 					if (ccdata.number == CC_SUSTAIN_PEDAL)
 						{
-						sustain = (ccdata.value >= 64);
+						if (ccdata.value >= 64)		// sustain is down
+							{
+							sustain = true;
+							}
+						else
+							{
+							// release all the sounds in the sustain queue
+							for(Sound sound : sustainQueue)
+								{
+								sound.release();
+								}
+							sustainQueue.clear();
+							sustain = false;
+							}
 						}
-
                     }            
                 }
             finally
@@ -278,21 +313,28 @@ public class Input
                     {
                     nrpn[ccdata.number] = MAX_NRPN_VAL;
                     }
+                msbSentLast[ccdata.number] = false;
                 }
             else
                 {
                 nrpn[ccdata.number] = (short)ccdata.value;
+                msbSentLast[ccdata.number] = ccdata.msbSentLast;
                 }
             }
         else if (ccdata.type == Midi.CCData.TYPE_RPN)
             {
-            if(ccdata.number == MPE_CONFIGURATION_RPN_NUMBER){
-                if(ccdata.validMSB){
+            if(ccdata.number == MPE_CONFIGURATION_RPN_NUMBER)
+            	{
+                if(ccdata.validMSB)
+                	{
                     int msb = ccdata.value;
                     int num = msb >> 7;
-                    if(sm.getChannel() == 0){
+                    if(sm.getChannel() == 0)
+                    	{
                         setupMIDI(CHANNEL_LOWER_ZONE,num,currentWrapper);
-                        } else {
+                        } 
+                        else 
+                        {
                         setupMIDI(CHANNEL_UPPER_ZONE,num,currentWrapper);
                         }
                     }
@@ -351,14 +393,25 @@ public class Input
                     noteCurrentlyOn = true;
                     }
                 }
-            else if (notesOff.isEmpty())
-                {
-                sound = (Sound)notesOn.removeLast();
-                }
-            else
-                {
-                sound = (Sound)notesOff.removeLast();
-                }
+            else 
+            	{
+            	if (notesOff.isEmpty())
+					{
+					sound = (Sound)notesOn.removeLast();
+					}
+				else
+					{
+					sound = (Sound)notesOff.removeLast();
+					}
+			
+				// handle sustain queue for non-mono sounds.  We need to release the old sound
+				if (sustain && sustainQueue.contains(sound))
+					{
+					sustainQueue.remove(sound);
+					sound.release();
+					}
+				}
+            	
             notesOn.addFirst(sound);
             }
             
@@ -412,12 +465,26 @@ public class Input
 						{
 						if (!onlyPlayFirstSound || monoIsEmpty)		// release our sound
 							{
-							if (!sustain)
+							// add to queue but don't release if we're sustaining
+							if (sustain && !sustainQueue.contains(sound))
+								{
+								sustainQueue.add(sound);
+								}
+							else
 								{
 								sound.release();
-								notesOn.remove(sound);
-								notesOff.addFirst(sound);
 								}
+							notesOn.remove(sound);
+							notesOff.addFirst(sound);
+							
+							// we do the following because Roli's MPE will typically immediately reuse the channel.
+							// See Page 11 of the MPE spec:
+							// 
+							// "The prevention of per-note control after Note Off allows rapid reuse of unoccupied Channels, 
+							// and applies even to notes that are kept active by a Damper Pedal message or a long release envelope."
+
+							if (isMPE())
+								sound.setChannel(Input.CHANNEL_NONE);  
 							}
 						else		// just reassign the sound
 							{
