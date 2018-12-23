@@ -41,14 +41,15 @@ public class Input
      * to indicate that the system has not received any value to indicate
      * what they should be set to.
      */
+    
     public static final byte UNSPECIFIED = -1;
-
+    
     // The array of CC values.  Some of these are not legal, since they are part of the NRPN facility.
     byte[] cc;
     
     // The number of mpe channels. This needs to be handled differently depending on the zone.
     int numMPEChannels = DEFAULT_NUM_MPE_CHANNELS;
-
+    
     // The array of channels that are in-zone for the current MPE settings
     boolean[] mpeChannels = new boolean[16];
     
@@ -59,7 +60,7 @@ public class Input
         {
         return rawBend;
         }
-
+    
     // The array of NRPN values
     short[] nrpn;
     boolean[] msbSentLast;
@@ -206,8 +207,16 @@ public class Input
         {
         for (int i = 0; i < 16; i++)
             {
-            mpeChannels[i] = (channel == CHANNEL_LOWER_ZONE && i <= numMPEChannels)
-                             || (channel == CHANNEL_UPPER_ZONE && 15 - i <= numMPEChannels);
+            int chan = channel;    // channel is volatile
+            if ((chan == CHANNEL_LOWER_ZONE && i <= numMPEChannels)
+                || (chan == CHANNEL_UPPER_ZONE && 15 - i <= numMPEChannels))
+                {
+                mpeChannels[i] = true;
+                }
+            else
+                {
+                mpeChannels[i] = false;
+                }
             }
         }
     

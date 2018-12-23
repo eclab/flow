@@ -114,7 +114,16 @@ public class UnitOutput extends InputOutput
                 {
                 UnitOutput.this.mouseReleased(e);
                 }
+                
+            public void mouseClicked(MouseEvent e)
+                {
+                for(UnitWire wire : outgoing)
+                	{
+                	wire.chooseColor();
+                	}
+                }
             };
+            
             
         jack.addMouseMotionListener(mouseAdapter);
         jack.addMouseListener(mouseAdapter);

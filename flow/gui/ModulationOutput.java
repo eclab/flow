@@ -115,6 +115,14 @@ public class ModulationOutput extends InputOutput
                 {
                 ModulationOutput.this.mouseReleased(e);
                 }
+
+            public void mouseClicked(MouseEvent e)
+                {
+                for(ModulationWire wire : outgoing)
+                	{
+                	wire.chooseColor();
+                	}
+                }
             };
             
         jack.addMouseMotionListener(mouseAdapter);

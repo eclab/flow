@@ -64,6 +64,7 @@ public class Modules
     flow.modules.Mix.class,
     flow.modules.ModMath.class,
     flow.modules.Morph.class,
+    flow.modules.MPE.class,
     flow.modules.Normalize.class,
     flow.modules.Noise.class,
     flow.modules.NRPN.class,

@@ -30,10 +30,15 @@ public class ModulationWire
     public void setEnd(ModulationInput p) { end = p; }
     public ModulationInput getEnd() { return end; }
         
+    public void chooseColor() 
+    	{
+        color = new Color((int)(Math.random() * 220), (int)(Math.random() * 220), (int)(Math.random() * 220), 175);
+    	}
+    	
     public ModulationWire(Rack rack) 
         { 
         this.rack = rack; 
-        color = new Color((int)(Math.random() * 80) + 80, (int)(Math.random() * 80) + 80, (int)(Math.random() * 80) + 80, 255);
+        chooseColor();
         }
         
     public void draw(Graphics2D g)
@@ -72,4 +77,6 @@ public class ModulationWire
         g.draw(path);
         
         }
+
+    public String toString() { return "ModWire [from=" + start + ", to=" + end + "]"; }
     }
