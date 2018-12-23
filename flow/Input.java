@@ -42,15 +42,15 @@ public class Input
      * what they should be set to.
      */
     public static final byte UNSPECIFIED = -1;
-    
+
     // The array of CC values.  Some of these are not legal, since they are part of the NRPN facility.
-    byte cc[];
+    byte[] cc;
     
     // The number of mpe channels. This needs to be handled differently depending on the zone.
     int numMPEChannels = DEFAULT_NUM_MPE_CHANNELS;
-    
+
     // The array of channels that are in-zone for the current MPE settings
-    boolean mpeChannels[] = new boolean[16];
+    boolean[] mpeChannels = new boolean[16];
     
     // The raw bend value
     int rawBend = 0;
@@ -59,10 +59,10 @@ public class Input
         {
         return rawBend;
         }
-    
+
     // The array of NRPN values
-    short nrpn[];
-    boolean msbSentLast[];
+    short[] nrpn;
+    boolean[] msbSentLast;
     
     public Midi getMidi()
         {
@@ -206,15 +206,8 @@ public class Input
         {
         for (int i = 0; i < 16; i++)
             {
-            if ((channel == CHANNEL_LOWER_ZONE && i <= numMPEChannels)
-                || (channel == CHANNEL_UPPER_ZONE && 15 - i <= numMPEChannels))
-                {
-                mpeChannels[i] = true;
-                }
-            else
-                {
-                mpeChannels[i] = false;
-                }
+            mpeChannels[i] = (channel == CHANNEL_LOWER_ZONE && i <= numMPEChannels)
+                             || (channel == CHANNEL_UPPER_ZONE && 15 - i <= numMPEChannels);
             }
         }
     
@@ -352,7 +345,7 @@ public class Input
                     {
                     if (sm.getChannel() == getMPEGlobalChannel())
                         {
-                        for(int i = 0; i < 16; i++)
+                        for (int i = 0; i < 16; i++)
                             {
                             mpeCCValues[i][ccdata.number] = cc[ccdata.number];
                             }
@@ -371,8 +364,7 @@ public class Input
                             }
                         }
                     }
-                }
-            finally
+                } finally
                 {
                 output.unlock();
                 }
@@ -480,11 +472,11 @@ public class Input
                 {
                 if (notesOff.isEmpty())
                     {
-                    sound = (Sound) notesOn.removeLast();
+                    sound = notesOn.removeLast();
                     }
                 else
                     {
-                    sound = (Sound) notesOff.removeLast();
+                    sound = notesOff.removeLast();
                     }
                 
                 // handle sustain queue for non-mono sounds.  We need to release the old sound
@@ -508,7 +500,7 @@ public class Input
             sound.setMIDINote(i);
             sound.setVelocity((double) sm.getData2() / 127.0);
             sound.setBend(globalBend);
-            if(isMPE())
+            if (isMPE())
                 {
                 for (int ccNumber = 0; ccNumber < 128; ccNumber++)
                     {
@@ -581,7 +573,7 @@ public class Input
                         //
                         // "The prevention of per-note control after Note Off allows rapid reuse of unoccupied Channels,
                         // and applies even to notes that are kept active by a Damper Pedal message or a long release envelope."
-
+                        
                         if (isMPE())
                             {
                             sound.setChannel(Input.CHANNEL_NONE);
@@ -750,7 +742,7 @@ public class Input
     // Pulses the Input.  Called by Output's voice sync thread's go() method.
     void go()
         {
-        MidiMessage messages[] = midi.getNextMessages();
+        MidiMessage[] messages = midi.getNextMessages();
         for (int i = 0; i < messages.length; i++)
             {
             MidiMessage message = messages[i];
