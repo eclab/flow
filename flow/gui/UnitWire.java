@@ -30,11 +30,16 @@ public class UnitWire
     public UnitOutput getStart() { return start; }
     public void setEnd(UnitInput p) { end = p; }
     public UnitInput getEnd() { return end; }
-        
+    
+    public void chooseColor() 
+    	{
+        color = new Color((int)(Math.random() * 220), (int)(Math.random() * 220), (int)(Math.random() * 220), 175);
+    	}
+    	
     public UnitWire(Rack rack) 
         { 
         this.rack = rack; 
-        color = new Color((int)(Math.random() * 220), (int)(Math.random() * 220), (int)(Math.random() * 220), 175);
+        chooseColor();
         }
         
     public void draw(Graphics2D g)

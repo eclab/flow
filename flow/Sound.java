@@ -75,7 +75,6 @@ public class Sound
     /** Returns a given registered Modulation / Unit */
     public void setChannel(int channel) { this.channel = channel; }
     
-
     /** Returns the Sound's index number in the Output */
     public int getIndex() { return index; }
 

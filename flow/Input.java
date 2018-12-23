@@ -29,7 +29,7 @@ public class Input
     public static final int CHANNEL_OMNI = -1;
     public static final int NUM_SPECIAL_CHANNELS = 3;  // CHANNEL_LOWER_ZONE through CHANNEL_OMNI
     public static final int DEFAULT_NUM_MPE_CHANNELS = 7;
-    int channel = CHANNEL_OMNI;
+    volatile int channel = CHANNEL_OMNI;
 
     /** CC values and NRPN values are all set to this initially
         to indicate that the system has not received any value to indicate
@@ -101,7 +101,7 @@ public class Input
 	ArrayList<Sound> sustainQueue = new ArrayList<Sound>();
 
     /** returns true if we are in MPE mode **/
-    public boolean isMPE() { return channel == CHANNEL_LOWER_ZONE  || channel == CHANNEL_UPPER_ZONE; }
+    public boolean isMPE() { int chan = channel; return chan == CHANNEL_LOWER_ZONE  || chan == CHANNEL_UPPER_ZONE; }  // channel is volatile
 
     public Output getOutput() { return output; }
 
@@ -160,8 +160,9 @@ public class Input
         {
         for (int i = 0; i < 16; i++) 
             {
-            if (  (channel == CHANNEL_LOWER_ZONE && i <= numMPEChannels)
-                ||(channel == CHANNEL_UPPER_ZONE && 15 - i <= numMPEChannels))
+            int chan = channel;	// channel is volatile
+            if (  (chan == CHANNEL_LOWER_ZONE && i <= numMPEChannels)
+                || (chan == CHANNEL_UPPER_ZONE && 15 - i <= numMPEChannels))
                 {
                 mpeChannels[i] = true;
                 } 
@@ -705,10 +706,14 @@ public class Input
         return mpeChannels[channel];
         }
 
-    private int getMPEGlobalChannel(){
-        if(getChannel() == CHANNEL_LOWER_ZONE){
+    private int getMPEGlobalChannel()
+    	{
+        if (getChannel() == CHANNEL_LOWER_ZONE)
+        	{
             return 0;
-            } else {
+            } 
+            else
+             {
             return 15;
             }
         }
