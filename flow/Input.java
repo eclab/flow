@@ -84,7 +84,7 @@ public class Input
     // current global bend value
     double globalBend = 1.0;
     // CC array
-    byte[][] mpeCCValues = new byte[16][127];
+    byte[][] mpeCCValues = new byte[16][128];
     
     
     public int getBendOctave()
@@ -366,7 +366,7 @@ public class Input
                     for (int i = 0; i < num; i++)
                         {
                         Sound sound = output.getSound(i);
-                        if (sm.getChannel() == sound.getChannel() || sm.getChannel() == getMPEGlobalChannel())
+                        if ((sm.getChannel() == sound.getChannel() || sm.getChannel() == getMPEGlobalChannel()))
                             {
                             sound.setCC(ccdata.number, ccdata.value);
                             break;  // there can only be one
