@@ -129,15 +129,19 @@ public class Smooth extends Unit
                 
                 double sFreq = smoothedFrequencies[order];
                 double iFreq = inputs0frequencies[order];
-                if (sFreq > Output.WELL_ABOVE_SUBNORMALS || iFreq > Output.WELL_ABOVE_SUBNORMALS)
-                    smoothedFrequencies[order] = (1 - mod) * sFreq + mod * iFreq;
+                double aa = (1 - mod) * sFreq;
+                double bb = mod * iFreq;
+                if (aa > Output.WELL_ABOVE_SUBNORMALS || bb > Output.WELL_ABOVE_SUBNORMALS)
+                    smoothedFrequencies[order] = aa + bb;
                 else
                     smoothedFrequencies[order] = 0;
                     
                 double sAmp = smoothedAmplitudes[order];
                 double iAmp = inputs0amplitudes[order];
-                if (sAmp > Output.WELL_ABOVE_SUBNORMALS || iAmp > Output.WELL_ABOVE_SUBNORMALS)
-                    smoothedAmplitudes[order] = (1 - mod) * sAmp + mod * iAmp;
+                aa = (1 - mod) * sAmp;
+                bb = mod * iAmp;
+                if (aa > Output.WELL_ABOVE_SUBNORMALS || bb > Output.WELL_ABOVE_SUBNORMALS)
+                    smoothedAmplitudes[order] = aa + bb;
                 else
                     smoothedAmplitudes[order] = 0;
                 }
