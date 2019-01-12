@@ -54,6 +54,10 @@ public class Macro extends Unit implements Cloneable
         obj.modules = (Modulation[])(obj.modules.clone());
         for(int i = 0; i < obj.modules.length; i++)
             obj.modules[i] = (Modulation)(obj.modules[i].clone());
+            
+        // set up backpointer
+        for(int i = 0; i < obj.modules.length; i++)
+            obj.modules[i].setMacro(obj);
                 
         // Here we need to rewire the modules again
         // We first build a map of old modules to new ones
@@ -98,7 +102,6 @@ public class Macro extends Unit implements Cloneable
         obj.ins = new ArrayList<In>();
         obj.out = null;
         obj.loadModules(obj.modules, obj.patchName);
-    
     
         return obj;
         }
@@ -224,6 +227,12 @@ public class Macro extends Unit implements Cloneable
         {
         this.modules = modules;  // now it's set
         this.patchName  = patchName;
+        
+        for(int m = 0; m < modules.length; m++)
+        	{
+        	modules[m].setMacro(this);
+        	}
+        
         // find the last Out
         for(int m = modules.length - 1; m >= 0; m--)
             {
@@ -342,7 +351,6 @@ public class Macro extends Unit implements Cloneable
         return obj;
         }
     
-    
     public static Macro loadMacro(Sound sound, File file) throws Exception
         {
 		JSONObject obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
@@ -350,52 +358,7 @@ public class Macro extends Unit implements Cloneable
 			Sound.loadModules(obj, Sound.loadFlowVersion(obj)), 
 			Sound.loadName(obj));
         }
-    
-    /*
-    public static Macro deserializeAsMacro(Sound sound, File file)
-        {
-        String[] patchName = new String[1];
-        return new Macro(sound, deserialize(file, patchName), patchName[0]);
-        }
         
-    public static Modulation[] deserialize(File file, String[] patchName)
-        {
-        ObjectInputStream s = null;
-        try
-            {
-            s = 
-                new ObjectInputStream(
-                    new GZIPInputStream (
-                        new BufferedInputStream (
-                            new FileInputStream (file))));
-            Modulation[] modules = (Modulation[]) s.readObject();
-            
-            // build the other elements map
-            HashMap otherElements = new HashMap();
-            ArrayList keys = (ArrayList)s.readObject();
-            ArrayList values = (ArrayList)s.readObject();
-            for(int i = 0; i < keys.size(); i++)
-                otherElements.put(keys.get(i), values.get(i));
-            patchName[0] = (String)(otherElements.get(PATCH_NAME_KEY));
-                
-            s.close();
-            return modules;
-            }
-        catch (IOException e)
-            { 
-            e.printStackTrace();
-            try { if (s != null) s.close(); } catch (IOException e0) { }
-            return null;
-            }
-        catch (ClassNotFoundException e1)
-            {
-            e1.printStackTrace();
-            try { if (s != null) s.close(); } catch (IOException e0) { }
-            return null;
-            }
-        }
-    */
-                 
     public ModulePanel getPanel()
         {
         return new ModulePanel(Macro.this)
