@@ -35,7 +35,7 @@ public class Out extends Unit
     public static final int NUM_MOD_OUTPUTS = 4;
     public static final int NUM_UNIT_OUTPUTS = 4;
     public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
-    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4", "Gain", "Wet", "Damp", "Size" };
+    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4", "Gain", "Wet", "Damp", "Size" }; // , "C", "R" };
 
     public static final int MOD_OSC_1 = 0;
     public static final int MOD_OSC_2 = 1;
@@ -52,8 +52,6 @@ public class Out extends Unit
 
     double gain;
     public double getGain() { return gain; }
-
-    Macro macro = null;
     
     double[][] modWave = new double[2][WAVE_SIZE];
     int[] wavePos = new int[] { 0, 0 };
@@ -81,13 +79,11 @@ public class Out extends Unit
         {
         super(sound);
         // we clone so we can keep the original names around
-        defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[])UNIT_NAMES.clone());
+        defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[]) UNIT_NAMES.clone());
         defineOutputs( new String[] { "A", "B" } );
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER, Constant.ZERO, Constant.HALF, Constant.HALF }, (String[]) MOD_NAMES.clone());
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER, Constant.ZERO, Constant.HALF, Constant.HALF/*, Constant.ZERO, Constant.ZERO */}, (String[]) MOD_NAMES.clone());
         if (sound != null) sound.setEmits(this);
         }
-
-    void setMacro(Macro macro) { this.macro = macro; }
 
     public boolean showsOutputs() { return false; }
 
@@ -295,12 +291,25 @@ public class Out extends Unit
     	else
     		{
     		JSONArray array = data.getJSONArray("mod");
-    		for(int i = 0; i < array.length(); i++)
+    		int num = getNumModulations();
+    		if (num != array.length())
+    			{
+    			warn("flow/modules/Out.java", "Number of modulations in Out (" + num + ") does not match those in the patch (" + array.length() + ")");
+    			if (array.length() < num) num = array.length();
+    			}
+    		for(int i = 0; i < num; i++)
     			{
     			setModulationName(i, array.getString(i));
     			}
-    		array = data.getJSONArray("unit");
-    		for(int i = 0; i < array.length(); i++)
+    			
+    		array = data.getJSONArray("unit");    		
+    		num = getNumInputs();
+    		if (num != array.length())
+    			{
+    			warn("flow/modules/Out.java", "Number of unit inputs in Out (" + num + ") does not match those in the patch (" + array.length() + ")");
+    			if (array.length() < num) num = array.length();
+    			}
+    		for(int i = 0; i < num; i++)
     			{
     			setInputName(i, array.getString(i));
     			}
@@ -319,6 +328,7 @@ public class Out extends Unit
         obj.put("mod", array);
 
         array = new JSONArray();
+        System.err.println("NUM INPUTS " + getNumInputs());
 
         for(int i = 0; i < getNumInputs(); i++)
             array.put(getInputName(i));

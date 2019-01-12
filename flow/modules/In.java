@@ -24,7 +24,6 @@ public class In extends Unit
     public static final int NUM_UNIT_INPUTS = 4;
     public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
     public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4" };
-    Macro macro = null;
         
     public In(Sound sound)
         {
@@ -37,12 +36,10 @@ public class In extends Unit
         setOrders();
         }
 
-    void setMacro(Macro macro) { this.macro = macro; }
-                
     public void go()
         {
         super.go();
-        
+                
         for(int i = 0; i < NUM_MOD_INPUTS; i++)
             {
             if (macro != null)
@@ -168,12 +165,25 @@ public class In extends Unit
     	else
     		{
     		JSONArray array = data.getJSONArray("mod");
-    		for(int i = 0; i < array.length(); i++)
+    		int num = getNumModulationOutputs();
+    		if (num != array.length())
+    			{
+    			warn("flow/modules/In.java", "Number of modulation outputs in In (" + num + ") does not match those in the patch (" + array.length() + ")");
+    			if (array.length() < num) num = array.length();
+    			}
+    		for(int i = 0; i < num; i++)
     			{
     			setModulationOutputName(i, array.getString(i));
     			}
+
     		array = data.getJSONArray("unit");
-    		for(int i = 0; i < array.length(); i++)
+    		num = getNumOutputs();
+    		if (num != array.length())
+    			{
+    			warn("flow/modules/Out.java", "Number of unit outputs in Out (" + num + ") does not match those in the patch (" + array.length() + ")");
+    			if (array.length() < num) num = array.length();
+    			}
+    		for(int i = 0; i < num; i++)
     			{
     			setOutputName(i, array.getString(i));
     			}
