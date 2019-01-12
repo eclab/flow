@@ -59,6 +59,7 @@ public class Seq extends Modulation
     boolean sample = true;
     boolean gated = false;
     boolean guided = false;
+    boolean display = false;
 
     public boolean getFree() { return free; }
     public void setFree(boolean val) { free = val; }
@@ -66,10 +67,13 @@ public class Seq extends Modulation
     public void setSample(boolean val) { sample = val; }
     public boolean getGuided() { return guided; }
     public void setGuided(boolean val) { guided = val; }
+    public boolean getDisplay() { return display; }
+    public void setDisplay(boolean val) { display = val; updateModulePanel(true); }
         
     public static final int OPTION_FREE = 0;
     public static final int OPTION_SAMPLE = 1;
     public static final int OPTION_GUIDED = 2;
+    public static final int OPTION_DISPLAY = 3;
 
     public int getOptionValue(int option) 
         { 
@@ -78,6 +82,7 @@ public class Seq extends Modulation
             case OPTION_FREE: return (getFree() ? 1 : 0);
             case OPTION_SAMPLE: return (getSample() ? 1 : 0);
             case OPTION_GUIDED: return (getGuided() ? 1 : 0);
+            case OPTION_DISPLAY: return (getDisplay() ? 1 : 0);
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -89,6 +94,7 @@ public class Seq extends Modulation
             case OPTION_FREE: setFree(value != 0); return;
             case OPTION_SAMPLE: setSample(value != 0); return;
             case OPTION_GUIDED: setGuided(value != 0); return;
+            case OPTION_DISPLAY: setDisplay(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -97,7 +103,7 @@ public class Seq extends Modulation
     public Seq(Sound sound)
         {
         super(sound);
-        defineOptions(new String[] { "Free", "Sample", "Guided" }, new String[][] { { "Free" }, { "Sample" }, { "Guided" } });
+        defineOptions(new String[] { "Free", "Sample", "Guided", "Display" }, new String[][] { { "Free" }, { "Sample" }, { "Guided" }, { "Display" } });
         defineModulations(new Constant[] 
             { Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
               Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
@@ -124,6 +130,28 @@ public class Seq extends Modulation
     // go() automatically clears the trigger so we need to set it a different way
     boolean didTrigger;
         
+    Object[] _stateLock = new Object[0];
+    int _state = 0;
+    void updateModulePanel(boolean force)
+    	{
+		if ((display || force) && getMacro() == null && sound.getOutput().getInput().getLastPlayedSound() == sound)
+			{
+			// At this point, I am the sound being played and I'm not in a macro, so I need
+			// to update the module panel.
+
+			int m = sound.findRegistered(this);
+    		Sound sound0 = sound.getOutput().getSoundUnsafe(0);
+			Seq seq0 = (Seq)(sound0.getRegistered(m));
+
+			synchronized(seq0._stateLock)
+				{
+				seq0._state = state;
+				}
+			
+			seq0.getModulePanel().repaint();
+			}
+    	}
+    	
     public void reset()
         {
         super.reset();
@@ -131,6 +159,7 @@ public class Seq extends Modulation
         setModulationOutput(0, modulate(state));
 //        didTrigger = true;            // this creates beeps when resetting, bad
         gated = false;
+	    updateModulePanel(false);
         }
                 
     public void gate()
@@ -142,7 +171,8 @@ public class Seq extends Modulation
             state = 0;
             setModulationOutput(0, modulate(state));
             didTrigger = true;
-            }
+	        updateModulePanel(false);
+			}
         }
     
     public void release()
@@ -161,6 +191,7 @@ public class Seq extends Modulation
         
         if (isTriggered(MOD_TRIGGER))
             {
+            int oldstate = state;
 	        int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
             if (guided)
             	{
@@ -172,6 +203,8 @@ public class Seq extends Modulation
             	state++;
 	            if (state >= maxState) state = 0;
 	            }
+	        if (oldstate != state)
+	        	updateModulePanel(false);
             setModulationOutput(0, modulate(state));
             updateTrigger(0);
             }
@@ -194,7 +227,6 @@ public class Seq extends Modulation
         else return "";
         }
 
-
     public ModulePanel getPanel()
         {
         return new ModulePanel(Seq.this)
@@ -213,6 +245,7 @@ public class Seq extends Modulation
                     Box box2 = new Box(BoxLayout.X_AXIS);
                     for(int j = i; j < i + 4; j++)
                         {
+                        final int _state = j;
 
                         // You'll notice a lot of code here is the same as in Shift
                         final ModulationInput[] m = new ModulationInput[1];
@@ -251,6 +284,14 @@ public class Seq extends Modulation
                                                                 
                                 return pop;
                                 }
+                            
+                            public boolean getDrawsStateDot()
+                            	{
+                            	synchronized(Seq.this._stateLock)
+                            		{
+	                            	return (Seq.this.getDisplay() && Seq.this._state == _state);
+	                            	}
+                            	}
                             };
 //                        m[0].getData().setPreferredSize(example.getPreferredSize());
                         m[0].getData().setMinimumSize(example.getPreferredSize());

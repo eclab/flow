@@ -78,6 +78,16 @@ public abstract class Modulation implements Cloneable
     {
     private static final long serialVersionUID = 1;
 
+	/** The Modulation's macro backpointer.  This is is null if the Modulation is not under a Macro. */
+	protected Macro macro = null;
+	public Macro getMacro() { return macro; }
+	public void setMacro(Macro macro) { this.macro = macro; }	
+
+	/** The Modulation's modulation panel backpointer.  This is is null if the Modulation is not associated with a modulation panel (typically because it's not part of Sound 0). */
+	protected ModulePanel modPanel = null;
+	public ModulePanel getModulePanel() { return modPanel; }
+	public void setModulePanel(ModulePanel modPanel) { this.modPanel = modPanel; }	
+
     /** The Modulation's sound backpointer. */
     protected Sound sound;
         
@@ -869,7 +879,7 @@ public abstract class Modulation implements Cloneable
             int val = options.optInt(getKeyForOption(i), -1);
             if (val == -1)
                 {
-                warnAlways("Modulation.java", "Could not load option " + getKeyForOption(i) + " in " + this);
+                warn("Modulation.java", "Could not load option " + getKeyForOption(i) + " in " + this);
                 }
             else
                 {
@@ -902,13 +912,13 @@ public abstract class Modulation implements Cloneable
                     if (mod != null)
                     	{
                     	int modOutput = mod.getModulationOutputForKey(m.getString("at"));
-                    	if (modOutput >= 0 && modOutput < mod.getNumModulations())
+                    	if (modOutput >= 0 && modOutput < mod.getNumModulationOutputs())
                     		{
 		                    setModulation(mod, i, modOutput);
 		                    }
-		            	else warnAlways("Modulation.java", "invalid mod output (" + modOutput + ") for id " + id + " in " + this);
+		            	else warn("Modulation.java", "invalid mod output (" + modOutput + ") for id " + id + " in " + this);
 		                }
-		            else warnAlways("Modulation.java", "no modulation for id " + id + " in " + this);
+		            else warn("Modulation.java", "no modulation for id " + id + " in " + this);
                     }
                 }
             }

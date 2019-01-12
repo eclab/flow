@@ -35,6 +35,7 @@ public class ModulePanel extends JPanel implements Transferable
     public ModulePanel(Modulation mod)
         {
         modulation = mod;
+        modulation.setModulePanel(this);
         
         setLayout(new BorderLayout());
         title = buildTitle();

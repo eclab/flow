@@ -19,6 +19,8 @@ public class ModulationInput extends InputOutput implements Rebuildable
     // The JLabel which holds the current parameter data
     JLabel data;
     
+    public boolean getDrawsStateDot() { return false; }
+    
     public JLabel getData() { return data; }
     
     // The underlying Modulation.  This is the Modulation for Sound #0
@@ -552,6 +554,16 @@ public class ModulationInput extends InputOutput implements Rebuildable
                 arc.setArc(rect.getX() + Style.DIAL_STROKE_WIDTH() / 2, rect.getY() + Style.DIAL_STROKE_WIDTH()/2, rect.getWidth() - Style.DIAL_STROKE_WIDTH(), rect.getHeight() - Style.DIAL_STROKE_WIDTH(), startAngle, interval, Arc2D.OPEN);            
                 graphics.draw(arc);
                 }
+                
+            if (getDrawsStateDot())
+            	{
+            	graphics.setPaint(Style.DIAL_DYNAMIC_COLOR());
+            		graphics.fill(new Ellipse2D.Double(
+            				rect.getX() + Style.DIAL_STROKE_WIDTH() * 2, 
+            				rect.getY() + Style.DIAL_STROKE_WIDTH() * 2, 
+            				rect.getWidth() - Style.DIAL_STROKE_WIDTH() * 4, 
+            				rect.getHeight() - Style.DIAL_STROKE_WIDTH() * 4));
+            	}
             }
         }
 

@@ -1359,9 +1359,9 @@ public class Unit extends Modulation
                 		{
 		                setInput(unit, i, unitOutput);
 		                }
-		            	else warnAlways("Unit.java", "invalid unit output (" + unitOutput + ") for id " + id + " in " + this);
+		            	else warn("Unit.java", "invalid unit output (" + unitOutput + ") for id " + id + " in " + this);
 					}
-				else warnAlways("Unit.java", "no unit for id " + id + " in " + this);
+				else warn("Unit.java", "no unit for id " + id + " in " + this);
                 }
             }       
         }
