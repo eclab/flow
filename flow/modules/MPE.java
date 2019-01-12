@@ -76,20 +76,16 @@ public class MPE extends Modulation implements ModSource
         if (pressureVariance < 0) at = 1 - at;
         setModulationOutput(MOD_PRESSURE, at);
         
-        double y = 0;
-        if (input.isMPE())
+        int cc = input.getCC(sound.getChannel(), 74);
+        if (cc != Input.UNSPECIFIED)
         	{
-        	y = 64;
-        	}
-        else
-        	{
-        	y = (sound.getCC(74) / 127.0) * Math.abs(yVariance) + yOffset;
+			double y = (cc / 127.0) * Math.abs(yVariance) + yOffset;
 			if (y < 0) y = 0;
 			if (y > 1) y = 1;
 			if (yVariance < 0) y = 1 - y;
-			}
 
-    	setModulationOutput(MOD_Y, y);
+    		setModulationOutput(MOD_Y, y);
+			}
         }
 
     public ModulePanel getPanel()
