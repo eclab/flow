@@ -128,13 +128,18 @@ public class MIDIIn extends Modulation implements ModSource
         
         for(int i = 0; i < NUM_CC; i++)
             {
-            double d = sound.getCC((int)(modulate(i) * 127))/127.0;
-            if (d != lastCC[i])
-                {
-                updateTrigger(MOD_CC + i);
-                setModulationOutput(MOD_CC + i, d);
-                lastCC[i] = d;
-                }
+            Input in = sound.getOutput().getInput();
+            int cc = in.getCC(sound.getChannel(), (int)(modulate(i) * 127));
+            if (cc != Input.UNSPECIFIED)
+            	{
+                double d = cc/127.0;
+				if (d != lastCC[i])
+					{
+					updateTrigger(MOD_CC + i);
+					setModulationOutput(MOD_CC + i, d);
+					lastCC[i] = d;
+					}
+				}
             }
         }
 

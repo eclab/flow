@@ -322,18 +322,31 @@ public class Output
     void register(Sound sound) 
         { 
         lock();
-        sound.index = numSounds; 
-        sounds[numSounds++] = sound; 
-        input.addSound(sound);
-        unlock();
+        try
+        	{
+        	sound.index = numSounds; 
+	        sounds[numSounds++] = sound; 
+	        input.addSound(sound);
+	        }
+	    finally
+	    	{
+	        unlock();
+	        }
         }
     
     /** Returns the given Sound */  
     public Sound getSound(int i)
         {
+        Sound s = null;
         lock();
-        Sound s = sounds[i];
-        unlock();
+        try
+        	{
+    	    s = sounds[i];
+    		}
+    	finally
+    		{
+	        unlock();
+	        }
         return s;
         }
     
@@ -349,9 +362,16 @@ public class Output
     /** Returns the total number of Sounds */
     public int getNumSounds()
         {
+        int n = 0;
         lock();
-        int n = numSounds;
-        unlock();
+        try
+        	{
+	        n = numSounds;
+	        }
+	    finally
+	    	{
+	        unlock();
+	        }
         return n;
         }
     
@@ -433,6 +453,8 @@ public class Output
         float reverbWet = 0.5f;
         float reverbRoomSize = 0.5f;
         float reverbDamp = 0.5f;
+        float c = 0.0f;
+        float r = 0.0f;
               
         public Swap()
             {
@@ -518,8 +540,10 @@ public class Output
             // by Java in *software*, resulting in a radical slowdown in this region.  Subnormals show up around
             // e^-308, so here if both ca[i] or what we're dropping to is even close to subnormals,
             // we just shut ca[0] straight to 0 to skip the whole subnormal range.
-            if (ca[oi] > WELL_ABOVE_SUBNORMALS || amplitude * PARTIALS_INTERPOLATION_ALPHA > WELL_ABOVE_SUBNORMALS)
-                ca[oi] = ca[oi] * (1.0 - PARTIALS_INTERPOLATION_ALPHA) + amplitude * PARTIALS_INTERPOLATION_ALPHA;
+            double aa = ca[oi] * (1.0 - PARTIALS_INTERPOLATION_ALPHA);
+            double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
+            if (aa > WELL_ABOVE_SUBNORMALS || bb > WELL_ABOVE_SUBNORMALS)
+                ca[oi] = aa + bb;
             else //if (ca[oi] != 0)
                 {
                 ca[oi] = 0;
@@ -790,6 +814,8 @@ public class Output
                         d = filter4;
                     	*/
                         
+                        //d = lowPassFilter(d, with.c, with.r);
+                        
                         int val = (int)(d);
                         audioBuffer[skipPos * 2 + 1] = (byte)((val >> 8) & 255);
                         audioBuffer[skipPos * 2] = (byte)(val & 255);
@@ -1046,6 +1072,8 @@ public class Output
             	swap.reverbWet = (float)(out.modulate(out.MOD_REVERB_WET));
             	swap.reverbDamp = (float)(out.modulate(out.MOD_REVERB_DAMP));
             	swap.reverbRoomSize = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE));
+            	//swap.c = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE + 1));
+            	//swap.r = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE + 2));
             	}
             }
         finally 
@@ -1073,5 +1101,47 @@ public class Output
                 }
             } 
 */
-        }       
+        }  
+        
+	static final double T = 1.0 / 44100.0;
+
+/*
+	static final double Q = Math.sqrt(0.5);
+	static final double CUTOFF = 1000.0;
+	static final double O = CUTOFF * 2 * Math.PI; //O = 2.0 / T * Math.tan(CUTOFF * Math.PI);
+	static final double OOQTT = O * O * Q * T * T;
+	static final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
+	static final double IJ = 1.0 / J;
+	static final double b0 = IJ * OOQTT;
+	static final double b1 = IJ * 2 * OOQTT;
+	static final double b2 = IJ * OOQTT;
+	static final double a1 = IJ * (-8 * Q + 2 * OOQTT);
+	static final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
+*/    
+    double[] N = new double[2];
+    double[] M = new double[2];
+    double lowPassFilter(double d, double cut, double res)
+    	{
+     double Q = (res * 10 + 1) * 0.7071;
+	 final double CUTOFF = cut * 20000 + 25;
+	 final double O = CUTOFF * 2 * Math.PI;
+	 final double OOQTT = O * O * Q * T * T;
+	 final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
+	 final double IJ = 1.0 / J;
+	 final double b0 = IJ * OOQTT;
+	 final double b1 = IJ * 2 * OOQTT;
+	 final double b2 = IJ * OOQTT;
+	 final double a1 = IJ * (-8 * Q + 2 * OOQTT);
+	 final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
+
+    	double y = d * b0 + N[0] * b1 + N[1] * b2 - a1 * M[0] - a2 * M[1];
+    	N[1] = N[0];
+    	N[0] = d;
+    	M[1] = M[0];
+    	M[0] = y;
+    	if (y < WELL_ABOVE_SUBNORMALS && y > 0) System.err.println("subnormal");
+    	if (y != y) System.err.println("NAN");
+    	return y;
+    	}    
+         
     }

@@ -44,14 +44,11 @@ public class Input
     
     public static final byte UNSPECIFIED = -1;
     
-    // The array of CC values.  Some of these are not legal, since they are part of the NRPN facility.
-    byte[] cc;
-    
     // The number of mpe channels. This needs to be handled differently depending on the zone.
     int numMPEChannels = DEFAULT_NUM_MPE_CHANNELS;
     
     // The array of channels that are in-zone for the current MPE settings
-    boolean[] mpeChannels = new boolean[16];
+    boolean[] mpeChannels = new boolean[NUM_CHANNELS];
     
     // The raw bend value
     int rawBend = 0;
@@ -61,9 +58,12 @@ public class Input
         return rawBend;
         }
     
+    // CC array
+    byte[][] cc = new byte[NUM_CHANNELS][NUM_CC];
+
     // The array of NRPN values
-    short[] nrpn;
-    boolean[] msbSentLast;
+    short[] nrpn = new short[NUM_NRPN];
+    boolean[] msbSentLast = new boolean[NUM_NRPN];
     
     public Midi getMidi()
         {
@@ -83,8 +83,6 @@ public class Input
     int bendOctave;
     // current global bend value
     double globalBend = 1.0;
-    // CC array
-    byte[][] mpeCCValues = new byte[16][128];
     
     
     public int getBendOctave()
@@ -118,9 +116,12 @@ public class Input
         return respondsToBend;
         }
     
-    
+    // MIDI Channel count
+    static final int NUM_CHANNELS = 16;
     // The number of CC values.
     static final int NUM_CC = 128;
+    // The maximum legal CC value
+    static final int MAX_CC_VAL = 127;
     // The number of NRPN Values.
     static final int NUM_NRPN = 16384;
     // The maximum legal NRPN value
@@ -156,12 +157,12 @@ public class Input
         bendOctave = Prefs.getLastBendOctave();
         
         channel = 0;
-        cc = new byte[NUM_CC];
-        nrpn = new short[NUM_NRPN];
-        msbSentLast = new boolean[NUM_NRPN];
         
-        for (int i = 0; i < NUM_CC; i++)
-            cc[i] = UNSPECIFIED;
+        for(int chan = 0; chan < NUM_CHANNELS; chan++)
+        	{
+	        for (int i = 0; i < NUM_CC; i++)
+	            cc[chan][i] = UNSPECIFIED;
+	        }
         
         for (int i = 0; i < NUM_NRPN; i++)
             nrpn[i] = UNSPECIFIED;
@@ -205,7 +206,7 @@ public class Input
     
     private void setupMPEArray()
         {
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < NUM_CHANNELS; i++)
             {
             int chan = channel;    // channel is volatile
             if ((chan == CHANNEL_LOWER_ZONE && i <= numMPEChannels)
@@ -256,7 +257,7 @@ public class Input
         }
     
     /**
-     * Returns the current channel.
+     * Returns the current channel for the input.
      */
     public int getChannel()
         {
@@ -276,11 +277,11 @@ public class Input
     
     
     /**
-     * Returns the current value for the given CC, or UNSPECIFIED
+     * Returns the current value for the given CC on the given channel, or UNSPECIFIED
      */
-    public byte getCC(int num)
+    public byte getCC(int channel, int num)
         {
-        return cc[num];
+        return cc[channel][num];
         }
     
     /**
@@ -309,12 +310,21 @@ public class Input
             }
         if (ccdata.type == Midi.CCData.TYPE_RAW_CC)
             {
-            cc[ccdata.number] = (byte) ccdata.value;
-            if (cc[ccdata.number] < 0)
-                {
-                cc[ccdata.number] = 0;
-                }
-            
+            byte val = (byte)ccdata.value;
+            if (val < 0) val = 0;
+            if (val > MAX_CC_VAL) val = MAX_CC_VAL;
+            cc[ccdata.channel][ccdata.number] = val;
+
+			// if it's global mpe, we need to distribute to all the channels
+			if (isMPE() && sm.getChannel() == getMPEGlobalChannel())
+				{
+				for (int i = 0; i < NUM_CHANNELS; i++)
+					{
+					if (isInMPEZone(i))
+						cc[i][ccdata.number] = val;
+					}
+				}
+
             // At present we're just distributing to all the sounds.
             // With MPE this needs to change.
             
@@ -322,61 +332,29 @@ public class Input
             try
                 {
                 int num = output.getNumSounds();
-                if (!isMPE())
-                    {
-                    for (int i = 0; i < num; i++)
-                        {
-                        output.getSound(i).setCC(ccdata.number, ccdata.value);
-                        }
-                    
-                    // We'll handle the sustain pedal for non-MPE here.
-                    // Should MPE support sustain globally maybe?
-                    
-                    if (ccdata.number == CC_SUSTAIN_PEDAL)
-                        {
-                        if (ccdata.value >= 64)        // sustain is down
-                            {
-                            sustain = true;
-                            }
-                        else
-                            {
-                            // release all the sounds in the sustain queue
-                            for (Sound sound : sustainQueue)
-                                {
-                                sound.release();
-                                }
-                            sustainQueue.clear();
-                            sustain = false;
-                            }
-                        }
+				if (ccdata.number == CC_SUSTAIN_PEDAL)
+					{
+					if (ccdata.value >= 64)        // sustain is down
+						{
+						sustain = true;
+						}
+					else
+						{
+						// release all the sounds in the sustain queue
+						for (Sound sound : sustainQueue)
+							{
+							sound.release();
+							}
+						sustainQueue.clear();
+						sustain = false;
+						}
                     }
-                else
-                    {
-                    if (sm.getChannel() == getMPEGlobalChannel())
-                        {
-                        for (int i = 0; i < 16; i++)
-                            {
-                            mpeCCValues[i][ccdata.number] = cc[ccdata.number];
-                            }
-                        }
-                    else
-                        {
-                        mpeCCValues[sm.getChannel()][ccdata.number] = cc[ccdata.number];
-                        }
-                    for (int i = 0; i < num; i++)
-                        {
-                        Sound sound = output.getSound(i);
-                        if ((sm.getChannel() == sound.getChannel() || sm.getChannel() == getMPEGlobalChannel()))
-                            {
-                            sound.setCC(ccdata.number, ccdata.value);
-                            break;  // there can only be one
-                            }
-                        }
-                    }
-                } finally
+                } 
+            finally
                 {
                 output.unlock();
                 }
+                
             }
         else if (ccdata.type == Midi.CCData.TYPE_NRPN)
             {
@@ -509,13 +487,6 @@ public class Input
             sound.setMIDINote(i);
             sound.setVelocity((double) sm.getData2() / 127.0);
             sound.setBend(globalBend);
-            if (isMPE())
-                {
-                for (int ccNumber = 0; ccNumber < 128; ccNumber++)
-                    {
-                    sound.setCC(ccNumber, mpeCCValues[sm.getChannel()][ccNumber]);
-                    }
-                }
             if (!noteCurrentlyOn)
                 {
                 sound.gate();
