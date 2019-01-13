@@ -365,6 +365,7 @@ public class AppMenu
                             rack.output.unlock();
                             }
 						rack.scrollToRight();
+						((Out.OutModulePanel)(rack.findOut())).updatePatchInfo();
                         }
                     catch(Exception ex) { ex.printStackTrace(); showSimpleError("Patch Reading Error", "The patch could not be loaded", rack); }
                     file = f;

@@ -134,7 +134,7 @@ public class Seq extends Modulation
     int _state = 0;
     void updateModulePanel(boolean force)
     	{
-		if ((display || force) && getMacro() == null && sound.getOutput().getInput().getLastPlayedSound() == sound)
+		if ((display || force) && getMacro() == null && sound != null) //  && sound.getOutput().getInput().getLastPlayedSound() == sound)
 			{
 			// At this point, I am the sound being played and I'm not in a macro, so I need
 			// to update the module panel.

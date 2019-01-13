@@ -30,7 +30,6 @@ public class ModulePanel extends JPanel implements Transferable
     
     JLabel titleLabel;
     JComponent titlePanel;
-    
         
     public ModulePanel(Modulation mod)
         {

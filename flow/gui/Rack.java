@@ -57,6 +57,14 @@ public class Rack extends JPanel
     
     public JScrollPane getScrollPane() { return pane; }
     
+    public ModulePanel findOut()
+    	{
+    	for(ModulePanel panel : allModulePanels)
+    		if (panel.getModulation() instanceof Out)
+    			return panel;
+    	return null;
+    	}
+    
     public Rack(Output output)
         {
         super();
@@ -278,7 +286,7 @@ public class Rack extends JPanel
                 {
                 output.unlock();
                 }
-            ModulePanel pan = firstModulation.getPanel();
+            ModulePanel pan = firstModulation.getPanel(); 
             addModulePanel(pan);
             reset();
             repaint();
