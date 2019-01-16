@@ -47,7 +47,7 @@
 
 \noindent {\Huge\bf {\name}}\\[0.5em]
 {\large \bf An Open-source Fully Modular Additive Synthesizer\\[0.2em]
-Version 2\\[0.2em]
+Version 3\\[0.2em]
 https://github.com/eclab/flow\\\\[0.2em]
 By Sean Luke\\[0.2em]
 Department of Computer Science\\[0.25em]
@@ -386,7 +386,7 @@ The Modules are divided into five categories:
 \item {\bf Modulation Shapers}\quad Are meant to modify modulation information.  Example: a module which takes an incoming signal and does a Sample and Hold on it.
 \item {\bf Partials Sources}\quad Are meant to be sources of, well, partials.  Example: a sawtooth wave.
 \item {\bf Partials Shapers}\quad Are meant to modify partials, producing new ones.  Example: a low pass filter.
-\item {\bf Special}\quad Various system modules, such as In, Out, and Macro.  Just because these are at the end doesn't mean they're not important (they're probably the {\it most} important, so don't skip them!).
+\item {\bf Special}\quad Various system modules, such as In, Out, Options, and Macro.  Just because these are at the end doesn't mean they're not important (they're probably the {\it most} important, so don't skip them!).
 \end{itemize}
 
 \subsection{Modulation Sources}
@@ -492,7 +492,7 @@ See also {\bf MIDIIn}, previous.
 
 \end{itemize}
 
-\paragraph{S \& H}  Sample and Hold.  Takes an incoming modulation signal and a trigger.  On receiving the trigger, it samples the signal and outputs that value until the next trigger, when it resamples, etc.
+\paragraph{S \& H}  Sample and Hold.  Takes an incoming modulation signal and a trigger.  If the type is {\it S \& H}, then on receiving the trigger, it samples the signal and outputs that value until the next trigger, when it resamples, etc.  If the type is {\it T \& H} or {\it T \& H 2}, then we are in {\it Track and Hold} mode.  Here, the trigger {\it toggles} between sampling and holding the value, or letting it pass through normally.  The difference between the two Track and Hold modes is just one of phase: in the first version, when a gate is received, we are in sample-and-hold mode, where as in the second version, when a gate is received, we are in pass-through mode.
 
 \paragraph{Seq}  A step sequencer of up to 32 steps, as specified by {\it Steps}.  Each step is a modulation value which you can set.  On gate (note-on), the sequencer resets itself to step 1, and the step increments each time the {\it Trigger} is fired.  The value of the current step is outputted as {\it Mod}.  Additionally, {\it Mod} outputs a trigger each time the step is incremented: you could use this to reset a sound to its start, for example. 
 
@@ -682,14 +682,13 @@ Partial Filter can be set to be {\it Relative}.  When relative, the partials are
 
 \subsection{Special Modules}
 
-%\begin{wrapfigure}{r}{1.6in}
-%\vspace{-2em}
-%\includegraphics[width=1.6in]{Other}
-%\caption{Special Modules}
-%\vspace{-5em}
-%\end{wrapfigure}
+There are four special modules: {\bf In}, {\bf Out}, {\bf Options}, and {\bf Macro}.  The {\bf Out} module is critical in every patch.  {\bf In} and {\bf Macro} enable {\it macros}\.---\,and {\bf Out} helps out here as well.
 
-There are three special modules: {\bf In}, {\bf Out}, and {\bf Macro}.  The {\bf Out} module is critical in every patch.  {\bf In} and {\bf Macro} enable {\it macros}\.---\,and {\bf Out} helps out here as well.
+\paragraph{Options}  The Options module is an odd duck: it doesn't produce any sounds or modulation at all.  Instead, it enables you to change a module's checkboxes and comboboxes using a modulation signal.  To do this, note that Options has a modulation input and a sound input port both called {\bf Target}.   Plug one of your target module's modulation or sound outputs into the appropriate Target port: this tells Options what target module it should be modifying.  Don't attach to both of them, or Options will just use the sound input port.
+
+After this is done, you will find you can select an option (a combobox or a checkbox) via the {\it Option} dial.\footnote{At present, the constraints facility is not part of the available options.  This might change in the future.} Once this is done, you can change the value of the selected option via the {\it Value} dial.  This might be particularly interesting to do via an LFO.
+
+Note that when you change the value, it's not immediately reflected (or reflected at all!) in the target module's GUI.  This is because updating the GUI in real time could be very costly.  But it's been change!  You can convince yourself of this by dragging the module and moving it.  Similarly, if you click on the option combo box or check box, the result is not directly reflected in the Options dial.
 
 \subsubsection{The \textit{Out} Module in Basic Use}  
 \label{outmodule}
