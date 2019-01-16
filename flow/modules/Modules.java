@@ -69,6 +69,7 @@ public class Modules
     flow.modules.Noise.class,
     flow.modules.NRPN.class,
     flow.modules.Out.class,
+    flow.modules.Options.class,
     flow.modules.PartialLab.class,
     flow.modules.PartialMod.class,
     flow.modules.PartialFilter.class,

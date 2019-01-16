@@ -834,6 +834,7 @@ public class AppMenu
         ArrayList<JMenuItem> unitShapers = new ArrayList<>();
         //JMenuItem outMenu = null;
         JMenuItem inMenu = null;
+        JMenuItem optMenu = null;
 
 		Class[] modules = Modules.getModules();
         for(int i = 0; i < modules.length; i++)
@@ -842,9 +843,11 @@ public class AppMenu
             JMenuItem m = menuFor(c, rack);
                         
             if (c == flow.modules.Out.class)
-                { } // do nothing //outMenu = m;
+                { } // do nothing
             else if (c == flow.modules.In.class)
                 inMenu = m;
+            else if (c == flow.modules.Options.class)
+            	optMenu = m;
             else if (flow.UnitSource.class.isAssignableFrom(c))
                 unitSources.add(m);
             else if (flow.ModSource.class.isAssignableFrom(c))
@@ -855,8 +858,6 @@ public class AppMenu
                 modShapers.add(m);
             }
                 
-        //menu.add(outMenu);
-        menu.add(inMenu);
                 
         JMenu sub = new JMenu("Modulation Sources");
         for(JMenuItem m : modSources)
@@ -876,6 +877,11 @@ public class AppMenu
         sub = new JMenu("Partials Shapers");
         for(JMenuItem m : unitShapers)
             sub.add(m);
+        menu.add(sub);
+                        
+        sub = new JMenu("Other");
+        sub.add(inMenu);
+        sub.add(optMenu);
         menu.add(sub);
                         
         return menu;

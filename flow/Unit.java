@@ -27,6 +27,8 @@ import java.util.*;
    possibly other ports), we can automatically *reset* some of those partials back to the
    ones originally supplied by input port 0.  This has the effect of constraining changes
    made to partials to only the ones not reset.
+   
+   <p>If you don't want a unit to be constrainable, override isConstrainable()
         
    <p>Because Units are Modulations, they can both send and receive modulation signals.  But
    because sending Modulation signals via a Unit is not very common, by default all Units
