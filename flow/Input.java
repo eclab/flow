@@ -281,6 +281,8 @@ public class Input
      */
     public byte getCC(int channel, int num)
         {
+        if (channel == CHANNEL_NONE) return UNSPECIFIED;
+        if (channel == CHANNEL_OMNI) channel = 0;
         return cc[channel][num];
         }
     
@@ -315,6 +317,12 @@ public class Input
             if (val > MAX_CC_VAL) val = MAX_CC_VAL;
             cc[ccdata.channel][ccdata.number] = val;
 
+			// if we're OMNI we should route to (say) channel 0
+			if (channel == CHANNEL_OMNI)
+				{
+				ccdata.channel = 0;
+				}
+				
 			// if it's global mpe, we need to distribute to all the channels
 			if (isMPE() && sm.getChannel() == getMPEGlobalChannel())
 				{
@@ -325,9 +333,6 @@ public class Input
 					}
 				}
 
-            // At present we're just distributing to all the sounds.
-            // With MPE this needs to change.
-            
             output.lock();
             try
                 {
