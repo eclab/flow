@@ -338,6 +338,9 @@ public class Out extends Unit
             	p.add(right, BorderLayout.NORTH);
             	p.add(pane, BorderLayout.CENTER);
 
+    			JPanel pushPanel = new JPanel();
+    			pushPanel.setLayout(new BorderLayout());
+    			
     			final PushButton _update = new PushButton("Patch Info")
     				{
     				public void perform()
@@ -346,7 +349,11 @@ public class Out extends Unit
     					updatePatchInfo();
     					}
     				};
-    			p.add(_update, BorderLayout.SOUTH);
+    			pushPanel.add(_update, BorderLayout.WEST);
+    			JComponent comp = flow.gui.Stretch.makeHorizontalStretch();
+    			pushPanel.add(comp, BorderLayout.CENTER);
+    			
+    			p.add(pushPanel, BorderLayout.SOUTH);
             	
             	Box box = new Box(BoxLayout.X_AXIS);
             	box.add(left);

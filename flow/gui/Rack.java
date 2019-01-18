@@ -57,12 +57,12 @@ public class Rack extends JPanel
     
     public JScrollPane getScrollPane() { return pane; }
     
-    public ModulePanel findOut()
+    public Out.OutModulePanel findOut()
     	{
     	for(ModulePanel panel : allModulePanels)
     		if (panel.getModulation() instanceof Out)
-    			return panel;
-    	return null;
+    			return (Out.OutModulePanel)panel;
+    	return (Out.OutModulePanel)null;
     	}
     
     public Rack(Output output)

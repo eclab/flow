@@ -92,6 +92,7 @@ public class AppMenu
         }
 
 
+/*
     static JMenuItem namePatchMenu(Rack rack)
         {
         JMenuItem name = new JMenuItem("Patch Info...");
@@ -106,7 +107,7 @@ public class AppMenu
             });
         return name;
         }
-
+*/
 
     static JMenuItem quitPatchMenu(Rack rack)
         {
@@ -199,12 +200,13 @@ public class AppMenu
         
     static void doSaveAs(Rack rack)
         {
+        /*
 		if (rack.getPatchName() == null || rack.getPatchName().trim().equals(""))
 			{
 			if (!rack.doPatchDialog("Patch Information Prior to Saving"))
 				return;		// failed
 			}
-
+		*/
 
         Modulation[] mods = new Modulation[rack.allModulePanels.size()];
         for(int i = 0; i < mods.length; i++)
@@ -500,6 +502,13 @@ public class AppMenu
                         rack.checkOrder();
                         rack.add(Out.class);
                         rack.setPatchName(null);
+						rack.setPatchVersion(null);
+						rack.setPatchInfo(null);
+						rack.setPatchAuthor(null);
+						rack.setPatchDate(null);
+						
+						// reset Out
+						rack.findOut().updatePatchInfo();
                         file = null;
                         // don't reset dirFile
                         }
@@ -782,7 +791,7 @@ public class AppMenu
         menu.add(velMenu(rack));
         menu.add(syncMenu(rack));
         menu.addSeparator();
-        menu.add(namePatchMenu(rack));
+//        menu.add(namePatchMenu(rack));
         return menu;
         }
 
@@ -846,7 +855,7 @@ public class AppMenu
                 { } // do nothing
             else if (c == flow.modules.In.class)
                 inMenu = m;
-            else if (c == flow.modules.Options.class)
+            else if (c == flow.modules.Choose.class)
             	optMenu = m;
             else if (flow.UnitSource.class.isAssignableFrom(c))
                 unitSources.add(m);

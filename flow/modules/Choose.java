@@ -6,8 +6,10 @@ package flow.modules;
 
 import flow.*;
 import flow.gui.*;
+import java.awt.*;
+import javax.swing.*;
 
-public class Options extends Unit
+public class Choose extends Unit
     {       
     private static final long serialVersionUID = 1;
 	
@@ -22,13 +24,19 @@ public class Options extends Unit
 	String lastOptionName = "";
 	String lastValueName = "";
 
-    public Options(Sound sound)
+    public Choose(Sound sound)
         {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO }, new String[] { "Target", "Option", "Value" });
         defineInputs(new Unit[] { Unit.NIL }, new String[] { "Target" });
         defineOutputs(new String[] { });
         }
+
+
+	public void redraw(final ModulationInput m)
+		{
+		SwingUtilities.invokeLater(new Runnable() { public void run() { m.updateText(); m.repaint(); } });
+		}
 
     public void go()
         {
@@ -43,6 +51,19 @@ public class Options extends Unit
     			{
     			if (mod instanceof Constant)
     				{
+    				if (lastMod != null)
+    					{
+						lastOption = -1;
+						lastValue = -1;
+						lastOptionName = "";
+						lastValueName = "";
+						if (modInput1 != null)
+							redraw(modInput1);
+						if (modInput2 != null)
+							redraw(modInput2);
+    					}
+    				
+    				lastMod = null;
     				return;		// Nothing plugged in to either one
     				}
     			}
@@ -66,12 +87,24 @@ public class Options extends Unit
     		lastValue = -1;
     		lastOptionName = "";
     		lastValueName = "";
+			if (modInput1 != null)
+				redraw(modInput1);
+			if (modInput2 != null)
+				redraw(modInput2);
     		return;
     		}
     	
     	// If we have changed the modulation target or the option, we need to redo everything
     	if (lastMod != mod || lastOption != option)
     		{
+    		if (getModulation(MOD_OPTION) instanceof Constant)
+    			{
+				if (modInput1 != null)
+					redraw(modInput1);
+				if (modInput2 != null)
+					redraw(modInput2);
+				}
+				
 			int newOption = (int)(numOptions * option);
 			if (newOption >= numOptions) 
 				{
@@ -86,8 +119,9 @@ public class Options extends Unit
 			Modulation vmod = getModulation(MOD_VALUE);
 			if (vmod instanceof Constant)
 				{
-				newValue = mod.getOptionValue(newOption) / valueNames.length;
-				((Constant)vmod).setValue(newValue);
+				newValue = mod.getOptionValue(newOption);
+				((Constant)vmod).setValue(newValue / (double)valueNames.length);
+					
 				// FIXME: maybe need to repaint here?
 				}
 			else
@@ -202,4 +236,26 @@ public class Options extends Unit
             }
         else return "";
         }
+
+	ModulationInput modInput1 = null;
+	ModulationInput modInput2 = null;
+	
+    public ModulePanel getPanel()
+        {
+        return new ModulePanel(Choose.this)
+            {
+            public JComponent buildPanel()
+                {               
+                Box box = new Box(BoxLayout.Y_AXIS);
+                Unit unit = (Unit) getModulation();
+                box.add(new UnitInput(unit, 0, this));
+                box.add(new ModulationInput(unit, 0, this));
+                box.add(modInput1 = new ModulationInput(unit, 1, this));
+                box.add(modInput2 = new ModulationInput(unit, 2, this));
+                return box;
+                }
+            };
+        }
+
+
     }
