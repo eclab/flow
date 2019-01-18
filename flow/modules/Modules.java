@@ -40,7 +40,7 @@ public class Modules
     flow.modules.AmpMath.class,
     flow.modules.Average.class,
     flow.modules.Buffer.class,
-    flow.modules.Choose.class,
+    flow.modules.Choice.class,
     flow.modules.Combine.class,
     flow.modules.Compress.class,
     flow.modules.DADSR.class,

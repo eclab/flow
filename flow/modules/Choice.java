@@ -9,7 +9,7 @@ import flow.gui.*;
 import java.awt.*;
 import javax.swing.*;
 
-public class Choose extends Unit
+public class Choice extends Unit
     {       
     private static final long serialVersionUID = 1;
 	
@@ -24,7 +24,7 @@ public class Choose extends Unit
 	String lastOptionName = "";
 	String lastValueName = "";
 
-    public Choose(Sound sound)
+    public Choice(Sound sound)
         {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO }, new String[] { "Target", "Option", "Value" });
@@ -242,7 +242,7 @@ public class Choose extends Unit
 	
     public ModulePanel getPanel()
         {
-        return new ModulePanel(Choose.this)
+        return new ModulePanel(Choice.this)
             {
             public JComponent buildPanel()
                 {               
