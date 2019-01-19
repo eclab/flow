@@ -855,7 +855,7 @@ public class AppMenu
                 { } // do nothing
             else if (c == flow.modules.In.class)
                 inMenu = m;
-            else if (c == flow.modules.Choose.class)
+            else if (c == flow.modules.Choice.class)
             	optMenu = m;
             else if (flow.UnitSource.class.isAssignableFrom(c))
                 unitSources.add(m);

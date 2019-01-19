@@ -61,6 +61,7 @@ public class ModMath extends Modulation
     public static final int AVERAGE = 10;
     public static final int THRESHOLD = 11;
     public static final int ADD_SUBTRACT = 12;
+    public static final int SWITCH = 13;
     
     public static final int TRIGGER_A = 0;
     public static final int TRIGGER_A_OR_B = 1;
@@ -80,24 +81,34 @@ public class ModMath extends Modulation
     public static final int TRIGGER_16_A = 15;
     public static final int TRIGGER_18_A = 16;
     public static final int TRIGGER_24_A = 17;
-    public static final int TRIGGER_36_A = 18;
-    public static final int TRIGGER_48_A = 19;
-    public static final int TRIGGER_64_A = 20;
+    public static final int TRIGGER_32_A = 18;
+    public static final int TRIGGER_36_A = 19;
+    public static final int TRIGGER_48_A = 20;
+    public static final int TRIGGER_64_A = 21;
+    public static final int TRIGGER_72_A = 22;
+    public static final int TRIGGER_96_A = 23;
+    public static final int TRIGGER_144_A = 24;
+    public static final int TRIGGER_192_A = 25;
+    public static final int TRIGGER_DIR = 26;
+    public static final int TRIGGER_CENTER = 27;
         
     public static final int DISCRETIZATION = 128;
         
-    public static final String[] OPERATION_NAMES = new String[] { "+", "-", "x", "min", "max", "square", "sqrt", "cube", "discretize", "map hi", "average", "threshold", "+/-"  };
-    public static final String[] TRIGGER_NAMES = new String[] { "A", "A or B", "A and B", "A but not B", "2 A", "3 A", "4 A", "5 A", "6 A", "7 A", "8 A", "9 A", "10 A", "11 A", "12 A", "16 A", "18 A", "24 A", "32 A", "36 A", "48 A", "64 A", "72 A", "96 A", "144 A", "192 A" };
+    public static final String[] OPERATION_NAMES = new String[] { "+", "-", "x", "min", "max", "square", "sqrt", "cube", "discretize", "map hi", "average", "threshold", "+/-", "switch"  };
+    public static final String[] TRIGGER_NAMES = new String[] { "A", "A or B", "A and B", "A but not B", "2 A",  "3 A",  "4 A",  "5 A",  "6 A",   "7 A",   "8 A",  "9 A", "10 A", "11 A", "12 A", "16 A", "18 A",  "24 A",  "32 A", "36 A", "48 A", "64 A", "72 A", "96 A", "144 A", "192 A", "dir", "center" };
     public static final int[] TRIGGER_DIVIDERS = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 18, 24, 32, 36, 48, 64, 72, 96, 144, 192 };
     int operation = ADD;
     int triggerOperation = TRIGGER_A;
     int triggerCount = 0;
+    boolean _switch = false;
+    boolean lastDir = false;
+    double lastMod0 = -1;
                 
     public int getOperation() { return operation; }
     public void setOperation(int val) { operation = val; }
 
     public int getTriggerOperation() { return triggerOperation; }
-    public void setTriggerOperation(int val) { triggerOperation = val; }
+    public void setTriggerOperation(int val) { triggerOperation = val; System.err.println(val);}
 
     public static final int OPTION_OPERATION = 0;
     public static final int OPTION_TRIGGER_OPERATION = 1;
@@ -135,7 +146,6 @@ public class ModMath extends Modulation
         
         double mod0 = modulate(MOD_A);
         double mod1 = modulate(MOD_B);
-                                
         double val = 0;
                 
         switch(operation)
@@ -216,6 +226,34 @@ public class ModMath extends Modulation
                 val = Math.max(0.0, Math.min(1.0, mod1 + mod0 - 0.5));
                 }
             break;
+            case SWITCH:
+            	{
+            	if (_switch)	// Currently B
+            		{
+            		if (isTriggered(MOD_A))
+            			{
+            			_switch = !_switch;
+            			val = mod0;
+            			}
+            		else
+            			{
+            			val = mod1;
+            			}
+            		}
+            	else		// Currently A
+            		{
+            		if (isTriggered(MOD_B))
+            			{
+            			_switch = !_switch;
+            			val = mod1;
+            			}
+            		else
+            			{
+            			val = mod0;
+            			}
+            		}
+            	}
+            break;
             default:
             	{
             	warn("modules/ModMath.java", "default occurred when it shouldn't be possible");
@@ -264,9 +302,14 @@ public class ModMath extends Modulation
             case TRIGGER_16_A:
             case TRIGGER_18_A:
             case TRIGGER_24_A:
+            case TRIGGER_32_A:
             case TRIGGER_36_A:
             case TRIGGER_48_A:
             case TRIGGER_64_A:
+            case TRIGGER_72_A:
+            case TRIGGER_96_A:
+            case TRIGGER_144_A:
+            case TRIGGER_192_A:
                 if (isTriggered(MOD_A))
                     triggerCount++;
                 if (triggerCount >= TRIGGER_DIVIDERS[triggerOperation - TRIGGER_2_A])
@@ -275,8 +318,36 @@ public class ModMath extends Modulation
                     updateTrigger(0);
                     }
                 break;
+            case TRIGGER_DIR:
+            	if (lastMod0 != -1 &&
+            		mod0 - lastMod0 != 0)
+            		{
+            		boolean dir = (lastMod0 > mod0);
+					if (dir != lastDir)  // we changed direction
+						{
+						updateTrigger(0);
+						}
+            		}
+            	break;
+            case TRIGGER_CENTER:
+            	if (lastMod0 != -1)
+            		{
+            		if (lastMod0 >= 0.5 && mod0 < 0.5 ||
+            			lastMod0 < 0.5 && mod0 >= 0.5)		// crossed center
+            			updateTrigger(0);
+            		}
+            	break;
             }
         setModulationOutput(0, val);
+
+		// update direction
+		if (lastMod0 != -1 && 
+			mod0 - lastMod0 != 0)
+			{
+			lastDir = (lastMod0 > mod0);
+			}
+			
+        lastMod0 = mod0;
         }
 
     public void resetTrigger(int num)
