@@ -95,6 +95,8 @@ public class ModulePanel extends JPanel implements Transferable
             return Color.BLACK;
         else if (modulation instanceof flow.modules.In)
             return Color.BLACK;
+        else if (modulation instanceof flow.modules.Choice)
+            return Color.BLACK;
         else if (modulation instanceof flow.modules.Macro)
             return new Color(32, 100, 32);
         else if (modulation instanceof flow.UnitSource)
