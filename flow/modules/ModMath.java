@@ -108,7 +108,7 @@ public class ModMath extends Modulation
     public void setOperation(int val) { operation = val; }
 
     public int getTriggerOperation() { return triggerOperation; }
-    public void setTriggerOperation(int val) { triggerOperation = val; System.err.println(val);}
+    public void setTriggerOperation(int val) { triggerOperation = val; }
 
     public static final int OPTION_OPERATION = 0;
     public static final int OPTION_TRIGGER_OPERATION = 1;

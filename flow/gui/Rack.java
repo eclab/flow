@@ -941,6 +941,7 @@ public class Rack extends JPanel
 
         JTextArea i = new JTextArea(5, LABEL_MAX_LENGTH);
         i.setText(info);
+		i.setCaretPosition(0);  // scrolls to top
         i.setLineWrap(true);
 		i.setWrapStyleWord(true);
         JScrollPane pane = new JScrollPane(i);

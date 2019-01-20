@@ -221,6 +221,7 @@ public class Out extends Unit
         _info.setText(" ");
         _info.setHighlighter(null);
 		_info.setEditable(false);
+		_info.setCaretPosition(0);  // scrolls to top
 		
         final JScrollPane pane = new JScrollPane(_info);
         pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -296,6 +297,7 @@ public class Out extends Unit
             	if (t == null || t.trim().equals("")) t = "--";
             	else t = t.trim();
 				_info.setText(t);
+				_info.setCaretPosition(0);  // scrolls to top
 				
 				repaint();
             	}
@@ -342,11 +344,11 @@ public class Out extends Unit
     			JPanel pushPanel = new JPanel();
     			pushPanel.setLayout(new BorderLayout());
     			
-    			final PushButton _update = new PushButton("Patch Info")
+    			final PushButton _update = new PushButton("Edit")
     				{
     				public void perform()
     					{
-    					getRack().doPatchDialog("Patch Info");
+    					getRack().doPatchDialog("Edit Patch Info");
     					updatePatchInfo();
     					}
     				};
