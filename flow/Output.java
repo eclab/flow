@@ -59,7 +59,7 @@ public class Output
         Larger and we have more latency.  Smaller and the system can't handle it.  
         It appears &geq 1024 is required on the Mac for 44100 KHz
     */
-    public static final int DEFAULT_BUFFER_SIZE = 2048;                     
+    public static final int DEFAULT_BUFFER_SIZE = 1152;                     
     static int bufferSize = -1;                     
     
     /** Number of samples emitted before reading the next partials output.

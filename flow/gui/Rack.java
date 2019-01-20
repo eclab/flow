@@ -707,8 +707,8 @@ public class Rack extends JPanel
         int voice = Prefs.getLastNumVoices();
         voicesCombo.setSelectedIndex(voice - 1);
         
-        int[] bufferSize = new int[] { 128, 256, 512, 1024, 1536, 2048, 2560, 3072, 3584, 4096 };
-        String[] s_bufferSize = new String[] { "128", "256", "512", "1024", "1536", "2048", "2560", "3072", "3584", "4096" };
+        int[] bufferSize = new int[] { 			64,   128,   256,   384,   512,   640,   768,   896,   1024,   1152,   1280,   1408,   1536,   1664,   1792,   1920,   2048 };
+        String[] s_bufferSize = new String[] { "64", "128", "256", "384", "512", "640", "768", "896", "1024", "1152", "1280", "1408", "1536", "1664", "1792", "1920", "2048" };
         JComboBox bufferSizeCombo = new JComboBox(s_bufferSize);
         int bs = Prefs.getLastBufferSize();
         int index = 0;

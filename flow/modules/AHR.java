@@ -81,14 +81,15 @@ public class AHR extends Modulation implements ModSource
     public static final int CURVE_X_8 = 3;
     public static final int CURVE_JUMP = 4;
         
-    public static final int MOD_ATTACK_TIME = 0;
-    public static final int MOD_ATTACK_LEVEL = 1;
-    public static final int MOD_HOLD_TIME = 2;
-    public static final int MOD_RELEASE_TIME = 3;
-    public static final int MOD_GATE_TR = 4;
-    public static final int MOD_REL_TR = 5;
+    public static final int MOD_RELEASE_LEVEL = 0;
+    public static final int MOD_ATTACK_TIME = 1;
+    public static final int MOD_ATTACK_LEVEL = 2;
+    public static final int MOD_HOLD_TIME = 3;
+    public static final int MOD_RELEASE_TIME = 4;
+    public static final int MOD_GATE_TR = 5;
+    public static final int MOD_REL_TR = 6;
         
-    double[] level = new double[4];          // not all of these slots will be used
+    double[] level = new double[4];
     double[] time = new double[4];          // not all of these slots will be used
     double start;
     double interval;
@@ -148,8 +149,8 @@ public class AHR extends Modulation implements ModSource
     public AHR(Sound sound)
         {
         super(sound);
-        defineModulations(new Constant[] { Constant.HALF, Constant.ONE, Constant.ZERO, Constant.HALF, Constant.ZERO, Constant.ZERO }, 
-            new String[] {  "Attack Time", "Attack Level", "Hold Time",  "Release Time", "On Tr", "Off Tr" });
+        defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ONE, Constant.ZERO, Constant.HALF, Constant.ZERO, Constant.ZERO }, 
+            new String[] { "Start Level", "Attack Time", "Attack Level", "Hold Time",  "Release Time", "On Tr", "Off Tr" });
         defineOptions(new String[] { "Attack Curve", "Release Curve", "One Shot",  "MIDI Sync" }, 
         	new String[][] { { "Linear", "x^2", "x^4", "x^8", "Jump" } , 
         					{ "Linear", "x^2", "x^4", "x^8", "Jump" }, 
@@ -167,12 +168,12 @@ public class AHR extends Modulation implements ModSource
         
     void doGate()
         {
-        time[ATTACK] = (modulate(MOD_ATTACK_TIME));
+        time[ATTACK] = modulate(MOD_ATTACK_TIME);
         level[ATTACK] = modulate(MOD_ATTACK_LEVEL);
-        time[HOLD] = (modulate(MOD_HOLD_TIME));
+        time[HOLD] = modulate(MOD_HOLD_TIME);
         level[HOLD] = level[ATTACK];
-        time[RELEASE] = (modulate(MOD_RELEASE_TIME));
-        level[RELEASE] = 0;
+        time[RELEASE] = modulate(MOD_RELEASE_TIME);
+        level[RELEASE] = modulate(MOD_RELEASE_LEVEL);
         time[DONE] = (0); // doesn't matter
         level[DONE] = level[RELEASE];
 
