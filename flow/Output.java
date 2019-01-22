@@ -515,7 +515,7 @@ public class Output
     
     // Builds a single sample from the partials.  ALPHA is the current interpolation
     // factor (from 0...1) 
-    double buildSample(int s, double[][] currentAmplitudes)
+    double buildSample(int s, double[][] currentAmplitudes/*, double[][] currentFrequencies*/)
         {
         // build the sample
         double sample = 0;
@@ -525,6 +525,7 @@ public class Output
         byte[] orders = _with.orders[s];
         double[] pos = positions[s];
         double[] ca = currentAmplitudes[s];
+        //double[] cf = currentFrequencies[s];
         double v = _with.velocities[s];
         double pitch = _with.pitches[s];
         double tr = pitch * Math.PI * 2 * INV_SAMPLING_RATE;
@@ -566,7 +567,23 @@ public class Output
                     continue;
                     }
                 
-                double position = pos[oi] + frequency * tr;
+                /*
+                double freqtr = frequency * tr;
+                if (cf[oi] < 0)  // uninitialized
+                	{
+                	cf[oi] = freqtr;
+                	}
+            	else
+            		{
+            		double faa = cf[oi] * (1.0 - (PARTIALS_INTERPOLATION_ALPHA));
+	 	           	double fbb = freqtr * PARTIALS_INTERPOLATION_ALPHA;
+	                cf[oi] = faa + fbb;
+                	}
+            	freqtr = cf[oi];
+                double position = pos[oi] + freqtr;
+				*/
+				
+                double position = pos[oi] + freqtr;
                 if (position >= Math.PI * 2)
                     {
                     position = position - (Math.PI * 2);
@@ -577,15 +594,6 @@ public class Output
                         }
                     }
                 pos[oi] = position;
-
-                // For some crazy reason, if I do buildSample too fast, and thus the
-                // output sound thread loops too fast, it significantly slows down
-                // the voice thread.  I don't know why -- I thought it might have something
-                // to do with the output sound thead checking emitsReady too fast, but now
-                // I really don't know.  :-(  As a result, when the user chooses "play voice 1 only",
-                // the voice thread loop really slows down.  So my approach right now is the
-                // single stupidest approach -- just do the full multi-voice computation here
-                // but only load the voice 1 samples into the sound output.
 
                 double smp = Utility.fastSin(position) * amplitude * v;
                 sample += smp;
@@ -671,6 +679,12 @@ public class Output
                 /// The last amplitudes (used for interpolation between the past partials and new ones)
                 /// Note that these are indexed by ORDER, not by actual index position
                 final double[][] currentAmplitudes = new double[numVoices][Unit.NUM_PARTIALS];
+                /*
+                final double[][] currentFrequencies = new double[numVoices][Unit.NUM_PARTIALS];
+                for(int ii = 0; ii < currentFrequencies.length; ii++)
+                	for(int jj = 0; jj < currentFrequencies[ii].length; jj++)
+                		currentFrequencies[ii][jj] = -1;
+                */
   
                 lightweightOutputSemaphores = new boolean[MAX_VOICES];
                 outputLocks = new Object[MAX_VOICES];
@@ -698,7 +712,7 @@ public class Output
                                         double[] samplessnd = samples[j];
                                         for (int skipPos = 0; skipPos < SKIP; skipPos++)
                                             {
-                                            samplessnd[skipPos] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+                                            samplessnd[skipPos] = buildSample(j, currentAmplitudes/*, currentFrequencies*/) * DEFAULT_VOLUME_MULTIPLIER;
                                             }
                                         }
                                     }
@@ -739,7 +753,7 @@ public class Output
                         double[] samplessnd = samples[solo];
                         for (int skipPos = 0; skipPos < SKIP; skipPos++)
                             {
-                            samplessnd[skipPos] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+                            samplessnd[skipPos] = buildSample(solo, currentAmplitudes/*, currentFrequencies*/) * DEFAULT_VOLUME_MULTIPLIER;
                             }
                         }
                     else
