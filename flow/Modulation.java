@@ -509,31 +509,25 @@ public abstract class Modulation implements Cloneable
             }
         return modToSignedFrequency_lastFreq;
         }
-                
-                
-    /** Converts a mod value of 0...1 into a filter dropoff (in amplitude scaling) per octave
-        going from 0 poles (no filter) to 8 poles (48db) with a 4-pole filter at 0.5. */
 
-    // An increase in D db corresponds to a multiplying of A amplitude
-    // according to D = 20 log_10 (A), so A = 10^(D/20).
-    //
-    // We convert this into poles (1 pole = 6db), and have A = 10^(P*6/20)
-    // And make it a drop, not a rise A = 10^(-P*6/20)
-    // We'd like to range from 0 poles to, say, 8 poles in modulation.  So we go from
-    // A = 10^(-0*6/20) = 10^(0/20) to A = 10(-8*6/20) = 10^(-24/20).  Thus
-    // A modulation value of N should correspond to a power of 10^(-1.2 N).
-    
-    double modToFilterDropPerOctave_lastMod = Double.NaN;
-    double modToFilterDropPerOctave_lastDrop;
-    public double modToFilterDropPerOctave(double mod)
+    /** Converts a modulation 0...1 into a frequency in the range -11025 ... 11025 (which is +/- 2^13.428491035332245).  */
+    double modToRelativeFrequency_lastMod = Double.NaN;
+    double modToRelativeFrequency_lastFreq;
+    public double modToRelativeFrequency(double mod)
         {
-        if (mod != modToFilterDropPerOctave_lastMod)
+        if (mod != modToRelativeFrequency_lastMod)
             {
-            modToFilterDropPerOctave_lastDrop = Math.pow(10, (-1.2 * mod));
-            modToFilterDropPerOctave_lastMod = mod;
+            if (mod >= 0.5)
+                modToRelativeFrequency_lastFreq = Math.pow(2, (mod - 0.5) * 2 * 13.428491035332245) - 1;
+            else
+                {
+                modToRelativeFrequency_lastFreq = Math.pow(2, 0 - (0.5 - mod) * 2 * 13.428491035332245) - 1;
+                }
+            modToRelativeFrequency_lastMod = mod;
             }
-        return modToFilterDropPerOctave_lastDrop;
+        return modToRelativeFrequency_lastFreq;
         }
+                
                 
     /** Maps the modulation value to a function more sensitive to lower values. */
     public double makeSensitive(double mod)
