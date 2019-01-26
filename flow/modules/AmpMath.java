@@ -59,11 +59,13 @@ public class AmpMath extends Unit
     public static final int THRESHOLD = 11;
     public static final int SCALEDOWN = 12;
     public static final int SCALEUP = 13;
-    public static final int EXPAND = 14;
+    //public static final int REMOVE = 14;
         
     public static final String[] OPERATION_NAMES = new String[] { 
         "+", "-", "*", "inv *", "compress", "average", "min", "max", "filter", "filternot", 
-        "fill", "threshold", "scaledown", "scaleup", }; 
+        "fill", "threshold", "scaledown", "scaleup", 
+        //"remove" 
+        }; 
         
     int operation = ADD;
     boolean normalize;
@@ -235,6 +237,28 @@ public class AmpMath extends Unit
                     }
                 }
             break;
+            /*
+            case REMOVE:
+                {
+                int remove = (int)Math.floor(modulation * 127);
+                int x = 0;
+                
+                for(int i = 0; i < amplitudes.length; i++)
+                    {
+                    if (x > 0 && x - 1 < remove)
+                    	{
+	                    amplitudes[i] = inputs1amplitudes[i];
+	                    }
+	                else
+	                	{
+	                	amplitudes[i] = inputs0amplitudes[i];
+	                	}
+	                x++;
+	                if (x >= remove) x = 0;
+                    }
+                }
+            break;
+            */
             }
                         
         if (normalize)

@@ -453,8 +453,8 @@ public class Output
         float reverbWet = 0.5f;
         float reverbRoomSize = 0.5f;
         float reverbDamp = 0.5f;
-        float c = 0.0f;
-        float r = 0.0f;
+        //float c = 0.0f;
+        //float r = 0.0f;
               
         public Swap()
             {
@@ -583,7 +583,7 @@ public class Output
                 double position = pos[oi] + freqtr;
 				*/
 				
-                double position = pos[oi] + freqtr;
+                double position = pos[oi] + frequency * tr;
                 if (position >= Math.PI * 2)
                     {
                     position = position - (Math.PI * 2);
@@ -827,8 +827,8 @@ public class Output
                         filter4 = (1 - 0.5) * filter4 + 0.5 * d;
                         d = filter4;
                     	*/
-                        
-                        //d = lowPassFilter(d, with.c, with.r);
+
+//                        d = lowPassFilter(d, with.c, with.r);
                         
                         int val = (int)(d);
                         audioBuffer[skipPos * 2 + 1] = (byte)((val >> 8) & 255);
@@ -1116,10 +1116,9 @@ public class Output
             } 
 */
         }  
-        
+        /*
 	static final double T = 1.0 / 44100.0;
 
-/*
 	static final double Q = Math.sqrt(0.5);
 	static final double CUTOFF = 1000.0;
 	static final double O = CUTOFF * 2 * Math.PI; //O = 2.0 / T * Math.tan(CUTOFF * Math.PI);
@@ -1131,7 +1130,7 @@ public class Output
 	static final double b2 = IJ * OOQTT;
 	static final double a1 = IJ * (-8 * Q + 2 * OOQTT);
 	static final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
-*/    
+
     double[] N = new double[2];
     double[] M = new double[2];
     double lowPassFilter(double d, double cut, double res)
@@ -1141,7 +1140,7 @@ public class Output
 	 final double O = CUTOFF * 2 * Math.PI;
 	 final double OOQTT = O * O * Q * T * T;
 	 final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
-	 final double IJ = 1.0 / J;
+	 final double IJ = 1.0 / (J < 0.001 ? 0.001 : J ;
 	 final double b0 = IJ * OOQTT;
 	 final double b1 = IJ * 2 * OOQTT;
 	 final double b2 = IJ * OOQTT;
@@ -1157,5 +1156,6 @@ public class Output
     	if (y != y) System.err.println("NAN");
     	return y;
     	}    
-         
+     */
+        
     }

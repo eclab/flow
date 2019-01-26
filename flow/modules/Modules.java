@@ -76,6 +76,7 @@ public class Modules
     flow.modules.Partials.class,
     flow.modules.Rand.class,
     flow.modules.Rectified.class,
+    flow.modules.Rotate.class,
     flow.modules.SampleAndHold.class,
     flow.modules.Sawtooth.class,
     flow.modules.Scale.class,
