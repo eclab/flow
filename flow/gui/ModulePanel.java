@@ -537,9 +537,14 @@ public class ModulePanel extends JPanel implements Transferable
     /** Called by doLoad(...) when loading a file.  Override this however you see fit (see doLoad()) */
     public void loadFile(File file, Rack rack) { }
 
-    /** A convenience method for loading a file in a ModulePanel.  Calls doLoad(...) to actually load the file if
-        the user decides to do so.  */
+    /** A convenience method for loading a file in a ModulePanel. */
     public File doLoad(String title, final String filenameExtension)
+    	{
+    	return doLoad(title, new String[] { filenameExtension });
+    	}
+    	
+    /** A convenience method for loading a file in a ModulePanel. */
+    public File doLoad(String title, final String[] filenameExtensions)
         {
         Rack rack = getRack();
         FileDialog fd = new FileDialog((JFrame)(SwingUtilities.getRoot(rack)), title, FileDialog.LOAD);
@@ -547,7 +552,10 @@ public class ModulePanel extends JPanel implements Transferable
             {
             public boolean accept(File dir, String name)
                 {
-                return AppMenu.ensureFileEndsWith(name, filenameExtension).equals(name);
+                for(int i = 0; i < filenameExtensions.length; i++)
+                	if (AppMenu.ensureFileEndsWith(name, filenameExtensions[i]).equals(name))
+                		return true;
+                return false;
                 }
             });
 

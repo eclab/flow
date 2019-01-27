@@ -551,7 +551,6 @@ In addition to sequencing modulation signals, Seq can also be used in combinatio
 
 \paragraph{Sine}  A single harmonic at 1.0 amplitude.  The harmonic can be any partial frequency from 1.0 to 128.0.
 
-\vbox{
 \paragraph{Tinkle}  Produces random partials, creating a tinkling effect.  Some {\it number} of new partials are created whenever the {\it trigger} occurs, and at the given {\it volume}.  The partials {\it decay} at some rate.  The {\it probability} specifies the likelihood that partials will be created when a trigger occurs.
 
 \paragraph{Triangle}  A triangle wave.  Note that normally triangle waves include negative amplitude harmonics, that is ones with inverted phases.  As {\name} does not produce phases, these harmonics become all positive (you likely won't hear a difference).
@@ -561,7 +560,9 @@ In addition to sequencing modulation signals, Seq can also be used in combinatio
 %\paragraph{Wavetable}  A wavetable from the set of Microwave II/XT waves with a modulatable position.  Note that Waldorf asked us to not include this data; and although they likely don't hold IP over these, we have elected to do as they wished.  We are looking for public domain wavetables we might use instead.
 
 \paragraph{Wavetable}  Lets you load wavetables (as ``.WAV'' files) from https:/\!/waveeditonline.com/, then wander through them using the provided modulation.  You have the option of turning off interpolation between waves.
-}
+
+You can also load an arbitrary sound directly and Flow will chop it up into a wavetable for you.  Your sound file must be a 16-bit signed integer WAV file, mono only.  You should turn on the {\it sampled} option prior to loading the sound, which will cause Flow to grab larger overlapping chunks and to use a windowed FFT (the {\it sampled} option doesn't do anything but affect how the sound is loaded).  The sampled option is designed to remove some of the choppiness from reading an arbitrary sound, but it won't remove all of it.  You can eliminate most of the rest by running the partials through a Smooth module set to about 0.5.  Note: this is only for sampling arbitrary sounds:  you don't want to do any of this stuff (the sample option, Smooth) if you're reading a prepared wavetable from https:/\!/waveeditonline.com/).
+
 
 \subsection{Partials Shapers}
 \label{unitshapers}

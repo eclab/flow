@@ -35,14 +35,19 @@ public class WaveTable extends Unit implements UnitSource
 
     public static final int MOD_POSITION = 0;
 
-    public static final String FILENAME_EXTENSION = ".WAV";
+    public static final String[] FILENAME_EXTENSIONS = new String[] { ".WAV", ".wav" };
     
     public String name = null;
 
     int currentPos = -1;
     boolean interpolate = true;
-        
+	boolean sampled = false;
+	        
     double[][] waveTable;
+    
+	// 1 and 2 are too bouncy, 8 sounds too... distant and wrong.
+    public static final int RESAMPLING = 4;
+    public static final int WAVETABLE_SIZE = 256;
         
     public Object clone()
         {
@@ -59,7 +64,7 @@ public class WaveTable extends Unit implements UnitSource
         {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Position" });
-        defineOptions(new String[] { "Interpolate" }, new String[][] { { "Interpolate" } });
+        defineOptions(new String[] { "Interpolate", "Sampled" }, new String[][] { { "Interpolate" }, { "Sampled" } });
         setClearOnReset(false);
         waveTable = new double[2][NUM_PARTIALS];
         waveTable[0][0] = 1;
@@ -74,13 +79,18 @@ public class WaveTable extends Unit implements UnitSource
 	public boolean getInterpolate() { return interpolate; }
 	public void setInterpolate(boolean val) { interpolate = val; }
 	
+	public boolean getSampled() { return sampled; }
+	public void setSampled(boolean val) { sampled = val; }
+	
     public static final int OPTION_INTERPOLATE = 0;
+    public static final int OPTION_SAMPLED = 1;
 
     public int getOptionValue(int option) 
         { 
         switch(option)
             {
             case OPTION_INTERPOLATE: return getInterpolate() ? 1 : 0;
+            case OPTION_SAMPLED: return getSampled() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -90,6 +100,7 @@ public class WaveTable extends Unit implements UnitSource
         switch(option)
             {
             case OPTION_INTERPOLATE: setInterpolate(value != 0); return;
+            case OPTION_SAMPLED: setSampled(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -147,6 +158,8 @@ public class WaveTable extends Unit implements UnitSource
             }
         }
 
+
+
     public ModulePanel getPanel()
         {
         final ModulePanel[] pan = new ModulePanel[1];
@@ -169,7 +182,7 @@ public class WaveTable extends Unit implements UnitSource
                     {
                     public void perform()
                         {
-                        File f = pan[0].doLoad("Load a Wavetable from https://waveeditonline.com/", FILENAME_EXTENSION);
+                        File f = pan[0].doLoad("Load a Wavetable from https://waveeditonline.com/", FILENAME_EXTENSIONS);
                         if (f != null)
                             {
                             name = AppMenu.removeExtension(f.getName());
@@ -177,7 +190,10 @@ public class WaveTable extends Unit implements UnitSource
                             }
                         }
                     });
-				box.add(new OptionsChooser(unit, 0));
+                for(int i = 0; i < unit.getNumOptions(); i++)
+                	{
+					box.add(new OptionsChooser(unit, i));
+					}
                 return box;
                 }
 
@@ -194,25 +210,55 @@ public class WaveTable extends Unit implements UnitSource
                         }
                     else
                         {
-                        ArrayList<double[]> buf = new ArrayList<>();
-                        double[] buffer = new double[256];
-                        int count = 0;
-                        while(true)
-                            {
-                            double[] finished = new double[128];
-        
-                            // Read frames into buffer
-                            int framesRead = wavFile.readFrames(buffer, 256);
-                            if (framesRead != 256) break;
-                                
-                            // Note no window.  Should still be okay (I think?)
-                            double[] harmonics = FFT.getHarmonics(buffer);
-                            for (int s=1 ; s<harmonics.length / 2 + 1; s++)
-                                {
-                                finished[s - 1] = (harmonics[s] >= MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
-                                }
-                            buf.add(finished);
-                            }
+						ArrayList<double[]> buf = new ArrayList<>();
+						if (sampled)
+							{
+							int sampleSize = WAVETABLE_SIZE * RESAMPLING;
+							double[] a = new double[sampleSize];
+							double[] b = new double[sampleSize];
+							double[] buffer = new double[WAVETABLE_SIZE];
+							int count = 0;
+							while(true)
+								{
+								// Read frames into buffer
+								int framesRead = wavFile.readFrames(buffer, WAVETABLE_SIZE);
+								if (framesRead != WAVETABLE_SIZE) break;
+							
+								System.arraycopy(b, WAVETABLE_SIZE, b, 0, sampleSize - WAVETABLE_SIZE);
+								System.arraycopy(buffer, 0, b, sampleSize - WAVETABLE_SIZE, WAVETABLE_SIZE);
+								System.arraycopy(b, 0, a, 0, sampleSize);
+								
+								// Note no window.  Should still be okay (I think?)
+								a = FFT.applyHanningWindow(a);
+								double[] harmonics = FFT.getHarmonics(a);
+								double[] finished = new double[harmonics.length / 2 / RESAMPLING];
+								for (int s=1 ; s < harmonics.length / 2 / RESAMPLING + 1; s++)
+									{
+									finished[s - 1] = (harmonics[s * RESAMPLING - 1] >= MINIMUM_AMPLITUDE ? harmonics[s * RESAMPLING - 1]  : 0 );
+									}
+								buf.add(finished);
+								}
+							}
+						else
+							{
+							double[] buffer = new double[WAVETABLE_SIZE];
+							int count = 0;
+							while(true)
+								{
+								// Read frames into buffer
+								int framesRead = wavFile.readFrames(buffer, WAVETABLE_SIZE);
+								if (framesRead != WAVETABLE_SIZE) break;
+							
+								// Note no window.  Should still be okay (I think?)
+								double[] harmonics = FFT.getHarmonics(buffer);
+								double[] finished = new double[harmonics.length / 2];
+								for (int s=1 ; s < harmonics.length / 2 + 1; s++)
+									{
+									finished[s - 1] = (harmonics[s] >= MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
+									}
+								buf.add(finished);
+								}
+                        	}
 
                         double max = 0;
                         double[][] done = new double[buf.size()][];

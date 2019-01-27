@@ -125,19 +125,19 @@ public class AmpMath extends Unit
 
         switch(operation)
             {
-            case ADD:           // A + B
+            case ADD:           // A + B + mod
                 {
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    amplitudes[i] = inputs0amplitudes[i] + inputs1amplitudes[i];
+                    amplitudes[i] = inputs0amplitudes[i] + inputs1amplitudes[i] + modulation;
                     }
                 }
             break;
-            case SUBTRACT:      // A - B
+            case SUBTRACT:      // A - B - mod
                 {
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    amplitudes[i] = inputs0amplitudes[i] - inputs1amplitudes[i];
+                    amplitudes[i] = inputs0amplitudes[i] - inputs1amplitudes[i] - modulation;
                     if (amplitudes[i] < 0) amplitudes[i] = 0;
                     }
                 }
