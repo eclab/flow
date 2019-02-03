@@ -55,6 +55,7 @@ public class Rotate extends Unit
     int stretch = STRETCH_NONE;
     int window = WINDOW_NONE;
     boolean center = false;
+    boolean solo = true;
     
     public void setWindow(int val) { window = val; }
     public int getWindow() { return window; }
@@ -65,9 +66,13 @@ public class Rotate extends Unit
     public void setCenter(boolean val) { center = val; }
     public boolean getCenter() { return center; }
 
+    public void setSolo(boolean val) { solo = val; }
+    public boolean getSolo() { return solo; }
+
     public static final int OPTION_STRETCH = 0;
     public static final int OPTION_WINDOW = 1;
     public static final int OPTION_CENTER = 2;
+    public static final int OPTION_SOLO = 3;
 
     public static final double FREQUENCY_SCALE = 256;
     
@@ -78,6 +83,7 @@ public class Rotate extends Unit
             case OPTION_WINDOW: return getWindow();
             case OPTION_STRETCH: return getStretch();
             case OPTION_CENTER: return getCenter() ? 1 : 0;
+            case OPTION_SOLO: return getSolo() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -89,6 +95,7 @@ public class Rotate extends Unit
             case OPTION_WINDOW: setWindow(value); return;
             case OPTION_STRETCH: setStretch(value); return;
             case OPTION_CENTER: setCenter(value != 0); return;
+            case OPTION_SOLO: setSolo(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -98,8 +105,8 @@ public class Rotate extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ONE, Constant.ZERO }, new String[] { "Rotate", "Upper", "Lower", "Thin j h" });
-        defineOptions(new String[] { "Stretch", "Window", "Center" }, new String[][] { { "None", "x^2", "x^4", "x^8", "x^16"}, { "None", "Tri", "x^2", "x^4", "x^8", "x^16", "x^32", "x^64", "x^128" }, { "Center" } } );
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ONE, Constant.ZERO }, new String[] { "Rotate", "Upper", "Lower", "Thin" });
+        defineOptions(new String[] { "Stretch", "Window", "Center", "Solo" }, new String[][] { { "None", "x^2", "x^4", "x^8", "x^16"}, { "None", "Tri", "x^2", "x^4", "x^8", "x^16", "x^32", "x^64", "x^128" }, { "Center" }, { "Solo" } } );
         }
     
     
@@ -110,7 +117,6 @@ public class Rotate extends Unit
         double rotate = modulate(MOD_ROTATE);
         double upper = modulate(MOD_UPPER_BOUND);
         double lower = modulate(MOD_LOWER_BOUND);
-		int remove = (int)Math.floor(modulate(MOD_SPACE) * MAX_SPACING);
 
 		copyFrequencies(0);
 		if (window == WINDOW_NONE)
@@ -140,9 +146,10 @@ public class Rotate extends Unit
 			{
 			scale = scale * scale;
 			}
-
+		
 		int x = 0;
 		
+		int remove = (int)Math.floor(modulate(MOD_SPACE) * MAX_SPACING);
 		for(int i = 0; i < frequencies.length; i++)
 			{
 			if (frequencies[i] >= lower && frequencies[i] <= upper)
@@ -197,6 +204,10 @@ public class Rotate extends Unit
 					a = 1 - a;
 					}
 				amplitudes[i] *= a;
+				}
+			else if (solo)
+				{
+				amplitudes[i] = 0;
 				}
 			}
 

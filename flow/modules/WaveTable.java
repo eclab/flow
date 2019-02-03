@@ -236,6 +236,33 @@ public class WaveTable extends Unit implements UnitSource
 									{
 									finished[s - 1] = (harmonics[s * RESAMPLING - 1] >= MINIMUM_AMPLITUDE ? harmonics[s * RESAMPLING - 1]  : 0 );
 									}
+
+
+									
+/*
+// averaging works like this...
+
+                     x
+                   x x x
+                 x x x x x
+               x x x x x x x
+     0 1 2 3 4 5 6 7 8 9 101112
+     - x x x x x x x   x x x x
+         x x x x x       x x x
+           x x x           x x
+             x               x
+									
+								for (int s=1 ; s < harmonics.length / 2 / RESAMPLING + 1; s++)
+									{
+									for(int q = 1; q <= RESAMPLING; q++)
+										{
+										finished[s-1] = finished[s-1] + q * harmonics[s * RESAMPLING - (RESAMPLING - 1) + q];
+										if (q != RESAMPLING) finished[s-1] = finished[s-1] + q * harmonics[s * RESAMPLING + (RESAMPLING - 1) - q];
+										}
+									finished[s-1] /= RESAMPLING * RESAMPLING;
+									}
+*/								
+
 								buf.add(finished);
 								}
 							}
