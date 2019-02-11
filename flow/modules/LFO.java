@@ -37,8 +37,9 @@ public class LFO extends Modulation implements ModSource
     public static final int MOD_PHASE = 1;
     public static final int MOD_SCALE = 2;
     public static final int MOD_SHIFT = 3;
-    public static final int MOD_SEED = 4;
-    public static final int MOD_GATE_TR = 5;
+    public static final int MOD_VARIANCE = 4;
+    public static final int MOD_SEED = 5;
+    public static final int MOD_GATE_TR = 6;
 
     public static final int SIN = 0;
     public static final int TRIANGLE = 1;
@@ -133,7 +134,8 @@ public class LFO extends Modulation implements ModSource
         oldRandomPos = 0;
         double scale = modulate(MOD_SCALE);
         double shift = modulate(MOD_SHIFT);
-        modulateRandom(scale, shift, true, false);  // set a new random pos
+        double variance = modulate(MOD_VARIANCE);
+        modulateRandom(scale, shift, variance, true, false);  // set a new random pos
         }
         
     void resetLFO()
@@ -182,8 +184,8 @@ public class LFO extends Modulation implements ModSource
         // Modulation 2: Scale
         // Modulation 3: Shift
         // Modulation 4: Random Seed
-        defineModulations(new Constant[] { Constant.HALF, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ONE, Constant.ZERO }, 
-            new String[] { "Rate", "Phase", "Scale", "Shift", "Seed", "On Tr" });
+        defineModulations(new Constant[] { Constant.HALF, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ONE, Constant.ONE, Constant.ZERO }, 
+            new String[] { "Rate", "Phase", "Scale", "Shift", "Variance", "Seed", "On Tr" });
         defineOptions(new String[] { "Type", "Free", "Invert", "Half Trigger", "Linear Rate", "MIDI Sync"}, new String[][] { TYPE_NAMES, { "Free" }, { "Invert" }, { "Half Trigger" }, { "Linear Rate" }, { "MIDI Sync" } } );
 
         this.type = TRIANGLE;
@@ -191,26 +193,38 @@ public class LFO extends Modulation implements ModSource
         }
         
     static final int MAX_TRIES = 20;
-    double modulateRandom(double scale, double shift, boolean wrapped, boolean sampleAndHold)
+    double modulateRandom(double scale, double shift, double variance, boolean wrapped, boolean sampleAndHold)
         {
         // do I update?
         if (wrapped)
             {
             oldRandomPos = randomPos;
-            
             Random rand = (random == null ? getSound().getRandom() : random);
+            
+            // Our strategy for picking a new target point is:
+            // 1. Choose a delta between -VARIANCE and +VARIANCE
+            // 2. Add it to the current value
+            // 3. Scale that by SCALE
+            // 4. Shift that by SHIFT
+            // 5. If the result is in bounds, we're done
+            // 6. Else go to 1
+            // 7. If all else fails, choose a random value in legal bounds
+            
             double newPos = 0;
             int i = 0;
+            
+			double max = Math.min(shift + scale * 0.5, 1.0);
+			double min = Math.max(shift - scale * 0.5, 0.0);
+
             for(i = 0; i < MAX_TRIES; i++)
                 {
-                newPos = (rand.nextDouble() * 2.0 - 1.0) * scale + randomPos;
-                if (newPos + shift - 0.5 <= 1.0 && newPos + shift - 0.5 >= 0.0) break; 
-                // note we could go into an infinite loop here if the user changes the scale
-                // and shift before we have created a new valid randomPos!
+                newPos = (rand.nextDouble() * 2.0 - 1.0) * variance * scale + randomPos;
+                if (newPos >= min && newPos <= max) 
+                	break;
                 }
             if (i == MAX_TRIES)   // we failed, bound to a legal value and that's that
                 {
-                newPos = Math.max(Math.min(newPos + shift - 0.5, 1.0), 0.0);
+                newPos = rand.nextDouble() * (max - min) + min; 
                 }
             randomPos = newPos;
             return oldRandomPos;
@@ -291,10 +305,10 @@ public class LFO extends Modulation implements ModSource
     PREVPOS = 0.... previous wave position at the new rate
 
     What I want is: STATE = OLDSTATE + (POS - PREVPOS)                      [MOD 1]
-    Now STATE = POS + BIAS                                                                  [MOD 1]
+    Now STATE = POS + BIAS                                                  [MOD 1]
     So POS + BIAS = OLDSTATE + (POS - PREVPOS)                              [MOD 1]
     So BIAS = OLDSTATE + (POS - PREVPOS) - POS                              [MOD 1]
-    BIAS = OLDSTATE - PREVPOS                                                                       [MOD 1]
+    BIAS = OLDSTATE - PREVPOS                                               [MOD 1]
                 
     STATE = POS + BIAS, MOD 1       
 */
@@ -351,7 +365,6 @@ public class LFO extends Modulation implements ModSource
             updateTrigger(0);
             }
         lastState = state;
-
         
         // Okay here we go
         double output = 0;
@@ -361,8 +374,8 @@ public class LFO extends Modulation implements ModSource
             case TRIANGLE: output = modulateTriangle(scale); break;
             case SQUARE: output = modulateSquare(scale); break;
             case SAW_UP: output = modulateSaw(scale); break;
-            case RANDOM: output = modulateRandom(scale, shift, wrapped, false); break;
-            case RANDOM_SAMPLE_AND_HOLD: output = modulateRandom(scale, shift, wrapped, true); break;
+            case RANDOM: output = modulateRandom(scale, shift, modulate(MOD_VARIANCE), wrapped, false); break;
+            case RANDOM_SAMPLE_AND_HOLD: output = modulateRandom(scale, shift, modulate(MOD_VARIANCE), wrapped, true); break;
             default: // cannot happen
             	{
             	warn("modules/LFO.java", "Impossible default in switch");
@@ -371,12 +384,14 @@ public class LFO extends Modulation implements ModSource
             	}
             }
                 
-        output = output + shift - 0.5;
-        
-        if (output > 1) output = 1;
-        if (output < 0) output = 0;
-        if (invert) output = 1.0 - output;
-        
+        if (type != RANDOM && type != RANDOM_SAMPLE_AND_HOLD)
+        	{
+	        output = output + shift - 0.5;
+	        if (output > 1) output = 1;
+	        if (output < 0) output = 0;
+	        if (invert) output = 1.0 - output;
+	        }
+	        
         setModulationOutput(0, output);
         }
         

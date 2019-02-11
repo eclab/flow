@@ -119,7 +119,7 @@ public class Rotate extends Unit
         double lower = modulate(MOD_LOWER_BOUND);
 
 		copyFrequencies(0);
-		if (window == WINDOW_NONE)
+		if (window == WINDOW_NONE && !solo)
 			pushAmplitudes(0);
 		else
 			copyAmplitudes(0);
