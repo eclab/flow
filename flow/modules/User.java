@@ -25,7 +25,7 @@ import javax.swing.*;
    BOUND modulation.
 */
 
-public class User extends Modulation
+public class User extends Modulation implements ModSource
     {
     private static final long serialVersionUID = 1;
 
