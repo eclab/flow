@@ -279,7 +279,9 @@ Displays can also be set to {\it Waterfall Mode}, where the partials become dots
 \paragraph{Oscilloscopes}
 You might also find the oscilloscopes handy to understand what a modulation signal looks like.  The left oscilloscope shows the modulation signal of anything connected to the {\it 1 (Scope)} jack in {\bf Out}.  Notice for example, that in Figure~\ref{simplepatch}, the LFO is wired up to modulate the {\it 1 (Scope)} jack: this will cause it to be displayed in the left oscilloscope display.  Similarly, the right oscilloscope shows the modulation signal of anything connected to the {\it 2 (Aux)} jack.  Oscilloscopes have axes (the horizontal axis passes through the 0.5 position).  These axes change colors from blue to green (or from green to blue) any time the modulation triggers.
 
-Oscillators don't currently display any text when you hover over them.  Maybe they should!
+Oscilloscopes don't currently display any text when you hover over them.  Maybe they should!
+
+A warning about oscilloscopes: like displays, they show the data of the most recently pressed note.  This can be confusing if (for example) you're using an LFO.  You've just reset the LFO with a note-on, but instead of resetting from its current position, it magically jumps to something much higher and resets from there.  This is because the voice being allocated for your note has its LFO at that position at the moment, {\it not the voice you've just been watching}, and the oscilloscope suddenly jumped to it.
 
 \subsection{Playing Sounds}
 
@@ -294,6 +296,8 @@ So how do you play a using keyboard?  You attach it to {\name} by selecting {\bf
 To set up a MIDI Polyphonic Expression (MPE) device, go to {\bf MIDI and Audio Preferences} in the {\bf Play} menu, and change the MIDI Channel to either the MPE Lower Zone or the MPE Upper Zone, as determined by your MPE Controller.  You can then specify the number of MPE channels in the Zone.  {\name} also responds to an MPE Configuration Message (or MCM) sent over MIDI from your controller.
 
 MPE devices are often designed to link certain behaviors to attack velocity, pitch bend, aftertouch, CC 74, and release velocity.  All of these are accessible via the {\bf MIDI In} module.  However, pitch bend and attack velocity also do specific things in Flow.  If you wanted Flow to respond in some {\it non-bend} way when you perform the bend behavior on a Roli Seaboard (say), you need a way to disable bend.  To do this, you can deselect {\bf Responds to Bend} in the {\bf Play} menu.  Similarly, you can disable {\bf Velocity Sensitive} in the {\bf Play} menu.  The Bend and Attack Velocity signals still will be sent to the MIDI In module, where you can tap into them to make your patch do what you like.
+
+\bump
 
 \subsubsection{Routing MIDI from a Digital Audio Workstation}
 \label{routingmidi}
@@ -331,6 +335,8 @@ This procedure will create a bunch of of virtual devices with names like {\tt Vi
 
 Note that {\name} is a standalone application, not a VST or AU.  By default it sends its audio to the default audio device on your computer, which is probably your computer's speakers.  If you want to route the audio to your DAW, you'll need a loopback device for audio similar to the one for MIDI discussed in Section~\ref{routingmidi}.  This is because neither Java nor your DAW will create their own audio devices, so neither can connect to the other.  You need an intermediary.
 
+
+\bump
 
 \paragraph{Making an Audio Loopback Device}  This varies depending on your operating system.
 \begin{itemize}
@@ -416,7 +422,7 @@ The {\it On Tr} option restarts the envelope whenever it receives a trigger (as 
 
 The oscillator can run free, you can invert the wave.    The LFO triggers on completion of one full wave, or one-half wave if half trigger is set.  The waves can be sine, triangle, saw up, square, random, and random sample and hold.   You can request that the LFO sync to MIDI when the synthesizer is set to MIDI (otherwise it's based on time as usual).  And finally, you can indicate that the rate dial should be linear and not exponential (which is useful when modulating an LFO with another LFO).
 
-Random works as follows: a random new target Y position is set and the LFO spends {\it rate} time to get there.  Once it reaches the point, it picks a new random target Y position and repeats.  The sample and hold version is similar except that the wave does not move to the target Y position, but rather immediately jumps to it and stays there for {\it rate} time.   {\it Scale} indicates how big a typical random jump is.  If the seed is set to 0, then the random waves are fully random; but if the seed is \(\neq 0\), then every time a gate occurs (assuming the LFO is not free), the LFO's random behavior will be exactly the same as before, so you can make a predictable ``random'' sound.
+Random works as follows: a random new target Y position is set and the LFO spends {\it rate} time to get there.  Once it reaches the point, it picks a new random target Y position and repeats.  The sample and hold version is similar except that the wave does not move to the target Y position, but rather immediately jumps to it and stays there for {\it rate} time.   {\it Variance} indicates how big a typical random jump is: this is also scaled by {\it Scale}.  If the seed is set to 0, then the random waves are fully random; but if the seed is \(\neq 0\), then every time a gate occurs (assuming the LFO is not free), the LFO's random behavior will be exactly the same as before, so you can make a predictable ``random'' sound.
 
 The {\it On Tr} option restarts the LFO whenever it receives a trigger (as if a Note-On happened).  This is an auxiliary trigger: don't use it to trigger on a note-on directly (as in from the MIDIIn module).  The LFO does that by default already.  Furthermore, if you connect to the On Tr port, then the LFO will {\it only} restart when a trigger occurs: it will {\it not} restart on a Note On.
 
@@ -437,9 +443,7 @@ Keep in mind that gate, velocity, pitch bend, note, and clock information are al
 
 \paragraph{NRPN}  A source of MIDI NRPN information.  NRPN works similarly to CC in that it has parameters, each of which can be set to values.  The parameters range from 0...16383 and are set using two numbers: the {\it Most Significant Byte} (MSB) and the {\it Least Significant Byte} (LSB).  Each ranges 0...127.  The parameter number \(\text{P} = \text{MSB} \times 128 + \text{LSB}\).  When you set the MSB and LSB to specific values, to the right of the LSB you'll see the resulting parameter number.  Some synthesizers only use the MSB or the LSB.  
 
-Like parameters, values also can be in the range 0...16383.  {\name} always expects incoming NRPN data in ``Fine'' or ``14-bit'' mode: that is, the whole value range 0...16383 is mapped to modulation values 0.0 ... 1.0.  If you need more than 6 NRPNs, just create another NRPN module.\footnote{A technical note.  NRPN data comes in chunks of four different types: MSB, LSB, Increment, and Decrement.  Flow's NRPN module doesn't update its value when it receives an MSB chunk.  It waits until an LSB, Increment, or Decrement shows up.}
-
-See also {\bf MIDIIn}, previous.
+Like parameters, values also can be in the range 0...16383.  {\name} always expects incoming NRPN data in ``Fine'' or ``14-bit'' mode: that is, the whole value range 0...16383 is mapped to modulation values 0.0 ... 1.0.  If you need more than 6 NRPNs, just create another NRPN module.\footnote{A technical note.  NRPN data comes in chunks of four different types: MSB, LSB, Increment, and Decrement.  Flow's NRPN module doesn't update its value when it receives an MSB chunk.  It waits until an LSB, Increment, or Decrement shows up.}  See also {\bf MIDIIn}, previous.
 
 \paragraph{PartialMod}  This is an unusual and experimental modulation source.  It takes an input in the form of a set of partials, and a modulation (``Partial'') which indicates {\it which} partial.  Then it outputs as a modulation the value of that partial, bounded to between 0 and 1.  PartialMod can smoothly interpolate between partial values or not.
 
@@ -451,6 +455,8 @@ See also {\bf MIDIIn}, previous.
 
 
 \subsection{Modulation Shapers}
+
+\paragraph{Either/Or}  A switch which chooses among up to four outputs.  You choose the number of outputs with {\it Options}.  Thereafter, whichever output is currently being referenced by the value in {\it Input} will receive the value of {\it Yes}.  All other outputs will receive the value of {\it No}.  Either/Or is particularly useful with {\bf Mix}, where it can be used to zero out the amplitudes of all the mix inputs except for one, allowing you to choose from among several inputs.  See also {\bf Mix}.
 
 \paragraph{Geiger}  A source of randomness in timing.  When it receives an input {\it Trigger}, Geiger outputs a trigger (and switches from modulation of 0.0 to 1.0 or vice versa) only with a certain random probability.  If {\it Trials} is 1, then the probability is simple: it's just the probability specified by the {\it Prob} dial.  If {\it Trials} is \(>1\), then every time Geiger decides to output a trigger (with the given probability), it instead increments a counter.  When that counter is  \(\geq\){\it Trials}, only then does Geiger output a trigger, and the counter is reset to 0.  The effect of this is that as {\it Trials} is increased, the effective variance between fast and slow intervals is reduced: but you'll also need to increase the rate at which you provide incoming triggers to keep things at about the same speed.\footnote{In case you were interested, Geiger's random number events are using a {\it Negative Binomial Distribution}.  Following https:/\!/en.wikipedia.org/wiki/Negative\_binomial\_distribution\ \ Geiger's Trials dial specifies the {\it r} parameter, and the Prob dial specifies \(1-p\).  When Trials is 1, then this simply the {\it Geometric Distribution}, and following https:/\!/en.wikipedia.org/wiki/Geometric\_distribution the Prob dial specifies the value {\it p}.}  Geiger also has a {\it Seed} for its randomness.  If the Seed is 0, then Geiger uses a nondeterministic random source: otherwise the random sequence is always the same every time a note is played, and that sequence is specified by the Seed.
 
@@ -640,7 +646,7 @@ Linear Filter can be set to be {\it Relative}.  This means that the filter cutof
 
 \paragraph{Jitter} You can add jitter to either the frequencies or the amplitudes (or both) of your partials.  The amount of noise is controlled by {\it Freq Var} and {\it Amp Var} respectively.  The {\it Trigger} informs the module to add noise to its current jitter configuration.  You can also specify that Jitter should {\it only} apply to non-zero partials this is useful when using Jitter along with Fill.
 
-\paragraph{Mix} This is a straightforward mixer: the amplitudes of the partials of four different inputs can be mixed, with their respective gains.  The {\it frequencies} of the partials of the first input are used for the frequencies of the final partials.  In most cases, it's likely that all four inputs have partials with the same frequency, so it wouldn't matter.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Amp Math} and {\bf Combine} and {\bf Fill} and {\bf Morph.}
+\paragraph{Mix} This is a straightforward mixer: the amplitudes of the partials of four different inputs can be mixed, with their respective gains.  The {\it frequencies} of the partials are set to those of the first input whose amplitudes are non-zero.  In many cases, it's likely that all four inputs have partials with the same frequency, so it wouldn't matter.  But this strategy is also useful because it allows Mix to be used in combination with {\bf Either/Or} to select a single output among the four mix inputs.  Be sure to also read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Either/Or} and {\bf Amp Math} and {\bf Combine} and {\bf Fill} and {\bf Morph.}
 
 \paragraph{Morph} This module morphs (interpolates) between two or more inputs.  In the most basic configuration, when two signals are morphed together, the amplitudes of their partials are weighted and averaged, and the frequencies of their partials are {\it also} weighted and averaged.  The weighting constant \(\alpha\) is controlled by the {\it Interpolation} knob.  For example, consider Inputs X and Y.  For each pair of partials \(\langle P^X_i, P^Y_i\rangle\) in X and Y respectively, with frequencies \(\langle F^X_i, F^Y_i\rangle\) and amplitudes \(\langle A^X_i, A^Y_i\rangle\), we produce a final partial \(P_i\) whose frequency \(F_i = (1-\alpha) F^X_i + \alpha F^Y_i\) and whose amplitude \(A_i = (1-\alpha) A^X_i + \alpha A^Y_i\).
 
@@ -666,7 +672,7 @@ Second, normally every Partial \(i\) in the first Input is paired up with the sa
 
 Finally, if {\it Free} is set, then Morph doesn't reset to Inputs A and B every time you press a note\,---\,it keeps morphing from wherever it left off.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Amp Math} and  {\bf Combine} and {\bf Fill} and {\bf Mix}.
 
-\paragraph{Normalize} This {\it normalizes} the input (scales it so that the amplitudes all sum to 1.0, creating a relatively consistent volume) and/or {\it standardizes} it (sets all the frequencies to standard harmonic values).
+\paragraph{Normalize} This {\it normalizes} the input (scales it so that the amplitudes all sum to 1.0, creating a relatively consistent volume) or {\it maximizes} it (scaling it so that the highest amplitude equals 1.0).  Optionally it also {\it standardizes} it (sets all the frequencies to standard harmonic values).
 
 \paragraph{Partial Filter} This is a filter based on the partials of an incoming signal.  The partials form nodes in the filter, and the filter function interpolates between them.  Try drawing partials with {\bf Draw} and feeding them into Partial Filter to filter some sound to get the idea.  
 
@@ -707,7 +713,7 @@ Every useful patch has to have an Out module, since it provides the facility for
 
 \paragraph{Audio Generation}  Out is responsible for converting your partials into sound.  To do this, connect your final partials to the port on Out normally labelled {\bf A}: it's the topmost port in the module.  You can adjust the volume of this port by changing the {\it Gain} knob.
 
-\paragraph{Reverb} Flow sports a simple implementation of the Freeverb algorithm\footnote{A well regarded reverb algorithm in the public domain by ``Jezar at Dreampoint''.}  This algorithm has three parameters.  {\it Wet} is the dry/wet knob for the algorithm (0 is fully dry).  {\it Damp} is the damping: basically a low-pass filter applied to the reflected signals.  {\it Size} is the room size, which translates roughly into the reverb decay.  Note only a single sound (voice \#0) controls the modulation of Wet, Damp, and Size.  This means that if you attach an Envelope etc. to any of these modules, it may not respond in exactly the way you think.  It's probably best to keep them as knobs rather than attaching a modulation source.
+\paragraph{Reverb} Flow sports a simple implementation of the Freeverb algorithm.\footnote{A well regarded reverb algorithm in the public domain by ``Jezar at Dreampoint''.}  This algorithm has three parameters.  {\it Wet} is the dry/wet knob for the algorithm (0 is fully dry).  {\it Damp} is the damping: basically a low-pass filter applied to the reflected signals.  {\it Size} is the room size, which translates roughly into the reverb decay.  Note only a single sound (voice \#0) controls the modulation of Wet, Damp, and Size.  This means that if you attach an Envelope etc. to any of these modules, it may not respond in exactly the way you think.  It's probably best to keep them as knobs rather than attaching a modulation source.
 
 \paragraph{Partials Visualization}  When you connect to the {\bf A} port, the resulting partials are also displayed on the left partials display in your rack.  The {\bf B} port is also useful for displaying partials (it shows them on the right partials display).  
 

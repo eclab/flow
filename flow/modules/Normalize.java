@@ -22,14 +22,18 @@ public class Normalize extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineOptions(new String[] { "Normalize", "Standardize" }, new String[][] { {"Normalize"}, {"Standardize"} });
+        defineOptions(new String[] { "Normalize", "Standardize" }, new String[][] { {"Off", "Normalize", "Maximize"}, {"Standardize"} });
         }
 
-    boolean normalize = true;
+	public static final int N_OFF = 0;
+	public static final int N_NORMALIZE = 1;
+	public static final int N_MAXIMIZE = 2;
+
+    int normalize = N_NORMALIZE;
     boolean standardize = false;
         
-    public void setNormalize(boolean val) { normalize = val; }
-    public boolean getNormalize() { return normalize; }
+    public void setNormalize(int val) { normalize = val; }
+    public int getNormalize() { return normalize; }
     public void setStandardize(boolean val) { standardize = val; }
     public boolean getStandardize() { return standardize; }
         
@@ -40,7 +44,7 @@ public class Normalize extends Unit
         { 
         switch(option)
             {
-            case OPTION_NORMALIZE: return getNormalize() ? 1 : 0;
+            case OPTION_NORMALIZE: return getNormalize();
             case OPTION_STANDARDIZE: return getStandardize() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
@@ -50,7 +54,7 @@ public class Normalize extends Unit
         { 
         switch(option)
             {
-            case OPTION_NORMALIZE: setNormalize(value != 0); return;
+            case OPTION_NORMALIZE: setNormalize(value); return;
             case OPTION_STANDARDIZE: setStandardize(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
@@ -61,11 +65,16 @@ public class Normalize extends Unit
         super.go();
                 
         
-        if (normalize)
+        if (normalize == N_NORMALIZE)
             {
             copyAmplitudes(0);
             normalizeAmplitudes();
             }
+        else if (normalize == N_MAXIMIZE)
+        	{
+            copyAmplitudes(0);
+            maximizeAmplitudes();
+        	}
         else
             {
             pushAmplitudes(0);
@@ -82,6 +91,6 @@ public class Normalize extends Unit
             }
                                                 
         if (constrain() && standardize)
-            simpleSort(0, !normalize);
+            simpleSort(0, normalize == N_OFF);
         }       
     }

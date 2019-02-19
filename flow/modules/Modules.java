@@ -48,6 +48,7 @@ public class Modules
     flow.modules.Dilate.class,
     flow.modules.Draw.class,
     flow.modules.Drawbars.class,
+    flow.modules.EitherOr.class,
     flow.modules.Envelope.class,
     flow.modules.Fatten.class,
     flow.modules.Fill.class,

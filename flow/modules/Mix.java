@@ -72,8 +72,6 @@ public class Mix extends Unit
         {
         super.go();
         
-        pushFrequencies(0);
-
         double[] amplitudes = getAmplitudes(0);
         
         double[] amp1 = getAmplitudesIn(UNIT_A);
@@ -84,7 +82,18 @@ public class Mix extends Unit
         double gain2 = modulate(MOD_GAIN_B);
         double gain3 = modulate(MOD_GAIN_C);
         double gain4 = modulate(MOD_GAIN_D);
-        
+		
+		if (gain1 > 0)
+	        pushFrequencies(0);
+	    else if (gain2 > 0)
+	    	pushFrequencies(1);
+	    else if (gain3 > 0)
+	    	pushFrequencies(2);
+	    else if (gain4 > 0)
+	    	pushFrequencies(3);
+	    else
+	    	pushFrequencies(0);
+
         if (mixType == MIX_TYPE_SUM)
         	{                     
 			for(int i = 0; i < amplitudes.length; i++)
