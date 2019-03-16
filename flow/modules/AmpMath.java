@@ -14,7 +14,7 @@ import flow.*;
    and an additional modulation source MOD):
    
    <ul>
-   <li> ADD: min(1, A + B)
+   <li> ADD: A + B
    <li> SUBTRACT: max(0, A - B)
    <li> MULTIPLY: A * B
    <li> INV_MULTIPLY: A * (1 - B)
@@ -28,6 +28,8 @@ import flow.*;
    <li> THRESHOLD: If A > mod, 1, else 0
    <li> SCALEDOWN: A * mod
    <li> SCALEUP: min(1, A * (mod + 1))
+   <li> CLAMPDOWN: If A > mod, mod, else A
+   <li> CLAMPUP: If A > mod, A, else mod
    </ul>
    
    <p>You also have have the option of NORMALIZING the result after the fact.
@@ -59,11 +61,13 @@ public class AmpMath extends Unit
     public static final int THRESHOLD = 11;
     public static final int SCALEDOWN = 12;
     public static final int SCALEUP = 13;
+    public static final int CLAMPDOWN = 14;
+    public static final int CLAMPUP = 15;
     //public static final int REMOVE = 14;
         
     public static final String[] OPERATION_NAMES = new String[] { 
         "+", "-", "*", "inv *", "compress", "average", "min", "max", "filter", "filternot", 
-        "fill", "threshold", "scaledown", "scaleup", 
+        "fill", "threshold", "scaledown", "scaleup", "clampdown", "clampup", 
         //"remove" 
         }; 
         
@@ -105,7 +109,7 @@ public class AmpMath extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL }, new String[] { "Input A", "Input B" });
-        defineModulations(new Constant[] { Constant.ONE }, new String[] { "Scale" });
+        defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Scale" });
         defineOptions(new String[] { "Operation", "Normalize" }, new String[][] { OPERATION_NAMES, { "Normalize"} } );
         setOperation(ADD);
         setNormalize(false);
@@ -234,6 +238,22 @@ public class AmpMath extends Unit
                 for(int i = 0; i < amplitudes.length; i++)
                     {
                     amplitudes[i] = inputs0amplitudes[i] * (modulation + 1.0);
+                    }
+                }
+            break;
+            case CLAMPDOWN:     // If A < mod then A else mod
+                {
+                for(int i = 0; i < amplitudes.length; i++)
+                    {
+                    amplitudes[i] = inputs0amplitudes[i] > modulation ? modulation : inputs0amplitudes[i];
+                    }
+                }
+            break;
+            case CLAMPUP:     // If A > mod then A else mod
+                {
+                for(int i = 0; i < amplitudes.length; i++)
+                    {
+                    amplitudes[i] = inputs0amplitudes[i] > modulation ? inputs0amplitudes[i] : modulation;
                     }
                 }
             break;
