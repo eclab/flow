@@ -47,22 +47,35 @@ public class Seq extends Modulation
         {
         for(int i = 0; i < PITCHES.length; i++)
             {
-            PITCHES[i] = (1.0 - (i - 24)/12.0) / 4.0 + 0.25;
+            PITCHES[i] = ((i - 24)/12.0) / Shift.MAX_PITCH_BOUND + 0.5;
             }
         };
 
+    public static final int CURVE_LINEAR = 0;
+    public static final int CURVE_X_2 = 1;
+    public static final int CURVE_X_4 = 2;
+    public static final int CURVE_X_8 = 3;
+    public static final int CURVE_X_16 = 4;
+    public static final int CURVE_X_32 = 5;
+    public static final int CURVE_STEP = 6;
 
     public static final int NUM_STATES = 32;
         
     int state = 0;
-    boolean free = false;
+    boolean free = true;
+    boolean release = false;
     boolean sample = true;
-    boolean gated = false;
     boolean guided = false;
     boolean display = false;
+    boolean playing = false;
+    int curve = CURVE_STEP;
 
+    public int getCurve() { return curve; }
+    public void setCurve(int val) { curve = val; }
     public boolean getFree() { return free; }
     public void setFree(boolean val) { free = val; }
+    public boolean getRelease() { return release; }
+    public void setRelease(boolean val) { release = val; }
     public boolean getSample() { return sample; }
     public void setSample(boolean val) { sample = val; }
     public boolean getGuided() { return guided; }
@@ -70,16 +83,20 @@ public class Seq extends Modulation
     public boolean getDisplay() { return display; }
     public void setDisplay(boolean val) { display = val; updateModulePanel(true); }
         
-    public static final int OPTION_FREE = 0;
-    public static final int OPTION_SAMPLE = 1;
-    public static final int OPTION_GUIDED = 2;
-    public static final int OPTION_DISPLAY = 3;
+    public static final int OPTION_CURVE = 0;
+    public static final int OPTION_FREE = 1;
+    public static final int OPTION_RELEASE = 2;
+    public static final int OPTION_SAMPLE = 3;
+    public static final int OPTION_GUIDED = 4;
+    public static final int OPTION_DISPLAY = 5;
 
     public int getOptionValue(int option) 
         { 
         switch(option)
             {
+            case OPTION_CURVE: return getCurve();
             case OPTION_FREE: return (getFree() ? 1 : 0);
+            case OPTION_RELEASE: return (getRelease() ? 1 : 0);
             case OPTION_SAMPLE: return (getSample() ? 1 : 0);
             case OPTION_GUIDED: return (getGuided() ? 1 : 0);
             case OPTION_DISPLAY: return (getDisplay() ? 1 : 0);
@@ -91,7 +108,9 @@ public class Seq extends Modulation
         { 
         switch(option)
             {
+            case OPTION_CURVE: setCurve(value); return;
             case OPTION_FREE: setFree(value != 0); return;
+            case OPTION_RELEASE: setRelease(value != 0); return;
             case OPTION_SAMPLE: setSample(value != 0); return;
             case OPTION_GUIDED: setGuided(value != 0); return;
             case OPTION_DISPLAY: setDisplay(value != 0); return;
@@ -103,7 +122,7 @@ public class Seq extends Modulation
     public Seq(Sound sound)
         {
         super(sound);
-        defineOptions(new String[] { "Free", "Sample", "Guided", "Display" }, new String[][] { { "Free" }, { "Sample" }, { "Guided" }, { "Display" } });
+        defineOptions(new String[] { "Change", "Free", "Stop on Release", "Sample", "Guided", "Display" }, new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" }, { "Free" }, { "Stop on Release" }, { "Sample" }, { "Guided" }, { "Display" } });
         defineModulations(new Constant[] 
             { Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
               Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
@@ -126,9 +145,6 @@ public class Seq extends Modulation
                 "Steps", "Trigger"
                 });
         }
-
-    // go() automatically clears the trigger so we need to set it a different way
-    boolean didTrigger;
         
     Object[] _stateLock = new Object[0];
     int _state = 0;
@@ -151,44 +167,114 @@ public class Seq extends Modulation
 			seq0.getModulePanel().repaint();
 			}
     	}
+    
+    void resetSequencerPosition()
+    	{
+    	int oldstate = state;
+        state = 0;
+        updateModulation();
+	    if (oldstate != state)
+	    	updateModulePanel(false);
+    	}
     	
     public void reset()
         {
         super.reset();
-        state = 0;
-        setModulationOutput(0, modulate(state));
-//        didTrigger = true;            // this creates beeps when resetting, bad
-        gated = false;
-	    updateModulePanel(false);
+        resetSequencerPosition();
+        if (free)
+	    	playing = true;
         }
                 
     public void gate()
         {
         super.gate();
-        gated = true;
-        if (!free) 
-            {
-            state = 0;
-            setModulationOutput(0, modulate(state));
-            didTrigger = true;
-	        updateModulePanel(false);
-			}
+        if (!free)
+        	{
+        	resetSequencerPosition();
+	        playing = true;
+	        }
         }
     
     public void release()
         {
-        gated = false;
+        if (!free && release)
+        	playing = false;
         }
+        
+    void updateModulation()
+    	{
+    	if (curve == CURVE_STEP)
+    		{
+        	setModulationOutput(0, modulate(state));
+        	}
+        else
+        	{
+        	double alpha = modulate(MOD_TRIGGER);
+        	
+        	switch(curve)
+        		{
+        		case CURVE_STEP:
+        			{
+        			// should never happen
+        			}
+        		break;
+        		case CURVE_X_2:
+        		{
+        		alpha = alpha * alpha;
+        		}
+        		break;
+        		case CURVE_X_4:
+        		{
+        		alpha = alpha * alpha;
+        		alpha = alpha * alpha;
+        		}
+        		break;
+        		case CURVE_X_8:
+        		{
+        		alpha = alpha * alpha;
+        		alpha = alpha * alpha;
+        		alpha = alpha * alpha;
+        		}
+        		break;
+        		case CURVE_X_16:
+        		{
+        		alpha = alpha * alpha;
+        		alpha = alpha * alpha;
+        		alpha = alpha * alpha;
+        		alpha = alpha * alpha;
+        		}
+        		break;
+        		case CURVE_X_32:
+        		{
+        		alpha = alpha * alpha;
+        		alpha = alpha * alpha;
+        		alpha = alpha * alpha;
+        		alpha = alpha * alpha;
+        		alpha = alpha * alpha;
+        		}
+        		break;
+        		default:
+        			{
+        			// should never happen
+        			}
+        		}
+        		
+        	double currentVal = modulate(state);
+	        int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
+        	int nextState = state + 1;
+        	if (nextState >= maxState) nextState = 0;
+        	double nextVal = modulate(nextState);
+        	setModulationOutput(0, (1 - alpha) * currentVal + alpha * nextVal);
+        	}
+    	}
         
     public void go()
         {
         super.go();
-        if (didTrigger) updateTrigger(0);
-        didTrigger = false;
 
-        if (!gated && !free)  
-            return;      
-        
+		if (!playing && !free) 
+			return;
+
         if (isTriggered(MOD_TRIGGER))
             {
             int oldstate = state;
@@ -205,12 +291,12 @@ public class Seq extends Modulation
 	            }
 	        if (oldstate != state)
 	        	updateModulePanel(false);
-            setModulationOutput(0, modulate(state));
+	        updateModulation();
             updateTrigger(0);
             }
         else if (!sample)
             {
-            setModulationOutput(0, modulate(state));
+			updateModulation();
             }
         }
 
