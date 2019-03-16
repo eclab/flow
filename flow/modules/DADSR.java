@@ -82,7 +82,9 @@ public class DADSR extends Modulation implements ModSource
     public static final int CURVE_X_2 = 1;
     public static final int CURVE_X_4 = 2;
     public static final int CURVE_X_8 = 3;
-    public static final int CURVE_JUMP = 4;
+    public static final int CURVE_X_16 = 4;
+    public static final int CURVE_X_32 = 5;
+    public static final int CURVE_STEP = 6;
         
     public static final int MOD_DELAY_TIME = 0;
     public static final int MOD_DELAY_LEVEL = 1;
@@ -165,7 +167,7 @@ public class DADSR extends Modulation implements ModSource
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.ONE, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
             new String[] {  "Delay Time", "Delay Level", "Attack Time", "Attack Level", "Decay Time", "Sustain Level", "Release Time", "Release Level", "On Tr", "Off Tr" });
         defineOptions(new String[] { "Curve", "One Shot", "Gate Reset", "MIDI Sync", "Fast Release" }, 
-        			new String[][] { { "Linear", "x^2", "x^4", "x^8", "Jump" }, 
+        			new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" }, 
         			{ "One Shot" }, { "Gate Reset" }, { "MIDI Sync" }, { "No Release" } } );
         setModulationOutput(0, 0);  
         }
@@ -333,7 +335,26 @@ public class DADSR extends Modulation implements ModSource
                 alpha = 1 - alpha;
                 }
             break;
-            case CURVE_JUMP:
+            case CURVE_X_16:
+                {
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
+                }
+            break;
+            case CURVE_X_32:
+                {
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
+                }
+            break;
+            case CURVE_STEP:
                 {
                 alpha = 1.0;
                 }
@@ -402,5 +423,4 @@ public class DADSR extends Modulation implements ModSource
                 }
             };
         }
-
     }

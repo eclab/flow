@@ -51,7 +51,9 @@ public class Envelope extends Modulation implements ModSource
     public static final int CURVE_X_2 = 1;
     public static final int CURVE_X_4 = 2;
     public static final int CURVE_X_8 = 3;
-    public static final int CURVE_JUMP = 4;
+    public static final int CURVE_X_16 = 4;
+    public static final int CURVE_X_32 = 5;
+    public static final int CURVE_STEP = 6;
         
     public static final int OPTION_CURVE = 0;
     public static final int OPTION_TYPE = 1;
@@ -121,7 +123,7 @@ public class Envelope extends Modulation implements ModSource
         super(sound);
         defineOptions(
             new String[] { "Curve", "Type", "Gate Reset", "MIDI Sync" }, 
-            new String[][] { { "Linear", "x^2", "x^4", "x^8", "Jump" }, TYPE_NAMES, { "Gate Reset" }, { "MIDI Sync" } } );        
+            new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" }, TYPE_NAMES, { "Gate Reset" }, { "MIDI Sync" } } );        
 
         Constant[] mods = new Constant[NUM_STATES * 2 + 3];
         for(int i = 0; i < mods.length; i++)
@@ -394,7 +396,26 @@ public class Envelope extends Modulation implements ModSource
                 alpha = 1 - alpha;
                 }
             break;
-            case CURVE_JUMP:
+            case CURVE_X_16:
+                {
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
+                }
+            break;
+            case CURVE_X_32:
+                {
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
+                }
+            break;
+            case CURVE_STEP:
                 {
                 alpha = 1.0;
                 }

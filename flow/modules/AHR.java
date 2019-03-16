@@ -79,7 +79,9 @@ public class AHR extends Modulation implements ModSource
     public static final int CURVE_X_2 = 1;
     public static final int CURVE_X_4 = 2;
     public static final int CURVE_X_8 = 3;
-    public static final int CURVE_JUMP = 4;
+    public static final int CURVE_X_16 = 4;
+    public static final int CURVE_X_32 = 5;
+    public static final int CURVE_STEP = 6;
         
     public static final int MOD_RELEASE_LEVEL = 0;
     public static final int MOD_ATTACK_TIME = 1;
@@ -152,8 +154,8 @@ public class AHR extends Modulation implements ModSource
         defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ONE, Constant.ZERO, Constant.HALF, Constant.ZERO, Constant.ZERO }, 
             new String[] { "Start Level", "Attack Time", "Attack Level", "Hold Time",  "Release Time", "On Tr", "Off Tr" });
         defineOptions(new String[] { "Attack Curve", "Release Curve", "One Shot",  "MIDI Sync" }, 
-        	new String[][] { { "Linear", "x^2", "x^4", "x^8", "Jump" } , 
-        					{ "Linear", "x^2", "x^4", "x^8", "Jump" }, 
+        	new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" } , 
+        					{ "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" }, 
         	{ "One Shot" }, { "Gate Reset" }, { "MIDI Sync" } } );
         this.oneshot = false;
         setModulationOutput(0, 0);  
@@ -294,7 +296,26 @@ public class AHR extends Modulation implements ModSource
                 alpha = 1 - alpha;
                 }
             break;
-            case CURVE_JUMP:
+            case CURVE_X_16:
+                {
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
+                }
+            break;
+            case CURVE_X_32:
+                {
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
+                }
+            break;
+            case CURVE_STEP:
                 {
                 alpha = 1.0;
                 }
