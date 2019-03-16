@@ -587,8 +587,8 @@ Okay, here we go.
 \paragraph{Amp Math}  This shaper modifies the partials from two sources \(A\) and \(B\) by putting every pair of them \(\langle A_i, B_i\rangle\) through the same function, along with a modulation source \(M\).  The operations are:
 
 \begin{itemize}
-\item \(\boldsymbol{+}\)\quad Does \(A_i + B_i\)
-\item \(\boldsymbol -\)\quad Does \(\lfloor A_i - B_i\rfloor\)
+\item \(\boldsymbol{+}\)\quad Does \(A_i + B_i + M\)
+\item \(\boldsymbol -\)\quad Does \(\max(A_i - B_i - M,\ 0)\)
 \item \(\boldsymbol \times\)\quad Does \(A_i \times B_i\)
 \item {\bf inv} \(\boldsymbol \times\)\quad Does \(A_i \times (1 - B_i)\)
 \item {\bf compress}\quad Does \(1 - (1 - A_i) \times (1 - B_i)\)
@@ -601,6 +601,8 @@ Okay, here we go.
 \item {\bf threshold}\quad If \(A_i > M\) then returns 1 else 0
 \item {\bf scaledown}\quad Does \(A_i \times M\)
 \item {\bf scaleup}\quad Does \(A_i \times (M + 1)\)
+\item {\bf clampdown}\quad If \(A_i > M\) then returns \(M\) else \(A_i\)
+\item {\bf clampup}\quad If \(A_i > M\) then returns \(A_i\) else \(M\)
 %\item {\bf remove}\quad If \(i\ \text{mod} (M \times 127) = 0\) then returns \(A_i\), else \(B_i\)
 \end{itemize}
 
