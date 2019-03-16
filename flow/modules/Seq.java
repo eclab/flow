@@ -9,6 +9,8 @@ import flow.gui.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
+import java.lang.ref.*;
 
 /**
    A Modulation which provides a simple step sequencer of up to 32 steps.  You specify
@@ -81,7 +83,7 @@ public class Seq extends Modulation
     public boolean getGuided() { return guided; }
     public void setGuided(boolean val) { guided = val; }
     public boolean getDisplay() { return display; }
-    public void setDisplay(boolean val) { display = val; updateModulePanel(true); }
+    public void setDisplay(boolean val) { display = val; }
         
     public static final int OPTION_CURVE = 0;
     public static final int OPTION_FREE = 1;
@@ -146,35 +148,11 @@ public class Seq extends Modulation
                 });
         }
         
-    Object[] _stateLock = new Object[0];
-    int _state = 0;
-    void updateModulePanel(boolean force)
-    	{
-		if ((display || force) && getMacro() == null && sound != null) //  && sound.getOutput().getInput().getLastPlayedSound() == sound)
-			{
-			// At this point, I am the sound being played and I'm not in a macro, so I need
-			// to update the module panel.
-
-			int m = sound.findRegistered(this);
-    		Sound sound0 = sound.getOutput().getSoundUnsafe(0);
-			Seq seq0 = (Seq)(sound0.getRegistered(m));
-
-			synchronized(seq0._stateLock)
-				{
-				seq0._state = state;
-				}
-			
-			seq0.getModulePanel().repaint();
-			}
-    	}
-    
     void resetSequencerPosition()
     	{
     	int oldstate = state;
         state = 0;
         updateModulation();
-	    if (oldstate != state)
-	    	updateModulePanel(false);
     	}
     	
     public void reset()
@@ -201,6 +179,7 @@ public class Seq extends Modulation
         	playing = false;
         }
         
+    volatile int _state = 0;
     void updateModulation()
     	{
     	if (curve == CURVE_STEP)
@@ -266,6 +245,8 @@ public class Seq extends Modulation
         	double nextVal = modulate(nextState);
         	setModulationOutput(0, (1 - alpha) * currentVal + alpha * nextVal);
         	}
+
+    	_state = state;
     	}
         
     public void go()
@@ -289,8 +270,6 @@ public class Seq extends Modulation
             	state++;
 	            if (state >= maxState) state = 0;
 	            }
-	        if (oldstate != state)
-	        	updateModulePanel(false);
 	        updateModulation();
             updateTrigger(0);
             }
@@ -313,10 +292,53 @@ public class Seq extends Modulation
         else return "";
         }
 
-    public ModulePanel getPanel()
-        {
-        return new ModulePanel(Seq.this)
-            {
+	static ArrayList panels = new ArrayList();
+	static javax.swing.Timer timer = null;
+	static void startTimer()
+		{
+		if (timer == null)
+			{
+			timer = new javax.swing.Timer(25, new ActionListener()
+				{
+				public void actionPerformed(ActionEvent e)
+					{
+					Iterator iterator = panels.iterator();
+					while(iterator.hasNext())
+						{
+						WeakReference ref = (WeakReference)(iterator.next());
+						Object obj = ref.get();
+						if (obj != null)
+							{
+							((SeqModulePanel) obj).doRepaint();
+							}
+						else
+							{
+							iterator.remove();
+							}
+						}
+					}
+				});
+			timer.start();
+			}
+		}
+
+	class SeqModulePanel extends ModulePanel
+		{
+		
+			boolean repaintOnce = true;			// this allows us to clear things if the user turns off getDisplay
+			public void doRepaint()
+				{
+				if (Seq.this.getDisplay())
+					{ repaint(); repaintOnce = true; }
+				else if (repaintOnce)
+					{ repaint(); repaintOnce = false; }
+				}
+		
+			public SeqModulePanel(Seq mod)
+				{
+				super(mod);
+				}
+				
             public JComponent buildPanel()
                 {
                 JLabel example = new JLabel("0.0000 ");
@@ -373,13 +395,17 @@ public class Seq extends Modulation
                             
                             public boolean getDrawsStateDot()
                             	{
-                            	synchronized(Seq.this._stateLock)
-                            		{
-	                            	return (Seq.this.getDisplay() && Seq.this._state == _state);
-	                            	}
+                            	if (!Seq.this.getDisplay()) return false;
+                            	
+								int m = sound.findRegistered(Seq.this);
+                            	Sound soundlast = sound.getOutput().getInput().getLastPlayedSound();
+                            	if (soundlast == null)
+                            		soundlast = sound.getOutput().getSoundUnsafe(0);
+								Seq seq0 = (Seq)(soundlast.getRegistered(m));
+
+	                            return (seq0._state == _state);
                             	}
                             };
-//                        m[0].getData().setPreferredSize(example.getPreferredSize());
                         m[0].getData().setMinimumSize(example.getPreferredSize());
                         box2.add(m[0]);
                         }
@@ -395,7 +421,16 @@ public class Seq extends Modulation
                     
                 return box;
                 }
-            };
+    		}
+
+    public ModulePanel getPanel()
+        {
+        startTimer();
+        SeqModulePanel mp = new SeqModulePanel(Seq.this);
+        
+        // I think this should be okay -- we're doing stuff here in the swing event thread
+        panels.add(new WeakReference(mp));
+        return mp;
         }
 
     }
