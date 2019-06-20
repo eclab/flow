@@ -12,8 +12,9 @@ I (Sean) have been asked where my Patreon page is.  So, sure, here's my <a href=
 
 Related projects:  
 
-* [Edisyn](https://github.com/eclab/edisyn), a patch editor toolkit with sophisticated exploration tools
-* [Gizmo](https://cs.gmu.edu/~sean/projects/gizmo/), an Arduino-based MIDI Swiss Army knife
+* [Edisyn](https://github.com/eclab/edisyn), a patch editor toolkit with sophisticated exploration tools.
+* [Gizmo](https://cs.gmu.edu/~sean/projects/gizmo/), an Arduino-based MIDI Swiss Army knife.
+* [Computational Music Synthesis](https://cs.gmu.edu/~sean/book/synthesis/), an open-content book on building software synthesizers.
 
 ## About
 
