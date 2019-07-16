@@ -20,15 +20,16 @@ public class VCA extends Unit
 
     public static final int MOD_MOD = 0;
     public static final int MOD_SCALE = 1;
-    public static final int MOD_DAMP = 2;
+    public static final int MOD_BOOST = 2;
 
     public static final double MAX_SCALE = 8.0;
+    public static final double MAX_BOOST = 2.0;
         
     public VCA(Sound sound)
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations(new Constant[] { Constant.ONE, Constant.HALF, Constant.ZERO }, new String[] { "Mod", "Scale", "Damp" });
+        defineModulations(new Constant[] { Constant.ONE, Constant.HALF, Constant.ZERO }, new String[] { "Mod", "Scale", "Bass Boost" });
         }
                 
     public void go()
@@ -51,16 +52,32 @@ public class VCA extends Unit
         
         for(int i = 0; i < amplitudes.length; i++)
             amplitudes[i] = amplitudes[i] * mod * scale; 
-            
-        double tana = Math.tan(modulate(MOD_DAMP) * Math.PI * 0.5);
+        
+        /*
+        double boost = modulate(MOD_BOOST) * MAX_BOOST;
         double[] frequencies = getFrequencies(0);
-    
+        double nyquist = Output.SAMPLING_RATE * 0.5;
+        double pitch = sound.getPitch();
+        
+        ////
+        // amplitudes *= (freq - 0) / (nyquist - 0)
+        
+        double invnyquist = 1.0 / nyquist;
         for(int i = 0; i < amplitudes.length; i++)
             {
-            amplitudes[i] = amplitudes[i] * (1 - frequencies[i] * getSound().getPitch()  * 1.0/22050 * tana);
-        	if (amplitudes[i] < 0) amplitudes[i] = 0;
+            if (frequencies[i] * pitch <= nyquist)
+            	{
+            	double alpha = ( 1 - frequencies[i] * pitch * invnyquist);
+            	//alpha *= alpha;
+            	//alpha *= alpha;
+            	//alpha *= alpha;
+            	//alpha *= alpha;
+            	//alpha *= alpha;
+           		amplitudes[i] = amplitudes[i]  *  alpha * boost;
+           		}
         	}
-        	
+        */
+
         constrain();
         }       
 
