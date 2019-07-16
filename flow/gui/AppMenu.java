@@ -779,12 +779,26 @@ public class AppMenu
         return reset;
         }
 
+    static JCheckBoxMenuItem testMenu(Rack rack)
+        {
+        final JCheckBoxMenuItem reset = new JCheckBoxMenuItem("Test");
+        reset.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+                rack.getOutput().test = reset.isSelected();
+                }
+            });
+        return reset;
+        }
+
     // Produces the Play menu
     public static JMenu providePlayMenu(Rack rack)
         {
         JMenu menu = new JMenu("Play");
 
         menu.add(resetMenu(rack));
+        menu.add(testMenu(rack));
         menu.addSeparator();
         menu.add(playFirstMenu(rack));
         menu.add(bendMenu(rack));
