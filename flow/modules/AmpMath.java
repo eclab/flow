@@ -61,13 +61,16 @@ public class AmpMath extends Unit
     public static final int THRESHOLD = 11;
     public static final int SCALEDOWN = 12;
     public static final int SCALEUP = 13;
-    public static final int CLAMPDOWN = 14;
-    public static final int CLAMPUP = 15;
-    //public static final int REMOVE = 14;
+    public static final int SCALEFAR = 14;
+    public static final int CLAMPDOWN = 15;
+    public static final int CLAMPUP = 16;
+    //public static final int REMOVE = 17;
+    
+    public static final double SCALEFAR_RANGE = 9;
         
     public static final String[] OPERATION_NAMES = new String[] { 
         "+", "-", "*", "inv *", "compress", "average", "min", "max", "filter", "filternot", 
-        "fill", "threshold", "scaledown", "scaleup", "clampdown", "clampup", 
+        "fill", "threshold", "scaledown", "scaleup", "scalefar", "clampdown", "clampup", 
         //"remove" 
         }; 
         
@@ -177,19 +180,19 @@ public class AmpMath extends Unit
                     }
                 }
             break;
-            case MIN:   // min(A, B)
+            case MIN:   // min(A * modulation, B)
                 {
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    amplitudes[i] = Math.min(inputs0amplitudes[i], inputs1amplitudes[i]);
+                    amplitudes[i] = Math.min(inputs0amplitudes[i] * (1 - modulation), inputs1amplitudes[i]);
                     }
                 }
             break;
-            case MAX:   // max(A, B)
+            case MAX:   // max(A * modulation, B)
                 {
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    amplitudes[i] = Math.max(inputs0amplitudes[i], inputs1amplitudes[i]);
+                    amplitudes[i] = Math.max(inputs0amplitudes[i] * (1 - modulation), inputs1amplitudes[i]);
                     }
                 }
             break;
@@ -225,19 +228,27 @@ public class AmpMath extends Unit
                     }
                 }
             break;
-            case SCALEDOWN:     // A * mod
+            case SCALEDOWN:     // A * mod + B
                 {
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    amplitudes[i] = inputs0amplitudes[i] * modulation;
+                    amplitudes[i] = inputs0amplitudes[i] * modulation + inputs1amplitudes[i];
                     }
                 }
             break;
-            case SCALEUP:       // A * (mod + 1)
+            case SCALEUP:       // A * (mod + 1) + B
                 {
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    amplitudes[i] = inputs0amplitudes[i] * (modulation + 1.0);
+                    amplitudes[i] = inputs0amplitudes[i] * (modulation + 1.0) + inputs1amplitudes[i];
+                    }
+                }
+            break;
+            case SCALEFAR:       // A * (mod * 9 + 1) + B
+                {
+                for(int i = 0; i < amplitudes.length; i++)
+                    {
+                    amplitudes[i] = inputs0amplitudes[i] * (modulation * SCALEFAR_RANGE + 1.0) + inputs1amplitudes[i];
                     }
                 }
             break;
@@ -245,7 +256,7 @@ public class AmpMath extends Unit
                 {
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    amplitudes[i] = inputs0amplitudes[i] > modulation ? modulation : inputs0amplitudes[i];
+                    amplitudes[i] = (inputs0amplitudes[i] > modulation ? modulation : inputs0amplitudes[i]) + inputs1amplitudes[1];
                     }
                 }
             break;
@@ -253,7 +264,7 @@ public class AmpMath extends Unit
                 {
                 for(int i = 0; i < amplitudes.length; i++)
                     {
-                    amplitudes[i] = inputs0amplitudes[i] > modulation ? inputs0amplitudes[i] : modulation;
+                    amplitudes[i] = (inputs0amplitudes[i] > modulation ? inputs0amplitudes[i] : modulation) + inputs1amplitudes[1];
                     }
                 }
             break;
