@@ -685,15 +685,18 @@ public class Input
             {
             if (!isMPE())
                 {
-                for (Sound sound : notesOn)
-                    {
-                    sound.setBend(d);
-                    }
-                
-                for (Sound sound : notesOff)
-                    {
-                    sound.setBend(d);
-                    }
+                if (channel == CHANNEL_OMNI || channel == sm.getChannel())
+                	{
+                	for (Sound sound : notesOn)
+						{
+						sound.setBend(d);
+						}
+				
+					for (Sound sound : notesOff)
+						{
+						sound.setBend(d);
+						}
+					}
                 }
             else
                 {
