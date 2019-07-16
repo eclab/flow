@@ -44,6 +44,7 @@ public class Shift extends Unit
     public static final int TYPE_PITCH = 0;
     public static final int TYPE_FREQUENCY = 1;
     public static final int TYPE_PARTIALS = 2;
+    public static final int TYPE_VIBRATO = 3;
     
     int type = TYPE_PITCH;
     public void setType(int val) { type = val; }
@@ -75,11 +76,12 @@ public class Shift extends Unit
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.HALF, Constant.ONE }, new String[] { "Shift", "Bound" });
-        defineOptions(new String[] { "Type" }, new String[][] { { "Pitch", "Frequency", "Partials" } } );
+        defineOptions(new String[] { "Type" }, new String[][] { { "Pitch", "Frequency", "Partials", "Vibrato" } } );
         }
         
     public static final double MAX_PITCH_BOUND = 12.0;
     public static final double MAX_PARTIALS_BOUND = 128.0;
+    public static final double MAX_VIBRATO_BOUND = 2.0 / 12.0;
         
     public void go()
         {
@@ -105,7 +107,7 @@ public class Shift extends Unit
                     frequencies[i] = frequencies[i] * multiplier;
                     }
                 }
-            break;
+            break; 
                         
             case TYPE_FREQUENCY:
                 {
@@ -114,7 +116,7 @@ public class Shift extends Unit
 
 				double[] frequencies = getFrequencies(0);
         
-                double delta = modToSignedFrequency(shift) * bound / sound.getPitch();
+                double delta = modToSignedFrequency(bound) * shift / sound.getPitch();
 
                 for(int i = 0; i < frequencies.length; i++)
                     {
@@ -155,6 +157,24 @@ public class Shift extends Unit
                 	
                 }
             break;
+
+            case TYPE_VIBRATO:
+                {
+				copyFrequencies(0);
+				pushAmplitudes(0);
+
+				double[] frequencies = getFrequencies(0);
+        
+                // If it's not Math.pow, but hybridpow, we get weird jumps
+                double multiplier = Math.pow(2, (shift - 0.5) * bound * MAX_VIBRATO_BOUND);
+
+                for(int i = 0; i < frequencies.length; i++)
+                    {
+                    frequencies[i] = frequencies[i] * multiplier;
+                    }
+                }
+            break; 
+                        
             }
 
         if (constrain()) 
