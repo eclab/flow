@@ -63,6 +63,7 @@ public class LFO extends Modulation implements ModSource
     boolean free;
     boolean invert;
     boolean halfTrigger;
+    boolean initTrigger;
     boolean sync;
     boolean linear;
         
@@ -78,6 +79,8 @@ public class LFO extends Modulation implements ModSource
     public void setInvert(boolean invert) { this.invert = invert; }
     public boolean getHalfTrigger() { return halfTrigger; }
     public void setHalfTrigger(boolean val) { this.halfTrigger = val; }
+    public boolean getInitTrigger() { return initTrigger; }
+    public void setInitTrigger(boolean val) { this.initTrigger = val; }
 
     public static final int OPTION_TYPE = 0;
     public static final int OPTION_FREE = 1;
@@ -85,6 +88,7 @@ public class LFO extends Modulation implements ModSource
     public static final int OPTION_HALF_TRIGGER = 3;
     public static final int OPTION_LINEAR = 4;
     public static final int OPTION_SYNC = 5;
+    public static final int OPTION_INIT_TRIGGER = 6;
         
     public int getOptionValue(int option) 
         { 
@@ -96,6 +100,7 @@ public class LFO extends Modulation implements ModSource
             case OPTION_HALF_TRIGGER: return getHalfTrigger() ? 1 : 0;
             case OPTION_LINEAR: return getLinear() ? 1 : 0;
             case OPTION_SYNC: return getSync() ? 1 : 0;
+            case OPTION_INIT_TRIGGER: return getInitTrigger() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -110,6 +115,7 @@ public class LFO extends Modulation implements ModSource
             case OPTION_HALF_TRIGGER: setHalfTrigger(value != 0); return;
             case OPTION_LINEAR: setLinear(value != 0); return;
             case OPTION_SYNC: setSync(value != 0); return;
+            case OPTION_INIT_TRIGGER: setInitTrigger(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }       
@@ -147,6 +153,8 @@ public class LFO extends Modulation implements ModSource
         lastState = 0;
         state = 0;
         bias = 0;
+        if (initTrigger) 
+        	nextUpdateTrigger = true;
         }
         
     public void gate() 
@@ -186,7 +194,8 @@ public class LFO extends Modulation implements ModSource
         // Modulation 4: Random Seed
         defineModulations(new Constant[] { Constant.HALF, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ONE, Constant.ONE, Constant.ZERO }, 
             new String[] { "Rate", "Phase", "Scale", "Shift", "Variance", "Seed", "On Tr" });
-        defineOptions(new String[] { "Type", "Free", "Invert", "Half Trigger", "Linear Rate", "MIDI Sync"}, new String[][] { TYPE_NAMES, { "Free" }, { "Invert" }, { "Half Trigger" }, { "Linear Rate" }, { "MIDI Sync" } } );
+        defineOptions(new String[] { "Type", "Free", "Invert", "Half Trigger", "Linear Rate", "MIDI Sync", "Init Trigger"}, 
+        			  new String[][] { TYPE_NAMES, { "Free" }, { "Invert" }, { "Half Trigger" }, { "Linear Rate" }, { "MIDI Sync" }, { "Init Trigger" } } );
 
         this.type = TRIANGLE;
         free = true;
@@ -313,10 +322,13 @@ public class LFO extends Modulation implements ModSource
     STATE = POS + BIAS, MOD 1       
 */
 
+	boolean nextUpdateTrigger = false;
     public void go()
         {
         super.go();
-                
+        if (nextUpdateTrigger)
+        	{ updateTrigger(0); nextUpdateTrigger = false; }
+        	
         if (isTriggered(MOD_GATE_TR))
             {
             resetLFO();
