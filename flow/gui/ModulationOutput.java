@@ -127,6 +127,13 @@ public class ModulationOutput extends InputOutput
             
         jack.addMouseMotionListener(mouseAdapter);
         jack.addMouseListener(mouseAdapter);
+
+		String[] help = modulation.wrapHelp(modulation.getModulationOutputHelp());
+		if (help != null && help.length > number && help[number] != null)
+			{
+			jack.setToolTipText(help[number]);
+			title.setToolTipText(help[number]);
+			}
         }
 
     /** Attaches a ModulationWire connected to the given ModulationInput. */

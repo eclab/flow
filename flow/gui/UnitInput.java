@@ -183,6 +183,13 @@ public class UnitInput extends InputOutput implements Rebuildable
             };
             
         addMouseListener(mouseAdapter);
+
+		String[] help = unit.wrapHelp(unit.getUnitInputHelp());
+		if (help != null && help.length > number && help[number] != null)
+			{
+			jack.setToolTipText(help[number]);
+			title.setToolTipText(help[number]);
+			}
         }
 
     public String toString()

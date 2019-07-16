@@ -184,6 +184,13 @@ public class ModulationInput extends InputOutput implements Rebuildable
         add(panel, BorderLayout.CENTER);
         add(dial, BorderLayout.WEST);
 
+		String[] help = mod.wrapHelp(mod.getModulationHelp());
+		if (help != null && help.length > number && help[number] != null)
+			{
+			dial.setToolTipText(help[number]);
+			title.setToolTipText(help[number]);
+			data.setToolTipText(help[number]);
+			}
         }
 
     double[] conversions = new double[] { 0.0, 1.0 / 4.0, 1.0 / 3.0, 1.0 / 2.0, 2.0 / 3.0, 3.0 / 4.0, 1.0 };

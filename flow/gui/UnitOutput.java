@@ -124,9 +124,15 @@ public class UnitOutput extends InputOutput
                 }
             };
             
-            
         jack.addMouseMotionListener(mouseAdapter);
         jack.addMouseListener(mouseAdapter);
+
+		String[] help = unit.wrapHelp(unit.getUnitOutputHelp());
+		if (help != null && help.length > number && help[number] != null)
+			{
+			jack.setToolTipText(help[number]);
+			title.setToolTipText(help[number]);
+			}
         }
 
 
