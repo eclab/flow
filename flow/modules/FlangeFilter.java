@@ -27,10 +27,9 @@ public class FlangeFilter extends Unit
     private static final long serialVersionUID = 1;
 
     public static final int MOD_WET = 0;
-    public static final int MOD_OFFSET = 1;
-    public static final int MOD_OFFSET_MOD = 2;
-    public static final int MOD_STRETCH = 3;
-    public static final int MOD_STRETCH_MOD = 4;
+    public static final int MOD_OFFSET_MOD = 1;
+    public static final int MOD_STRETCH = 2;
+    public static final int MOD_STRETCH_MOD = 3;
 
     public static final double MAX_STRETCH = 4;
         
@@ -85,8 +84,8 @@ public class FlangeFilter extends Unit
         { 
         super(sound);   
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations(new Constant[] {  Constant.ONE, Constant.ZERO, Constant.HALF, Constant.HALF, Constant.ZERO },
-            new String[] { "Wet", "Offset", "OffsetMod", "Stretch", "StretchMod"});
+        defineModulations(new Constant[] {  Constant.ONE, Constant.HALF, Constant.HALF, Constant.ZERO },
+            new String[] { "Wet", "OffsetMod", "Stretch", "StretchMod"});
         defineOptions(new String[] { "Style", "Fixed", "Fundamental" }, new String[][] { STYLE_NAMES, { "Fixed" }, { "Fundamental" } } );
         }
         
@@ -104,12 +103,10 @@ public class FlangeFilter extends Unit
         double pitch = getSound().getPitch();
                 
         // The filter stretch (lobe size) is presently the BASE LOBE SIZE + lobe scale * modulation
-                
         double filterStretch = (makeSensitive(modulate(MOD_STRETCH)) * 22049 + 1) * (1 + modulate(MOD_STRETCH_MOD) * (MAX_STRETCH - 1));
 
         // The filter frequency is presently the BASE frequency + lobe size * number of lobes * modulation
-                
-        double filterFreq = modToFrequency(modulate(MOD_OFFSET)) + ( fixed ? 0 : pitch) + filterStretch * (modulate(MOD_OFFSET_MOD) - 0.5) * 4;
+        double filterFreq = (fixed ? 0 : pitch) + filterStretch * (modulate(MOD_OFFSET_MOD) - 0.5) * 4;
                                 
         double wet = modulate(MOD_WET);
                                 
