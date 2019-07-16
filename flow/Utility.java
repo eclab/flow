@@ -102,28 +102,72 @@ public class Utility
     // the problem we were having was that SIN_TABLE_LENGTH was too short, but that's not it.
     static final int SIN_TABLE_LENGTH = 65536; //  * 16;
     static final double SIN_MULTIPLIER = SIN_TABLE_LENGTH / Math.PI / 2;
-    static double[] sinTable = new double[SIN_TABLE_LENGTH];
+ 	final static int SIN_TABLE_LENGTH_MINUS_1 = SIN_TABLE_LENGTH - 1;
+	final static int SIN_TABLE_LENGTH_DIV_4 = SIN_TABLE_LENGTH / 4;
+    final static double[] sinTable = new double[SIN_TABLE_LENGTH];
 
     /** A fast approximation of Sine using a lookup table. */
     public static final double fastSin(double f) 
         {
-        /*
-        // interpolating version -- seems to make little to no difference
-        double v = f * SIN_MULTIPLIER;
-        int conv = (int) v;
-        double alpha = v - conv;
-        int slot1 = conv & (SIN_TABLE_LENGTH - 1);
-        int slot2 = (slot1 + 1) & SIN_TABLE_LENGTH;
-        return sinTable[slot2] * alpha + sinTable[slot1] * (1.0 - alpha);
-        */
-        return sinTable[(int) (f * SIN_MULTIPLIER) & (SIN_TABLE_LENGTH - 1)];
+        return sinTable[((int) (f * SIN_MULTIPLIER)) & (SIN_TABLE_LENGTH - 1)];
         }
 
     /** A fast approximation of Cosine using a lookup table. */
     public static final double fastCos(double f) 
         {
-        return sinTable[(int) (f * SIN_MULTIPLIER + SIN_TABLE_LENGTH / 4) & (SIN_TABLE_LENGTH - 1)];      // seriously.  He's ANDing with a char.  Go figure.
+        return sinTable[((int) (f * SIN_MULTIPLIER + SIN_TABLE_LENGTH_DIV_4)) & (SIN_TABLE_LENGTH - 1)];      // seriously.  He's ANDing with a char.  Go figure.
         }
+
+
+    /**
+     * A fast approximation of Sine using a lookup table and Catmull-Rom cubic spline interpolation.
+     */
+    public static final double fastIntSin(double f) {
+    	double v = f * SIN_MULTIPLIER;
+        int conv = (int) v;
+        double alpha = v - conv;
+        
+        int slot1 = conv & SIN_TABLE_LENGTH_MINUS_1;
+    	int slot0 = (slot1 - 1) & SIN_TABLE_LENGTH_MINUS_1;
+    	int slot2 = (slot1 + 1) & SIN_TABLE_LENGTH_MINUS_1;
+    	int slot3 = (slot2 + 1) & SIN_TABLE_LENGTH_MINUS_1;
+    	
+    	double f0 = sinTable[slot0];
+    	double f1 = sinTable[slot1];
+    	double f2 = sinTable[slot2];
+    	double f3 = sinTable[slot3];
+    	
+    	return alpha * alpha * alpha * (-0.5 * f0 + 1.5 * f1 - 1.5 * f2 + 0.5 * f3) +
+    		   alpha * alpha * (f0 - 2.5 * f1 + 2 * f2 - 0.5 * f3) +
+    		   alpha * (-0.5 * f0 + 0.5 * f2) +
+    		   f1;
+        }
+
+
+    /** A fast approximation of Cosine using a lookup table and Catmull-Rom cubic spline interpolation. */
+    public static final double fastIntCos(double f) 
+        {
+    	double v = f * SIN_MULTIPLIER + SIN_TABLE_LENGTH_DIV_4;
+        int conv = (int) v;
+        double alpha = v - conv;
+        
+        int slot1 = conv & SIN_TABLE_LENGTH_MINUS_1;
+    	int slot0 = (slot1 - 1) & SIN_TABLE_LENGTH_MINUS_1;
+    	int slot2 = (slot1 + 1) & SIN_TABLE_LENGTH_MINUS_1;
+    	int slot3 = (slot2 + 1) & SIN_TABLE_LENGTH_MINUS_1;
+    	
+    	double f0 = sinTable[slot0];
+    	double f1 = sinTable[slot1];
+    	double f2 = sinTable[slot2];
+    	double f3 = sinTable[slot3];
+    	
+    	return alpha * alpha * alpha * (-0.5 * f0 + 1.5 * f1 - 1.5 * f2 + 0.5 * f3) +
+    		   alpha * alpha * (f0 - 2.5 * f1 + 2 * f2 - 0.5 * f3) +
+    		   alpha * (-0.5 * f0 + 0.5 * f2) +
+    		   f1;
+        }
+
+
 
     static 
         {
@@ -138,6 +182,16 @@ public class Utility
             }
         }
 
+
+	public static void main(String[] args)
+		{
+		double sum = 0;
+		for(double i = 0; i < 10000; i+= 0.000005)
+			{
+			sum += Utility.fastIntSin(i);
+			}
+		System.err.println(sum);
+		}
 
 
 
