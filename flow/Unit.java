@@ -220,6 +220,11 @@ public class Unit extends Modulation
     /** Returns the orders array for the partials of the given unit output port. */
     public byte[] getOrders(int val) { return orders[val]; }
     
+    /** Override this to provide tooltips for unit outputs.  This array by default is null. 
+    	If any given String is null or empty, no tooltip is generated for it.  */
+    public String[] getUnitOutputHelp() { return null; }
+
+
             
     ////// INPUTS
     
@@ -390,6 +395,7 @@ public class Unit extends Modulation
         	frequencies[output] = (double[])(f1.clone());
 		else
 	        System.arraycopy(f1, 0, f2, 0, f2.length);
+		//testDenormals(f2,  "" + this);	    	
         }
 
     /** Copies the amplitudes array of Unit Output Port OUTPUT from 
@@ -403,6 +409,7 @@ public class Unit extends Modulation
         	amplitudes[output] = (double[])(f1.clone());
 		else
 	        System.arraycopy(f1, 0, f2, 0, f2.length);
+		//testDenormals(f2, "" + this);	    	
         }
                 
     /** Copies the orders array of Unit Output Port OUTPUT from 
@@ -465,6 +472,11 @@ public class Unit extends Modulation
         {
         copyOrders(input, 0);
         }
+
+    /** Override this to provide tooltips for unit inputs.  This array by default is null. 
+    	If any given String is null or empty, no tooltip is generated for it.  */
+    public String[] getUnitInputHelp() { return null; }
+
 
        
     ////// INPUT UTILITIES
@@ -1405,4 +1417,16 @@ public class Unit extends Modulation
                 }
             }
         }
+        
+/*
+    public void testDenormals(double[] vals, String s)
+    	{
+    	for(int i = 0; i < vals.length; i++)
+    		{
+    		double val = vals[i];
+ 					if (val > 0 && val <= 2250738585072012e-308)
+						System.err.println(s + " is DENORMAL " + val);
+			}
+    	}
+*/
     }

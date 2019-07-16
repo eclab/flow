@@ -8,6 +8,7 @@ import flow.modules.*;
 import flow.gui.*;
 import java.util.*;
 import org.json.*;
+import javax.swing.JToolTip;
 
 /**
    This is the top-level class of modules in the synthesizer.
@@ -200,7 +201,9 @@ public abstract class Modulation implements Cloneable
     /** Returns the names of all possible values the option can take on.  */
     public String[] getOptionValues(int option) { return optionValues[option]; }
         
-        
+    /** Override this to provide tooltips for options.  This array by default is null. 
+    	If any given String is null or empty, no tooltip is generated for it.  */
+    public String[] getOptionHelp() { return null; }
         
         
         
@@ -368,6 +371,11 @@ public abstract class Modulation implements Cloneable
     /** Returns the modulation value for the modulation currently at Input Modulation port INDEX */
     public final double modulate(int index)
         {
+/*
+        double d = modulations[index].getModulationOutput(modulationIndexes[index]);
+        testDenormals(d, "" + this);
+        return d;
+*/
         return modulations[index].getModulationOutput(modulationIndexes[index]);
         }
         
@@ -389,6 +397,11 @@ public abstract class Modulation implements Cloneable
         return modulations[index] instanceof Constant;
         }
         
+    /** Override this to provide tooltips for modulation inputs.  This array by default is null. 
+    	If any given String is null or empty, no tooltip is generated for it.  */
+    public String[] getModulationHelp() { return null; }
+
+
 
     //// MODULATION UTILITIES
 
@@ -592,6 +605,10 @@ public abstract class Modulation implements Cloneable
     /** Returns number of modulation output ports. */
     public int getNumModulationOutputs() { return modulationOutputNames.length; }
 
+    /** Override this to provide tooltips for modulation outputs.  This array by default is null. 
+    	If any given String is null or empty, no tooltip is generated for it.  */
+    public String[] getModulationOutputHelp() { return null; }
+
     // Resets all output port modulation triggers
     void resetAllTriggered()
         {
@@ -704,6 +721,28 @@ public abstract class Modulation implements Cloneable
         {
         return new ModulePanel(this);
         }
+        
+    public static final int MAX_TOOL_TIP_WIDTH = 400;
+    public String[] wrapHelp(String[] help)
+    	{
+    	if (help == null) return null;
+    	String[] newHelp = new String[help.length];
+    	JToolTip tip = new JToolTip();
+    	for(int i = 0; i < help.length; i++)
+    		{
+    		if (help[i] != null)
+    			{
+    			tip.setTipText(help[i]);
+    			int width = (int)(tip.getPreferredSize().getWidth());
+    			if (width > MAX_TOOL_TIP_WIDTH)
+    				newHelp[i] = "<html><p width=" + MAX_TOOL_TIP_WIDTH + ">" +
+    					help[i] + "</p></html>";
+    			else
+    				newHelp[i] = help[i];
+    			}
+    		}
+    	return newHelp;
+    	}
     
     /** Print some statistics regarding triggers and modulations. */
     public void printStats()
@@ -935,4 +974,10 @@ public abstract class Modulation implements Cloneable
         JSONObject mods = obj.getJSONObject("mod");
         loadModulations(mods, ids, moduleVersion, patchVersion);
         }
+
+    public void testDenormals(double val, String s)
+    	{
+ 					if (val > 0 && val <= 2250738585072012e-308)
+						System.err.println(s + " is DENORMAL " + val);
+    	}
     }
