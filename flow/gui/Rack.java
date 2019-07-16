@@ -723,7 +723,7 @@ public class Rack extends JPanel
             new String[] { "Polyphony", "Audio Buffer Size", "Partials" }, 
             new JComponent[] { voicesCombo, bufferSizeCombo, partialsCombo }, 
             "Tuning Parameters", 
-            "<html>Parameters don't take effect until<br>the synthesizer is restarted.",
+            "<html>Parameter changes don't take effect<br>until the synthesizer is restarted.",
             new String[] { "Okay", "Cancel", "Reset" });
         
         if (result == 0)  // OKAY
