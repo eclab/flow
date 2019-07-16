@@ -322,9 +322,11 @@ public class Seq extends Modulation
 			}
 		}
 
+	// we need a custom module so we can make up a method in it called doRepaint(),
+	// which repaints when appropriate.
+	
 	class SeqModulePanel extends ModulePanel
 		{
-		
 			boolean repaintOnce = true;			// this allows us to clear things if the user turns off getDisplay
 			public void doRepaint()
 				{
