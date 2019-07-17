@@ -523,6 +523,22 @@ public class AppMenu
         }
         
 
+    static JMenuItem showDisplay(Rack rack)
+        {
+        final JCheckBoxMenuItem display = new JCheckBoxMenuItem("Show Displays");
+        display.setSelected(Prefs.getShowsDisplays());
+        rack.setShowsDisplays(display.isSelected());
+        display.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+				rack.setShowsDisplays(display.isSelected());
+                Prefs.setShowsDisplays(display.isSelected());
+                }
+            });
+        return display;
+        }
+
     static JMenuItem waterfallDisplay(Rack rack)
         {
         final JCheckBoxMenuItem waterfall = new JCheckBoxMenuItem("Waterfall Display");
@@ -800,6 +816,7 @@ public class AppMenu
         {
         JMenu menu = new JMenu("Options");
 
+        menu.add(showDisplay(rack));
         menu.add(logAxisDisplay(rack));
         menu.add(waterfallDisplay(rack));
         menu.add(maxDisplayedHarmonic(rack));

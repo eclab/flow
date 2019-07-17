@@ -86,10 +86,10 @@ public class Output
         voice thread to a separate CPU -- if we have very costly voice threads, then this might be
         useful. 
     */
-    public static final int DEFAULT_NUM_VOICES_PER_THREAD = 1;
+    public static final int DEFAULT_NUM_VOICES_PER_THREAD = 8;
     static int numVoicesPerThread = -1;
     
-    public static final int DEFAULT_NUM_OUTPUTS_PER_THREAD = 4;
+    public static final int DEFAULT_NUM_OUTPUTS_PER_THREAD = 2;
 	static int numOutputsPerThread = -1;
 
 
@@ -564,7 +564,9 @@ public class Output
         double pitch = _with.pitches[s];
         double tr = pitch * PI2 * INV_SAMPLING_RATE;
         boolean dephase = _with.dephase;
-            
+        
+        if (dephase)			// this is a manual hoist
+        	{
         for (int i = 0; i < pos.length; i++)
             {
             double amplitude = amp[i];
@@ -585,65 +587,91 @@ public class Output
 				}
 				
 			double frequency = freq[i];
-			double absoluteFrequency = frequency * pitch;
+			//double absoluteFrequency = frequency * pitch;
 				
 			// Beyond Nyquist.  We may assume that ALL later frequencies are also beyond Nyquist since we're sorted.
-			if (absoluteFrequency > NYQUIST)
+			if (frequency * pitch > NYQUIST) //(absoluteFrequency > NYQUIST)
 				{
 				break;
 				}
- 
- 			/*
- 			// The frequency shouldn't ever be negative, but just in case.
- 			// The frequency can often be zero with an empty patch, perhaps firing up Flow
- 			if (absoluteFrequency <= 0.0)
-				{
-				continue;
-				}
-			*/
-			
-			/*
-            if (amplitude * amplitude <= 0)  //  < MINIMUM_VOLUME_SQUARED)
-            	{
-                continue;
-                }
-            */
 
-			//if (absoluteFrequency <= NYQUIST)
-				{
 				double position = pos[oi] + frequency * tr;
 				if (position >= PI2)
 					{
 					position = position - (PI2);
+
+					/*
+					 //// This can only happen when absoluteFrequency > NYQUIST 
+					if (position >= PI2)
+						{
+						position = position % (PI2);
+						}
+					*/
 					}
 				pos[oi] = position;
 			
 				if (amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
 					{
 					sample += 
-						Utility.fastSin(dephase ? position + MIXING[oi] : position) * 
+						Utility.fastSin(position + MIXING[oi]) * 
 						amplitude * v;
 					}
+           	 }
+            }
+		else
+			{
+        for (int i = 0; i < pos.length; i++)
+            {
+            double amplitude = amp[i];
+			int oi = orders[i];
+			if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
+							
+            if (ca[oi] != amplitude)
+            	{
+            	// incoming amplitudes are pre-denormalized by the voice threads.
+            	// However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
+            	// get denormalized.  So we undenormalize here.  It's theoretically possible that we
+            	// could still get denormalized when summing the samples below; but I have not been
+            	// able to cause that.
+				double aa = undenormalize(ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
+            	double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
+				amplitude = aa + bb;
+				ca[oi] = amplitude;
 				}
-			/*
-			else
+				
+			double frequency = freq[i];
+			//double absoluteFrequency = frequency * pitch;
+				
+			// Beyond Nyquist.  We may assume that ALL later frequencies are also beyond Nyquist since we're sorted.
+			if (frequency * pitch > NYQUIST) 		// (absoluteFrequency > NYQUIST)
 				{
+				break;
+				}
+ 
 				double position = pos[oi] + frequency * tr;
 				if (position >= PI2)
 					{
 					position = position - (PI2);
-						
+
+					/*
 					 //// This can only happen when absoluteFrequency > NYQUIST 
 					if (position >= PI2)
 						{
 						position = position % (PI2);
 						}
+					*/
 					}
 				pos[oi] = position;
-				}
-			*/
-				
+			
+				if (amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
+					{
+					sample += 
+						Utility.fastSin(position) * 
+						amplitude * v;
+					}
             }
+		}
+
         return sample;
         }
         

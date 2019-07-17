@@ -45,6 +45,8 @@ public class Rack extends JPanel
     public Display display2;
     public Oscilloscope osc1;
     public Oscilloscope osc2;
+    public Box displayBox;
+    boolean showsDisplays = true;
     
     // A list of all current module panels.  Note that this isn't all the
     // *Modulations* in use -- Constants and NILs don't get panels.  But they're
@@ -92,21 +94,21 @@ public class Rack extends JPanel
         setLayout(new BorderLayout());
         add(pane, BorderLayout.CENTER);
         
-        Box pane2 = new Box(BoxLayout.X_AXIS);
+        displayBox = new Box(BoxLayout.X_AXIS);
         display1 = new Display(output, false);
         display1.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
-        pane2.add(display1);
+        displayBox.add(display1);
         osc1 = new Oscilloscope(output, false);
         osc1.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
-        pane2.add(osc1);
+        displayBox.add(osc1);
         osc2 = new Oscilloscope(output, true);
         osc2.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
-        pane2.add(osc2);
+        displayBox.add(osc2);
         display2 = new Display(output, true);
         display2.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, new JLabel().getBackground()));
-        pane2.add(display2);
+        displayBox.add(display2);
                 
-        add(pane2, BorderLayout.NORTH);
+        add(displayBox, BorderLayout.NORTH);
 
         setTransferHandler(new ModulePanelTransferHandler());
         this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener())
@@ -136,7 +138,15 @@ public class Rack extends JPanel
                 }
             });
 
+		// the frame width is dependent on the display width
+		// we'll temporarily include the display, then remove it if
+		// necessary after packing, then display the window
+
+		boolean showing = getShowsDisplays();
+		setShowsDisplays(true);
         frame.pack();
+        setShowsDisplays(showing);
+        
         frame.setVisible(true);
         
         return frame;
@@ -151,6 +161,17 @@ public class Rack extends JPanel
         {
         doQuit();
         }
+
+    public void setShowsDisplays(boolean val)
+    	{
+    	if (showsDisplays == val) return;  // no need to do anything
+    	remove(displayBox);
+    	if (val) add(displayBox, BorderLayout.NORTH);
+    	revalidate();
+    	showsDisplays = val;
+    	}
+    	
+    public boolean getShowsDisplays() { return showsDisplays; }
         
     public boolean getAddModulesAfter() { return addModulesAfter; }
     public void setAddModulesAfter(boolean val) { addModulesAfter = val; }
@@ -723,18 +744,18 @@ public class Rack extends JPanel
         bufferSizeCombo.setSelectedIndex(index);
 
 		// Voices Per Thread
-        int[] voicesPerThread = new int[] { 1, 2, 4, 8 };
-        String[] s_voicesPerThread = new String[] { "1", "2", "3", "4", "8" };
+        int[] voicesPerThread = new int[] { 1, 2, 4, 8, 16 };
+        String[] s_voicesPerThread = new String[] { "1", "2", "4", "8", "16" };
         JComboBox voicesPerThreadCombo = new JComboBox(s_voicesPerThread);
         int voicePerThread = Prefs.getLastNumVoicesPerThread();
-        voicesPerThreadCombo.setSelectedIndex(voicePerThread == 1 ? 0 : (voicePerThread == 2 ? 1 : (voicePerThread == 4 ? 2 : 3)));
+        voicesPerThreadCombo.setSelectedIndex(voicePerThread == 1 ? 0 : (voicePerThread == 2 ? 1 : (voicePerThread == 4 ? 2 : (voicePerThread == 8 ? 3 : 4))));
 
 		// Outputs Per Thread
-        int[] outputsPerThread = new int[] { 1, 2, 4, 8 };
-        String[] s_outputsPerThread = new String[] { "1", "2", "3", "4", "8" };
+        int[] outputsPerThread = new int[] { 1, 2, 4, 8, 16 };
+        String[] s_outputsPerThread = new String[] { "1", "2", "4", "8", "16" };
         JComboBox outputsPerThreadCombo = new JComboBox(s_outputsPerThread);
         int outputPerThread = Prefs.getLastNumOutputsPerThread();
-        outputsPerThreadCombo.setSelectedIndex(outputPerThread == 1 ? 0 : (outputPerThread == 2 ? 1 : (outputPerThread == 4 ? 2 : 3)));
+        outputsPerThreadCombo.setSelectedIndex(outputPerThread == 1 ? 0 : (outputPerThread == 2 ? 1 : (outputPerThread == 4 ? 2 : (outputPerThread == 8 ? 3 : 4))));
 
         int result = showMultiOption(this, 
             new String[] { "Polyphony", "Audio Buffer Size", "Partials", "Voices Per Thread", "Outputs Per Thread" }, 

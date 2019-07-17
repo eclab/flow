@@ -269,6 +269,14 @@ public class Prefs
         return Unit.DEFAULT_NUM_PARTIALS;                       
         }
 
+    public static void setShowsDisplays(boolean val) { setLastX("" + val, "ShowDisplays"); }
+    public static boolean getShowsDisplays() 
+        { 
+        String s = getLastX("ShowDisplays"); 
+        return Boolean.parseBoolean(s);         // default is FALSE
+        }
+
+
     public static void setWaterfallDisplay(boolean val) { setLastX("" + val, "WaterfallDisplay"); }
     public static boolean getWaterfallDisplay() 
         { 
