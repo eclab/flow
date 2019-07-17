@@ -459,7 +459,7 @@ public class Output
         float reverbWet = 0.5f;
         float reverbRoomSize = 0.5f;
         float reverbDamp = 0.5f;
-        boolean dephase;
+        boolean dephase[];
         //float c = 0.0f;
         //float r = 0.0f;
               
@@ -472,6 +472,7 @@ public class Output
             orders = new byte[numVoices][Unit.NUM_PARTIALS];
             pitches = new double[numVoices];
             velocities = new double[numVoices];
+            dephase = new boolean[numVoices];
             }
         }
     
@@ -562,8 +563,8 @@ public class Output
         double[] ca = currentAmplitudes[s];
         double v = _with.velocities[s];
         double pitch = _with.pitches[s];
-        double tr = pitch * PI2 * INV_SAMPLING_RATE;
-        boolean dephase = _with.dephase;
+        double tr = pitch * INV_SAMPLING_RATE;
+        boolean dephase = _with.dephase[s];
         
         if (dephase)			// this is a manual hoist
         	{
@@ -585,26 +586,26 @@ public class Output
 				amplitude = aa + bb;
 				ca[oi] = amplitude;
 				}
-				
+
 			double frequency = freq[i];
+								
+			// Because we're mixing, we can just ignore the higher frequency stuff, which gives us a speed boost.
+			// However if the user wants to switch back to non-mixing, it might produce a pop because we have
+			// reset everything.
+			if (frequency * pitch > NYQUIST)
+				{
+				break;
+				}
+			if (amplitude <= MINIMUM_VOLUME_SQUARED)
+				{
+				continue;
+				}
 				
 				double position = pos[oi] + frequency * tr;
-				if (position >= PI2)
-					{
-					position = position - (PI2);
-
-					 //// This can only happen when absoluteFrequency > NYQUIST 
-					if (position >= PI2)
-						{
-						position = position % (PI2);
-						}
-					}
+				position = position - (int) position;			// fun fact. this is 9 times faster than position = position % 1.0
 				pos[oi] = position;
 			
-				if (frequency * pitch < NYQUIST && amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
-					{
-					sample += Utility.fastSin(position + MIXING[oi]) * amplitude * v;
-					}
+				sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude * v;
            	 }
             }
 		else
@@ -631,21 +632,12 @@ public class Output
 			double frequency = freq[i];
  
 				double position = pos[oi] + frequency * tr;
-				if (position >= PI2)
-					{
-					position = position - (PI2);
-
-					 //// This can only happen when absoluteFrequency > NYQUIST 
-					if (position >= PI2)
-						{
-						position = position % (PI2);
-						}
-					}
+				position = position - (int) position;  			// fun fact. this is 9 times faster than position = position % 1.0
 				pos[oi] = position;
 			
-				if (frequency * pitch < NYQUIST && amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
+				if (frequency * pitch <= NYQUIST && amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
 					{
-					sample += Utility.fastSin(position) * amplitude * v;
+					sample += Utility.fastSin(position * PI2) * amplitude * v;
 					}
             }
 		}
@@ -1131,6 +1123,14 @@ public class Output
                     
                 swap.pitches[i] = sounds[i].getPitch();
                 swap.velocities[i] = (velocitySensitive ? sounds[i].getVelocity() : Sound.DEFAULT_VELOCITY);
+                if (emits instanceof Out)
+                	{
+                	swap.dephase[i] = ((Out)emits).getDephase();
+                	}
+                else
+                	{
+                	System.err.println("Output.go() WARNING, emits isn't an Out!");
+                	}
                 }
                 
             if (e instanceof Out) 	// we're only doing this for ONE sound, namely sounds[0]
@@ -1139,7 +1139,6 @@ public class Output
             	swap.reverbWet = (float)(out.modulate(out.MOD_REVERB_WET));
             	swap.reverbDamp = (float)(out.modulate(out.MOD_REVERB_DAMP));
             	swap.reverbRoomSize = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE));
-            	swap.dephase = out.getDephase();
             	//swap.c = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE + 1));
             	//swap.r = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE + 2));
             	}

@@ -56,7 +56,16 @@ public class Out extends Unit
  
  	boolean dephase;
     public boolean getDephase() { return dephase; }
-    public void setDephase(boolean val) { dephase = val; }
+    public void setDephase(boolean val) 
+    	{
+    	if (dephase == val) return;
+    	dephase = val; 
+
+    	if (val == false)  // we have to reset the sound so the positions are back to zero
+    		{
+    		getSound().reset();
+    		}
+    	}
     
     double[][] modWave = new double[2][WAVE_SIZE];
     int[] wavePos = new int[] { 0, 0 };
