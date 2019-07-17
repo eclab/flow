@@ -20,16 +20,16 @@ public class VCA extends Unit
 
     public static final int MOD_MOD = 0;
     public static final int MOD_SCALE = 1;
-    public static final int MOD_BOOST = 2;
+    //public static final int MOD_BOOST = 2;
 
     public static final double MAX_SCALE = 8.0;
-    public static final double MAX_BOOST = 2.0;
+    //public static final double MAX_BOOST = 2.0;
         
     public VCA(Sound sound)
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations(new Constant[] { Constant.ONE, Constant.HALF, Constant.ZERO }, new String[] { "Mod", "Scale", "Bass Boost" });
+        defineModulations(new Constant[] { Constant.ONE, Constant.HALF, /* Constant.ZERO */ }, new String[] { "Mod", "Scale", /* "Bass Boost" */ });
         }
                 
     public void go()
