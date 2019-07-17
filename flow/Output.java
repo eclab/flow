@@ -587,34 +587,23 @@ public class Output
 				}
 				
 			double frequency = freq[i];
-			//double absoluteFrequency = frequency * pitch;
 				
-			// Beyond Nyquist.  We may assume that ALL later frequencies are also beyond Nyquist since we're sorted.
-			if (frequency * pitch > NYQUIST) //(absoluteFrequency > NYQUIST)
-				{
-				break;
-				}
-
 				double position = pos[oi] + frequency * tr;
 				if (position >= PI2)
 					{
 					position = position - (PI2);
 
-					/*
 					 //// This can only happen when absoluteFrequency > NYQUIST 
 					if (position >= PI2)
 						{
 						position = position % (PI2);
 						}
-					*/
 					}
 				pos[oi] = position;
 			
-				if (amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
+				if (frequency * pitch < NYQUIST && amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
 					{
-					sample += 
-						Utility.fastSin(position + MIXING[oi]) * 
-						amplitude * v;
+					sample += Utility.fastSin(position + MIXING[oi]) * amplitude * v;
 					}
            	 }
             }
@@ -640,34 +629,23 @@ public class Output
 				}
 				
 			double frequency = freq[i];
-			//double absoluteFrequency = frequency * pitch;
-				
-			// Beyond Nyquist.  We may assume that ALL later frequencies are also beyond Nyquist since we're sorted.
-			if (frequency * pitch > NYQUIST) 		// (absoluteFrequency > NYQUIST)
-				{
-				break;
-				}
  
 				double position = pos[oi] + frequency * tr;
 				if (position >= PI2)
 					{
 					position = position - (PI2);
 
-					/*
 					 //// This can only happen when absoluteFrequency > NYQUIST 
 					if (position >= PI2)
 						{
 						position = position % (PI2);
 						}
-					*/
 					}
 				pos[oi] = position;
 			
-				if (amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
+				if (frequency * pitch < NYQUIST && amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
 					{
-					sample += 
-						Utility.fastSin(position) * 
-						amplitude * v;
+					sample += Utility.fastSin(position) * amplitude * v;
 					}
             }
 		}
