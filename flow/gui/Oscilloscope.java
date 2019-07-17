@@ -44,7 +44,7 @@ public class Oscilloscope extends JComponent
         this.output = output;
         stroke = new BasicStroke(STROKE_WIDTH);
 
-        Timer timer = new Timer(25, new ActionListener()
+        Timer timer = new Timer(50, new ActionListener()
             {
             public void actionPerformed(ActionEvent e)
                 {

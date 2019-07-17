@@ -59,7 +59,7 @@ public class Display extends JComponent
         this.aux = aux;
         this.output = output;
 
-        Timer timer = new Timer(25, new ActionListener()
+        Timer timer = new Timer(50, new ActionListener()
             {
             public void actionPerformed(ActionEvent e)
                 {
