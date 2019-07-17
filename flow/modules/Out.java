@@ -53,6 +53,10 @@ public class Out extends Unit
 
     double gain;
     public double getGain() { return gain; }
+ 
+ 	boolean dephase;
+    public boolean getDephase() { return dephase; }
+    public void setDephase(boolean val) { dephase = val; }
     
     double[][] modWave = new double[2][WAVE_SIZE];
     int[] wavePos = new int[] { 0, 0 };
@@ -83,8 +87,33 @@ public class Out extends Unit
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[]) UNIT_NAMES.clone());
         defineOutputs( new String[] { "A", "B" } );
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER, Constant.ZERO, Constant.HALF, Constant.HALF /*, Constant.ZERO, Constant.ZERO*/ }, (String[]) MOD_NAMES.clone());
+        defineOptions(new String[] { "Dephase" }, new String[][] { { "Dephase" } } );
         if (sound != null) sound.setEmits(this);
         }
+
+
+
+    public static final int OPTION_DEPHASE = 0;
+        
+    public int getOptionValue(int option) 
+        { 
+        switch(option)
+            {
+            case OPTION_DEPHASE: return getDephase() ? 1 : 0;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+                
+    public void setOptionValue(int option, int value)
+        { 
+        switch(option)
+            {
+            case OPTION_DEPHASE: setDephase(value != 0); return;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }       
+        
+
 
     public boolean showsOutputs() { return false; }
 
@@ -389,8 +418,9 @@ public class Out extends Unit
             {
             public void actionPerformed ( ActionEvent e )
                 {
-                boolean clipped = panel[0].getRack().getOutput().getAndResetClipped();
-                boolean glitched = panel[0].getRack().getOutput().getAndResetGlitched();
+                Output out = panel[0].getRack().getOutput();
+                boolean clipped = out.getAndResetClipped();
+                boolean glitched = out.getAndResetGlitched();
                 
                 if (clipped != oldClipped[0] || glitched != oldGlitched[0])
                     {

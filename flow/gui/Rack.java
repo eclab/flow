@@ -695,18 +695,21 @@ public class Rack extends JPanel
 
     public void chooseTuningParameters()
         {
-        int[] partials = new int[] { 64, 128, 256 };
-        String[] s_partials = new String[] { "64", "128", "256" };
-        JComboBox partialsCombo = new JComboBox(s_partials);
-        int partial = Prefs.getLastNumPartials();
-        partialsCombo.setSelectedIndex(partial == 64 ? 0 : (partial == 128 ? 1 : 2));
-
+        // Polyphony
         int[] voices = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
         String[] s_voices = new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
         JComboBox voicesCombo = new JComboBox(s_voices);
         int voice = Prefs.getLastNumVoices();
         voicesCombo.setSelectedIndex(voice - 1);
         
+        // Partials
+        int[] partials = new int[] { 64, 128, 256 };
+        String[] s_partials = new String[] { "64", "128", "256" };
+        JComboBox partialsCombo = new JComboBox(s_partials);
+        int partial = Prefs.getLastNumPartials();
+        partialsCombo.setSelectedIndex(partial == 64 ? 0 : (partial == 128 ? 1 : 2));
+
+		// Audio Buffer Size
         int[] bufferSize = new int[] { 			64,   128,   256,   384,   512,   640,   768,   896,   1024,   1152,   1280,   1408,   1536,   1664,   1792,   1920,   2048 };
         String[] s_bufferSize = new String[] { "64", "128", "256", "384", "512", "640", "768", "896", "1024", "1152", "1280", "1408", "1536", "1664", "1792", "1920", "2048" };
         JComboBox bufferSizeCombo = new JComboBox(s_bufferSize);
@@ -718,10 +721,24 @@ public class Rack extends JPanel
                 { index = i; break; }
             }
         bufferSizeCombo.setSelectedIndex(index);
-        
+
+		// Voices Per Thread
+        int[] voicesPerThread = new int[] { 1, 2, 4, 8 };
+        String[] s_voicesPerThread = new String[] { "1", "2", "3", "4", "8" };
+        JComboBox voicesPerThreadCombo = new JComboBox(s_voicesPerThread);
+        int voicePerThread = Prefs.getLastNumVoicesPerThread();
+        voicesPerThreadCombo.setSelectedIndex(voicePerThread == 1 ? 0 : (voicePerThread == 2 ? 1 : (voicePerThread == 4 ? 2 : 3)));
+
+		// Outputs Per Thread
+        int[] outputsPerThread = new int[] { 1, 2, 4, 8 };
+        String[] s_outputsPerThread = new String[] { "1", "2", "3", "4", "8" };
+        JComboBox outputsPerThreadCombo = new JComboBox(s_outputsPerThread);
+        int outputPerThread = Prefs.getLastNumOutputsPerThread();
+        outputsPerThreadCombo.setSelectedIndex(outputPerThread == 1 ? 0 : (outputPerThread == 2 ? 1 : (outputPerThread == 4 ? 2 : 3)));
+
         int result = showMultiOption(this, 
-            new String[] { "Polyphony", "Audio Buffer Size", "Partials" }, 
-            new JComponent[] { voicesCombo, bufferSizeCombo, partialsCombo }, 
+            new String[] { "Polyphony", "Audio Buffer Size", "Partials", "Voices Per Thread", "Outputs Per Thread" }, 
+            new JComponent[] { voicesCombo, bufferSizeCombo, partialsCombo, voicesPerThreadCombo, outputsPerThreadCombo }, 
             "Tuning Parameters", 
             "<html>Parameter changes don't take effect<br>until the synthesizer is restarted.",
             new String[] { "Okay", "Cancel", "Reset" });
@@ -731,12 +748,16 @@ public class Rack extends JPanel
             Prefs.setLastNumVoices(voices[voicesCombo.getSelectedIndex()]);
             Prefs.setLastBufferSize(bufferSize[bufferSizeCombo.getSelectedIndex()]);
             Prefs.setLastNumPartials(partials[partialsCombo.getSelectedIndex()]);
+            Prefs.setLastNumVoicesPerThread(voicesPerThread[voicesPerThreadCombo.getSelectedIndex()]);
+            Prefs.setLastNumOutputsPerThread(outputsPerThread[outputsPerThreadCombo.getSelectedIndex()]);
             }
         else if (result == 2) // RESET
             {
             Prefs.setLastNumVoices(Output.DEFAULT_NUM_VOICES);
             Prefs.setLastBufferSize(Output.DEFAULT_BUFFER_SIZE);
             Prefs.setLastNumPartials(Unit.DEFAULT_NUM_PARTIALS);
+            Prefs.setLastNumVoicesPerThread(Output.DEFAULT_NUM_VOICES_PER_THREAD);
+            Prefs.setLastNumOutputsPerThread(Output.DEFAULT_NUM_OUTPUTS_PER_THREAD);
             }
         }
 

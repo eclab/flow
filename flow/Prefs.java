@@ -168,6 +168,19 @@ public class Prefs
         return Output.DEFAULT_NUM_VOICES_PER_THREAD;                            
         }
 
+    public static void setLastNumOutputsPerThread(int outputsPerThread) { setLastX("" + outputsPerThread, "OutputsPerThread"); }
+    public static int getLastNumOutputsPerThread() 
+        { 
+        String s = getLastX("OutputsPerThread"); 
+        try
+            {
+            if (s != null)
+                return Integer.parseInt(s);
+            }
+        catch (NumberFormatException e) { }
+        return Output.DEFAULT_NUM_OUTPUTS_PER_THREAD;                            
+        }
+
     public static void setLastBufferSize(int bufferSize) { setLastX("" + bufferSize, "BufferSize"); }
     public static int getLastBufferSize() 
         { 
