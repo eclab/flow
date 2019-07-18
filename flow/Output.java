@@ -51,8 +51,8 @@ public class Output
     {
     /** Sampling rate of sound */
     public static final float SAMPLING_RATE = 44100.0f;
-	public static final double NYQUIST = SAMPLING_RATE / 2.0;
-	
+    public static final double NYQUIST = SAMPLING_RATE / 2.0;
+        
     /** 1 / Sampling rate */
     public static final double INV_SAMPLING_RATE = 1.0 / SAMPLING_RATE;
 
@@ -90,7 +90,7 @@ public class Output
     static int numVoicesPerThread = -1;
     
     public static final int DEFAULT_NUM_OUTPUTS_PER_THREAD = 2;
-	static int numOutputsPerThread = -1;
+    static int numOutputsPerThread = -1;
 
 
     public static final double DEFAULT_VOLUME_MULTIPLIER = 2000;
@@ -119,15 +119,15 @@ public class Output
     volatile int numSounds = 0;   
     
     static
-    	{
+        {
         // Load preferences
         numVoices = Prefs.getLastNumVoices();
         numVoicesPerThread = Prefs.getLastNumVoicesPerThread();
         numOutputsPerThread = Prefs.getLastNumOutputsPerThread();
         bufferSize = Prefs.getLastBufferSize();
         //skip = Prefs.getLastSkip();   
-    	}
-    	
+        }
+        
     public Output()
         {
         // We do NOT set this here because it confuse people doing Output programmatically.
@@ -329,15 +329,15 @@ public class Output
         { 
         lock();
         try
-        	{
-        	sound.index = numSounds; 
-	        sounds[numSounds++] = sound; 
-	        input.addSound(sound);
-	        }
-	    finally
-	    	{
-	        unlock();
-	        }
+            {
+            sound.index = numSounds; 
+            sounds[numSounds++] = sound; 
+            input.addSound(sound);
+            }
+        finally
+            {
+            unlock();
+            }
         }
     
     /** Returns the given Sound */  
@@ -346,13 +346,13 @@ public class Output
         Sound s = null;
         lock();
         try
-        	{
-    	    s = sounds[i];
-    		}
-    	finally
-    		{
-	        unlock();
-	        }
+            {
+            s = sounds[i];
+            }
+        finally
+            {
+            unlock();
+            }
         return s;
         }
     
@@ -371,13 +371,13 @@ public class Output
         int n = 0;
         lock();
         try
-        	{
-	        n = numSounds;
-	        }
-	    finally
-	    	{
-	        unlock();
-	        }
+            {
+            n = numSounds;
+            }
+        finally
+            {
+            unlock();
+            }
         return n;
         }
     
@@ -436,10 +436,10 @@ public class Output
     /** Sets whether we are only playing the first sound, or all sounds. */
     public void setOnlyPlayFirstSound(boolean val) { onlyPlayFirstSound = val; }
 
-	// notice that we're using lock() and unlock().  This is because velocitySensitive
-	// is checked directly when building the Swap and we're already inside lock() and unlock() at that point
-	// so we might as well use that.
-	boolean velocitySensitive;
+    // notice that we're using lock() and unlock().  This is because velocitySensitive
+    // is checked directly when building the Swap and we're already inside lock() and unlock() at that point
+    // so we might as well use that.
+    boolean velocitySensitive;
     /** Returns whether we are only playing the first sound, or all sounds. */
     public boolean getVelocitySensitive() { lock(); try { return velocitySensitive; } finally { unlock(); } }
     /** Sets whether we are only playing the first sound, or all sounds. */
@@ -524,29 +524,29 @@ public class Output
     
     public static final double PI2 = Math.PI * 2.0;
     
-    public static double undenormalize(double val)		// assumes only positive values
-    	{
-    	if (val > 0 && val <= 1e-200)		// really it's 2250738585072012e-308, but I'm giving breathing room for multiplication
-    		val = 0;
-    	return val;
-    	}
-    	
+    public static double undenormalize(double val)              // assumes only positive values
+        {
+        if (val > 0 && val <= 1e-200)           // really it's 2250738585072012e-308, but I'm giving breathing room for multiplication
+            val = 0;
+        return val;
+        }
+        
     // can't quite squeeze this into 35 bytes :-(   It's 37, so not inlined
-    public static void undenormalize(double[] val)		// assumes only positive values
-    	{
-    	for(int i = 0; i < val.length; i++)
-    		{
-    		if (val[i] > 0 && val[i] <= 1e-200)		// really it's 2250738585072012e-308, but I'm giving breathing room for multiplication
-    			val[i] = 0;
-    		}
-    	}
-    	
+    public static void undenormalize(double[] val)              // assumes only positive values
+        {
+        for(int i = 0; i < val.length; i++)
+            {
+            if (val[i] > 0 && val[i] <= 1e-200)             // really it's 2250738585072012e-308, but I'm giving breathing room for multiplication
+                val[i] = 0;
+            }
+        }
+        
 
     public static void printDenormal(double val, String s)
-    	{
- 					if (val > 0 && val <= 2250738585072012e-308)
-						System.err.println(s + " is DENORMAL " + val);
-   		}
+        {
+        if (val > 0 && val <= 2250738585072012e-308)
+            System.err.println(s + " is DENORMAL " + val);
+        }
     
 
     // Builds a single sample from the partials.  ALPHA is the current interpolation
@@ -566,81 +566,81 @@ public class Output
         double tr = pitch * INV_SAMPLING_RATE;
         boolean dephase = _with.dephase[s];
         
-        if (dephase)			// this is a manual hoist
-        	{
-        for (int i = 0; i < pos.length; i++)
+        if (dephase)                    // this is a manual hoist
             {
-            double amplitude = amp[i];
-			int oi = orders[i];
-			if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
-							
-            if (ca[oi] != amplitude)
-            	{
-            	// incoming amplitudes are pre-denormalized by the voice threads.
-            	// However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
-            	// get denormalized.  So we undenormalize here.  It's theoretically possible that we
-            	// could still get denormalized when summing the samples below; but I have not been
-            	// able to cause that.
-				double aa = undenormalize(ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
-            	double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
-				amplitude = aa + bb;
-				ca[oi] = amplitude;
-				}
+            for (int i = 0; i < pos.length; i++)
+                {
+                double amplitude = amp[i];
+                int oi = orders[i];
+                if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
+                                                        
+                if (ca[oi] != amplitude)
+                    {
+                    // incoming amplitudes are pre-denormalized by the voice threads.
+                    // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
+                    // get denormalized.  So we undenormalize here.  It's theoretically possible that we
+                    // could still get denormalized when summing the samples below; but I have not been
+                    // able to cause that.
+                    double aa = undenormalize(ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
+                    double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
+                    amplitude = aa + bb;
+                    ca[oi] = amplitude;
+                    }
 
-			double frequency = freq[i];
-								
-			// Because we're mixing, we can just ignore the higher frequency stuff, which gives us a speed boost.
-			// However if the user wants to switch back to non-mixing, it might produce a pop because we have
-			// reset everything.
-			if (frequency * pitch > NYQUIST)
-				{
-				break;
-				}
-			if (amplitude <= MINIMUM_VOLUME_SQUARED)
-				{
-				continue;
-				}
-				
-				double position = pos[oi] + frequency * tr;
-				position = position - (int) position;			// fun fact. this is 9 times faster than position = position % 1.0
-				pos[oi] = position;
-			
-				sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude * v;
-           	 }
+                double frequency = freq[i];
+                                                                
+                // Because we're mixing, we can just ignore the higher frequency stuff, which gives us a speed boost.
+                // However if the user wants to switch back to non-mixing, it might produce a pop because we have
+                // reset everything.
+                if (frequency * pitch > NYQUIST)
+                    {
+                    break;
+                    }
+                if (amplitude <= MINIMUM_VOLUME_SQUARED)
+                    {
+                    continue;
+                    }
+                                
+                double position = pos[oi] + frequency * tr;
+                position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
+                pos[oi] = position;
+                        
+                sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude * v;
+                }
             }
-		else
-			{
-        for (int i = 0; i < pos.length; i++)
+        else
             {
-            double amplitude = amp[i];
-			int oi = orders[i];
-			if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
-							
-            if (ca[oi] != amplitude)
-            	{
-            	// incoming amplitudes are pre-denormalized by the voice threads.
-            	// However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
-            	// get denormalized.  So we undenormalize here.  It's theoretically possible that we
-            	// could still get denormalized when summing the samples below; but I have not been
-            	// able to cause that.
-				double aa = undenormalize(ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
-            	double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
-				amplitude = aa + bb;
-				ca[oi] = amplitude;
-				}
-				
-			double frequency = freq[i];
+            for (int i = 0; i < pos.length; i++)
+                {
+                double amplitude = amp[i];
+                int oi = orders[i];
+                if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
+                                                        
+                if (ca[oi] != amplitude)
+                    {
+                    // incoming amplitudes are pre-denormalized by the voice threads.
+                    // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
+                    // get denormalized.  So we undenormalize here.  It's theoretically possible that we
+                    // could still get denormalized when summing the samples below; but I have not been
+                    // able to cause that.
+                    double aa = undenormalize(ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
+                    double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
+                    amplitude = aa + bb;
+                    ca[oi] = amplitude;
+                    }
+                                
+                double frequency = freq[i];
  
-				double position = pos[oi] + frequency * tr;
-				position = position - (int) position;  			// fun fact. this is 9 times faster than position = position % 1.0
-				pos[oi] = position;
-			
-				if (frequency * pitch <= NYQUIST && amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
-					{
-					sample += Utility.fastSin(position * PI2) * amplitude * v;
-					}
+                double position = pos[oi] + frequency * tr;
+                position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
+                pos[oi] = position;
+                        
+                if (frequency * pitch <= NYQUIST && amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
+                    {
+                    sample += Utility.fastSin(position * PI2) * amplitude * v;
+                    }
+                }
             }
-		}
 
         return sample;
         }
@@ -698,10 +698,10 @@ public class Output
     // int timeCountFoo = 0;
     
     /*
-    double filter = 0;
-    double filter2 = 0;
-    double filter3 = 0;
-    double filter4 = 0;
+      double filter = 0;
+      double filter2 = 0;
+      double filter3 = 0;
+      double filter4 = 0;
     */
     
     double samples[][] = new double[0][SKIP];
@@ -717,10 +717,10 @@ public class Output
                 /// Note that these are indexed by ORDER, not by actual index position
                 final double[][] currentAmplitudes = new double[numVoices][Unit.NUM_PARTIALS];
                 /*
-                final double[][] currentFrequencies = new double[numVoices][Unit.NUM_PARTIALS];
-                for(int ii = 0; ii < currentFrequencies.length; ii++)
-                	for(int jj = 0; jj < currentFrequencies[ii].length; jj++)
-                		currentFrequencies[ii][jj] = -1;
+                  final double[][] currentFrequencies = new double[numVoices][Unit.NUM_PARTIALS];
+                  for(int ii = 0; ii < currentFrequencies.length; ii++)
+                  for(int jj = 0; jj < currentFrequencies[ii].length; jj++)
+                  currentFrequencies[ii][jj] = -1;
                 */
   
                 lightweightOutputSemaphores = new boolean[MAX_VOICES];
@@ -744,8 +744,8 @@ public class Output
                                 
                                 int n = MAX_VOICES;
                                 if (n >  _i + numOutputsPerThread)
-                                	n =  _i + numOutputsPerThread;
-                                	
+                                    n =  _i + numOutputsPerThread;
+                                        
                                 for(int j = _i; j < n; j++)
                                     {
                                     if (j < samples.length)         // voice hasn't been loaded yet, hang tight
@@ -811,11 +811,11 @@ public class Output
                         }
                                       
                     if (with.reverbWet > 0.0f)
-                    	{        
-                    	freeverb.setWet(with.reverbWet);
-                    	freeverb.setRoomSize(with.reverbRoomSize);
-                    	freeverb.setDamp(with.reverbDamp);
-                    	}
+                        {        
+                        freeverb.setWet(with.reverbWet);
+                        freeverb.setRoomSize(with.reverbRoomSize);
+                        freeverb.setDamp(with.reverbDamp);
+                        }
 
                     for (int skipPos = 0; skipPos < SKIP; skipPos++)
                         {
@@ -845,31 +845,31 @@ public class Output
                         
                         // add reverb?
                         if (with.reverbWet > 0.0f)
-                        	{
-                        	// I think freeverb sounds better going in both channels and taking
-                        	// both channel results.  But you may have a different opinion, in
-                        	// which I think you do: 
-                        	//
-	                        //freeverbInput[0][0] = (float)d;
-	                        //freeverb.compute(1, freeverbInput, freeverbOutput);
-	                        //d = freeverbOutput[0][0]; 
-	                        
-	                        freeverbInput[0][0] = (float)d;
-	                        freeverbInput[1][0] = (float)d;
-	                        freeverb.compute(1, freeverbInput, freeverbOutput);
-	                        d = (freeverbOutput[0][0] + freeverbOutput[1][0]) / 2; 
-	                        }
+                            {
+                            // I think freeverb sounds better going in both channels and taking
+                            // both channel results.  But you may have a different opinion, in
+                            // which I think you do: 
+                            //
+                            //freeverbInput[0][0] = (float)d;
+                            //freeverb.compute(1, freeverbInput, freeverbOutput);
+                            //d = freeverbOutput[0][0]; 
+                                
+                            freeverbInput[0][0] = (float)d;
+                            freeverbInput[1][0] = (float)d;
+                            freeverb.compute(1, freeverbInput, freeverbOutput);
+                            d = (freeverbOutput[0][0] + freeverbOutput[1][0]) / 2; 
+                            }
                             
                         /*
-                        filter = (1 - 0.5) * filter + 0.5 * d;
-                        d = filter;
-                        filter2 = (1 - 0.5) * filter2 + 0.5 * d;
-                        d = filter2;
-                        filter3 = (1 - 0.5) * filter3 + 0.5 * d;
-                        d = filter3;
-                        filter4 = (1 - 0.5) * filter4 + 0.5 * d;
-                        d = filter4;
-                    	*/
+                          filter = (1 - 0.5) * filter + 0.5 * d;
+                          d = filter;
+                          filter2 = (1 - 0.5) * filter2 + 0.5 * d;
+                          d = filter2;
+                          filter3 = (1 - 0.5) * filter3 + 0.5 * d;
+                          d = filter3;
+                          filter4 = (1 - 0.5) * filter4 + 0.5 * d;
+                          d = filter4;
+                        */
 
 //                        d = lowPassFilter(d, with.c, with.r);
                         
@@ -1006,8 +1006,8 @@ public class Output
 
 //    int totalPartialsTicks;
 //    int totalPartialsWaits;
-//	int totalOutputTicks;
-// 	int totalOutputWaits;
+//      int totalOutputTicks;
+//      int totalOutputWaits;
 //    static final int NUM_TICKS_PER_PRINT = 1024 * 5;
 //    int avgTimeTick = 0;
 //    long lastTime = -1;
@@ -1094,11 +1094,11 @@ public class Output
 //            totalPartialsWaits++;
             Thread.currentThread().yield();
 
-	        while(emitsReady)
-	            {
-	            Thread.currentThread().yield();
-	            }
-	        }
+            while(emitsReady)
+                {
+                Thread.currentThread().yield();
+                }
+            }
                 
         lock();
         try
@@ -1124,24 +1124,24 @@ public class Output
                 swap.pitches[i] = sounds[i].getPitch();
                 swap.velocities[i] = (velocitySensitive ? sounds[i].getVelocity() : Sound.DEFAULT_VELOCITY);
                 if (emits instanceof Out)
-                	{
-                	swap.dephase[i] = ((Out)emits).getDephase();
-                	}
+                    {
+                    swap.dephase[i] = ((Out)emits).getDephase();
+                    }
                 else
-                	{
-                	System.err.println("Output.go() WARNING, emits isn't an Out!");
-                	}
+                    {
+                    System.err.println("Output.go() WARNING, emits isn't an Out!");
+                    }
                 }
                 
-            if (e instanceof Out) 	// we're only doing this for ONE sound, namely sounds[0]
-            	{
-            	Out out = (Out)e;
-            	swap.reverbWet = (float)(out.modulate(out.MOD_REVERB_WET));
-            	swap.reverbDamp = (float)(out.modulate(out.MOD_REVERB_DAMP));
-            	swap.reverbRoomSize = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE));
-            	//swap.c = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE + 1));
-            	//swap.r = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE + 2));
-            	}
+            if (e instanceof Out)       // we're only doing this for ONE sound, namely sounds[0]
+                {
+                Out out = (Out)e;
+                swap.reverbWet = (float)(out.modulate(out.MOD_REVERB_WET));
+                swap.reverbDamp = (float)(out.modulate(out.MOD_REVERB_DAMP));
+                swap.reverbRoomSize = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE));
+                //swap.c = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE + 1));
+                //swap.r = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE + 2));
+                }
             }
         finally 
             {
@@ -1151,328 +1151,328 @@ public class Output
         swap.count++;
         emitsReady = true;
 /*
-        avgTimeTick++;
-        if (avgTimeTick == NUM_TICKS_PER_PRINT)
-            {
-            avgTimeTick = 0;
-            if (lastTime == -1)
-                lastTime = System.currentTimeMillis();
-            else
-                {
-                long time = System.currentTimeMillis();
-                System.err.println("H% " + String.format("%.2f", (totalPartialsWaits / (double)totalPartialsTicks)) +
-                    ": " + String.format("%.2f", (swap.reads / (double)swap.count)) + " " + swap.reads + " " + swap.count +
-                    " O% " + String.format("%.2f", (totalOutputWaits / (double)totalOutputTicks)) + 
-                    " Wait " + String.format("%.2f", (time - lastTime) / (double)NUM_TICKS_PER_PRINT));
-                lastTime = time;
-                }
-            } 
+  avgTimeTick++;
+  if (avgTimeTick == NUM_TICKS_PER_PRINT)
+  {
+  avgTimeTick = 0;
+  if (lastTime == -1)
+  lastTime = System.currentTimeMillis();
+  else
+  {
+  long time = System.currentTimeMillis();
+  System.err.println("H% " + String.format("%.2f", (totalPartialsWaits / (double)totalPartialsTicks)) +
+  ": " + String.format("%.2f", (swap.reads / (double)swap.count)) + " " + swap.reads + " " + swap.count +
+  " O% " + String.format("%.2f", (totalOutputWaits / (double)totalOutputTicks)) + 
+  " Wait " + String.format("%.2f", (time - lastTime) / (double)NUM_TICKS_PER_PRINT));
+  lastTime = time;
+  }
+  } 
 */
         }  
-        /*
-	static final double T = 1.0 / 44100.0;
+    /*
+      static final double T = 1.0 / 44100.0;
 
-	static final double Q = Math.sqrt(0.5);
-	static final double CUTOFF = 1000.0;
-	static final double O = CUTOFF * 2 * Math.PI; //O = 2.0 / T * Math.tan(CUTOFF * Math.PI);
-	static final double OOQTT = O * O * Q * T * T;
-	static final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
-	static final double IJ = 1.0 / J;
-	static final double b0 = IJ * OOQTT;
-	static final double b1 = IJ * 2 * OOQTT;
-	static final double b2 = IJ * OOQTT;
-	static final double a1 = IJ * (-8 * Q + 2 * OOQTT);
-	static final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
+      static final double Q = Math.sqrt(0.5);
+      static final double CUTOFF = 1000.0;
+      static final double O = CUTOFF * 2 * Math.PI; //O = 2.0 / T * Math.tan(CUTOFF * Math.PI);
+      static final double OOQTT = O * O * Q * T * T;
+      static final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
+      static final double IJ = 1.0 / J;
+      static final double b0 = IJ * OOQTT;
+      static final double b1 = IJ * 2 * OOQTT;
+      static final double b2 = IJ * OOQTT;
+      static final double a1 = IJ * (-8 * Q + 2 * OOQTT);
+      static final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
 
-    double[] N = new double[2];
-    double[] M = new double[2];
-    double lowPassFilter(double d, double cut, double res)
-    	{
-     double Q = (res * 10 + 1) * 0.7071;
-	 final double CUTOFF = cut * 20000 + 25;
-	 final double O = CUTOFF * 2 * Math.PI;
-	 final double OOQTT = O * O * Q * T * T;
-	 final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
-	 final double IJ = 1.0 / (J < 0.001 ? 0.001 : J ;
-	 final double b0 = IJ * OOQTT;
-	 final double b1 = IJ * 2 * OOQTT;
-	 final double b2 = IJ * OOQTT;
-	 final double a1 = IJ * (-8 * Q + 2 * OOQTT);
-	 final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
+      double[] N = new double[2];
+      double[] M = new double[2];
+      double lowPassFilter(double d, double cut, double res)
+      {
+      double Q = (res * 10 + 1) * 0.7071;
+      final double CUTOFF = cut * 20000 + 25;
+      final double O = CUTOFF * 2 * Math.PI;
+      final double OOQTT = O * O * Q * T * T;
+      final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
+      final double IJ = 1.0 / (J < 0.001 ? 0.001 : J ;
+      final double b0 = IJ * OOQTT;
+      final double b1 = IJ * 2 * OOQTT;
+      final double b2 = IJ * OOQTT;
+      final double a1 = IJ * (-8 * Q + 2 * OOQTT);
+      final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
 
-    	double y = d * b0 + N[0] * b1 + N[1] * b2 - a1 * M[0] - a2 * M[1];
-    	N[1] = N[0];
-    	N[0] = d;
-    	M[1] = M[0];
-    	M[0] = y;
-    	if (y < WELL_ABOVE_SUBNORMALS && y > 0) System.err.println("subnormal");
-    	if (y != y) System.err.println("NAN");
-    	return y;
-    	}    
-     */
+      double y = d * b0 + N[0] * b1 + N[1] * b2 - a1 * M[0] - a2 * M[1];
+      N[1] = N[0];
+      N[0] = d;
+      M[1] = M[0];
+      M[0] = y;
+      if (y < WELL_ABOVE_SUBNORMALS && y > 0) System.err.println("subnormal");
+      if (y != y) System.err.println("NAN");
+      return y;
+      }    
+    */
         
 
-	final static double[] MIXING = new double[]
-		{
-4.3930522285718725, 
-2.0980074779050573, 
-5.911617141284784, 
-3.302416782999798, 
-0.532648003019616, 
-3.864552401356139, 
-0.6828907136007456, 
-3.309690303702759, 
-3.78626929045274, 
-2.880490449092737, 
-0.6412955842415297, 
-4.210561997218116, 
-1.329093445651415, 
-4.423635829349905, 
-0.9697059483036133, 
-3.3800872309232752, 
-5.190082241176484, 
-4.179658018481378, 
-3.1761418769465792, 
-1.8514888920948884, 
-5.672079791211344, 
-2.80457371107737, 
-5.752510144539967, 
-2.0542370131054426, 
-4.059706623677195, 
-5.059878289798797, 
-3.2535931944316436, 
-1.251760344228206, 
-1.1697673184395325, 
-5.499988425488455, 
-2.5487075166480784, 
-5.671174843247418, 
-1.5889337469209264, 
-3.4966660573449286, 
-4.1128697586043845, 
-1.32223042596809, 
-3.634874408433536, 
-5.4727212070712845, 
-4.050330922059182, 
-1.329430792144477, 
-4.347179582872594, 
-0.49531926549671, 
-1.9981399038451473, 
-2.2024506973065567, 
-5.422728478571278, 
-4.342491898622478, 
-2.340585893867574, 
-1.595375474206211, 
-5.534647380650129, 
-2.1854360354552314, 
-4.407323953511916, 
-5.875238413239378, 
-5.807281013442006, 
-2.611730008727033, 
-2.404221048946509, 
-4.5142628863423, 
-4.585857046489191, 
-2.7585550894249278, 
-6.034609601973635, 
-1.784818848275311, 
-2.9385777003341786, 
-2.7379768217657237, 
-5.204281144711419, 
-2.5743565427801682, 
-5.633773284292306, 
-0.37163019591190505, 
-5.4767684684458136, 
-2.469637673803118, 
-4.796244127749591, 
-6.131515108692101, 
-5.442227729315259, 
-1.6393092165445262, 
-2.905279921897077, 
-5.887610452331277, 
-2.231151580725118, 
-1.311410267937173, 
-5.1320011670472665, 
-1.0637225421542722, 
-2.161631508466618, 
-1.542156486372099, 
-3.7292113803036364, 
-1.7137086767243934, 
-5.4642677550381755, 
-3.0853750211403574, 
-3.0173444667823857, 
-0.6315436517090349, 
-3.3421180705036546, 
-4.209646257875283, 
-3.7926270717945605, 
-5.819113544074465, 
-1.904641568725281, 
-3.909964870239804, 
-3.5835554395539133, 
-3.8436429642943346, 
-2.197853136078777, 
-4.866540140523055, 
-6.18086741431614, 
-5.4147864419797465, 
-1.123181428416226, 
-5.767777606674638, 
-1.2247017979747263, 
-3.2021001566014204, 
-4.509373040115699, 
-3.7362376775556543, 
-0.08683319620390151, 
-1.2405920482832018, 
-0.8724415122969259, 
-2.961759106078713, 
-2.0771434354580864, 
-2.923727915641903, 
-2.7159263377789484, 
-5.20302805883522, 
-3.8574313667909914, 
-0.9620003437805832, 
-2.758032882552134, 
-2.110632917575416, 
-4.423350054567123, 
-4.6696945714405045, 
-3.366131602771689, 
-1.4757790606175893, 
-4.423642339560315, 
-4.92807311466011, 
-2.067548270280224, 
-3.772824744655635, 
-2.84617535065996, 
-4.6283185725205, 
-0.092443463110639, 
-6.154303648109571, 
-5.764843632300961, 
-3.7978438062146234, 
-4.581524010352971, 
-2.6704472245847883, 
-4.28496763451278, 
-3.079068811519279, 
-6.215571764084275, 
-1.6727154189264666, 
-1.5702907676316764, 
-3.0167494385334965, 
-3.5141258234246533, 
-4.5840366922727425, 
-2.7706972066454743, 
-4.294461552185262, 
-3.807630008844287, 
-0.2630172179015329, 
-2.115045951553029, 
-3.423269843873172, 
-5.7978670935946, 
-1.6945359810872747, 
-3.0436962789661797, 
-2.368298216504867, 
-4.8554730921226374, 
-4.159204477042065, 
-0.21666124977089396, 
-3.381162299738797, 
-0.1441628078280086, 
-1.541825983163458, 
-5.529820230628496, 
-3.0811151395049796, 
-1.463250254179737, 
-3.9225001868930343, 
-4.133792216068891, 
-0.9242787399407808, 
-4.52161640487037, 
-3.9304320982687724, 
-1.6630928269575334, 
-3.6124930881561648, 
-1.5756809048093188, 
-1.2284009214428435, 
-3.6667071469745096, 
-3.731393225939248, 
-1.3805717439790721, 
-4.3356357222344934, 
-2.808892673945348, 
-2.1194589855109074, 
-1.1925169734369456, 
-5.850783005068567, 
-5.6640714433910375, 
-3.0339273779002425, 
-4.201648701469412, 
-0.3289178314175416, 
-5.161934219713718, 
-5.932017725015613, 
-5.54990471757801, 
-3.2685298202768385, 
-3.3400508259054345, 
-4.61241753082556, 
-2.024160879689441, 
-3.108107374510848, 
-0.21973074174871066, 
-4.536135686410281, 
-3.023281955038178, 
-0.35146993875006327, 
-6.06360994679823, 
-1.6810294052530046, 
-3.1837768890758444, 
-0.6374076523146917, 
-1.6375793184645058, 
-6.142404473157965, 
-5.048278576240986, 
-3.8565616882630644, 
-3.781988825321103, 
-0.6626461774182255, 
-4.511015710407045, 
-1.3781495182202912, 
-0.3048210194240344, 
-1.2281990925819724, 
-5.530568411276023, 
-3.9826621922332768, 
-6.148919688034672, 
-0.3849323271843632, 
-2.3895972379985033, 
-2.0351897098873533, 
-5.478720725311914, 
-4.5101107624565735, 
-0.5674943806341197, 
-4.667407863259131, 
-4.180649474473559, 
-0.761845235610469, 
-1.0511013301219272, 
-2.078027466814059, 
-3.922709192162581, 
-2.9191198961157077, 
-3.6120440358146144, 
-5.938650489751697, 
-3.5529228291672803, 
-4.252974513646061, 
-0.07321558074413037, 
-4.606624069065216, 
-1.1381464803518826, 
-0.6300786117796688, 
-6.265717644929687, 
-0.8430061348604436, 
-3.1486688816017, 
-2.187113308963469, 
-2.55904691435907, 
-0.9064953139550527, 
-5.37692637169442, 
-5.853139585850388, 
-1.575131271143313, 
-2.952143357394929, 
-5.66264462166993, 
-1.6711595897952538, 
-0.5699793026370283, 
-2.3172163459061377, 
-1.7397750472133227, 
-0.40865290826939393, 
-1.9322709447427506, 
-3.7488814181123082, 
-0.999910036276269, 
-2.202464383904762, 
-6.225511119055286, 
-0.4607922129972568, 
-0.18347089591674237, 
-0.7998209062335242, 
-5.0746310546021345, 
-1.75341780686486
-		};
+    final static double[] MIXING = new double[]
+    {
+    4.3930522285718725, 
+    2.0980074779050573, 
+    5.911617141284784, 
+    3.302416782999798, 
+    0.532648003019616, 
+    3.864552401356139, 
+    0.6828907136007456, 
+    3.309690303702759, 
+    3.78626929045274, 
+    2.880490449092737, 
+    0.6412955842415297, 
+    4.210561997218116, 
+    1.329093445651415, 
+    4.423635829349905, 
+    0.9697059483036133, 
+    3.3800872309232752, 
+    5.190082241176484, 
+    4.179658018481378, 
+    3.1761418769465792, 
+    1.8514888920948884, 
+    5.672079791211344, 
+    2.80457371107737, 
+    5.752510144539967, 
+    2.0542370131054426, 
+    4.059706623677195, 
+    5.059878289798797, 
+    3.2535931944316436, 
+    1.251760344228206, 
+    1.1697673184395325, 
+    5.499988425488455, 
+    2.5487075166480784, 
+    5.671174843247418, 
+    1.5889337469209264, 
+    3.4966660573449286, 
+    4.1128697586043845, 
+    1.32223042596809, 
+    3.634874408433536, 
+    5.4727212070712845, 
+    4.050330922059182, 
+    1.329430792144477, 
+    4.347179582872594, 
+    0.49531926549671, 
+    1.9981399038451473, 
+    2.2024506973065567, 
+    5.422728478571278, 
+    4.342491898622478, 
+    2.340585893867574, 
+    1.595375474206211, 
+    5.534647380650129, 
+    2.1854360354552314, 
+    4.407323953511916, 
+    5.875238413239378, 
+    5.807281013442006, 
+    2.611730008727033, 
+    2.404221048946509, 
+    4.5142628863423, 
+    4.585857046489191, 
+    2.7585550894249278, 
+    6.034609601973635, 
+    1.784818848275311, 
+    2.9385777003341786, 
+    2.7379768217657237, 
+    5.204281144711419, 
+    2.5743565427801682, 
+    5.633773284292306, 
+    0.37163019591190505, 
+    5.4767684684458136, 
+    2.469637673803118, 
+    4.796244127749591, 
+    6.131515108692101, 
+    5.442227729315259, 
+    1.6393092165445262, 
+    2.905279921897077, 
+    5.887610452331277, 
+    2.231151580725118, 
+    1.311410267937173, 
+    5.1320011670472665, 
+    1.0637225421542722, 
+    2.161631508466618, 
+    1.542156486372099, 
+    3.7292113803036364, 
+    1.7137086767243934, 
+    5.4642677550381755, 
+    3.0853750211403574, 
+    3.0173444667823857, 
+    0.6315436517090349, 
+    3.3421180705036546, 
+    4.209646257875283, 
+    3.7926270717945605, 
+    5.819113544074465, 
+    1.904641568725281, 
+    3.909964870239804, 
+    3.5835554395539133, 
+    3.8436429642943346, 
+    2.197853136078777, 
+    4.866540140523055, 
+    6.18086741431614, 
+    5.4147864419797465, 
+    1.123181428416226, 
+    5.767777606674638, 
+    1.2247017979747263, 
+    3.2021001566014204, 
+    4.509373040115699, 
+    3.7362376775556543, 
+    0.08683319620390151, 
+    1.2405920482832018, 
+    0.8724415122969259, 
+    2.961759106078713, 
+    2.0771434354580864, 
+    2.923727915641903, 
+    2.7159263377789484, 
+    5.20302805883522, 
+    3.8574313667909914, 
+    0.9620003437805832, 
+    2.758032882552134, 
+    2.110632917575416, 
+    4.423350054567123, 
+    4.6696945714405045, 
+    3.366131602771689, 
+    1.4757790606175893, 
+    4.423642339560315, 
+    4.92807311466011, 
+    2.067548270280224, 
+    3.772824744655635, 
+    2.84617535065996, 
+    4.6283185725205, 
+    0.092443463110639, 
+    6.154303648109571, 
+    5.764843632300961, 
+    3.7978438062146234, 
+    4.581524010352971, 
+    2.6704472245847883, 
+    4.28496763451278, 
+    3.079068811519279, 
+    6.215571764084275, 
+    1.6727154189264666, 
+    1.5702907676316764, 
+    3.0167494385334965, 
+    3.5141258234246533, 
+    4.5840366922727425, 
+    2.7706972066454743, 
+    4.294461552185262, 
+    3.807630008844287, 
+    0.2630172179015329, 
+    2.115045951553029, 
+    3.423269843873172, 
+    5.7978670935946, 
+    1.6945359810872747, 
+    3.0436962789661797, 
+    2.368298216504867, 
+    4.8554730921226374, 
+    4.159204477042065, 
+    0.21666124977089396, 
+    3.381162299738797, 
+    0.1441628078280086, 
+    1.541825983163458, 
+    5.529820230628496, 
+    3.0811151395049796, 
+    1.463250254179737, 
+    3.9225001868930343, 
+    4.133792216068891, 
+    0.9242787399407808, 
+    4.52161640487037, 
+    3.9304320982687724, 
+    1.6630928269575334, 
+    3.6124930881561648, 
+    1.5756809048093188, 
+    1.2284009214428435, 
+    3.6667071469745096, 
+    3.731393225939248, 
+    1.3805717439790721, 
+    4.3356357222344934, 
+    2.808892673945348, 
+    2.1194589855109074, 
+    1.1925169734369456, 
+    5.850783005068567, 
+    5.6640714433910375, 
+    3.0339273779002425, 
+    4.201648701469412, 
+    0.3289178314175416, 
+    5.161934219713718, 
+    5.932017725015613, 
+    5.54990471757801, 
+    3.2685298202768385, 
+    3.3400508259054345, 
+    4.61241753082556, 
+    2.024160879689441, 
+    3.108107374510848, 
+    0.21973074174871066, 
+    4.536135686410281, 
+    3.023281955038178, 
+    0.35146993875006327, 
+    6.06360994679823, 
+    1.6810294052530046, 
+    3.1837768890758444, 
+    0.6374076523146917, 
+    1.6375793184645058, 
+    6.142404473157965, 
+    5.048278576240986, 
+    3.8565616882630644, 
+    3.781988825321103, 
+    0.6626461774182255, 
+    4.511015710407045, 
+    1.3781495182202912, 
+    0.3048210194240344, 
+    1.2281990925819724, 
+    5.530568411276023, 
+    3.9826621922332768, 
+    6.148919688034672, 
+    0.3849323271843632, 
+    2.3895972379985033, 
+    2.0351897098873533, 
+    5.478720725311914, 
+    4.5101107624565735, 
+    0.5674943806341197, 
+    4.667407863259131, 
+    4.180649474473559, 
+    0.761845235610469, 
+    1.0511013301219272, 
+    2.078027466814059, 
+    3.922709192162581, 
+    2.9191198961157077, 
+    3.6120440358146144, 
+    5.938650489751697, 
+    3.5529228291672803, 
+    4.252974513646061, 
+    0.07321558074413037, 
+    4.606624069065216, 
+    1.1381464803518826, 
+    0.6300786117796688, 
+    6.265717644929687, 
+    0.8430061348604436, 
+    3.1486688816017, 
+    2.187113308963469, 
+    2.55904691435907, 
+    0.9064953139550527, 
+    5.37692637169442, 
+    5.853139585850388, 
+    1.575131271143313, 
+    2.952143357394929, 
+    5.66264462166993, 
+    1.6711595897952538, 
+    0.5699793026370283, 
+    2.3172163459061377, 
+    1.7397750472133227, 
+    0.40865290826939393, 
+    1.9322709447427506, 
+    3.7488814181123082, 
+    0.999910036276269, 
+    2.202464383904762, 
+    6.225511119055286, 
+    0.4607922129972568, 
+    0.18347089591674237, 
+    0.7998209062335242, 
+    5.0746310546021345, 
+    1.75341780686486
+    };
 
-    	
+        
 
 
     }

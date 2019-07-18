@@ -539,10 +539,10 @@ public class ModulePanel extends JPanel implements Transferable
 
     /** A convenience method for loading a file in a ModulePanel. */
     public File doLoad(String title, final String filenameExtension)
-    	{
-    	return doLoad(title, new String[] { filenameExtension });
-    	}
-    	
+        {
+        return doLoad(title, new String[] { filenameExtension });
+        }
+        
     /** A convenience method for loading a file in a ModulePanel. */
     public File doLoad(String title, final String[] filenameExtensions)
         {
@@ -553,8 +553,8 @@ public class ModulePanel extends JPanel implements Transferable
             public boolean accept(File dir, String name)
                 {
                 for(int i = 0; i < filenameExtensions.length; i++)
-                	if (AppMenu.ensureFileEndsWith(name, filenameExtensions[i]).equals(name))
-                		return true;
+                    if (AppMenu.ensureFileEndsWith(name, filenameExtensions[i]).equals(name))
+                        return true;
                 return false;
                 }
             });

@@ -65,44 +65,44 @@ public class Harmonics extends Unit implements UnitSource
                     }
 
                 PushButton sample = new PushButton("Get")
-                	{
-                	public void perform()
-                		{
-	                    Harmonics harmonics = (Harmonics)(getModulation());
-        				int index = harmonics.getSound().findRegistered(harmonics);
-        				Output output = getRack().getOutput();
-        				int numSounds = output.getNumSounds();
-						output.lock();
-						try
-							{
-							double[] amplitudesIn = harmonics.getAmplitudesIn(0);        
-							for(int i = 0; i < NUM_HARMONICS; i++)
-								{
-								double a = amplitudesIn[i];
-								if (a < 0) a = 0;
-								if (a > 1) a = 1;
-								
-								// distribute modulation to all the sounds
-								for(int j = 0; j < numSounds; j++)
-									{
-									Harmonics d = (Harmonics)(output.getSound(j).getRegistered(index));
+                    {
+                    public void perform()
+                        {
+                        Harmonics harmonics = (Harmonics)(getModulation());
+                        int index = harmonics.getSound().findRegistered(harmonics);
+                        Output output = getRack().getOutput();
+                        int numSounds = output.getNumSounds();
+                        output.lock();
+                        try
+                            {
+                            double[] amplitudesIn = harmonics.getAmplitudesIn(0);        
+                            for(int i = 0; i < NUM_HARMONICS; i++)
+                                {
+                                double a = amplitudesIn[i];
+                                if (a < 0) a = 0;
+                                if (a > 1) a = 1;
+                                                                
+                                // distribute modulation to all the sounds
+                                for(int j = 0; j < numSounds; j++)
+                                    {
+                                    Harmonics d = (Harmonics)(output.getSound(j).getRegistered(index));
 
-									if (d.getModulation(i) instanceof Constant)
-										((Constant)(d.getModulation(i))).setValue(a);
-									}
-								}
-							}
-						finally 
-							{
-							output.unlock();
-							}
-						for(int i = 0; i < NUM_HARMONICS; i++)
-							{
-							mi[i].updateText();
-							}
-						mp[0].repaint();
-                		}
-                	};
+                                    if (d.getModulation(i) instanceof Constant)
+                                        ((Constant)(d.getModulation(i))).setValue(a);
+                                    }
+                                }
+                            }
+                        finally 
+                            {
+                            output.unlock();
+                            }
+                        for(int i = 0; i < NUM_HARMONICS; i++)
+                            {
+                            mi[i].updateText();
+                            }
+                        mp[0].repaint();
+                        }
+                    };
                 
                 box.add(sample);
                 box.add(new UnitInput(unit, 0, this));

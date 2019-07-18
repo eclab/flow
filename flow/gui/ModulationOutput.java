@@ -119,21 +119,21 @@ public class ModulationOutput extends InputOutput
             public void mouseClicked(MouseEvent e)
                 {
                 for(ModulationWire wire : outgoing)
-                	{
-                	wire.chooseColor();
-                	}
+                    {
+                    wire.chooseColor();
+                    }
                 }
             };
             
         jack.addMouseMotionListener(mouseAdapter);
         jack.addMouseListener(mouseAdapter);
 
-		String[] help = modulation.wrapHelp(modulation.getModulationOutputHelp());
-		if (help != null && help.length > number && help[number] != null)
-			{
-			jack.setToolTipText(help[number]);
-			title.setToolTipText(help[number]);
-			}
+        String[] help = modulation.wrapHelp(modulation.getModulationOutputHelp());
+        if (help != null && help.length > number && help[number] != null)
+            {
+            jack.setToolTipText(help[number]);
+            title.setToolTipText(help[number]);
+            }
         }
 
     /** Attaches a ModulationWire connected to the given ModulationInput. */

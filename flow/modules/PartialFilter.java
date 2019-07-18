@@ -41,14 +41,14 @@ public class PartialFilter extends Unit
         
     public static String getName() { return "Partial Filter"; }
 
-	public static final int FREQ_RELATIVE = 0;
-	public static final int FREQ_FIXED = 1;
-	public static final int FREQ_DOUBLE = 2;
+    public static final int FREQ_RELATIVE = 0;
+    public static final int FREQ_FIXED = 1;
+    public static final int FREQ_DOUBLE = 2;
 
-	int freq = FREQ_RELATIVE;
-	public int getFreq() { return freq; }
-	public void setFreq(int val) { freq = val; }
-	
+    int freq = FREQ_RELATIVE;
+    public int getFreq() { return freq; }
+    public void setFreq(int val) { freq = val; }
+        
     public static final int OPTION_FREQ = 0;
     
     public int getOptionValue(int option) 
@@ -94,15 +94,15 @@ public class PartialFilter extends Unit
         double scale = 1.0;
         
         if (freq == FREQ_FIXED)
-        	{
-        	pitch = sound.getPitch();
-        	scale = 100.0;				// 100Hz per frequency integer
-        	}
+            {
+            pitch = sound.getPitch();
+            scale = 100.0;                          // 100Hz per frequency integer
+            }
         else if (freq == FREQ_DOUBLE)
-        	{
-         	pitch = sound.getPitch();
-        	scale = 200.0;				// 200Hz per frequency integer
-	       	}
+            {
+            pitch = sound.getPitch();
+            scale = 200.0;                          // 200Hz per frequency integer
+            }
         
         int node = 0;
         for(int i = 0; i < amplitudes.length; i++)

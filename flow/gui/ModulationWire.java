@@ -31,10 +31,10 @@ public class ModulationWire
     public ModulationInput getEnd() { return end; }
         
     public void chooseColor() 
-    	{
+        {
         color = new Color((int)(Math.random() * 220), (int)(Math.random() * 220), (int)(Math.random() * 220), 175);
-    	}
-    	
+        }
+        
     public ModulationWire(Rack rack) 
         { 
         this.rack = rack; 

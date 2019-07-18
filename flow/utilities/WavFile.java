@@ -255,7 +255,7 @@ public class WavFile
                 // any extra format bytes
                 numChunkBytes -= 16;
                 if (numChunkBytes > 0) 
-                	wavFile.iStream.skip(numChunkBytes);	// result ignored
+                    wavFile.iStream.skip(numChunkBytes);    // result ignored
                 }
             else if (chunkID == DATA_CHUNK_ID)
                 {

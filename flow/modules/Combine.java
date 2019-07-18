@@ -32,9 +32,9 @@ public class Combine extends Unit
     public static final int MOD_SCALE_A = 0;
     public static final int MOD_SCALE_B = 1;
 
-	int[] outstandingOrders;
-	int[] outstandingOrderPositions;
-	
+    int[] outstandingOrders;
+    int[] outstandingOrderPositions;
+        
     /// Do we attempt to merge identical frequencies into one frequency, or load them independently?
     boolean merge = false;
     /// Do we guarantee that each incoming partials gets 1/2 of the final partials, or just load them both asynchronously until expended?
@@ -86,16 +86,16 @@ public class Combine extends Unit
 
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
-		byte[] orders = getOrders(0);
-		
-		
-		// Combine is kind of a mess at preserving orders.  So we're doing it as follows:
-		// 1. All of A's orders are preserved
-		// 2. Any of B's orders which CAN be preserved without conflicting with #1 will be preserved
-		// 3. We arbitrarily assign the remainder
-		// To do this we need some arrays, and we'll have to allocate them every time or otherwise
-		// zero them out.  This allows us to avoid doing sorts, yay.
-		boolean[] filledOrders = new boolean[amplitudes.length];  // all false
+        byte[] orders = getOrders(0);
+                
+                
+        // Combine is kind of a mess at preserving orders.  So we're doing it as follows:
+        // 1. All of A's orders are preserved
+        // 2. Any of B's orders which CAN be preserved without conflicting with #1 will be preserved
+        // 3. We arbitrarily assign the remainder
+        // To do this we need some arrays, and we'll have to allocate them every time or otherwise
+        // zero them out.  This allows us to avoid doing sorts, yay.
+        boolean[] filledOrders = new boolean[amplitudes.length];  // all false
 
         if (outstandingOrders == null) outstandingOrders = new int[amplitudes.length];
         if (outstandingOrderPositions == null) outstandingOrderPositions = new int[amplitudes.length];
@@ -129,7 +129,7 @@ public class Combine extends Unit
                 orders[i] = ordersA[iA];
                 int o = ordersA[iA];
                 if (o < 0) o += 256;
-                filledOrders[o] = true;		// this order is now used
+                filledOrders[o] = true;         // this order is now used
                 iA++;
                 iB++;
                 }
@@ -142,8 +142,8 @@ public class Combine extends Unit
                 orders[i] = ordersA[iA];
                 int o = ordersA[iA];
                 if (o < 0) o += 256;
-                filledOrders[o] = true;		// this order is now used
-              	iA++;
+                filledOrders[o] = true;         // this order is now used
+                iA++;
                 }
             else // if (iB < maxIncomingFreqLen && (iA >= maxIncomingFreqLen || frequenciesB[iB] < frequenciesA[iA]))
                 {
@@ -154,7 +154,7 @@ public class Combine extends Unit
                 int o = ordersB[iB];
                 if (o < 0) o += 256;
                 outstandingOrders[numOutstanding] = o;
-                outstandingOrderPositions[numOutstanding] = i;		// this basically says that partial i would *like* to have order o
+                outstandingOrderPositions[numOutstanding] = i;          // this basically says that partial i would *like* to have order o
                 numOutstanding++;
                 iB++;
                 }
@@ -193,31 +193,31 @@ public class Combine extends Unit
         /*
         // Fill in the outstanding orders that we can fill
         for(int j = 0; j < numOutstanding; j++)
-        	{
-        	if (!filledOrders[outstandingOrders[j]]) // the requested order isn't being used yet, so we can use it
-        		{
-        		filledOrders[outstandingOrders[j]] = true;								// mark it used
-        		orders[outstandingOrderPositions[j]] = (byte)outstandingOrders[j];		// use it
-        		outstandingOrders[j] = -1;  											// eliminate it so we don't try to force it in the next pass
-        		}
-        	}
+        {
+        if (!filledOrders[outstandingOrders[j]]) // the requested order isn't being used yet, so we can use it
+        {
+        filledOrders[outstandingOrders[j]] = true;                                                              // mark it used
+        orders[outstandingOrderPositions[j]] = (byte)outstandingOrders[j];              // use it
+        outstandingOrders[j] = -1;                                                                                      // eliminate it so we don't try to force it in the next pass
+        }
+        }
         */
-        	
+                
         // Force the remaining orders
         int nextOrder = 0;
         for(int j = 0; j < numOutstanding; j++)
-        	{
-        	if (outstandingOrders[j] >= 0)  // still hasn't been filled, we need to force it to something
-        		{
-        		// find next unfilled order
-        		while(filledOrders[nextOrder]) nextOrder++;
-        		
-        		// fill
-        		filledOrders[nextOrder] = true;
-        		orders[outstandingOrderPositions[j]] = (byte)nextOrder;
-        		}
-        	}
-        	
+            {
+            if (outstandingOrders[j] >= 0)  // still hasn't been filled, we need to force it to something
+                {
+                // find next unfilled order
+                while(filledOrders[nextOrder]) nextOrder++;
+                        
+                // fill
+                filledOrders[nextOrder] = true;
+                orders[outstandingOrderPositions[j]] = (byte)nextOrder;
+                }
+            }
+                
         if (constrain()) simpleSort(0, false);
         }
     }

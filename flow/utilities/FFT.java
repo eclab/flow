@@ -9,18 +9,18 @@ package flow.utilities;
 
 public class FFT 
     {
-	public static double[] applyHanningWindow(double[] wave)
-		{
-		double[] d = new double[wave.length];
-		System.arraycopy(wave, 0, d, 0, wave.length);
+    public static double[] applyHanningWindow(double[] wave)
+        {
+        double[] d = new double[wave.length];
+        System.arraycopy(wave, 0, d, 0, wave.length);
 
-		for(int i = 0; i < d.length; i++)
-			{
-			double s = Math.sin((Math.PI * i) / (d.length - 1));
-			d[i] = d[i] * s * s;
-			}
-		return d;
-		}
+        for(int i = 0; i < d.length; i++)
+            {
+            double s = Math.sin((Math.PI * i) / (d.length - 1));
+            d[i] = d[i] * s * s;
+            }
+        return d;
+        }
 
 /** Returns the harmonics amplitudes (only) from the given wave. */
     public static double[] getHarmonics(double[] wave) 

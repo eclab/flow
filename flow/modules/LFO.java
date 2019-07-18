@@ -154,7 +154,7 @@ public class LFO extends Modulation implements ModSource
         state = 0;
         bias = 0;
         if (initTrigger) 
-        	nextUpdateTrigger = true;
+            nextUpdateTrigger = true;
         }
         
     public void gate() 
@@ -195,7 +195,7 @@ public class LFO extends Modulation implements ModSource
         defineModulations(new Constant[] { Constant.HALF, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ONE, Constant.ONE, Constant.ZERO }, 
             new String[] { "Rate", "Phase", "Scale", "Shift", "Variance", "Seed", "On Tr" });
         defineOptions(new String[] { "Type", "Free", "Invert", "Half Trigger", "Linear Rate", "MIDI Sync", "Init Trigger"}, 
-        			  new String[][] { TYPE_NAMES, { "Free" }, { "Invert" }, { "Half Trigger" }, { "Linear Rate" }, { "MIDI Sync" }, { "Init Trigger" } } );
+            new String[][] { TYPE_NAMES, { "Free" }, { "Invert" }, { "Half Trigger" }, { "Linear Rate" }, { "MIDI Sync" }, { "Init Trigger" } } );
 
         this.type = TRIANGLE;
         free = true;
@@ -222,14 +222,14 @@ public class LFO extends Modulation implements ModSource
             double newPos = 0;
             int i = 0;
             
-			double max = Math.min(shift + scale * 0.5, 1.0);
-			double min = Math.max(shift - scale * 0.5, 0.0);
+            double max = Math.min(shift + scale * 0.5, 1.0);
+            double min = Math.max(shift - scale * 0.5, 0.0);
 
             for(i = 0; i < MAX_TRIES; i++)
                 {
                 newPos = (rand.nextDouble() * 2.0 - 1.0) * variance * scale + randomPos;
                 if (newPos >= min && newPos <= max) 
-                	break;
+                    break;
                 }
             if (i == MAX_TRIES)   // we failed, bound to a legal value and that's that
                 {
@@ -322,13 +322,13 @@ public class LFO extends Modulation implements ModSource
     STATE = POS + BIAS, MOD 1       
 */
 
-	boolean nextUpdateTrigger = false;
+    boolean nextUpdateTrigger = false;
     public void go()
         {
         super.go();
         if (nextUpdateTrigger)
-        	{ updateTrigger(0); nextUpdateTrigger = false; }
-        	
+            { updateTrigger(0); nextUpdateTrigger = false; }
+                
         if (isTriggered(MOD_GATE_TR))
             {
             resetLFO();
@@ -389,21 +389,21 @@ public class LFO extends Modulation implements ModSource
             case RANDOM: output = modulateRandom(scale, shift, modulate(MOD_VARIANCE), wrapped, false); break;
             case RANDOM_SAMPLE_AND_HOLD: output = modulateRandom(scale, shift, modulate(MOD_VARIANCE), wrapped, true); break;
             default: // cannot happen
-            	{
-            	warn("modules/LFO.java", "Impossible default in switch");
-            	output = 0; 
-            	break;
-            	}
+                {
+                warn("modules/LFO.java", "Impossible default in switch");
+                output = 0; 
+                break;
+                }
             }
                 
         if (type != RANDOM && type != RANDOM_SAMPLE_AND_HOLD)
-        	{
-	        output = output + shift - 0.5;
-	        if (output > 1) output = 1;
-	        if (output < 0) output = 0;
-	        if (invert) output = 1.0 - output;
-	        }
-	        
+            {
+            output = output + shift - 0.5;
+            if (output > 1) output = 1;
+            if (output < 0) output = 0;
+            if (invert) output = 1.0 - output;
+            }
+                
         setModulationOutput(0, output);
         }
         

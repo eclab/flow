@@ -41,11 +41,11 @@ public class WaveTable extends Unit implements UnitSource
 
     int currentPos = -1;
     boolean interpolate = true;
-	boolean sampled = false;
-	        
+    boolean sampled = false;
+                
     double[][] waveTable;
     
-	// 1 and 2 are too bouncy, 8 sounds too... distant and wrong.
+    // 1 and 2 are too bouncy, 8 sounds too... distant and wrong.
     public static final int RESAMPLING = 4;
     public static final int WAVETABLE_SIZE = 256;
         
@@ -76,12 +76,12 @@ public class WaveTable extends Unit implements UnitSource
             }
         }
 
-	public boolean getInterpolate() { return interpolate; }
-	public void setInterpolate(boolean val) { interpolate = val; }
-	
-	public boolean getSampled() { return sampled; }
-	public void setSampled(boolean val) { sampled = val; }
-	
+    public boolean getInterpolate() { return interpolate; }
+    public void setInterpolate(boolean val) { interpolate = val; }
+        
+    public boolean getSampled() { return sampled; }
+    public void setSampled(boolean val) { sampled = val; }
+        
     public static final int OPTION_INTERPOLATE = 0;
     public static final int OPTION_SAMPLED = 1;
 
@@ -123,21 +123,21 @@ public class WaveTable extends Unit implements UnitSource
                 int wave = (int) d;
                 double alpha = (d - wave);
                 if (interpolate)
-                	{
-                	double[] wt0 = waveTable[wave];
-                	double[] wt1 = waveTable[wave + 1];
-	                for(int i = 0; i < amplitudes.length; i++)
-	                    {
-	                    amplitudes[i] = wt0[i] * (1-alpha) + wt1[i] * alpha;
-	                    }
-	                }
-	            else
-	            	{
-	            	double[] wt = waveTable[wave];
-	            	if (alpha >= 0.5)
-	            		wt = waveTable[wave + 1];
-	            	System.arraycopy(wt, 0, amplitudes, 0, amplitudes.length);
-	            	}
+                    {
+                    double[] wt0 = waveTable[wave];
+                    double[] wt1 = waveTable[wave + 1];
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                        amplitudes[i] = wt0[i] * (1-alpha) + wt1[i] * alpha;
+                        }
+                    }
+                else
+                    {
+                    double[] wt = waveTable[wave];
+                    if (alpha >= 0.5)
+                        wt = waveTable[wave + 1];
+                    System.arraycopy(wt, 0, amplitudes, 0, amplitudes.length);
+                    }
                 }
             }
         }
@@ -191,9 +191,9 @@ public class WaveTable extends Unit implements UnitSource
                         }
                     });
                 for(int i = 0; i < unit.getNumOptions(); i++)
-                	{
-					box.add(new OptionsChooser(unit, i));
-					}
+                    {
+                    box.add(new OptionsChooser(unit, i));
+                    }
                 return box;
                 }
 
@@ -210,82 +210,82 @@ public class WaveTable extends Unit implements UnitSource
                         }
                     else
                         {
-						ArrayList<double[]> buf = new ArrayList<>();
-						if (sampled)
-							{
-							int sampleSize = WAVETABLE_SIZE * RESAMPLING;
-							double[] a = new double[sampleSize];
-							double[] b = new double[sampleSize];
-							double[] buffer = new double[WAVETABLE_SIZE];
-							int count = 0;
-							while(true)
-								{
-								// Read frames into buffer
-								int framesRead = wavFile.readFrames(buffer, WAVETABLE_SIZE);
-								if (framesRead != WAVETABLE_SIZE) break;
-							
-								System.arraycopy(b, WAVETABLE_SIZE, b, 0, sampleSize - WAVETABLE_SIZE);
-								System.arraycopy(buffer, 0, b, sampleSize - WAVETABLE_SIZE, WAVETABLE_SIZE);
-								System.arraycopy(b, 0, a, 0, sampleSize);
-								
-								// Note no window.  Should still be okay (I think?)
-								a = FFT.applyHanningWindow(a);
-								double[] harmonics = FFT.getHarmonics(a);
-								double[] finished = new double[harmonics.length / 2 / RESAMPLING];
-								for (int s=1 ; s < harmonics.length / 2 / RESAMPLING + 1; s++)
-									{
-									finished[s - 1] = (harmonics[s * RESAMPLING - 1] >= MINIMUM_AMPLITUDE ? harmonics[s * RESAMPLING - 1]  : 0 );
-									}
+                        ArrayList<double[]> buf = new ArrayList<>();
+                        if (sampled)
+                            {
+                            int sampleSize = WAVETABLE_SIZE * RESAMPLING;
+                            double[] a = new double[sampleSize];
+                            double[] b = new double[sampleSize];
+                            double[] buffer = new double[WAVETABLE_SIZE];
+                            int count = 0;
+                            while(true)
+                                {
+                                // Read frames into buffer
+                                int framesRead = wavFile.readFrames(buffer, WAVETABLE_SIZE);
+                                if (framesRead != WAVETABLE_SIZE) break;
+                                                        
+                                System.arraycopy(b, WAVETABLE_SIZE, b, 0, sampleSize - WAVETABLE_SIZE);
+                                System.arraycopy(buffer, 0, b, sampleSize - WAVETABLE_SIZE, WAVETABLE_SIZE);
+                                System.arraycopy(b, 0, a, 0, sampleSize);
+                                                                
+                                // Note no window.  Should still be okay (I think?)
+                                a = FFT.applyHanningWindow(a);
+                                double[] harmonics = FFT.getHarmonics(a);
+                                double[] finished = new double[harmonics.length / 2 / RESAMPLING];
+                                for (int s=1 ; s < harmonics.length / 2 / RESAMPLING + 1; s++)
+                                    {
+                                    finished[s - 1] = (harmonics[s * RESAMPLING - 1] >= MINIMUM_AMPLITUDE ? harmonics[s * RESAMPLING - 1]  : 0 );
+                                    }
 
 
-									
+                                                                        
 /*
 // averaging works like this...
 
-                     x
-                   x x x
-                 x x x x x
-               x x x x x x x
-     0 1 2 3 4 5 6 7 8 9 101112
-     - x x x x x x x   x x x x
-         x x x x x       x x x
-           x x x           x x
-             x               x
-									
-								for (int s=1 ; s < harmonics.length / 2 / RESAMPLING + 1; s++)
-									{
-									for(int q = 1; q <= RESAMPLING; q++)
-										{
-										finished[s-1] = finished[s-1] + q * harmonics[s * RESAMPLING - (RESAMPLING - 1) + q];
-										if (q != RESAMPLING) finished[s-1] = finished[s-1] + q * harmonics[s * RESAMPLING + (RESAMPLING - 1) - q];
-										}
-									finished[s-1] /= RESAMPLING * RESAMPLING;
-									}
-*/								
+x
+x x x
+x x x x x
+x x x x x x x
+0 1 2 3 4 5 6 7 8 9 101112
+- x x x x x x x   x x x x
+x x x x x       x x x
+x x x           x x
+x               x
+                                                                        
+for (int s=1 ; s < harmonics.length / 2 / RESAMPLING + 1; s++)
+{
+for(int q = 1; q <= RESAMPLING; q++)
+{
+finished[s-1] = finished[s-1] + q * harmonics[s * RESAMPLING - (RESAMPLING - 1) + q];
+if (q != RESAMPLING) finished[s-1] = finished[s-1] + q * harmonics[s * RESAMPLING + (RESAMPLING - 1) - q];
+}
+finished[s-1] /= RESAMPLING * RESAMPLING;
+}
+*/                                                              
 
-								buf.add(finished);
-								}
-							}
-						else
-							{
-							double[] buffer = new double[WAVETABLE_SIZE];
-							int count = 0;
-							while(true)
-								{
-								// Read frames into buffer
-								int framesRead = wavFile.readFrames(buffer, WAVETABLE_SIZE);
-								if (framesRead != WAVETABLE_SIZE) break;
-							
-								// Note no window.  Should still be okay (I think?)
-								double[] harmonics = FFT.getHarmonics(buffer);
-								double[] finished = new double[harmonics.length / 2];
-								for (int s=1 ; s < harmonics.length / 2 + 1; s++)
-									{
-									finished[s - 1] = (harmonics[s] >= MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
-									}
-								buf.add(finished);
-								}
-                        	}
+                                buf.add(finished);
+                                }
+                            }
+                        else
+                            {
+                            double[] buffer = new double[WAVETABLE_SIZE];
+                            int count = 0;
+                            while(true)
+                                {
+                                // Read frames into buffer
+                                int framesRead = wavFile.readFrames(buffer, WAVETABLE_SIZE);
+                                if (framesRead != WAVETABLE_SIZE) break;
+                                                        
+                                // Note no window.  Should still be okay (I think?)
+                                double[] harmonics = FFT.getHarmonics(buffer);
+                                double[] finished = new double[harmonics.length / 2];
+                                for (int s=1 ; s < harmonics.length / 2 + 1; s++)
+                                    {
+                                    finished[s - 1] = (harmonics[s] >= MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
+                                    }
+                                buf.add(finished);
+                                }
+                            }
 
                         double max = 0;
                         double[][] done = new double[buf.size()][];

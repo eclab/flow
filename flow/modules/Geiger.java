@@ -59,15 +59,15 @@ public class Geiger extends Modulation
     public void reset()
         {
         super.reset();
-		initializeRandom(); 
-		down = false; 
-		setModulationOutput(0, 0);
+        initializeRandom(); 
+        down = false; 
+        setModulationOutput(0, 0);
         }
                 
     public void gate()
         {
         super.gate();
-		initializeRandom(); 
+        initializeRandom(); 
         }
     
     public static final double MAX_RATE = 10.0;
@@ -79,20 +79,20 @@ public class Geiger extends Modulation
         super.go();
 
         if (isTriggered(MOD_TRIGGER))
-        	{
-       		Random rand = (random == null ? getSound().getRandom() : random);
-	       	if (rand.nextFloat() < modulate(MOD_PROBABILITY))
-        		{
-        		count++;
-        		if (count > modulate(MOD_RATE) * MAX_RATE)
-        			{
-        			down = !down;
-					setModulationOutput(0, down ? 0 : 1);
-        			updateTrigger(0);
-        			count = 0;
-        			}
-        		}
-        	}
+            {
+            Random rand = (random == null ? getSound().getRandom() : random);
+            if (rand.nextFloat() < modulate(MOD_PROBABILITY))
+                {
+                count++;
+                if (count > modulate(MOD_RATE) * MAX_RATE)
+                    {
+                    down = !down;
+                    setModulationOutput(0, down ? 0 : 1);
+                    updateTrigger(0);
+                    count = 0;
+                    }
+                }
+            }
         }
 
 

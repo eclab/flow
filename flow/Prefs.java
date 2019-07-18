@@ -327,24 +327,24 @@ public class Prefs
         }
 
 
-	/** Parses a boolean from a string, returning the default if failure occurs */
-	public static boolean parseBoolean(String s, boolean def)
-		{
-		if (def == false)
-			{
-			return Boolean.parseBoolean(s);  // easy case
-			}
-		else
-			{
-			return (s == null || !s.equalsIgnoreCase("false"));
-			}
-		}
+    /** Parses a boolean from a string, returning the default if failure occurs */
+    public static boolean parseBoolean(String s, boolean def)
+        {
+        if (def == false)
+            {
+            return Boolean.parseBoolean(s);  // easy case
+            }
+        else
+            {
+            return (s == null || !s.equalsIgnoreCase("false"));
+            }
+        }
 
     public static void setVelocitySensitive(boolean val) { setLastX("" + val, "VelocitySensitive"); }
     public static boolean getVelocitySensitive() 
         { 
         String s = getLastX("VelocitySensitive"); 
-        return parseBoolean(s, true);			// default is TRUE
+        return parseBoolean(s, true);                   // default is TRUE
         }
 
 
@@ -352,7 +352,7 @@ public class Prefs
     public static boolean getRespondsToBend() 
         { 
         String s = getLastX("RespondsToBend"); 
-        return parseBoolean(s, true);			// default is TRUE
+        return parseBoolean(s, true);                   // default is TRUE
         }
 
 

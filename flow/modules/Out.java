@@ -54,18 +54,18 @@ public class Out extends Unit
     double gain;
     public double getGain() { return gain; }
  
- 	boolean dephase;
+    boolean dephase;
     public boolean getDephase() { return dephase; }
     public void setDephase(boolean val) 
-    	{
-    	if (dephase == val) return;
-    	dephase = val; 
+        {
+        if (dephase == val) return;
+        dephase = val; 
 
-    	if (val == false)  // we have to reset the sound so the positions are back to zero
-    		{
-    		getSound().reset();
-    		}
-    	}
+        if (val == false)  // we have to reset the sound so the positions are back to zero
+            {
+            getSound().resetPartialPhases();
+            }
+        }
     
     double[][] modWave = new double[2][WAVE_SIZE];
     int[] wavePos = new int[] { 0, 0 };
@@ -229,44 +229,44 @@ public class Out extends Unit
         }
 
         
-	public static final int LABEL_MAX_LENGTH = 16;
+    public static final int LABEL_MAX_LENGTH = 16;
 
 
-	public static abstract class OutModulePanel extends ModulePanel
-		{
-		public abstract void updatePatchInfo();
-		public OutModulePanel(Modulation mod) { super(mod); }
-		};
+    public static abstract class OutModulePanel extends ModulePanel
+        {
+        public abstract void updatePatchInfo();
+        public OutModulePanel(Modulation mod) { super(mod); }
+        };
 
     public ModulePanel getPanel()
         {
-		final JLabel _name = new JLabel(" ", SwingConstants.LEFT);
-		final JLabel _author = new JLabel(" ", SwingConstants.LEFT);
-		final JLabel _date = new JLabel(" ", SwingConstants.LEFT);
-		final JLabel _version = new JLabel(" ", SwingConstants.LEFT);
-		final JTextArea _info = new JTextArea(5, LABEL_MAX_LENGTH / 2);
-    	
+        final JLabel _name = new JLabel(" ", SwingConstants.LEFT);
+        final JLabel _author = new JLabel(" ", SwingConstants.LEFT);
+        final JLabel _date = new JLabel(" ", SwingConstants.LEFT);
+        final JLabel _version = new JLabel(" ", SwingConstants.LEFT);
+        final JTextArea _info = new JTextArea(5, LABEL_MAX_LENGTH / 2);
+        
         _name.setFont(Style.SMALL_FONT());
         _author.setFont(Style.SMALL_FONT());
         _date.setFont(Style.SMALL_FONT());
         _version.setFont(Style.SMALL_FONT());
         _info.setFont(Style.SMALL_FONT());
         _info.setLineWrap(true);
-		_info.setWrapStyleWord(true);
+        _info.setWrapStyleWord(true);
         _info.setBorder(null);
         _info.setBackground(_name.getBackground());
         _info.setRows(10);
         _info.setText(" ");
         _info.setHighlighter(null);
-		_info.setEditable(false);
-		_info.setCaretPosition(0);  // scrolls to top
-		
+        _info.setEditable(false);
+        _info.setCaretPosition(0);  // scrolls to top
+                
         final JScrollPane pane = new JScrollPane(_info);
         pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         pane.setBorder(null);
-		pane.getViewport().setBackground(_name.getBackground());
-		pane.getVerticalScrollBar().setBackground(_name.getBackground());
-		pane.getVerticalScrollBar().setOpaque(false);
+        pane.getViewport().setBackground(_name.getBackground());
+        pane.getVerticalScrollBar().setBackground(_name.getBackground());
+        pane.getVerticalScrollBar().setOpaque(false);
 
         // I hate Java's broken closure rules...
         final javax.swing.Timer[] timer = new javax.swing.Timer[1];
@@ -310,106 +310,106 @@ public class Out extends Unit
                 }
                
             public void updatePatchInfo()
-            	{
-            	String t = getRack().getPatchName();
-            	if (t == null || t.trim().equals("")) t = "Untitled";
-            	else t = t.trim();
-				_name.setText(t);
+                {
+                String t = getRack().getPatchName();
+                if (t == null || t.trim().equals("")) t = "Untitled";
+                else t = t.trim();
+                _name.setText(t);
 
-				t = getRack().getPatchAuthor();
-            	if (t == null || t.trim().equals("")) t = "--";
-            	else t = t.trim();
-				_author.setText(t);
+                t = getRack().getPatchAuthor();
+                if (t == null || t.trim().equals("")) t = "--";
+                else t = t.trim();
+                _author.setText(t);
 
-				t = getRack().getPatchVersion();
-            	if (t == null || t.trim().equals("")) t = "--";
-            	else t = t.trim();
-				_version.setText(t);
+                t = getRack().getPatchVersion();
+                if (t == null || t.trim().equals("")) t = "--";
+                else t = t.trim();
+                _version.setText(t);
 
-				t = getRack().getPatchDate();
-            	if (t == null || t.trim().equals("")) t = "--";
-            	else t = t.trim();
-				_date.setText(t);
+                t = getRack().getPatchDate();
+                if (t == null || t.trim().equals("")) t = "--";
+                else t = t.trim();
+                _date.setText(t);
 
-				t = getRack().getPatchInfo();
-            	if (t == null || t.trim().equals("")) t = "--";
-            	else t = t.trim();
-				_info.setText(t);
-				_info.setCaretPosition(0);  // scrolls to top
-				
-				repaint();
-            	}
-            	 
+                t = getRack().getPatchInfo();
+                if (t == null || t.trim().equals("")) t = "--";
+                else t = t.trim();
+                _info.setText(t);
+                _info.setCaretPosition(0);  // scrolls to top
+                                
+                repaint();
+                }
+                 
             public JComponent buildPanel()
-            	{
-            	JComponent left = super.buildPanel();
-            	
-            	Box right = new Box(BoxLayout.Y_AXIS);
-            	
-            	JLabel label = new JLabel("<html><b>Name</b></html>");
-            	label.setFont(Style.SMALL_FONT());
-            	right.add(label);
-            	right.add(_name);
-            	right.add(Strut.makeVerticalStrut(3));
+                {
+                JComponent left = super.buildPanel();
+                
+                Box right = new Box(BoxLayout.Y_AXIS);
+                
+                JLabel label = new JLabel("<html><b>Name</b></html>");
+                label.setFont(Style.SMALL_FONT());
+                right.add(label);
+                right.add(_name);
+                right.add(Strut.makeVerticalStrut(3));
 
-				label = new JLabel("<html><b>Version</b></html>");
-            	label.setFont(Style.SMALL_FONT());            	
-            	right.add(label);
-            	right.add(_version);
-            	right.add(Strut.makeVerticalStrut(3));
+                label = new JLabel("<html><b>Version</b></html>");
+                label.setFont(Style.SMALL_FONT());              
+                right.add(label);
+                right.add(_version);
+                right.add(Strut.makeVerticalStrut(3));
 
-				label = new JLabel("<html><b>Author</b></html>");
-            	label.setFont(Style.SMALL_FONT());            	
-            	right.add(label);
-            	right.add(_author);
-            	right.add(Strut.makeVerticalStrut(3));
+                label = new JLabel("<html><b>Author</b></html>");
+                label.setFont(Style.SMALL_FONT());              
+                right.add(label);
+                right.add(_author);
+                right.add(Strut.makeVerticalStrut(3));
 
-				label = new JLabel("<html><b>Date</b></html>");
-            	label.setFont(Style.SMALL_FONT());            	
-            	right.add(label);
-            	right.add(_date);
-            	right.add(Strut.makeVerticalStrut(3));
+                label = new JLabel("<html><b>Date</b></html>");
+                label.setFont(Style.SMALL_FONT());              
+                right.add(label);
+                right.add(_date);
+                right.add(Strut.makeVerticalStrut(3));
 
-				label = new JLabel("<html><b>Info</b></html>");
-            	label.setFont(Style.SMALL_FONT());            	
-            	right.add(label);
-            	
-            	JPanel p = new JPanel();
-            	p.setLayout(new BorderLayout());
-            	p.add(right, BorderLayout.NORTH);
-            	p.add(pane, BorderLayout.CENTER);
+                label = new JLabel("<html><b>Info</b></html>");
+                label.setFont(Style.SMALL_FONT());              
+                right.add(label);
+                
+                JPanel p = new JPanel();
+                p.setLayout(new BorderLayout());
+                p.add(right, BorderLayout.NORTH);
+                p.add(pane, BorderLayout.CENTER);
 
-    			JPanel pushPanel = new JPanel();
-    			pushPanel.setLayout(new BorderLayout());
-    			
-    			final PushButton _update = new PushButton("Edit")
-    				{
-    				public void perform()
-    					{
-    					getRack().doPatchDialog("Edit Patch Info");
-    					updatePatchInfo();
-    					}
-    				};
-    			pushPanel.add(_update, BorderLayout.WEST);
-    			JComponent comp = flow.gui.Stretch.makeHorizontalStretch();
-    			pushPanel.add(comp, BorderLayout.CENTER);
-    			
-    			p.add(pushPanel, BorderLayout.SOUTH);
-            	
-            	Box box = new Box(BoxLayout.X_AXIS);
-            	box.add(left);
-            	box.add(Strut.makeHorizontalStrut(10));
-            	box.add(p);
+                JPanel pushPanel = new JPanel();
+                pushPanel.setLayout(new BorderLayout());
+                        
+                final PushButton _update = new PushButton("Edit")
+                    {
+                    public void perform()
+                        {
+                        getRack().doPatchDialog("Edit Patch Info");
+                        updatePatchInfo();
+                        }
+                    };
+                pushPanel.add(_update, BorderLayout.WEST);
+                JComponent comp = flow.gui.Stretch.makeHorizontalStretch();
+                pushPanel.add(comp, BorderLayout.CENTER);
+                        
+                p.add(pushPanel, BorderLayout.SOUTH);
+                
+                Box box = new Box(BoxLayout.X_AXIS);
+                box.add(left);
+                box.add(Strut.makeHorizontalStrut(10));
+                box.add(p);
 
-            	return box;
-				}
-				
-			public void setRack(Rack rack)
-				{
-				super.setRack(rack);
-				updatePatchInfo();
-				}
-				
+                return box;
+                }
+                                
+            public void setRack(Rack rack)
+                {
+                super.setRack(rack);
+                updatePatchInfo();
+                }
+                                
             };
             
             
@@ -465,36 +465,36 @@ public class Out extends Unit
         }
         
     public void setData(JSONObject data, int moduleVersion, int patchVersion) 
-    	{
-    	if (data == null)
-    		warn("flow/modules/Out.java", "Empty Data for Out.  That can't be right.  Old patch?");
-    	else
-    		{
-    		JSONArray array = data.getJSONArray("mod");
-    		int num = getNumModulations();
-    		if (num != array.length())
-    			{
-    			warn("flow/modules/Out.java", "Number of modulations in Out (" + num + ") does not match those in the patch (" + array.length() + ")");
-    			if (array.length() < num) num = array.length();
-    			}
-    		for(int i = 0; i < num; i++)
-    			{
-    			setModulationName(i, array.getString(i));
-    			}
-    			
-    		array = data.getJSONArray("unit");    		
-    		num = getNumInputs();
-    		if (num != array.length())
-    			{
-    			warn("flow/modules/Out.java", "Number of unit inputs in Out (" + num + ") does not match those in the patch (" + array.length() + ")");
-    			if (array.length() < num) num = array.length();
-    			}
-    		for(int i = 0; i < num; i++)
-    			{
-    			setInputName(i, array.getString(i));
-    			}
-    		}
-    	}
+        {
+        if (data == null)
+            warn("flow/modules/Out.java", "Empty Data for Out.  That can't be right.  Old patch?");
+        else
+            {
+            JSONArray array = data.getJSONArray("mod");
+            int num = getNumModulations();
+            if (num != array.length())
+                {
+                warn("flow/modules/Out.java", "Number of modulations in Out (" + num + ") does not match those in the patch (" + array.length() + ")");
+                if (array.length() < num) num = array.length();
+                }
+            for(int i = 0; i < num; i++)
+                {
+                setModulationName(i, array.getString(i));
+                }
+                        
+            array = data.getJSONArray("unit");              
+            num = getNumInputs();
+            if (num != array.length())
+                {
+                warn("flow/modules/Out.java", "Number of unit inputs in Out (" + num + ") does not match those in the patch (" + array.length() + ")");
+                if (array.length() < num) num = array.length();
+                }
+            for(int i = 0; i < num; i++)
+                {
+                setInputName(i, array.getString(i));
+                }
+            }
+        }
     
     public JSONObject getData() 
         { 

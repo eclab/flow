@@ -65,7 +65,7 @@ public class Sound
         random = output.getNewRandom();
         output.register(this);
         }
-	
+        
     /** Returns the number of Modulations / Units registered with this Sound.
         This does not include Constants.   */
     public int getChannel() { return channel; }
@@ -185,8 +185,14 @@ public class Sound
         int len = elements.size();
         for(int i = 0; i < len; i++)
             elements.get(i).reset();
-	    output.positions = new double[output.numVoices][Unit.NUM_PARTIALS];
+        resetPartialPhases();
         }
+
+    /** Resets all Modulations / Units to their initial positions. */
+	public void resetPartialPhases()
+		{
+        output.positions = new double[output.numVoices][Unit.NUM_PARTIALS];
+		}
 
     /** Informs all Modulations / Units that a clock reset, or MIDI CLOCK START, occurred. */
     public void restart()

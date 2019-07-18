@@ -108,12 +108,12 @@ public class Display extends JComponent
         addMouseMotionListener(ma);
         }
 
-	BufferedImage buffer = null;
-	boolean waterfall = false;
-	public void setWaterfall(boolean val) { waterfall = val; }
-	public boolean isWaterfall() { return waterfall; }
-	
-	public static final Color COLOR_BEYOND_NYQUIST = new Color(175, 175, 175);
+    BufferedImage buffer = null;
+    boolean waterfall = false;
+    public void setWaterfall(boolean val) { waterfall = val; }
+    public boolean isWaterfall() { return waterfall; }
+        
+    public static final Color COLOR_BEYOND_NYQUIST = new Color(175, 175, 175);
     public static final double DEFAULT_MAX_FREQUENCY = 150;
     public static final double DEFAULT_MIN_FREQUENCY = 1.0 / 16.0;
     public static final double DEFAULT_MAX_AMPLITUDE = 1.0;
@@ -163,64 +163,64 @@ public class Display extends JComponent
         }
         
         
-	 double invNormalizedFrequency(double nFrequency, double fundamental)
-    	{
+    double invNormalizedFrequency(double nFrequency, double fundamental)
+        {
         if (logFrequency)
-        	{
-        	return Math.exp(nFrequency - fundamental);
-        	}
+            {
+            return Math.exp(nFrequency - fundamental);
+            }
         else
-        	{
-        	return (nFrequency - fundamental) + 1;
-        	}
-    	}
+            {
+            return (nFrequency - fundamental) + 1;
+            }
+        }
 
     double normalizedFrequency(double frequency, double fundamental)
-    	{
-		return fundamental + (logFrequency ? Math.log(frequency) : frequency - 1.0);
-    	}
+        {
+        return fundamental + (logFrequency ? Math.log(frequency) : frequency - 1.0);
+        }
     
     public Graphics2D prepareBuffer()
-    	{
-    	if (buffer == null || buffer.getWidth() != getWidth() || buffer.getHeight() != getHeight())
-    		{
-    		// prep a new buffer
-    		buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
-    		Graphics2D g = (Graphics2D)(buffer.getGraphics());
-    		g.setColor(Color.BLACK);
-    		g.fillRect(0, 0, buffer.getWidth(), buffer.getHeight());
-    		}
-    	
-    	BufferedImage old = buffer;
-    	buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
-    	Graphics2D g = (Graphics2D)(buffer.getGraphics());
-    	g.drawImage(old, 0, -1, null);
-    	
-    	return g;
-    	}
+        {
+        if (buffer == null || buffer.getWidth() != getWidth() || buffer.getHeight() != getHeight())
+            {
+            // prep a new buffer
+            buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = (Graphics2D)(buffer.getGraphics());
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, buffer.getWidth(), buffer.getHeight());
+            }
+        
+        BufferedImage old = buffer;
+        buffer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = (Graphics2D)(buffer.getGraphics());
+        g.drawImage(old, 0, -1, null);
+        
+        return g;
+        }
     
     public static Color[] colors;
     public static final int NUM_COLORS = 256;
-    	
-	public Color getColorForAmplitude(double amplitude)
-		{
-		if (colors == null)
-			{
-			colors = new Color[NUM_COLORS];
-			for(int i = 0; i < NUM_COLORS; i++)
-				colors[i] = new Color(i, i, i);
-			}
-		amplitude = Math.log(1.0 + amplitude) * (1.0 / 0.6931471805599453);  // so amplitude = 2.0 goes to 1.0
+        
+    public Color getColorForAmplitude(double amplitude)
+        {
+        if (colors == null)
+            {
+            colors = new Color[NUM_COLORS];
+            for(int i = 0; i < NUM_COLORS; i++)
+                colors[i] = new Color(i, i, i);
+            }
+        amplitude = Math.log(1.0 + amplitude) * (1.0 / 0.6931471805599453);  // so amplitude = 2.0 goes to 1.0
 
-		if (amplitude > 1.0) amplitude = 1.0;
-		if (amplitude < 0.0) amplitude = 0.0;
-		
-		amplitude = 1 - amplitude;
-		amplitude = amplitude * amplitude * amplitude * amplitude * amplitude;
-		amplitude = 1 - amplitude;
-		
-		return colors[(int) (Math.min(amplitude * NUM_COLORS, 255))];
-		}
+        if (amplitude > 1.0) amplitude = 1.0;
+        if (amplitude < 0.0) amplitude = 0.0;
+                
+        amplitude = 1 - amplitude;
+        amplitude = amplitude * amplitude * amplitude * amplitude * amplitude;
+        amplitude = 1 - amplitude;
+                
+        return colors[(int) (Math.min(amplitude * NUM_COLORS, 255))];
+        }
 
     public void paintComponent(Graphics graphics)
         {
@@ -287,22 +287,22 @@ public class Display extends JComponent
         double max = maxFrequency;
         double min = minFrequency;
         if (boundPartials)
-        	{
-        	min = frequencies[0];
-        	max = frequencies[frequencies.length - 1];
-        	boundMin = min;
-        	boundMax = max;
-        	}
-		if (max < min) { double temp = max; max = min; min = temp; }
-		if (max == min) max = max + 1.0;
+            {
+            min = frequencies[0];
+            max = frequencies[frequencies.length - 1];
+            boundMin = min;
+            boundMax = max;
+            }
+        if (max < min) { double temp = max; max = min; min = temp; }
+        if (max == min) max = max + 1.0;
         double fundamental = 1.0 / max;
         double range = max - min;
         if (logFrequency)
-        	{
-        	double m = Math.abs(Math.log(min));
-        	range = Math.abs(Math.log(max)) + m;
-        	fundamental = m;  // this is the zero point
-        	} 
+            {
+            double m = Math.abs(Math.log(min));
+            range = Math.abs(Math.log(max)) + m;
+            fundamental = m;  // this is the zero point
+            } 
                     
         double nyquist = (Output.SAMPLING_RATE / 2.0) / pitch;
         
@@ -323,81 +323,81 @@ public class Display extends JComponent
             }
             
         if (!waterfall)
-        	{
-        	buffer = null;
-        	
-			g.setColor(DARK_BLUE);
-			double xx = (width - BORDER * 2) / range * normalizedFrequency(nyquist, fundamental) + BORDER;
-			g.draw(new Line2D.Double(xx, height, xx, 0));
-				
-			g.setColor(DARK_GREEN);
-			xx = (width - BORDER * 2) / range * normalizedFrequency(1.0, fundamental) + BORDER;
-			g.draw(new Line2D.Double(xx, height, xx, 0));
+            {
+            buffer = null;
+                
+            g.setColor(DARK_BLUE);
+            double xx = (width - BORDER * 2) / range * normalizedFrequency(nyquist, fundamental) + BORDER;
+            g.draw(new Line2D.Double(xx, height, xx, 0));
+                                
+            g.setColor(DARK_GREEN);
+            xx = (width - BORDER * 2) / range * normalizedFrequency(1.0, fundamental) + BORDER;
+            g.draw(new Line2D.Double(xx, height, xx, 0));
 
-			prepareColorsForPartials();
-			for(int i = 0; i < frequencies.length; i++)
-				{
-				double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) + BORDER;
-				double y = (height - BORDER * 2) / maxAmplitude * amplitudes[i];
-						
-				if (x >= 0 && x <= width)
-					{
-					g.setColor(closestPartial == i ? Color.ORANGE : 
-								(frequencies[i] > nyquist ? COLOR_BEYOND_NYQUIST : 
-									getColorForPartial(i, amplitudes[i])));
-					g.draw(new Line2D.Double(x, height - BORDER, x, height - BORDER - y));
-					}
-				}
-			}
-		else
-			{
-			Graphics2D gb = null;
-			if (timesup)
-				{
-				gb = prepareBuffer();
-				}
+            prepareColorsForPartials();
+            for(int i = 0; i < frequencies.length; i++)
+                {
+                double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) + BORDER;
+                double y = (height - BORDER * 2) / maxAmplitude * amplitudes[i];
+                                                
+                if (x >= 0 && x <= width)
+                    {
+                    g.setColor(closestPartial == i ? Color.ORANGE : 
+                            (frequencies[i] > nyquist ? COLOR_BEYOND_NYQUIST : 
+                            getColorForPartial(i, amplitudes[i])));
+                    g.draw(new Line2D.Double(x, height - BORDER, x, height - BORDER - y));
+                    }
+                }
+            }
+        else
+            {
+            Graphics2D gb = null;
+            if (timesup)
+                {
+                gb = prepareBuffer();
+                }
 
-			double closestX = -1;
-			for(int i = 0; i < frequencies.length; i++)
-				{
-				double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) + BORDER;
-				double y = (height - BORDER * 2) / maxAmplitude * amplitudes[i];
-					
-				if (x >= 0 && x <= width)
-					{
-					if (closestPartial == i)
-						{
-						closestX = x;
-						}
-					
-					if (timesup)
-						{
-						gb.setColor(frequencies[i] > nyquist ? Color.BLACK : getColorForAmplitude(amplitudes[i]));
-						gb.draw(new Line2D.Double(x, height - 1, x, height - 2));
-						}
-					}
-				}
-				
-			timesup = false;
-				
-			if (buffer != null)
-				g.drawImage(buffer, 0, 0, width, height, null);
+            double closestX = -1;
+            for(int i = 0; i < frequencies.length; i++)
+                {
+                double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) + BORDER;
+                double y = (height - BORDER * 2) / maxAmplitude * amplitudes[i];
+                                        
+                if (x >= 0 && x <= width)
+                    {
+                    if (closestPartial == i)
+                        {
+                        closestX = x;
+                        }
+                                        
+                    if (timesup)
+                        {
+                        gb.setColor(frequencies[i] > nyquist ? Color.BLACK : getColorForAmplitude(amplitudes[i]));
+                        gb.draw(new Line2D.Double(x, height - 1, x, height - 2));
+                        }
+                    }
+                }
+                                
+            timesup = false;
+                                
+            if (buffer != null)
+                g.drawImage(buffer, 0, 0, width, height, null);
 
-			if (closestX != -1)
-				{
-				g.setColor(Color.ORANGE);
-				g.draw(new Line2D.Double(closestX, height, closestX, 0));
-				}
-							
-			g.setColor(DARK_BLUE);
-			double xx = (width - BORDER * 2) / range * normalizedFrequency(nyquist, fundamental) + BORDER;
-			g.draw(new Line2D.Double(xx, height, xx, 0));
-				
-			g.setColor(DARK_GREEN);
-			xx = (width - BORDER * 2) / range * normalizedFrequency(1.0, fundamental) + BORDER;
-			g.draw(new Line2D.Double(xx, height, xx, 0));
+            if (closestX != -1)
+                {
+                g.setColor(Color.ORANGE);
+                g.draw(new Line2D.Double(closestX, height, closestX, 0));
+                }
+                                                        
+            g.setColor(DARK_BLUE);
+            double xx = (width - BORDER * 2) / range * normalizedFrequency(nyquist, fundamental) + BORDER;
+            g.draw(new Line2D.Double(xx, height, xx, 0));
+                                
+            g.setColor(DARK_GREEN);
+            xx = (width - BORDER * 2) / range * normalizedFrequency(1.0, fundamental) + BORDER;
+            g.draw(new Line2D.Double(xx, height, xx, 0));
 
-			}
+            }
         
         String text = null;
         if (lastPitch != -1 && closestPartial != -1)
@@ -476,18 +476,18 @@ public class Display extends JComponent
  
                     frequencies = unit.getFrequencies(0);
                                                         
-					// what's the closest partial?  Not sure if binary search is useful here
-					// since we only have 256 or so partials, so we just do an O(n) scan
+                    // what's the closest partial?  Not sure if binary search is useful here
+                    // since we only have 256 or so partials, so we just do an O(n) scan
 
-					for(int i = 0; i < frequencies.length - 1; i++)
-						{
-						if (x >= frequencies[i] && x <= frequencies[i + 1])
-							{
-							if (Math.abs(x - frequencies[i]) < Math.abs(x - frequencies[i + 1]))
-								{ updatePartial(i, y, continuation); break; }
-							else { updatePartial(i + 1, y, continuation); break; }
-							}
-						}
+                    for(int i = 0; i < frequencies.length - 1; i++)
+                        {
+                        if (x >= frequencies[i] && x <= frequencies[i + 1])
+                            {
+                            if (Math.abs(x - frequencies[i]) < Math.abs(x - frequencies[i + 1]))
+                                { updatePartial(i, y, continuation); break; }
+                            else { updatePartial(i + 1, y, continuation); break; }
+                            }
+                        }
                     }
                 }
             updatePitch(e); 
@@ -503,27 +503,27 @@ public class Display extends JComponent
         {
         double d = (x - BORDER) / (getWidth() - BORDER * 2);
 
-		double max = maxFrequency;
-		double min = minFrequency;
+        double max = maxFrequency;
+        double min = minFrequency;
 
         if (boundPartials)
-        	{
-        	min = boundMin;
-        	max = boundMax;
-        	}
+            {
+            min = boundMin;
+            max = boundMax;
+            }
 
-		if (max < min) { double temp = max; max = min; min = temp; }
-		if (max == min) max = max + 1.0;
+        if (max < min) { double temp = max; max = min; min = temp; }
+        if (max == min) max = max + 1.0;
         double fundamental = 1.0 / max;
         double range = max - min;
         if (logFrequency)
-        	{
-        	double m = Math.abs(Math.log(min));
-        	range = Math.abs(Math.log(max)) + m;
-        	fundamental = m;  // this is the zero point
-        	} 
+            {
+            double m = Math.abs(Math.log(min));
+            range = Math.abs(Math.log(max)) + m;
+            fundamental = m;  // this is the zero point
+            } 
 
-		return invNormalizedFrequency(d * range, fundamental);
+        return invNormalizedFrequency(d * range, fundamental);
         }
         
     // Returns the amplitude associated with a y coordinate

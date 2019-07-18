@@ -219,9 +219,9 @@ public class Macro extends Unit implements Cloneable
         }
         
     public Macro(Sound sound)
-    	{
-    	super(sound);
-    	}
+        {
+        super(sound);
+        }
                 
     public void loadModules(Modulation[] modules, String patchName)
         {
@@ -229,9 +229,9 @@ public class Macro extends Unit implements Cloneable
         this.patchName  = patchName;
         
         for(int m = 0; m < modules.length; m++)
-        	{
-        	modules[m].setMacro(this);
-        	}
+            {
+            modules[m].setMacro(this);
+            }
         
         // find the last Out
         for(int m = modules.length - 1; m >= 0; m--)
@@ -353,10 +353,10 @@ public class Macro extends Unit implements Cloneable
     
     public static Macro loadMacro(Sound sound, File file) throws Exception
         {
-		JSONObject obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
-		return new Macro(sound, 
-			Sound.loadModules(obj, Sound.loadFlowVersion(obj)), 
-			Sound.loadName(obj));
+        JSONObject obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
+        return new Macro(sound, 
+            Sound.loadModules(obj, Sound.loadFlowVersion(obj)), 
+            Sound.loadName(obj));
         }
         
     public ModulePanel getPanel()

@@ -269,26 +269,26 @@ public class AmpMath extends Unit
                 }
             break;
             /*
-            case REMOVE:
-                {
-                int remove = (int)Math.floor(modulation * 127);
-                int x = 0;
+              case REMOVE:
+              {
+              int remove = (int)Math.floor(modulation * 127);
+              int x = 0;
                 
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    if (x > 0 && x - 1 < remove)
-                    	{
-	                    amplitudes[i] = inputs1amplitudes[i];
-	                    }
-	                else
-	                	{
-	                	amplitudes[i] = inputs0amplitudes[i];
-	                	}
-	                x++;
-	                if (x >= remove) x = 0;
-                    }
-                }
-            break;
+              for(int i = 0; i < amplitudes.length; i++)
+              {
+              if (x > 0 && x - 1 < remove)
+              {
+              amplitudes[i] = inputs1amplitudes[i];
+              }
+              else
+              {
+              amplitudes[i] = inputs0amplitudes[i];
+              }
+              x++;
+              if (x >= remove) x = 0;
+              }
+              }
+              break;
             */
             }
                         

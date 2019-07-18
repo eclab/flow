@@ -82,39 +82,39 @@ public class Mix extends Unit
         double gain2 = modulate(MOD_GAIN_B);
         double gain3 = modulate(MOD_GAIN_C);
         double gain4 = modulate(MOD_GAIN_D);
-		
-		if (gain1 > 0)
-	        pushFrequencies(0);
-	    else if (gain2 > 0)
-	    	pushFrequencies(1);
-	    else if (gain3 > 0)
-	    	pushFrequencies(2);
-	    else if (gain4 > 0)
-	    	pushFrequencies(3);
-	    else
-	    	pushFrequencies(0);
+                
+        if (gain1 > 0)
+            pushFrequencies(0);
+        else if (gain2 > 0)
+            pushFrequencies(1);
+        else if (gain3 > 0)
+            pushFrequencies(2);
+        else if (gain4 > 0)
+            pushFrequencies(3);
+        else
+            pushFrequencies(0);
 
         if (mixType == MIX_TYPE_SUM)
-        	{                     
-			for(int i = 0; i < amplitudes.length; i++)
-				{
-				amplitudes[i] = gain1 * amp1[i] + gain2 * amp2[i] + gain3 * amp3[i] + gain4 * amp4[i];
-				}
-			}
-		else	// MIX_TYPE_MAX
-			{
-			for(int i = 0; i < amplitudes.length; i++)
-				{
-				double d = gain1 * amp1[i];
-				double e = gain2 * amp2[i];
-				if (e > d) d = e;
-				e = gain3 * amp3[i];
-				if (e > d) d = e;
-				e = gain4 * amp4[i];
-				if (e > d) d = e;
-				amplitudes[i] = d;
-				}
-			}
+            {                     
+            for(int i = 0; i < amplitudes.length; i++)
+                {
+                amplitudes[i] = gain1 * amp1[i] + gain2 * amp2[i] + gain3 * amp3[i] + gain4 * amp4[i];
+                }
+            }
+        else    // MIX_TYPE_MAX
+            {
+            for(int i = 0; i < amplitudes.length; i++)
+                {
+                double d = gain1 * amp1[i];
+                double e = gain2 * amp2[i];
+                if (e > d) d = e;
+                e = gain3 * amp3[i];
+                if (e > d) d = e;
+                e = gain4 * amp4[i];
+                if (e > d) d = e;
+                amplitudes[i] = d;
+                }
+            }
                         
         constrain();
         }

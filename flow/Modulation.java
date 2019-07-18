@@ -79,15 +79,15 @@ public abstract class Modulation implements Cloneable
     {
     private static final long serialVersionUID = 1;
 
-	/** The Modulation's macro backpointer.  This is is null if the Modulation is not under a Macro. */
-	protected Macro macro = null;
-	public Macro getMacro() { return macro; }
-	public void setMacro(Macro macro) { this.macro = macro; }	
+    /** The Modulation's macro backpointer.  This is is null if the Modulation is not under a Macro. */
+    protected Macro macro = null;
+    public Macro getMacro() { return macro; }
+    public void setMacro(Macro macro) { this.macro = macro; }       
 
-	/** The Modulation's modulation panel backpointer.  This is is null if the Modulation is not associated with a modulation panel (typically because it's not part of Sound 0). */
-	protected ModulePanel modPanel = null;
-	public ModulePanel getModulePanel() { return modPanel; }
-	public void setModulePanel(ModulePanel modPanel) { this.modPanel = modPanel; }	
+    /** The Modulation's modulation panel backpointer.  This is is null if the Modulation is not associated with a modulation panel (typically because it's not part of Sound 0). */
+    protected ModulePanel modPanel = null;
+    public ModulePanel getModulePanel() { return modPanel; }
+    public void setModulePanel(ModulePanel modPanel) { this.modPanel = modPanel; }  
 
     /** The Modulation's sound backpointer. */
     protected Sound sound;
@@ -202,7 +202,7 @@ public abstract class Modulation implements Cloneable
     public String[] getOptionValues(int option) { return optionValues[option]; }
         
     /** Override this to provide tooltips for options.  This array by default is null. 
-    	If any given String is null or empty, no tooltip is generated for it.  */
+        If any given String is null or empty, no tooltip is generated for it.  */
     public String[] getOptionHelp() { return null; }
         
         
@@ -372,9 +372,9 @@ public abstract class Modulation implements Cloneable
     public final double modulate(int index)
         {
 /*
-        double d = modulations[index].getModulationOutput(modulationIndexes[index]);
-        testDenormals(d, "" + this);
-        return d;
+  double d = modulations[index].getModulationOutput(modulationIndexes[index]);
+  testDenormals(d, "" + this);
+  return d;
 */
         return modulations[index].getModulationOutput(modulationIndexes[index]);
         }
@@ -398,7 +398,7 @@ public abstract class Modulation implements Cloneable
         }
         
     /** Override this to provide tooltips for modulation inputs.  This array by default is null. 
-    	If any given String is null or empty, no tooltip is generated for it.  */
+        If any given String is null or empty, no tooltip is generated for it.  */
     public String[] getModulationHelp() { return null; }
 
 
@@ -606,7 +606,7 @@ public abstract class Modulation implements Cloneable
     public int getNumModulationOutputs() { return modulationOutputNames.length; }
 
     /** Override this to provide tooltips for modulation outputs.  This array by default is null. 
-    	If any given String is null or empty, no tooltip is generated for it.  */
+        If any given String is null or empty, no tooltip is generated for it.  */
     public String[] getModulationOutputHelp() { return null; }
 
     // Resets all output port modulation triggers
@@ -700,22 +700,22 @@ public abstract class Modulation implements Cloneable
             return (s == sound);
         }
 
-	/** For debugging... */
-	protected void print(String str)
-		{
-		if (isFirstSound()) System.err.println(str);
-		}
+    /** For debugging... */
+    protected void print(String str)
+        {
+        if (isFirstSound()) System.err.println(str);
+        }
 
-   protected void warn(String where, String what)
-   		{
-   		print("WARNING (" + where + "): " + what);
-   		}
+    protected void warn(String where, String what)
+        {
+        print("WARNING (" + where + "): " + what);
+        }
 
-   protected void warnAlways(String where, String what)
-   		{
-   		System.err.println("WARNING (" + where + "): " + what);
-   		}
-   	         
+    protected void warnAlways(String where, String what)
+        {
+        System.err.println("WARNING (" + where + "): " + what);
+        }
+                 
     /** Returns the ModulePanel associated with this Modulation.  Use the default here, or override this to create your own ModulePanel. */
     public ModulePanel getPanel()
         {
@@ -724,25 +724,25 @@ public abstract class Modulation implements Cloneable
         
     public static final int MAX_TOOL_TIP_WIDTH = 400;
     public String[] wrapHelp(String[] help)
-    	{
-    	if (help == null) return null;
-    	String[] newHelp = new String[help.length];
-    	JToolTip tip = new JToolTip();
-    	for(int i = 0; i < help.length; i++)
-    		{
-    		if (help[i] != null)
-    			{
-    			tip.setTipText(help[i]);
-    			int width = (int)(tip.getPreferredSize().getWidth());
-    			if (width > MAX_TOOL_TIP_WIDTH)
-    				newHelp[i] = "<html><p width=" + MAX_TOOL_TIP_WIDTH + ">" +
-    					help[i] + "</p></html>";
-    			else
-    				newHelp[i] = help[i];
-    			}
-    		}
-    	return newHelp;
-    	}
+        {
+        if (help == null) return null;
+        String[] newHelp = new String[help.length];
+        JToolTip tip = new JToolTip();
+        for(int i = 0; i < help.length; i++)
+            {
+            if (help[i] != null)
+                {
+                tip.setTipText(help[i]);
+                int width = (int)(tip.getPreferredSize().getWidth());
+                if (width > MAX_TOOL_TIP_WIDTH)
+                    newHelp[i] = "<html><p width=" + MAX_TOOL_TIP_WIDTH + ">" +
+                        help[i] + "</p></html>";
+                else
+                    newHelp[i] = help[i];
+                }
+            }
+        return newHelp;
+        }
     
     /** Print some statistics regarding triggers and modulations. */
     public void printStats()
@@ -937,21 +937,21 @@ public abstract class Modulation implements Cloneable
                 if (m == null)
                     {
                     // probably a Macro
-                	setModulation(new Constant(0), i);
+                    setModulation(new Constant(0), i);
                     }
                 else
                     {
                     Modulation mod = ids.get(m.getString("id"));
                     if (mod != null)
-                    	{
-                    	int modOutput = mod.getModulationOutputForKey(m.getString("at"));
-                    	if (modOutput >= 0 && modOutput < mod.getNumModulationOutputs())
-                    		{
-		                    setModulation(mod, i, modOutput);
-		                    }
-		            	else warn("Modulation.java", "invalid mod output (" + modOutput + ") for id " + id + " in " + this);
-		                }
-		            else warn("Modulation.java", "no modulation for id " + id + " in " + this);
+                        {
+                        int modOutput = mod.getModulationOutputForKey(m.getString("at"));
+                        if (modOutput >= 0 && modOutput < mod.getNumModulationOutputs())
+                            {
+                            setModulation(mod, i, modOutput);
+                            }
+                        else warn("Modulation.java", "invalid mod output (" + modOutput + ") for id " + id + " in " + this);
+                        }
+                    else warn("Modulation.java", "no modulation for id " + id + " in " + this);
                     }
                 }
             }
@@ -976,8 +976,8 @@ public abstract class Modulation implements Cloneable
         }
 
     public void testDenormals(double val, String s)
-    	{
- 					if (val > 0 && val <= 2250738585072012e-308)
-						System.err.println(s + " is DENORMAL " + val);
-    	}
+        {
+        if (val > 0 && val <= 2250738585072012e-308)
+            System.err.println(s + " is DENORMAL " + val);
+        }
     }

@@ -160,9 +160,9 @@ public class AHR extends Modulation implements ModSource
         defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ONE, Constant.ZERO, Constant.HALF, Constant.ZERO, Constant.ZERO }, 
             new String[] { "Start Level", "Attack Time", "Attack Level", "Hold Time",  "Release Time", "On Tr", "Off Tr" });
         defineOptions(new String[] { "Attack Curve", "Release Curve", "One Shot",  "MIDI Sync", "Ramp" }, 
-        	new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" } , 
-        					{ "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" }, 
-        	{ "One Shot" }, { "Gate Reset" }, { "MIDI Sync" } } );
+            new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" } , 
+                { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" }, 
+                { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" } } );
         this.oneshot = false;
         setModulationOutput(0, 0);  
         }
@@ -203,21 +203,21 @@ public class AHR extends Modulation implements ModSource
         if (oneshot) return;
         
         if (ramp)
-        	{
-	        state = HOLD;
-	        start = getSyncTick(sync);
-	        interval = toTicks(time[HOLD]);
-	        level[ATTACK] = level[HOLD] = getModulationOutput(0);  // so we decrease from there during release
+            {
+            state = HOLD;
+            start = getSyncTick(sync);
+            interval = toTicks(time[HOLD]);
+            level[ATTACK] = level[HOLD] = getModulationOutput(0);  // so we decrease from there during release
             updateTrigger(0);
-        	}
+            }
         else
-        	{
-	        state = RELEASE;
-	        start = getSyncTick(sync);
-	        interval = toTicks(time[RELEASE]);
-	        level[HOLD] = getModulationOutput(0);  // so we decrease from there during release
+            {
+            state = RELEASE;
+            start = getSyncTick(sync);
+            interval = toTicks(time[RELEASE]);
+            level[HOLD] = getModulationOutput(0);  // so we decrease from there during release
             updateTrigger(0);
-	        }
+            }
         }
     
     public double toTicks(double mod)
@@ -253,29 +253,29 @@ public class AHR extends Modulation implements ModSource
             }
     
         // Do we need to transition to a new state?
-		while (tick >= start + interval)
-			{
-			if (ramp && state == HOLD)
-				{
-				// don't transition
-				setModulationOutput(0, level[HOLD]);
-				return;
-				}
-				
-			state++;
-			updateTrigger(0);
-		
-			// try sticky again
-			if (state == DONE)
-				{
-				setModulationOutput(0, level[DONE]);
-				return;
-				}
+        while (tick >= start + interval)
+            {
+            if (ramp && state == HOLD)
+                {
+                // don't transition
+                setModulationOutput(0, level[HOLD]);
+                return;
+                }
+                                
+            state++;
+            updateTrigger(0);
+                
+            // try sticky again
+            if (state == DONE)
+                {
+                setModulationOutput(0, level[DONE]);
+                return;
+                }
 
-			// update the state
-			start = start + interval;
-			interval = toTicks(time[state]);
-			}
+            // update the state
+            start = start + interval;
+            interval = toTicks(time[state]);
+            }
   
         // Where are we in the state?  We compute only for delay, attack, decay, and release
         
@@ -285,12 +285,12 @@ public class AHR extends Modulation implements ModSource
 
         double alpha = (tick - start) / interval;
 
-		int c = CURVE_LINEAR;
-		
-		if (state == ATTACK)
-			c = attackCurve;
-		else if (state == RELEASE)
-			c = releaseCurve;
+        int c = CURVE_LINEAR;
+                
+        if (state == ATTACK)
+            c = attackCurve;
+        else if (state == RELEASE)
+            c = releaseCurve;
 
         switch(c)
             {
@@ -410,46 +410,46 @@ public class AHR extends Modulation implements ModSource
         }
 
     public String[] getOptionHelp() 
-    	{ 
-    	return new String[]
-    		{ 
-    		"Function for rate of attack, ranging from a straight line (linear) to very extreme (x^32).  x^4 is close to exponential tradition.  Step is no change at all until the very end, then a sudden jump.",
-    		"Function for rate of release, ranging from a straight line (linear) to very extreme (x^32).  x^4 is close to exponential tradition.  Step is no change at all until the very end, then a sudden jump.",
-    		"Envelope ignores note-off, and continues on its own.",
-    		"Envelope time is synced to MIDI clock.  Double-click on a time dial and MIDI note speeds will appear.",
-    		"Envelope ignores hold and release time: it just goes from start level to attack level, then holds there.",
-			};
-		}
+        { 
+        return new String[]
+            { 
+            "Function for rate of attack, ranging from a straight line (linear) to very extreme (x^32).  x^4 is close to exponential tradition.  Step is no change at all until the very end, then a sudden jump.",
+            "Function for rate of release, ranging from a straight line (linear) to very extreme (x^32).  x^4 is close to exponential tradition.  Step is no change at all until the very end, then a sudden jump.",
+            "Envelope ignores note-off, and continues on its own.",
+            "Envelope time is synced to MIDI clock.  Double-click on a time dial and MIDI note speeds will appear.",
+            "Envelope ignores hold and release time: it just goes from start level to attack level, then holds there.",
+            };
+        }
 
     public String[] getModulationHelp() 
-    	{ 
-    	return new String[]
-    		{ 
-    		"Level for starting or ending the envelope.  If Ramping, then this is just the level for starting the envelope.",
-    		"Time to reach the attack level",
-    		"Attack level value.  If a release occurs early, this value may never be reached.",
-    		"Time to hold at the attack level after reaching it",
-    		"Time to release to back to the start level",
-    		"Alternative trigger for (re)starting the envelope.  If nothing is connected here, the envelope is triggered by a NOTE ON.  If connected, then a NOTE ON does nothing.",
-    		"Alternative trigger for releasing the envelope.  If nothing is connected here, the release is triggered by a NOTE OFF.  If connected, then a NOTE OFF does nothing.",
-			};
-		}
+        { 
+        return new String[]
+            { 
+            "Level for starting or ending the envelope.  If Ramping, then this is just the level for starting the envelope.",
+            "Time to reach the attack level",
+            "Attack level value.  If a release occurs early, this value may never be reached.",
+            "Time to hold at the attack level after reaching it",
+            "Time to release to back to the start level",
+            "Alternative trigger for (re)starting the envelope.  If nothing is connected here, the envelope is triggered by a NOTE ON.  If connected, then a NOTE ON does nothing.",
+            "Alternative trigger for releasing the envelope.  If nothing is connected here, the release is triggered by a NOTE OFF.  If connected, then a NOTE OFF does nothing.",
+            };
+        }
 
     public String[] getModulationOutputHelp() 
-    	{ 
-    	return new String[]
-    		{ 
-    		"Current AHR value.",
-			};
-		}
+        { 
+        return new String[]
+            { 
+            "Current AHR value.",
+            };
+        }
 
     public String[] getUnitInputHelp() 
-    	{
-    	return null; 
-    	}
+        {
+        return null; 
+        }
 
     public String[] getUnitOutputHelp() 
-    	{ 
-    	return null;
-		}
+        { 
+        return null;
+        }
     }

@@ -76,24 +76,24 @@ public class Draw extends Unit implements UnitSource
     public boolean isConstrainable() { return false; }
     
     public void takeSnapshot()
-    	{
-		copyFrequencies(0);
-		copyAmplitudes(0);
-    	}
+        {
+        copyFrequencies(0);
+        copyAmplitudes(0);
+        }
             
     public void restoreFromBackup()
-    	{
-		double[] amplitudes = getAmplitudes(0);
-		double[] frequencies = getFrequencies(0);
-		double[] tempAmp = new double[amplitudes.length];
-		double[] tempFreq = new double[frequencies.length];
-		System.arraycopy(amplitudes, 0, tempAmp, 0, tempAmp.length);
-		System.arraycopy(frequencies, 0, tempFreq, 0, tempFreq.length);
-		System.arraycopy(backupAmplitudes, 0, amplitudes, 0, amplitudes.length);
-		System.arraycopy(backupFrequencies, 0, frequencies, 0, frequencies.length);
-		backupFrequencies = tempFreq;
-		backupAmplitudes = tempAmp;
-		}
+        {
+        double[] amplitudes = getAmplitudes(0);
+        double[] frequencies = getFrequencies(0);
+        double[] tempAmp = new double[amplitudes.length];
+        double[] tempFreq = new double[frequencies.length];
+        System.arraycopy(amplitudes, 0, tempAmp, 0, tempAmp.length);
+        System.arraycopy(frequencies, 0, tempFreq, 0, tempFreq.length);
+        System.arraycopy(backupAmplitudes, 0, amplitudes, 0, amplitudes.length);
+        System.arraycopy(backupFrequencies, 0, frequencies, 0, frequencies.length);
+        backupFrequencies = tempFreq;
+        backupAmplitudes = tempAmp;
+        }
 
     void distributeToAllSounds()
         {
@@ -205,8 +205,8 @@ public class Draw extends Unit implements UnitSource
                 {
                 try
                     {
-                     Draw draw = (Draw)(getModulation());
-                   Scanner scanner = new Scanner(file, "US-ASCII");
+                    Draw draw = (Draw)(getModulation());
+                    Scanner scanner = new Scanner(file, "US-ASCII");
                     getRack().getOutput().lock();
                     try
                         {
@@ -305,7 +305,7 @@ public class Draw extends Unit implements UnitSource
                                     if (backupFrequencies != null)
                                         {
                                         draw.restoreFromBackup();
-	                                    draw.distributeToAllSounds();
+                                        draw.distributeToAllSounds();
                                         }
                                     }
                                 finally 
@@ -322,7 +322,7 @@ public class Draw extends Unit implements UnitSource
                                     draw.backup();
                                     draw.takeSnapshot();  // this doesn't distribute right now; we'll do it later
                                     draw.distributeToAllSounds();
-                                   }
+                                    }
                                 finally 
                                     {
                                     getRack().getOutput().unlock();
@@ -411,10 +411,10 @@ public class Draw extends Unit implements UnitSource
                                 break;
                                 }
                             default:
-                            	{
-                            	warn("modules/Draw.java", "default occured when it shouldn't be possible");
-                            	break;
-                            	}
+                                {
+                                warn("modules/Draw.java", "default occured when it shouldn't be possible");
+                                break;
+                                }
                             }
                         }
                     };

@@ -1,10 +1,10 @@
 package flow.utilities;
 
 /**
-	Freeverb
-	
-	<p>This is (I believe) a Faust-generated Java implementation of Freeverb (google for info on it),
-	released as BSD.  I've made some simplifying tweaks.
+   Freeverb
+        
+   <p>This is (I believe) a Faust-generated Java implementation of Freeverb (google for info on it),
+   released as BSD.  I've made some simplifying tweaks.
 
 //-----------------------------------------------------
 // name: "freeverb"
@@ -15,20 +15,20 @@ package flow.utilities;
 //
 // Code generated with Faust 0.9.9.5b2 (http://faust.grame.fr)
 //-----------------------------------------------------
-	
-	<p>Original source of code:  https://raw.githubusercontent.com/kmatheussen/soundengine/master/FreeVerb.java
-	
-	
+        
+<p>Original source of code:  https://raw.githubusercontent.com/kmatheussen/soundengine/master/FreeVerb.java
+        
+        
 **/
 
 public class FreeVerb {
-	
-	public float getWet() { return wet; }
-	public void setWet(float val) { wet = val; }
-	public float getDamp() { return damp; }
-	public void setDamp(float val) { damp = val; }
-	public float getRoomSize() { return roomSize; }
-	public void setRoomSize(float val) { roomSize = val; } 
+        
+    public float getWet() { return wet; }
+    public void setWet(float val) { wet = val; }
+    public float getDamp() { return damp; }
+    public void setDamp(float val) { damp = val; }
+    public float getRoomSize() { return roomSize; }
+    public void setRoomSize(float val) { roomSize = val; } 
 
     float   damp;
     float   fRec9_0;
@@ -145,11 +145,11 @@ public class FreeVerb {
         roomSize = 0.5f;
         IOTA = 0;
         wet = 0.3333f;
-    }
+        }
 
 
-	/** This is the number of samples to read and write, with two channels. */
-	
+    /** This is the number of samples to read and write, with two channels. */
+        
     public void compute (int count, float[][] input, float[][] output) {
         float   fSlow0 = (0.4f * damp);
         float   fSlow1 = (1 - fSlow0);
@@ -165,7 +165,7 @@ public class FreeVerb {
             float fTemp0 = input1[i];
             float fTemp1 = input0[i];
             float fTemp2 = (1.500000e-02f * (fTemp1 + fTemp0));
-	    int p=IOTA&2047;
+            int p=IOTA&2047;
             fVec0[p] = (fTemp2 + (fSlow2 * fRec9_0));
             fRec8_0 = fVec0[(IOTA-1617)&2047];
             fRec11_0 = ((fSlow1 * fRec10_1) + (fSlow0 * fRec11_1));
@@ -285,6 +285,6 @@ public class FreeVerb {
             fRec8_1 = fRec8_0;
             IOTA = IOTA+1;
             fRec9_1 = fRec9_0;
+            }
         }
     }
-}

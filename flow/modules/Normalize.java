@@ -25,9 +25,9 @@ public class Normalize extends Unit
         defineOptions(new String[] { "Normalize", "Standardize" }, new String[][] { {"Off", "Normalize", "Maximize"}, {"Standardize"} });
         }
 
-	public static final int N_OFF = 0;
-	public static final int N_NORMALIZE = 1;
-	public static final int N_MAXIMIZE = 2;
+    public static final int N_OFF = 0;
+    public static final int N_NORMALIZE = 1;
+    public static final int N_MAXIMIZE = 2;
 
     int normalize = N_NORMALIZE;
     boolean standardize = false;
@@ -71,10 +71,10 @@ public class Normalize extends Unit
             normalizeAmplitudes();
             }
         else if (normalize == N_MAXIMIZE)
-        	{
+            {
             copyAmplitudes(0);
             maximizeAmplitudes();
-        	}
+            }
         else
             {
             pushAmplitudes(0);

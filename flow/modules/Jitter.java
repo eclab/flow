@@ -21,7 +21,7 @@ public class Jitter extends Unit
     public static final int FREQUENCY_VAR = 0;
     public static final int AMPLITUDE_VAR = 1;
 
-	
+        
     public static final int MOD_FREQ_VAR = 0;
     public static final int MOD_AMP_VAR = 1;
     public static final int MOD_TRIGGER = 2;
@@ -133,17 +133,17 @@ public class Jitter extends Unit
         for(int i = 0; i < targets[FREQUENCY_VAR].length; i++)
             {
             if (!nonZero || inputs0amplitudes[i] > 0)
-            	{
-            	double f = inputs0frequencies[i] + targets[FREQUENCY_VAR][i] * 20;
-            	if (f >= 0) frequencies[i] = f;
-            	double a = inputs0amplitudes[i] + targets[AMPLITUDE_VAR][i] / 4;
-            	if (a >= 0) amplitudes[i] = a;
-            	}
+                {
+                double f = inputs0frequencies[i] + targets[FREQUENCY_VAR][i] * 20;
+                if (f >= 0) frequencies[i] = f;
+                double a = inputs0amplitudes[i] + targets[AMPLITUDE_VAR][i] / 4;
+                if (a >= 0) amplitudes[i] = a;
+                }
             else
-            	{
-            	frequencies[i] = inputs0frequencies[i];
-            	amplitudes[i] = 0;
-            	}
+                {
+                frequencies[i] = inputs0frequencies[i];
+                amplitudes[i] = 0;
+                }
             }
 
         constrain();

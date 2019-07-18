@@ -60,12 +60,12 @@ public class Rack extends JPanel
     public JScrollPane getScrollPane() { return pane; }
     
     public Out.OutModulePanel findOut()
-    	{
-    	for(ModulePanel panel : allModulePanels)
-    		if (panel.getModulation() instanceof Out)
-    			return (Out.OutModulePanel)panel;
-    	return (Out.OutModulePanel)null;
-    	}
+        {
+        for(ModulePanel panel : allModulePanels)
+            if (panel.getModulation() instanceof Out)
+                return (Out.OutModulePanel)panel;
+        return (Out.OutModulePanel)null;
+        }
     
     public Rack(Output output)
         {
@@ -138,12 +138,12 @@ public class Rack extends JPanel
                 }
             });
 
-		// the frame width is dependent on the display width
-		// we'll temporarily include the display, then remove it if
-		// necessary after packing, then display the window
+        // the frame width is dependent on the display width
+        // we'll temporarily include the display, then remove it if
+        // necessary after packing, then display the window
 
-		boolean showing = getShowsDisplays();
-		setShowsDisplays(true);
+        boolean showing = getShowsDisplays();
+        setShowsDisplays(true);
         frame.pack();
         setShowsDisplays(showing);
         
@@ -163,14 +163,14 @@ public class Rack extends JPanel
         }
 
     public void setShowsDisplays(boolean val)
-    	{
-    	if (showsDisplays == val) return;  // no need to do anything
-    	remove(displayBox);
-    	if (val) add(displayBox, BorderLayout.NORTH);
-    	revalidate();
-    	showsDisplays = val;
-    	}
-    	
+        {
+        if (showsDisplays == val) return;  // no need to do anything
+        remove(displayBox);
+        if (val) add(displayBox, BorderLayout.NORTH);
+        revalidate();
+        showsDisplays = val;
+        }
+        
     public boolean getShowsDisplays() { return showsDisplays; }
         
     public boolean getAddModulesAfter() { return addModulesAfter; }
@@ -277,6 +277,12 @@ public class Rack extends JPanel
             for(int i = 0; i < len; i++)
                 {
                 output.getSound(i).reset();
+                }
+                
+            // Reset phases for good measure
+            for(int i = 0; i < len; i++)
+                {
+                output.getSound(i).resetPartialPhases();
                 }
             }
         finally 
@@ -730,8 +736,8 @@ public class Rack extends JPanel
         int partial = Prefs.getLastNumPartials();
         partialsCombo.setSelectedIndex(partial == 64 ? 0 : (partial == 128 ? 1 : 2));
 
-		// Audio Buffer Size
-        int[] bufferSize = new int[] { 			64,   128,   256,   384,   512,   640,   768,   896,   1024,   1152,   1280,   1408,   1536,   1664,   1792,   1920,   2048 };
+        // Audio Buffer Size
+        int[] bufferSize = new int[] {                  64,   128,   256,   384,   512,   640,   768,   896,   1024,   1152,   1280,   1408,   1536,   1664,   1792,   1920,   2048 };
         String[] s_bufferSize = new String[] { "64", "128", "256", "384", "512", "640", "768", "896", "1024", "1152", "1280", "1408", "1536", "1664", "1792", "1920", "2048" };
         JComboBox bufferSizeCombo = new JComboBox(s_bufferSize);
         int bs = Prefs.getLastBufferSize();
@@ -743,14 +749,14 @@ public class Rack extends JPanel
             }
         bufferSizeCombo.setSelectedIndex(index);
 
-		// Voices Per Thread
+        // Voices Per Thread
         int[] voicesPerThread = new int[] { 1, 2, 4, 8, 16 };
         String[] s_voicesPerThread = new String[] { "1", "2", "4", "8", "16" };
         JComboBox voicesPerThreadCombo = new JComboBox(s_voicesPerThread);
         int voicePerThread = Prefs.getLastNumVoicesPerThread();
         voicesPerThreadCombo.setSelectedIndex(voicePerThread == 1 ? 0 : (voicePerThread == 2 ? 1 : (voicePerThread == 4 ? 2 : (voicePerThread == 8 ? 3 : 4))));
 
-		// Outputs Per Thread
+        // Outputs Per Thread
         int[] outputsPerThread = new int[] { 1, 2, 4, 8, 16 };
         String[] s_outputsPerThread = new String[] { "1", "2", "4", "8", "16" };
         JComboBox outputsPerThreadCombo = new JComboBox(s_outputsPerThread);
@@ -945,20 +951,20 @@ public class Rack extends JPanel
         }       
 
 
-	public boolean doPatchDialog(String title)
-		{
-		String[] result = Rack.showPatchDialog(this, title, getPatchName(), getPatchAuthor(), getPatchDate(), getPatchVersion(), getPatchInfo());
-		if (result == null) return false;
-		else
-			{
-			setPatchName(result[0]);
-			setPatchAuthor(result[1]);
-			setPatchDate(result[2]);
-			setPatchVersion(result[3]);
-			setPatchInfo(result[4]);
-			return true; 
-			}
-		}
+    public boolean doPatchDialog(String title)
+        {
+        String[] result = Rack.showPatchDialog(this, title, getPatchName(), getPatchAuthor(), getPatchDate(), getPatchVersion(), getPatchInfo());
+        if (result == null) return false;
+        else
+            {
+            setPatchName(result[0]);
+            setPatchAuthor(result[1]);
+            setPatchDate(result[2]);
+            setPatchVersion(result[3]);
+            setPatchInfo(result[4]);
+            return true; 
+            }
+        }
 
     public static final int LABEL_MAX_LENGTH = 32;
     public static String[] showPatchDialog(JComponent root, String title, String name, String author, String date, String version, String info)
@@ -983,9 +989,9 @@ public class Rack extends JPanel
 
         JTextArea i = new JTextArea(5, LABEL_MAX_LENGTH);
         i.setText(info);
-		i.setCaretPosition(0);  // scrolls to top
+        i.setCaretPosition(0);  // scrolls to top
         i.setLineWrap(true);
-		i.setWrapStyleWord(true);
+        i.setWrapStyleWord(true);
         JScrollPane pane = new JScrollPane(i);
         pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         pane.setBorder(v.getBorder());

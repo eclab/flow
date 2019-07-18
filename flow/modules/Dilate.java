@@ -55,10 +55,10 @@ public class Dilate extends Unit
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Boost" });
         defineOptions(new String[] { "Direction" }, new String[][] { { "Left", "Right", "Both" } });
         }
-	
-	double[] zeros;        
-	double[] upcuts_a;
-	double[] downcuts_a;
+        
+    double[] zeros;        
+    double[] upcuts_a;
+    double[] downcuts_a;
 
     public void go()
         {
@@ -69,31 +69,31 @@ public class Dilate extends Unit
         
         double[] amplitudes = getAmplitudes(0);
 
-		if (zeros == null)
-			{
-			zeros = new double[amplitudes.length];
-			upcuts_a = new double[amplitudes.length];
-			downcuts_a = new double[amplitudes.length];
-			}
+        if (zeros == null)
+            {
+            zeros = new double[amplitudes.length];
+            upcuts_a = new double[amplitudes.length];
+            downcuts_a = new double[amplitudes.length];
+            }
 
-		// zero out the arrays
-		System.arraycopy(zeros, 0, upcuts_a, 0, zeros.length);			
-		System.arraycopy(zeros, 0, downcuts_a, 0, zeros.length);			
+        // zero out the arrays
+        System.arraycopy(zeros, 0, upcuts_a, 0, zeros.length);                  
+        System.arraycopy(zeros, 0, downcuts_a, 0, zeros.length);                        
 
-		double[] upcuts = upcuts_a;
-		double[] downcuts = downcuts_a;
+        double[] upcuts = upcuts_a;
+        double[] downcuts = downcuts_a;
         double cut = 1.0 - modulate(MOD_CUT);
 
         if (direction == DIRECTION_BOTH)
             {
-			upcuts[0] = amplitudes[0];
-			for(int i = 1; i < amplitudes.length; i++)
-				{
-				if (amplitudes[i] <= upcuts[i - 1])
-					{  upcuts[i] = cut * upcuts[i] + (1 - cut) * upcuts[i - 1]; }
-				else
-					{ upcuts[i] = amplitudes[i]; }
-				}
+            upcuts[0] = amplitudes[0];
+            for(int i = 1; i < amplitudes.length; i++)
+                {
+                if (amplitudes[i] <= upcuts[i - 1])
+                    {  upcuts[i] = cut * upcuts[i] + (1 - cut) * upcuts[i - 1]; }
+                else
+                    { upcuts[i] = amplitudes[i]; }
+                }
                 
             downcuts[amplitudes.length - 1] = amplitudes[amplitudes.length - 1];
             for(int i = amplitudes.length - 2; i >= 0; i--)
@@ -111,22 +111,22 @@ public class Dilate extends Unit
             }
         else if (direction == DIRECTION_RIGHT)
             {
-			upcuts[0] = amplitudes[0];
-			for(int i = 1; i < amplitudes.length; i++)
-				{
-				if (amplitudes[i] <= upcuts[i - 1])
-					{  upcuts[i] = cut * upcuts[i] + (1 - cut) * upcuts[i - 1]; }
-				else
-					{ upcuts[i] = amplitudes[i]; }
-				}
+            upcuts[0] = amplitudes[0];
+            for(int i = 1; i < amplitudes.length; i++)
+                {
+                if (amplitudes[i] <= upcuts[i - 1])
+                    {  upcuts[i] = cut * upcuts[i] + (1 - cut) * upcuts[i - 1]; }
+                else
+                    { upcuts[i] = amplitudes[i]; }
+                }
                 
             for(int i = 0; i < amplitudes.length; i++)
                 {
                 amplitudes[i] = upcuts[i];
                 }
             }
-        else		// direction == DIRECTION_LEFT
-        	{
+        else            // direction == DIRECTION_LEFT
+            {
             downcuts[amplitudes.length - 1] = amplitudes[amplitudes.length - 1];
             for(int i = amplitudes.length - 2; i >= 0; i--)
                 {
@@ -140,7 +140,7 @@ public class Dilate extends Unit
                 {
                 amplitudes[i] = downcuts[i];
                 }
-        	}
+            }
         
         constrain(); 
         }       

@@ -96,7 +96,7 @@ public class OptionsChooser extends JPanel implements Rebuildable
             add(checkbox, BorderLayout.CENTER);
             String[] help = mod.wrapHelp(mod.getOptionHelp());
             if (help != null && help.length > optionNumber && help[optionNumber] != null)
-            	checkbox.setToolTipText(help[optionNumber]);
+                checkbox.setToolTipText(help[optionNumber]);
             }
         else
             {
@@ -156,10 +156,10 @@ public class OptionsChooser extends JPanel implements Rebuildable
             add(label, BorderLayout.NORTH);
             String[] help = mod.wrapHelp(mod.getOptionHelp());
             if (help != null && help.length > optionNumber && help[optionNumber] != null)
-            	{
-            	combo.setToolTipText(help[optionNumber]);
-            	label.setToolTipText(help[optionNumber]);
-            	}
+                {
+                combo.setToolTipText(help[optionNumber]);
+                label.setToolTipText(help[optionNumber]);
+                }
             }
         }
     }

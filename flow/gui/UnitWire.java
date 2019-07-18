@@ -32,10 +32,10 @@ public class UnitWire
     public UnitInput getEnd() { return end; }
     
     public void chooseColor() 
-    	{
+        {
         color = new Color((int)(Math.random() * 220), (int)(Math.random() * 220), (int)(Math.random() * 220), 175);
-    	}
-    	
+        }
+        
     public UnitWire(Rack rack) 
         { 
         this.rack = rack; 

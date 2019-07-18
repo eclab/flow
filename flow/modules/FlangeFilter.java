@@ -168,10 +168,10 @@ public class FlangeFilter extends Unit
                     }
                 break;
                 default:
-                	{
-                	warn("modules/FlangeFilter.java", "default occurred when it shouldn't be possible");
-                	break;
-                	}
+                    {
+                    warn("modules/FlangeFilter.java", "default occurred when it shouldn't be possible");
+                    break;
+                    }
                 }
 
             // Gain is right now 0...1.  We need to make it 0...2 centered at 1 with a variable modulation

@@ -118,21 +118,21 @@ public class UnitOutput extends InputOutput
             public void mouseClicked(MouseEvent e)
                 {
                 for(UnitWire wire : outgoing)
-                	{
-                	wire.chooseColor();
-                	}
+                    {
+                    wire.chooseColor();
+                    }
                 }
             };
             
         jack.addMouseMotionListener(mouseAdapter);
         jack.addMouseListener(mouseAdapter);
 
-		String[] help = unit.wrapHelp(unit.getUnitOutputHelp());
-		if (help != null && help.length > number && help[number] != null)
-			{
-			jack.setToolTipText(help[number]);
-			title.setToolTipText(help[number]);
-			}
+        String[] help = unit.wrapHelp(unit.getUnitOutputHelp());
+        if (help != null && help.length > number && help[number] != null)
+            {
+            jack.setToolTipText(help[number]);
+            title.setToolTipText(help[number]);
+            }
         }
 
 

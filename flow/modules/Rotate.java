@@ -11,17 +11,17 @@ import java.awt.*;
 import java.awt.event.*;
 
 /**
-	A unit which rotates all the partials, by frequency, within
-	the some range.  You can attach this unit to a sawtooth lfo
-	to cause them to continuously rotate within this range.
-	You might also wish to <b>window</b> the amplitude of the partials so that
-	the ones at the far ends aren't immediately wiped out.  There
-	are a number of window options; you can also change how the partials
-	are stretched during rotation from linear to a pseudo-exponential.
-	The windowing is normally based on the pre-stretched frequencies,
-	so stretching them will also stretch the window.  You can change this
-	to have the windowing based on the post-stretched frequencies instead
-	by selecting CENTER.
+   A unit which rotates all the partials, by frequency, within
+   the some range.  You can attach this unit to a sawtooth lfo
+   to cause them to continuously rotate within this range.
+   You might also wish to <b>window</b> the amplitude of the partials so that
+   the ones at the far ends aren't immediately wiped out.  There
+   are a number of window options; you can also change how the partials
+   are stretched during rotation from linear to a pseudo-exponential.
+   The windowing is normally based on the pre-stretched frequencies,
+   so stretching them will also stretch the window.  You can change this
+   to have the windowing based on the post-stretched frequencies instead
+   by selecting CENTER.
 **/
 
 
@@ -118,108 +118,108 @@ public class Rotate extends Unit
         double upper = modulate(MOD_UPPER_BOUND);
         double lower = modulate(MOD_LOWER_BOUND);
 
-		copyFrequencies(0);
-		if (window == WINDOW_NONE && !solo)
-			pushAmplitudes(0);
-		else
-			copyAmplitudes(0);
-		
-		if (upper == lower) return;
-		
-		if (upper < lower)
-			{
-			double swap = upper;
-			upper = lower;
-			lower = swap;
-			}
-			
-		upper *= FREQUENCY_SCALE;
-		lower *= FREQUENCY_SCALE;
-		
-		double[] frequencies = getFrequencies(0);
-		double[] amplitudes = getAmplitudes(0);
+        copyFrequencies(0);
+        if (window == WINDOW_NONE && !solo)
+            pushAmplitudes(0);
+        else
+            copyAmplitudes(0);
+                
+        if (upper == lower) return;
+                
+        if (upper < lower)
+            {
+            double swap = upper;
+            upper = lower;
+            lower = swap;
+            }
+                        
+        upper *= FREQUENCY_SCALE;
+        lower *= FREQUENCY_SCALE;
+                
+        double[] frequencies = getFrequencies(0);
+        double[] amplitudes = getAmplitudes(0);
 
-		double delta = rotate * (upper - lower);
-		
-		double scale = 0.5;
-		for(int w = WINDOW_X_2 ; w <= window ; w++)
-			{
-			scale = scale * scale;
-			}
-		
-		int x = 0;
-		
-		int remove = (int)Math.floor(modulate(MOD_SPACE) * MAX_SPACING);
-		for(int i = 0; i < frequencies.length; i++)
-			{
-			if (frequencies[i] >= lower && frequencies[i] <= upper)
-				{
-				// space
+        double delta = rotate * (upper - lower);
+                
+        double scale = 0.5;
+        for(int w = WINDOW_X_2 ; w <= window ; w++)
+            {
+            scale = scale * scale;
+            }
+                
+        int x = 0;
+                
+        int remove = (int)Math.floor(modulate(MOD_SPACE) * MAX_SPACING);
+        for(int i = 0; i < frequencies.length; i++)
+            {
+            if (frequencies[i] >= lower && frequencies[i] <= upper)
+                {
+                // space
                 if (x > 0)
-            		{
-	                amplitudes[i] = 0;
-	                }
-	            x++;
-	            if (x > remove) x = 0;
-	                
-				// map
-				frequencies[i] = frequencies[i] + delta;
-			
-				if (frequencies[i] < lower) 
-					frequencies[i] += (upper - lower);
-				else if (frequencies[i] > upper) 
-					{
-					frequencies[i] -= (upper - lower);
-					}
-					
-				double f = (frequencies[i] - lower) / (upper - lower);
-				double a = f;
-				for(int s = 0; s < stretch; s++)
-					f = f * f;
-				
-				if (center) a = f;
-				
-				f = f * (upper - lower) + lower;
-				frequencies[i] = f;
+                    {
+                    amplitudes[i] = 0;
+                    }
+                x++;
+                if (x > remove) x = 0;
+                        
+                // map
+                frequencies[i] = frequencies[i] + delta;
+                        
+                if (frequencies[i] < lower) 
+                    frequencies[i] += (upper - lower);
+                else if (frequencies[i] > upper) 
+                    {
+                    frequencies[i] -= (upper - lower);
+                    }
+                                        
+                double f = (frequencies[i] - lower) / (upper - lower);
+                double a = f;
+                for(int s = 0; s < stretch; s++)
+                    f = f * f;
+                                
+                if (center) a = f;
+                                
+                f = f * (upper - lower) + lower;
+                frequencies[i] = f;
 
 
-				// window
-				if (window == WINDOW_NONE)
-					{
-					// do nothing
-					a = 1.0;
-					}
-				else if (window == WINDOW_TRIANGLE)
-					{
-					a = 1 - 2 * Math.abs(a - 0.5);
-					}
-				else
-					{
-					a = a - 0.5;
-					for(int w = WINDOW_X_2 ; w <= window ; w++)
-						{
-						a = a * a;
-						}
-					a /= scale;
-					a = 1 - a;
-					}
-				amplitudes[i] *= a;
-				}
-			else if (solo)
-				{
-				amplitudes[i] = 0;
-				}
-			}
+                // window
+                if (window == WINDOW_NONE)
+                    {
+                    // do nothing
+                    a = 1.0;
+                    }
+                else if (window == WINDOW_TRIANGLE)
+                    {
+                    a = 1 - 2 * Math.abs(a - 0.5);
+                    }
+                else
+                    {
+                    a = a - 0.5;
+                    for(int w = WINDOW_X_2 ; w <= window ; w++)
+                        {
+                        a = a * a;
+                        }
+                    a /= scale;
+                    a = 1 - a;
+                    }
+                amplitudes[i] *= a;
+                }
+            else if (solo)
+                {
+                amplitudes[i] = 0;
+                }
+            }
 
-		if (constrain())
-			{
-	        simpleSort(0, true);
-	        }
-	    else
-	    	{
-	    	// In the future, we could do better than this since we know exactly
-	    	// which partials got moved, so we could very easily shift.
-	        simpleSort(0, true);
-	    	}
+        if (constrain())
+            {
+            simpleSort(0, true);
+            }
+        else
+            {
+            // In the future, we could do better than this since we know exactly
+            // which partials got moved, so we could very easily shift.
+            simpleSort(0, true);
+            }
         }       
     }

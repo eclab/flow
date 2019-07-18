@@ -74,31 +74,31 @@ public class In extends Unit
         panel[0] = new ModulePanel(this)
             {
             public void setRack(Rack rack)
-            	{
-            	super.setRack(rack);
-            	ModulePanel[] all = rack.getAllModulePanels();
-            	
-            	// are there any other Ins?  Find the first one
-            	for(int i = 0; i < all.length; i++)
-            		{
-            		if (all[i].getModulation() instanceof In && all[i] != panel[0])
-            			{
-            			// set me to the same values as the first one
-						ModulationOutput[] a = panel[0].getModulationOutputs();
-						ModulationOutput[] aa = all[i].getModulationOutputs();
-						for(int j = 0; j < a.length; j++)
-							a[j].setTitleText(aa[j].getTitleText());
+                {
+                super.setRack(rack);
+                ModulePanel[] all = rack.getAllModulePanels();
+                
+                // are there any other Ins?  Find the first one
+                for(int i = 0; i < all.length; i++)
+                    {
+                    if (all[i].getModulation() instanceof In && all[i] != panel[0])
+                        {
+                        // set me to the same values as the first one
+                        ModulationOutput[] a = panel[0].getModulationOutputs();
+                        ModulationOutput[] aa = all[i].getModulationOutputs();
+                        for(int j = 0; j < a.length; j++)
+                            a[j].setTitleText(aa[j].getTitleText());
 
-						UnitOutput[] b = panel[0].getUnitOutputs();
-						UnitOutput[] bb = all[i].getUnitOutputs();
-						for(int j = 0; j < b.length; j++)
-							b[j].setTitleText(bb[j].getTitleText());
+                        UnitOutput[] b = panel[0].getUnitOutputs();
+                        UnitOutput[] bb = all[i].getUnitOutputs();
+                        for(int j = 0; j < b.length; j++)
+                            b[j].setTitleText(bb[j].getTitleText());
 
-            			break;  // we're done, no more changing
-            			}
-            		}
-            	}
-            	
+                        break;  // we're done, no more changing
+                        }
+                    }
+                }
+                
             public void updateTitleChange(InputOutput inout, int number, String newTitle)
                 {
                 // Here we're going to redistribute the title to all the Ins in the patch
@@ -159,36 +159,36 @@ public class In extends Unit
         }
 
     public void setData(JSONObject data, int moduleVersion, int patchVersion) 
-    	{
-    	if (data == null)
-    		warn("flow/modules/In.java", "Empty Data for In.  That can't be right.");
-    	else
-    		{
-    		JSONArray array = data.getJSONArray("mod");
-    		int num = getNumModulationOutputs();
-    		if (num != array.length())
-    			{
-    			warn("flow/modules/In.java", "Number of modulation outputs in In (" + num + ") does not match those in the patch (" + array.length() + ")");
-    			if (array.length() < num) num = array.length();
-    			}
-    		for(int i = 0; i < num; i++)
-    			{
-    			setModulationOutputName(i, array.getString(i));
-    			}
+        {
+        if (data == null)
+            warn("flow/modules/In.java", "Empty Data for In.  That can't be right.");
+        else
+            {
+            JSONArray array = data.getJSONArray("mod");
+            int num = getNumModulationOutputs();
+            if (num != array.length())
+                {
+                warn("flow/modules/In.java", "Number of modulation outputs in In (" + num + ") does not match those in the patch (" + array.length() + ")");
+                if (array.length() < num) num = array.length();
+                }
+            for(int i = 0; i < num; i++)
+                {
+                setModulationOutputName(i, array.getString(i));
+                }
 
-    		array = data.getJSONArray("unit");
-    		num = getNumOutputs();
-    		if (num != array.length())
-    			{
-    			warn("flow/modules/Out.java", "Number of unit outputs in Out (" + num + ") does not match those in the patch (" + array.length() + ")");
-    			if (array.length() < num) num = array.length();
-    			}
-    		for(int i = 0; i < num; i++)
-    			{
-    			setOutputName(i, array.getString(i));
-    			}
-    		}
-    	}
+            array = data.getJSONArray("unit");
+            num = getNumOutputs();
+            if (num != array.length())
+                {
+                warn("flow/modules/Out.java", "Number of unit outputs in Out (" + num + ") does not match those in the patch (" + array.length() + ")");
+                if (array.length() < num) num = array.length();
+                }
+            for(int i = 0; i < num; i++)
+                {
+                setOutputName(i, array.getString(i));
+                }
+            }
+        }
     
     public JSONObject getData() 
         { 

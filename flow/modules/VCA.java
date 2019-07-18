@@ -54,28 +54,28 @@ public class VCA extends Unit
             amplitudes[i] = amplitudes[i] * mod * scale; 
         
         /*
-        double boost = modulate(MOD_BOOST) * MAX_BOOST;
-        double[] frequencies = getFrequencies(0);
-        double nyquist = Output.SAMPLING_RATE * 0.5;
-        double pitch = sound.getPitch();
+          double boost = modulate(MOD_BOOST) * MAX_BOOST;
+          double[] frequencies = getFrequencies(0);
+          double nyquist = Output.SAMPLING_RATE * 0.5;
+          double pitch = sound.getPitch();
         
-        ////
-        // amplitudes *= (freq - 0) / (nyquist - 0)
+          ////
+          // amplitudes *= (freq - 0) / (nyquist - 0)
         
-        double invnyquist = 1.0 / nyquist;
-        for(int i = 0; i < amplitudes.length; i++)
-            {
-            if (frequencies[i] * pitch <= nyquist)
-            	{
-            	double alpha = ( 1 - frequencies[i] * pitch * invnyquist);
-            	//alpha *= alpha;
-            	//alpha *= alpha;
-            	//alpha *= alpha;
-            	//alpha *= alpha;
-            	//alpha *= alpha;
-           		amplitudes[i] = amplitudes[i]  *  alpha * boost;
-           		}
-        	}
+          double invnyquist = 1.0 / nyquist;
+          for(int i = 0; i < amplitudes.length; i++)
+          {
+          if (frequencies[i] * pitch <= nyquist)
+          {
+          double alpha = ( 1 - frequencies[i] * pitch * invnyquist);
+          //alpha *= alpha;
+          //alpha *= alpha;
+          //alpha *= alpha;
+          //alpha *= alpha;
+          //alpha *= alpha;
+          amplitudes[i] = amplitudes[i]  *  alpha * boost;
+          }
+          }
         */
 
         constrain();

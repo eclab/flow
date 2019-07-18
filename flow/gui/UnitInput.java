@@ -46,15 +46,15 @@ public class UnitInput extends InputOutput implements Rebuildable
                 connection = unit.getInput(number);
                 }
                                 
-			int outUnitNumber = 0;
-			if (number == ConstraintsChooser.INDEX)
-				{
-				outUnitNumber = unit.getConstraintIndex();
-				}
-			else
-				{
-				outUnitNumber = unit.getInputIndex(number);
-				}
+            int outUnitNumber = 0;
+            if (number == ConstraintsChooser.INDEX)
+                {
+                outUnitNumber = unit.getConstraintIndex();
+                }
+            else
+                {
+                outUnitNumber = unit.getInputIndex(number);
+                }
 
             disconnect();
                         
@@ -184,12 +184,12 @@ public class UnitInput extends InputOutput implements Rebuildable
             
         addMouseListener(mouseAdapter);
 
-		String[] help = unit.wrapHelp(unit.getUnitInputHelp());
-		if (help != null && help.length > number && help[number] != null)
-			{
-			jack.setToolTipText(help[number]);
-			title.setToolTipText(help[number]);
-			}
+        String[] help = unit.wrapHelp(unit.getUnitInputHelp());
+        if (help != null && help.length > number && help[number] != null)
+            {
+            jack.setToolTipText(help[number]);
+            title.setToolTipText(help[number]);
+            }
         }
 
     public String toString()

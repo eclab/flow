@@ -5,32 +5,32 @@
 package flow.modules;
 
 /** 
-	Module storage and reference. 
+    Module storage and reference. 
 */
 
 public class Modules
-	{
-	public static final Class[] getModules()
-		{
-		String modName = System.getProperty("module", null);
-		if (modName == null) return modules;
-		else
-			{
-			try
+    {
+    public static final Class[] getModules()
+        {
+        String modName = System.getProperty("module", null);
+        if (modName == null) return modules;
+        else
+            {
+            try
                 {
                 Class c = Class.forName(modName);
                 Class[] m = new Class[modules.length + 1];
                 System.arraycopy(modules, 0, m, 0, modules.length);
                 m[m.length - 1] = c;
                 return m;
-				}
-			catch (Exception ex)
-				{
-				return modules;
-				}
-			}
-		}
-		
+                }
+            catch (Exception ex)
+                {
+                return modules;
+                }
+            }
+        }
+                
     // A list of all the modules in the system which can appear in the
     // Modules menu.
     static final Class[] modules = new Class[]
@@ -98,4 +98,4 @@ public class Modules
     flow.modules.VCA.class,
     flow.modules.WaveTable.class,
     };      
-	}
+    }

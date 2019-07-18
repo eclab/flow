@@ -94,10 +94,10 @@ public class Shift extends Unit
             {
             case TYPE_PITCH:
                 {
-				copyFrequencies(0);
-				pushAmplitudes(0);
+                copyFrequencies(0);
+                pushAmplitudes(0);
 
-				double[] frequencies = getFrequencies(0);
+                double[] frequencies = getFrequencies(0);
         
                 // If it's not Math.pow, but hybridpow, we get weird jumps
                 double multiplier = Math.pow(2, (shift - 0.5) * bound * MAX_PITCH_BOUND);
@@ -111,10 +111,10 @@ public class Shift extends Unit
                         
             case TYPE_FREQUENCY:
                 {
-				copyFrequencies(0);
-				pushAmplitudes(0);
+                copyFrequencies(0);
+                pushAmplitudes(0);
 
-				double[] frequencies = getFrequencies(0);
+                double[] frequencies = getFrequencies(0);
         
                 double delta = modToSignedFrequency(bound) * shift / sound.getPitch();
 
@@ -129,41 +129,41 @@ public class Shift extends Unit
                         
             case TYPE_PARTIALS:
                 {
-				pushFrequencies(0);
-				copyAmplitudes(0);
+                pushFrequencies(0);
+                copyAmplitudes(0);
 
-				double[] amplitudes = getAmplitudes(0);
+                double[] amplitudes = getAmplitudes(0);
         
                 int delta = (int)((shift - 0.5) * 2 * bound * MAX_PARTIALS_BOUND);
                 
                 if (delta > 0)
-                	{
-					for(int i = amplitudes.length - 1; i >= 0; i--)
-						{
-						int j = i - delta;
-						if (j < 0) amplitudes[i] = 0;
-						else amplitudes[i] = amplitudes[j];
-						}
-                	}
+                    {
+                    for(int i = amplitudes.length - 1; i >= 0; i--)
+                        {
+                        int j = i - delta;
+                        if (j < 0) amplitudes[i] = 0;
+                        else amplitudes[i] = amplitudes[j];
+                        }
+                    }
                 else if (delta < 0)
-                	{
-					for(int i = 0; i < amplitudes.length; i++)
-						{
-						int j = i - delta;
-						if (j >= amplitudes.length) amplitudes[i] = 0;
-						else amplitudes[i] = amplitudes[j];
-						}
-                	}
-                	
+                    {
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                        int j = i - delta;
+                        if (j >= amplitudes.length) amplitudes[i] = 0;
+                        else amplitudes[i] = amplitudes[j];
+                        }
+                    }
+                        
                 }
             break;
 
             case TYPE_VIBRATO:
                 {
-				copyFrequencies(0);
-				pushAmplitudes(0);
+                copyFrequencies(0);
+                pushAmplitudes(0);
 
-				double[] frequencies = getFrequencies(0);
+                double[] frequencies = getFrequencies(0);
         
                 // If it's not Math.pow, but hybridpow, we get weird jumps
                 double multiplier = Math.pow(2, (shift - 0.5) * bound * MAX_VIBRATO_BOUND);

@@ -19,9 +19,9 @@ public class SampleAndHold extends Modulation
     public static final int MOD_SIGNAL = 0;
     public static final int MOD_TRIGGER = 1;
 
-	public static final int TYPE_SAMPLE_AND_HOLD = 0;
-	public static final int TYPE_TRACK_AND_HOLD = 1;
-	public static final int TYPE_TRACK_AND_HOLD_ALT = 2;
+    public static final int TYPE_SAMPLE_AND_HOLD = 0;
+    public static final int TYPE_TRACK_AND_HOLD = 1;
+    public static final int TYPE_TRACK_AND_HOLD_ALT = 2;
     
     int type;
     public int getType() { return type; }
@@ -64,13 +64,13 @@ public class SampleAndHold extends Modulation
         super.reset();
         setModulationOutput(0, modulate(MOD_SIGNAL));
         if (getType() == TYPE_TRACK_AND_HOLD)
-        	{
-        	sampling = true;
-        	}
+            {
+            sampling = true;
+            }
         else
-        	{
-        	sampling = false;
-        	}
+            {
+            sampling = false;
+            }
         }
 
     public void gate()
@@ -78,13 +78,13 @@ public class SampleAndHold extends Modulation
         super.gate();
         setModulationOutput(0, modulate(MOD_SIGNAL));
         if (getType() == TYPE_TRACK_AND_HOLD)
-        	{
-        	sampling = true;
-        	}
+            {
+            sampling = true;
+            }
         else
-        	{
-        	sampling = false;
-        	}
+            {
+            sampling = false;
+            }
         }
 
     public void go()
@@ -92,26 +92,26 @@ public class SampleAndHold extends Modulation
         super.go();
         
         if (getType() == TYPE_SAMPLE_AND_HOLD)
-        	{
-        	if (isTriggered(MOD_TRIGGER))
-        		{
-    		    setModulationOutput(0, modulate(MOD_SIGNAL));
-        		}
-        	}
+            {
+            if (isTriggered(MOD_TRIGGER))
+                {
+                setModulationOutput(0, modulate(MOD_SIGNAL));
+                }
+            }
         else
-        	{
-        	if (isTriggered(MOD_TRIGGER))
-        		{
-        		if (sampling)
-        			{
-	    		    setModulationOutput(0, modulate(MOD_SIGNAL));
-	    		    }
-	    		sampling = !sampling;
-        		}
-        	else if (!sampling)
-        		{
-	    		setModulationOutput(0, modulate(MOD_SIGNAL));
-        		}
-        	}
+            {
+            if (isTriggered(MOD_TRIGGER))
+                {
+                if (sampling)
+                    {
+                    setModulationOutput(0, modulate(MOD_SIGNAL));
+                    }
+                sampling = !sampling;
+                }
+            else if (!sampling)
+                {
+                setModulationOutput(0, modulate(MOD_SIGNAL));
+                }
+            }
         }
     }

@@ -149,133 +149,133 @@ public class Seq extends Modulation
         }
         
     void resetSequencerPosition()
-    	{
-    	int oldstate = state;
+        {
+        int oldstate = state;
         state = 0;
         updateModulation();
-    	}
-    	
+        }
+        
     public void reset()
         {
         super.reset();
         resetSequencerPosition();
         if (free)
-	    	playing = true;
+            playing = true;
         }
                 
     public void gate()
         {
         super.gate();
         if (!free)
-        	{
-        	resetSequencerPosition();
-	        playing = true;
-	        }
+            {
+            resetSequencerPosition();
+            playing = true;
+            }
         }
     
     public void release()
         {
         if (!free && release)
-        	playing = false;
+            playing = false;
         }
         
     volatile int _state = 0;
     void updateModulation()
-    	{
-    	if (curve == CURVE_STEP)
-    		{
-        	setModulationOutput(0, modulate(state));
-        	}
+        {
+        if (curve == CURVE_STEP)
+            {
+            setModulationOutput(0, modulate(state));
+            }
         else
-        	{
-        	double alpha = modulate(MOD_TRIGGER);
-        	
-        	switch(curve)
-        		{
-        		case CURVE_STEP:
-        			{
-        			// should never happen
-        			}
-        		break;
-        		case CURVE_X_2:
-        		{
-        		alpha = alpha * alpha;
-        		}
-        		break;
-        		case CURVE_X_4:
-        		{
-        		alpha = alpha * alpha;
-        		alpha = alpha * alpha;
-        		}
-        		break;
-        		case CURVE_X_8:
-        		{
-        		alpha = alpha * alpha;
-        		alpha = alpha * alpha;
-        		alpha = alpha * alpha;
-        		}
-        		break;
-        		case CURVE_X_16:
-        		{
-        		alpha = alpha * alpha;
-        		alpha = alpha * alpha;
-        		alpha = alpha * alpha;
-        		alpha = alpha * alpha;
-        		}
-        		break;
-        		case CURVE_X_32:
-        		{
-        		alpha = alpha * alpha;
-        		alpha = alpha * alpha;
-        		alpha = alpha * alpha;
-        		alpha = alpha * alpha;
-        		alpha = alpha * alpha;
-        		}
-        		break;
-        		default:
-        			{
-        			// should never happen
-        			}
-        		}
-        		
-        	double currentVal = modulate(state);
-	        int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
-        	int nextState = state + 1;
-        	if (nextState >= maxState) nextState = 0;
-        	double nextVal = modulate(nextState);
-        	setModulationOutput(0, (1 - alpha) * currentVal + alpha * nextVal);
-        	}
+            {
+            double alpha = modulate(MOD_TRIGGER);
+                
+            switch(curve)
+                {
+                case CURVE_STEP:
+                    {
+                    // should never happen
+                    }
+                break;
+                case CURVE_X_2:
+                    {
+                    alpha = alpha * alpha;
+                    }
+                break;
+                case CURVE_X_4:
+                    {
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    }
+                break;
+                case CURVE_X_8:
+                    {
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    }
+                break;
+                case CURVE_X_16:
+                    {
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    }
+                break;
+                case CURVE_X_32:
+                    {
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    }
+                break;
+                default:
+                    {
+                    // should never happen
+                    }
+                }
+                        
+            double currentVal = modulate(state);
+            int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
+            int nextState = state + 1;
+            if (nextState >= maxState) nextState = 0;
+            double nextVal = modulate(nextState);
+            setModulationOutput(0, (1 - alpha) * currentVal + alpha * nextVal);
+            }
 
-    	_state = state;
-    	}
+        _state = state;
+        }
         
     public void go()
         {
         super.go();
 
-		if (!playing && !free) 
-			return;
+        if (!playing && !free) 
+            return;
 
         if (isTriggered(MOD_TRIGGER))
             {
             int oldstate = state;
-	        int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
+            int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
             if (guided)
-            	{
-            	state = (int)(modulate(MOD_TRIGGER) * maxState);
-            	if (state == maxState) state--;
-            	}
+                {
+                state = (int)(modulate(MOD_TRIGGER) * maxState);
+                if (state == maxState) state--;
+                }
             else
-            	{
-            	state++;
-	            if (state >= maxState) state = 0;
-	            }
-	        updateModulation();
+                {
+                state++;
+                if (state >= maxState) state = 0;
+                }
+            updateModulation();
             updateTrigger(0);
             }
         else if (!sample)
             {
-			updateModulation();
+            updateModulation();
             }
         }
 
@@ -292,138 +292,138 @@ public class Seq extends Modulation
         else return "";
         }
 
-	static ArrayList panels = new ArrayList();
-	static javax.swing.Timer timer = null;
-	static void startTimer()
-		{
-		if (timer == null)
-			{
-			timer = new javax.swing.Timer(25, new ActionListener()
-				{
-				public void actionPerformed(ActionEvent e)
-					{
-					Iterator iterator = panels.iterator();
-					while(iterator.hasNext())
-						{
-						WeakReference ref = (WeakReference)(iterator.next());
-						Object obj = ref.get();
-						if (obj != null)
-							{
-							((SeqModulePanel) obj).doRepaint();
-							}
-						else
-							{
-							iterator.remove();
-							}
-						}
-					}
-				});
-			timer.start();
-			}
-		}
-
-	// we need a custom module so we can make up a method in it called doRepaint(),
-	// which repaints when appropriate.
-	
-	class SeqModulePanel extends ModulePanel
-		{
-			boolean repaintOnce = true;			// this allows us to clear things if the user turns off getDisplay
-			public void doRepaint()
-				{
-				if (Seq.this.getDisplay())
-					{ repaint(); repaintOnce = true; }
-				else if (repaintOnce)
-					{ repaint(); repaintOnce = false; }
-				}
-		
-			public SeqModulePanel(Seq mod)
-				{
-				super(mod);
-				}
-				
-            public JComponent buildPanel()
+    static ArrayList panels = new ArrayList();
+    static javax.swing.Timer timer = null;
+    static void startTimer()
+        {
+        if (timer == null)
+            {
+            timer = new javax.swing.Timer(25, new ActionListener()
                 {
-                JLabel example = new JLabel("0.0000 ");
-                example.setFont(Style.SMALL_FONT());
-                
-                Modulation mod = getModulation();
-                Box box = new Box(BoxLayout.Y_AXIS);
-                box.add(new ModulationOutput(mod, 0, this));
-
-                for(int i = 0; i < NUM_STATES; i+=4)
+                public void actionPerformed(ActionEvent e)
                     {
-                    Box box2 = new Box(BoxLayout.X_AXIS);
-                    for(int j = i; j < i + 4; j++)
+                    Iterator iterator = panels.iterator();
+                    while(iterator.hasNext())
                         {
-                        final int _state = j;
-
-                        // You'll notice a lot of code here is the same as in Shift
-                        final ModulationInput[] m = new ModulationInput[1];
-                        m[0] = new ModulationInput(mod, j, this)
+                        WeakReference ref = (WeakReference)(iterator.next());
+                        Object obj = ref.get();
+                        if (obj != null)
                             {
-                            public JPopupMenu getPopupMenu()
-                                {
-                                final JPopupMenu pop = new JPopupMenu();
-                                KeyDisplay display = new KeyDisplay(null, Color.RED, 36, 84, 60, 0)
-                                    {
-                                    public void setState(int state)
-                                        {
-                                        pop.setVisible(false);
-                                        m[0].setState(PITCHES[state - 60 + 24]);
-                                        }
-                                    };
-                                pop.add(display);
-
-                                String[] options = getOptions();
-                                for(int i = 0; i < options.length; i++)
-                                    {
-                                    JMenuItem menu = new JMenuItem(options[i]);
-                                    menu.setFont(Style.SMALL_FONT());
-                                    final int _i = i;
-                                    menu.addActionListener(new ActionListener()
-                                        {
-                                        public void actionPerformed(ActionEvent e)      
-                                            {
-                                            double val = convert(_i);
-                                            if (val >= 0 && val <= 1)
-                                                setState(val);
-                                            }       
-                                        });     
-                                    pop.add(menu);
-                                    }    
-                                                                
-                                return pop;
-                                }
-                            
-                            public boolean getDrawsStateDot()
-                            	{
-                            	if (!Seq.this.getDisplay()) return false;
-                            	
-								int m = sound.findRegistered(Seq.this);
-                            	Sound soundlast = sound.getOutput().getInput().getLastPlayedSound();
-                            	if (soundlast == null)
-                            		soundlast = sound.getOutput().getSoundUnsafe(0);
-								Seq seq0 = (Seq)(soundlast.getRegistered(m));
-
-	                            return (seq0._state == _state);
-                            	}
-                            };
-                        m[0].getData().setMinimumSize(example.getPreferredSize());
-                        box2.add(m[0]);
+                            ((SeqModulePanel) obj).doRepaint();
+                            }
+                        else
+                            {
+                            iterator.remove();
+                            }
                         }
-                    box.add(box2);
                     }
-                box.add(new ModulationInput(mod, MOD_STEPS, this));
-                box.add(new ModulationInput(mod, MOD_TRIGGER, this));
+                });
+            timer.start();
+            }
+        }
 
-                for(int i = 0; i < mod.getNumOptions(); i++)
+    // we need a custom module so we can make up a method in it called doRepaint(),
+    // which repaints when appropriate.
+        
+    class SeqModulePanel extends ModulePanel
+        {
+        boolean repaintOnce = true;                     // this allows us to clear things if the user turns off getDisplay
+        public void doRepaint()
+            {
+            if (Seq.this.getDisplay())
+                { repaint(); repaintOnce = true; }
+            else if (repaintOnce)
+                { repaint(); repaintOnce = false; }
+            }
+                
+        public SeqModulePanel(Seq mod)
+            {
+            super(mod);
+            }
+                                
+        public JComponent buildPanel()
+            {
+            JLabel example = new JLabel("0.0000 ");
+            example.setFont(Style.SMALL_FONT());
+                
+            Modulation mod = getModulation();
+            Box box = new Box(BoxLayout.Y_AXIS);
+            box.add(new ModulationOutput(mod, 0, this));
+
+            for(int i = 0; i < NUM_STATES; i+=4)
+                {
+                Box box2 = new Box(BoxLayout.X_AXIS);
+                for(int j = i; j < i + 4; j++)
                     {
-                    box.add(new OptionsChooser(mod, i));
+                    final int _state = j;
+
+                    // You'll notice a lot of code here is the same as in Shift
+                    final ModulationInput[] m = new ModulationInput[1];
+                    m[0] = new ModulationInput(mod, j, this)
+                        {
+                        public JPopupMenu getPopupMenu()
+                            {
+                            final JPopupMenu pop = new JPopupMenu();
+                            KeyDisplay display = new KeyDisplay(null, Color.RED, 36, 84, 60, 0)
+                                {
+                                public void setState(int state)
+                                    {
+                                    pop.setVisible(false);
+                                    m[0].setState(PITCHES[state - 60 + 24]);
+                                    }
+                                };
+                            pop.add(display);
+
+                            String[] options = getOptions();
+                            for(int i = 0; i < options.length; i++)
+                                {
+                                JMenuItem menu = new JMenuItem(options[i]);
+                                menu.setFont(Style.SMALL_FONT());
+                                final int _i = i;
+                                menu.addActionListener(new ActionListener()
+                                    {
+                                    public void actionPerformed(ActionEvent e)      
+                                        {
+                                        double val = convert(_i);
+                                        if (val >= 0 && val <= 1)
+                                            setState(val);
+                                        }       
+                                    });     
+                                pop.add(menu);
+                                }    
+                                                                
+                            return pop;
+                            }
+                            
+                        public boolean getDrawsStateDot()
+                            {
+                            if (!Seq.this.getDisplay()) return false;
+                                
+                            int m = sound.findRegistered(Seq.this);
+                            Sound soundlast = sound.getOutput().getInput().getLastPlayedSound();
+                            if (soundlast == null)
+                                soundlast = sound.getOutput().getSoundUnsafe(0);
+                            Seq seq0 = (Seq)(soundlast.getRegistered(m));
+
+                            return (seq0._state == _state);
+                            }
+                        };
+                    m[0].getData().setMinimumSize(example.getPreferredSize());
+                    box2.add(m[0]);
                     }
-                    
-                return box;
+                box.add(box2);
                 }
-    		}
+            box.add(new ModulationInput(mod, MOD_STEPS, this));
+            box.add(new ModulationInput(mod, MOD_TRIGGER, this));
+
+            for(int i = 0; i < mod.getNumOptions(); i++)
+                {
+                box.add(new OptionsChooser(mod, i));
+                }
+                    
+            return box;
+            }
+        }
 
     public ModulePanel getPanel()
         {

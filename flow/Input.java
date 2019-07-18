@@ -159,10 +159,10 @@ public class Input
         channel = 0;
         
         for(int chan = 0; chan < NUM_CHANNELS; chan++)
-        	{
-	        for (int i = 0; i < NUM_CC; i++)
-	            cc[chan][i] = UNSPECIFIED;
-	        }
+            {
+            for (int i = 0; i < NUM_CC; i++)
+                cc[chan][i] = UNSPECIFIED;
+            }
         
         for (int i = 0; i < NUM_NRPN; i++)
             nrpn[i] = UNSPECIFIED;
@@ -317,42 +317,42 @@ public class Input
             if (val > MAX_CC_VAL) val = MAX_CC_VAL;
             cc[ccdata.channel][ccdata.number] = val;
 
-			// if we're OMNI we should route to (say) channel 0
-			if (channel == CHANNEL_OMNI)
-				{
-				ccdata.channel = 0;
-				}
-				
-			// if it's global mpe, we need to distribute to all the channels
-			if (isMPE() && sm.getChannel() == getMPEGlobalChannel())
-				{
-				for (int i = 0; i < NUM_CHANNELS; i++)
-					{
-					if (isInMPEZone(i))
-						cc[i][ccdata.number] = val;
-					}
-				}
+            // if we're OMNI we should route to (say) channel 0
+            if (channel == CHANNEL_OMNI)
+                {
+                ccdata.channel = 0;
+                }
+                                
+            // if it's global mpe, we need to distribute to all the channels
+            if (isMPE() && sm.getChannel() == getMPEGlobalChannel())
+                {
+                for (int i = 0; i < NUM_CHANNELS; i++)
+                    {
+                    if (isInMPEZone(i))
+                        cc[i][ccdata.number] = val;
+                    }
+                }
 
             output.lock();
             try
                 {
                 int num = output.getNumSounds();
-				if (ccdata.number == CC_SUSTAIN_PEDAL)
-					{
-					if (ccdata.value >= 64)        // sustain is down
-						{
-						sustain = true;
-						}
-					else
-						{
-						// release all the sounds in the sustain queue
-						for (Sound sound : sustainQueue)
-							{
-							sound.release();
-							}
-						sustainQueue.clear();
-						sustain = false;
-						}
+                if (ccdata.number == CC_SUSTAIN_PEDAL)
+                    {
+                    if (ccdata.value >= 64)        // sustain is down
+                        {
+                        sustain = true;
+                        }
+                    else
+                        {
+                        // release all the sounds in the sustain queue
+                        for (Sound sound : sustainQueue)
+                            {
+                            sound.release();
+                            }
+                        sustainQueue.clear();
+                        sustain = false;
+                        }
                     }
                 } 
             finally
@@ -686,17 +686,17 @@ public class Input
             if (!isMPE())
                 {
                 if (channel == CHANNEL_OMNI || channel == sm.getChannel())
-                	{
-                	for (Sound sound : notesOn)
-						{
-						sound.setBend(d);
-						}
-				
-					for (Sound sound : notesOff)
-						{
-						sound.setBend(d);
-						}
-					}
+                    {
+                    for (Sound sound : notesOn)
+                        {
+                        sound.setBend(d);
+                        }
+                                
+                    for (Sound sound : notesOff)
+                        {
+                        sound.setBend(d);
+                        }
+                    }
                 }
             else
                 {
@@ -723,8 +723,8 @@ public class Input
     boolean isVoiceMessage(ShortMessage m)
         {
         return (
-                m.getStatus() >= 0x80 &&
-                m.getStatus() < 0xF0);
+            m.getStatus() >= 0x80 &&
+            m.getStatus() < 0xF0);
         }
     
     // Pulses the Input.  Called by Output's voice sync thread's go() method.
@@ -746,12 +746,12 @@ public class Input
                 if ((sm.getChannel() == channel) || // If it's in our channel
                     (channel == CHANNEL_OMNI) || // or we're looking for all messages
                     (isMPE() && isInMPEZone(sm.getChannel())) || // or we're mpe and in the mpe range
-                    (
-                            sm.getCommand() == ShortMessage.CONTROL_CHANGE && // or we're a RPN message for configuring the MPE message
-                            (ccdata = midi.getParser().processCC(sm, false, false)) != null &&
-                            ccdata.type == Midi.CCData.TYPE_RPN &&
-                            ccdata.number == MPE_CONFIGURATION_RPN_NUMBER)
-                )
+                        (
+                        sm.getCommand() == ShortMessage.CONTROL_CHANGE && // or we're a RPN message for configuring the MPE message
+                        (ccdata = midi.getParser().processCC(sm, false, false)) != null &&
+                        ccdata.type == Midi.CCData.TYPE_RPN &&
+                        ccdata.number == MPE_CONFIGURATION_RPN_NUMBER)
+                    )
                     {
                     int command = sm.getCommand();                  // Note not getStatus().  See below.
                     if (command == ShortMessage.NOTE_OFF || command == ShortMessage.NOTE_ON && sm.getData2() == 0)

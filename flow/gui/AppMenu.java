@@ -93,20 +93,20 @@ public class AppMenu
 
 
 /*
-    static JMenuItem namePatchMenu(Rack rack)
-        {
-        JMenuItem name = new JMenuItem("Patch Info...");
-        name.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+  static JMenuItem namePatchMenu(Rack rack)
+  {
+  JMenuItem name = new JMenuItem("Patch Info...");
+  name.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 
-        name.addActionListener(new ActionListener()
-            {
-            public void actionPerformed(ActionEvent e)
-                {
-                rack.doPatchDialog("Patch Info");
-                }
-            });
-        return name;
-        }
+  name.addActionListener(new ActionListener()
+  {
+  public void actionPerformed(ActionEvent e)
+  {
+  rack.doPatchDialog("Patch Info");
+  }
+  });
+  return name;
+  }
 */
 
     static JMenuItem quitPatchMenu(Rack rack)
@@ -152,25 +152,25 @@ public class AppMenu
 
                     PrintWriter p = null;
 
-                        rack.output.lock();
-                        try
-                            {
-                            rack.output.getSound(0).saveModules(obj);
-                            p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(file)));
-                            System.out.println(obj);
-                            p.println(obj);
-                            p.close();
-                            }
-                        catch (Exception e2)
-                            {
-                            e2.printStackTrace();
-                            try { if (p != null) p.close(); }
-                            catch (Exception e3) { }
-                            }
-                        finally 
-                            {
-                            rack.output.unlock();
-                            }
+                    rack.output.lock();
+                    try
+                        {
+                        rack.output.getSound(0).saveModules(obj);
+                        p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(file)));
+                        System.out.println(obj);
+                        p.println(obj);
+                        p.close();
+                        }
+                    catch (Exception e2)
+                        {
+                        e2.printStackTrace();
+                        try { if (p != null) p.close(); }
+                        catch (Exception e3) { }
+                        }
+                    finally 
+                        {
+                        rack.output.unlock();
+                        }
                     }
                 else
                     {
@@ -201,12 +201,12 @@ public class AppMenu
     static void doSaveAs(Rack rack)
         {
         /*
-		if (rack.getPatchName() == null || rack.getPatchName().trim().equals(""))
-			{
-			if (!rack.doPatchDialog("Patch Information Prior to Saving"))
-				return;		// failed
-			}
-		*/
+          if (rack.getPatchName() == null || rack.getPatchName().trim().equals(""))
+          {
+          if (!rack.doPatchDialog("Patch Information Prior to Saving"))
+          return;         // failed
+          }
+        */
 
         Modulation[] mods = new Modulation[rack.allModulePanels.size()];
         for(int i = 0; i < mods.length; i++)
@@ -239,44 +239,44 @@ public class AppMenu
 
         PrintWriter p = null;
         if (fd.getFile() != null)
-                {
-                f = new File(fd.getDirectory(), ensureFileEndsWith(fd.getFile(), PATCH_EXTENSION));
+            {
+            f = new File(fd.getDirectory(), ensureFileEndsWith(fd.getFile(), PATCH_EXTENSION));
                 
-                JSONObject obj = new JSONObject();
+            JSONObject obj = new JSONObject();
 
-                if (rack.getPatchName() == null || rack.getPatchName().trim().equals(""))
-                    Sound.saveName(removeExtension(f.getName()), obj);
-                else
-                    Sound.saveName(rack.getPatchName(), obj);
-                Sound.savePatchVersion(rack.getPatchVersion(), obj);
-                Sound.savePatchInfo(rack.getPatchInfo(), obj);
-                Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
-                Sound.saveFlowVersion(obj);
+            if (rack.getPatchName() == null || rack.getPatchName().trim().equals(""))
+                Sound.saveName(removeExtension(f.getName()), obj);
+            else
+                Sound.saveName(rack.getPatchName(), obj);
+            Sound.savePatchVersion(rack.getPatchVersion(), obj);
+            Sound.savePatchInfo(rack.getPatchInfo(), obj);
+            Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
+            Sound.saveFlowVersion(obj);
 
-                rack.output.lock();
-                try
-                    {
-                    rack.output.getSound(0).saveModules(obj);
-                    p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(f)));
-                    System.err.println(obj);
-                    p.println(obj);
-                    p.flush();
-                    p.close();
-                    }
-                catch (Exception e)
-                    {
-                    e.printStackTrace();
-                    try { if (p != null) p.close(); }
-                    catch (Exception e2) { }
-                    }
-                finally 
-                    {
-                    rack.output.unlock();
-                    }
-                file = f;
-                dirFile = f;
-                rack.setPatchName(removeExtension(f.getName()));
+            rack.output.lock();
+            try
+                {
+                rack.output.getSound(0).saveModules(obj);
+                p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(f)));
+                System.err.println(obj);
+                p.println(obj);
+                p.flush();
+                p.close();
                 }
+            catch (Exception e)
+                {
+                e.printStackTrace();
+                try { if (p != null) p.close(); }
+                catch (Exception e2) { }
+                }
+            finally 
+                {
+                rack.output.unlock();
+                }
+            file = f;
+            dirFile = f;
+            rack.setPatchName(removeExtension(f.getName()));
+            }
         }
 
 // From https://stackoverflow.com/questions/924394/how-to-get-the-filename-without-the-extension-in-java
@@ -354,20 +354,20 @@ public class AppMenu
                             // Create and update Modulations and create ModulePanels
                             load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
                             if (obj != null)
-                            	{
-                            	rack.setPatchVersion(Sound.loadPatchVersion(obj));
-                            	rack.setPatchInfo(Sound.loadPatchInfo(obj));
-                            	rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
-                            	rack.setPatchDate(Sound.loadPatchDate(obj));
-                            	}
+                                {
+                                rack.setPatchVersion(Sound.loadPatchVersion(obj));
+                                rack.setPatchInfo(Sound.loadPatchInfo(obj));
+                                rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
+                                rack.setPatchDate(Sound.loadPatchDate(obj));
+                                }
                             rack.checkOrder();
                             }
                         finally 
                             {
                             rack.output.unlock();
                             }
-						rack.scrollToRight();
-						((Out.OutModulePanel)(rack.findOut())).updatePatchInfo();
+                        rack.scrollToRight();
+                        ((Out.OutModulePanel)(rack.findOut())).updatePatchInfo();
                         }
                     catch(Exception ex) { ex.printStackTrace(); showSimpleError("Patch Reading Error", "The patch could not be loaded", rack); }
                     file = f;
@@ -502,13 +502,13 @@ public class AppMenu
                         rack.checkOrder();
                         rack.add(Out.class);
                         rack.setPatchName(null);
-						rack.setPatchVersion(null);
-						rack.setPatchInfo(null);
-						rack.setPatchAuthor(null);
-						rack.setPatchDate(null);
-						
-						// reset Out
-						rack.findOut().updatePatchInfo();
+                        rack.setPatchVersion(null);
+                        rack.setPatchInfo(null);
+                        rack.setPatchAuthor(null);
+                        rack.setPatchDate(null);
+                                                
+                        // reset Out
+                        rack.findOut().updatePatchInfo();
                         file = null;
                         // don't reset dirFile
                         }
@@ -532,7 +532,7 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-				rack.setShowsDisplays(display.isSelected());
+                rack.setShowsDisplays(display.isSelected());
                 Prefs.setShowsDisplays(display.isSelected());
                 }
             });
@@ -549,8 +549,8 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-				rack.display1.setWaterfall(waterfall.isSelected());
-				rack.display2.setWaterfall(waterfall.isSelected());
+                rack.display1.setWaterfall(waterfall.isSelected());
+                rack.display2.setWaterfall(waterfall.isSelected());
                 Prefs.setWaterfallDisplay(waterfall.isSelected());
                 }
             });
@@ -567,117 +567,117 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-				rack.display1.setLogFrequency(log.isSelected());
-				rack.display2.setLogFrequency(log.isSelected());
+                rack.display1.setLogFrequency(log.isSelected());
+                rack.display2.setLogFrequency(log.isSelected());
                 Prefs.setLogAxisDisplay(log.isSelected());
                 }
             });
         return log;
         }
 
-	public static final int DEFAULT_MAX_DISPLAYED_HARMONIC = 6;		// 150
-	
+    public static final int DEFAULT_MAX_DISPLAYED_HARMONIC = 6;             // 150
+        
     static JMenuItem maxDisplayedHarmonic(Rack rack)
         {
         final double maxHarm[] = new double[] { 31, 49, 63, 79, 99, 127, 149, 199, 255, 299, 399, 499 };
         final JMenu max = new JMenu("Max Displayed Harmonic");
         final JRadioButtonMenuItem[] buttons = new JRadioButtonMenuItem[] {
-        new JRadioButtonMenuItem("32"),
-        new JRadioButtonMenuItem("50"),
-        new JRadioButtonMenuItem("64"),
-        new JRadioButtonMenuItem("80"),
-        new JRadioButtonMenuItem("100"),
-        new JRadioButtonMenuItem("128"),
-        new JRadioButtonMenuItem("150"),
-        new JRadioButtonMenuItem("200"),
-        new JRadioButtonMenuItem("256"),
-        new JRadioButtonMenuItem("300"),
-        new JRadioButtonMenuItem("400"),
-        new JRadioButtonMenuItem("500")};
+            new JRadioButtonMenuItem("32"),
+            new JRadioButtonMenuItem("50"),
+            new JRadioButtonMenuItem("64"),
+            new JRadioButtonMenuItem("80"),
+            new JRadioButtonMenuItem("100"),
+            new JRadioButtonMenuItem("128"),
+            new JRadioButtonMenuItem("150"),
+            new JRadioButtonMenuItem("200"),
+            new JRadioButtonMenuItem("256"),
+            new JRadioButtonMenuItem("300"),
+            new JRadioButtonMenuItem("400"),
+            new JRadioButtonMenuItem("500")};
         
         ButtonGroup group = new ButtonGroup();
         for(int i = 0; i < buttons.length; i++)
-        	{
-        	max.add(buttons[i]);
-        	group.add(buttons[i]);
-        	}
+            {
+            max.add(buttons[i]);
+            group.add(buttons[i]);
+            }
         
         int sel = Prefs.getMaxDisplayedHarmonic();
         buttons[sel].setSelected(true);
-		rack.display1.setMaxFrequency(maxHarm[sel]);
-		rack.display2.setMaxFrequency(maxHarm[sel]);
-		
-		for(int q = 0; q < buttons.length; q++)
-		{
-        buttons[q].addActionListener(new ActionListener()
+        rack.display1.setMaxFrequency(maxHarm[sel]);
+        rack.display2.setMaxFrequency(maxHarm[sel]);
+                
+        for(int q = 0; q < buttons.length; q++)
             {
-            public void actionPerformed(ActionEvent e)
+            buttons[q].addActionListener(new ActionListener()
                 {
-                // yuck
-                int selected = 0;
-                for(int i = 0; i < buttons.length; i++)
-                	if (buttons[i].isSelected()) 
-                		{ 
-                		selected = i; 
-                		break; 
-                		}
-                	
-				rack.display1.setMaxFrequency(maxHarm[selected]);
-				rack.display2.setMaxFrequency(maxHarm[selected]);
-                Prefs.setMaxDisplayedHarmonic(selected);
-                }
-            });
-        }
+                public void actionPerformed(ActionEvent e)
+                    {
+                    // yuck
+                    int selected = 0;
+                    for(int i = 0; i < buttons.length; i++)
+                        if (buttons[i].isSelected()) 
+                            { 
+                            selected = i; 
+                            break; 
+                            }
+                        
+                    rack.display1.setMaxFrequency(maxHarm[selected]);
+                    rack.display2.setMaxFrequency(maxHarm[selected]);
+                    Prefs.setMaxDisplayedHarmonic(selected);
+                    }
+                });
+            }
         return max;
         }
 
 
-	public static final int DEFAULT_MIN_DISPLAYED_HARMONIC = 4;		// 1/16
-	
+    public static final int DEFAULT_MIN_DISPLAYED_HARMONIC = 4;             // 1/16
+        
     static JMenuItem minDisplayedHarmonic(Rack rack)
         {
         final double minHarm[] = new double[] { 1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125 };
         final JMenu min = new JMenu("Min Displayed Harmonic");
         final JRadioButtonMenuItem[] buttons = new JRadioButtonMenuItem[] {
-        new JRadioButtonMenuItem("Fundamental"),
-        new JRadioButtonMenuItem("1/2"),
-        new JRadioButtonMenuItem("1/4"),
-        new JRadioButtonMenuItem("1/8"),
-        new JRadioButtonMenuItem("1/16"),
-        new JRadioButtonMenuItem("1/32") };
+            new JRadioButtonMenuItem("Fundamental"),
+            new JRadioButtonMenuItem("1/2"),
+            new JRadioButtonMenuItem("1/4"),
+            new JRadioButtonMenuItem("1/8"),
+            new JRadioButtonMenuItem("1/16"),
+            new JRadioButtonMenuItem("1/32") };
         
         ButtonGroup group = new ButtonGroup();
         for(int i = 0; i < buttons.length; i++)
-        	{
-        	min.add(buttons[i]);
-        	group.add(buttons[i]);
-        	}
+            {
+            min.add(buttons[i]);
+            group.add(buttons[i]);
+            }
         
         int sel = Prefs.getMinDisplayedHarmonic();
         buttons[sel].setSelected(true);
-		rack.display1.setMinFrequency(minHarm[sel]);
-		rack.display2.setMinFrequency(minHarm[sel]);
+        rack.display1.setMinFrequency(minHarm[sel]);
+        rack.display2.setMinFrequency(minHarm[sel]);
         for(int q = 0; q < buttons.length; q++)
-		{
-		buttons[q].addActionListener(new ActionListener()
             {
-            public void actionPerformed(ActionEvent e)
+            buttons[q].addActionListener(new ActionListener()
                 {
-                // yuck
-                int selected = 0;
-                for(int i = 0; i < buttons.length; i++)
-                	if (buttons[i].isSelected()) 
-                		{ 
-                		selected = i; 
-                		break; 
-                		}
-                	
-				rack.display1.setMinFrequency(minHarm[selected]);
-				rack.display2.setMinFrequency(minHarm[selected]);
-                Prefs.setMinDisplayedHarmonic(selected);
-                }
-            });
-        }
+                public void actionPerformed(ActionEvent e)
+                    {
+                    // yuck
+                    int selected = 0;
+                    for(int i = 0; i < buttons.length; i++)
+                        if (buttons[i].isSelected()) 
+                            { 
+                            selected = i; 
+                            break; 
+                            }
+                        
+                    rack.display1.setMinFrequency(minHarm[selected]);
+                    rack.display2.setMinFrequency(minHarm[selected]);
+                    Prefs.setMinDisplayedHarmonic(selected);
+                    }
+                });
+            }
         return min;
         }
 
@@ -768,8 +768,8 @@ public class AppMenu
         return sync;
         }
 
-	public static JMenuBar provideMenuBar(Rack rack)
-		{
+    public static JMenuBar provideMenuBar(Rack rack)
+        {
         JMenuBar menubar = new JMenuBar();
         menubar.add(provideFileMenu(rack));
         menubar.add(providePlayMenu(rack));
@@ -780,7 +780,7 @@ public class AppMenu
             menubar.add(AppMenu.provideWindowsAboutMenu(rack));
             }
         return menubar;
-		}
+        }
 
     static JMenuItem resetMenu(Rack rack)
         {
@@ -862,7 +862,7 @@ public class AppMenu
         JMenuItem inMenu = null;
         JMenuItem optMenu = null;
 
-		Class[] modules = Modules.getModules();
+        Class[] modules = Modules.getModules();
         for(int i = 0; i < modules.length; i++)
             {
             Class c = modules[i];
@@ -873,7 +873,7 @@ public class AppMenu
             else if (c == flow.modules.In.class)
                 inMenu = m;
             else if (c == flow.modules.Choice.class)
-            	optMenu = m;
+                optMenu = m;
             else if (flow.UnitSource.class.isAssignableFrom(c))
                 unitSources.add(m);
             else if (flow.ModSource.class.isAssignableFrom(c))

@@ -63,7 +63,7 @@ public class MPE extends Modulation implements ModSource
         
         setModulationOutput(MOD_VELOCITY, sound.getVelocity());
         setModulationOutput(MOD_RELEASE_VELOCITY, sound.getReleaseVelocity());
-    	setModulationOutput(MOD_BEND, (input.getRawBend() / 8191.0 + 1.0) / 2.0);
+        setModulationOutput(MOD_BEND, (input.getRawBend() / 8191.0 + 1.0) / 2.0);
 
         double pressureOffset = modulate(MOD_IN_PRESSURE_OFFSET);
         double pressureVariance = (modulate(MOD_IN_PRESSURE_VARIANCE) - 0.5) * 4.0;
@@ -78,14 +78,14 @@ public class MPE extends Modulation implements ModSource
         
         int cc = input.getCC(sound.getChannel(), 74);
         if (cc != Input.UNSPECIFIED)
-        	{
-			double y = (cc / 127.0) * Math.abs(yVariance) + yOffset;
-			if (y < 0) y = 0;
-			if (y > 1) y = 1;
-			if (yVariance < 0) y = 1 - y;
+            {
+            double y = (cc / 127.0) * Math.abs(yVariance) + yOffset;
+            if (y < 0) y = 0;
+            if (y > 1) y = 1;
+            if (yVariance < 0) y = 1 - y;
 
-    		setModulationOutput(MOD_Y, y);
-			}
+            setModulationOutput(MOD_Y, y);
+            }
         }
 
     public ModulePanel getPanel()
@@ -116,9 +116,9 @@ public class MPE extends Modulation implements ModSource
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
         {
         if (modulation == MOD_IN_PRESSURE_VARIANCE || modulation == MOD_IN_Y_VARIANCE)
-        	{
-        	return String.format("%.4f", ((value - 0.5) * 4.0));
-        	}
+            {
+            return String.format("%.4f", ((value - 0.5) * 4.0));
+            }
         else return super.getModulationValueDescription(modulation, value, isConstant);
         }
 

@@ -142,10 +142,10 @@ public class Stretch extends Unit
                     m = m * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS)));
                     break;
                 default: // never happens
-                	{
-                	warn("modules/Stretch.java", "default should never occur");
-                	break;
-                	}
+                    {
+                    warn("modules/Stretch.java", "default should never occur");
+                    break;
+                    }
                 }
             if (locked)
                 {

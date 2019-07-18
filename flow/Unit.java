@@ -221,7 +221,7 @@ public class Unit extends Modulation
     public byte[] getOrders(int val) { return orders[val]; }
     
     /** Override this to provide tooltips for unit outputs.  This array by default is null. 
-    	If any given String is null or empty, no tooltip is generated for it.  */
+        If any given String is null or empty, no tooltip is generated for it.  */
     public String[] getUnitOutputHelp() { return null; }
 
 
@@ -392,10 +392,10 @@ public class Unit extends Modulation
         double[] f1 = inputs[input].frequencies[inputIndexes[input]];
         double[] f2 = frequencies[output];
         if (f1 == f2) 
-        	frequencies[output] = (double[])(f1.clone());
-		else
-	        System.arraycopy(f1, 0, f2, 0, f2.length);
-		//testDenormals(f2,  "" + this);	    	
+            frequencies[output] = (double[])(f1.clone());
+        else
+            System.arraycopy(f1, 0, f2, 0, f2.length);
+        //testDenormals(f2,  "" + this);                
         }
 
     /** Copies the amplitudes array of Unit Output Port OUTPUT from 
@@ -406,10 +406,10 @@ public class Unit extends Modulation
         double[] f1 = inputs[input].amplitudes[inputIndexes[input]];
         double[] f2 = amplitudes[output];
         if (f1 == f2) 
-        	amplitudes[output] = (double[])(f1.clone());
-		else
-	        System.arraycopy(f1, 0, f2, 0, f2.length);
-		//testDenormals(f2, "" + this);	    	
+            amplitudes[output] = (double[])(f1.clone());
+        else
+            System.arraycopy(f1, 0, f2, 0, f2.length);
+        //testDenormals(f2, "" + this);         
         }
                 
     /** Copies the orders array of Unit Output Port OUTPUT from 
@@ -420,9 +420,9 @@ public class Unit extends Modulation
         byte[] f1 = inputs[input].orders[inputIndexes[input]];
         byte[] f2 = orders[output];
         if (f1 == f2) 
-        	orders[output] = (byte[])(f1.clone());
-		else
-	        System.arraycopy(f1, 0, f2, 0, f2.length);
+            orders[output] = (byte[])(f1.clone());
+        else
+            System.arraycopy(f1, 0, f2, 0, f2.length);
         }
 
     /** Sets the frequencies array of Unit Output Port #0 to 
@@ -474,7 +474,7 @@ public class Unit extends Modulation
         }
 
     /** Override this to provide tooltips for unit inputs.  This array by default is null. 
-    	If any given String is null or empty, no tooltip is generated for it.  */
+        If any given String is null or empty, no tooltip is generated for it.  */
     public String[] getUnitInputHelp() { return null; }
 
 
@@ -1367,15 +1367,15 @@ public class Unit extends Modulation
                 {
                 Unit unit = (Unit)(ids.get(m.getString("id")));
                 if (unit != null)
-                	{
-                	int unitOutput = unit.getOutputForKey(m.getString("at"));
-                	if (unitOutput >= 0 && unitOutput < unit.getNumOutputs())
-                		{
-		                setInput(unit, i, unitOutput);
-		                }
-		            	else warn("Unit.java", "invalid unit output (" + unitOutput + ") for id " + id + " in " + this);
-					}
-				else warn("Unit.java", "no unit for id " + id + " in " + this);
+                    {
+                    int unitOutput = unit.getOutputForKey(m.getString("at"));
+                    if (unitOutput >= 0 && unitOutput < unit.getNumOutputs())
+                        {
+                        setInput(unit, i, unitOutput);
+                        }
+                    else warn("Unit.java", "invalid unit output (" + unitOutput + ") for id " + id + " in " + this);
+                    }
+                else warn("Unit.java", "no unit for id " + id + " in " + this);
                 }
             }       
         }
@@ -1419,14 +1419,14 @@ public class Unit extends Modulation
         }
         
 /*
-    public void testDenormals(double[] vals, String s)
-    	{
-    	for(int i = 0; i < vals.length; i++)
-    		{
-    		double val = vals[i];
- 					if (val > 0 && val <= 2250738585072012e-308)
-						System.err.println(s + " is DENORMAL " + val);
-			}
-    	}
+  public void testDenormals(double[] vals, String s)
+  {
+  for(int i = 0; i < vals.length; i++)
+  {
+  double val = vals[i];
+  if (val > 0 && val <= 2250738585072012e-308)
+  System.err.println(s + " is DENORMAL " + val);
+  }
+  }
 */
     }

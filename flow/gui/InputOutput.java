@@ -48,9 +48,9 @@ public abstract class InputOutput extends JPanel
         val = val.trim();
         
         if (isInput())
-	        title.setText(" " + val);
-	    else
-	    	title.setText(val + " ");
+            title.setText(" " + val);
+        else
+            title.setText(val + " ");
 
         // distribute
         Modulation mod = modPanel.getModulation();

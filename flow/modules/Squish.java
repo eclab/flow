@@ -141,10 +141,10 @@ public class Squish extends Unit
                     m = m * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS)));
                     break;
                 default:
-                	{
-                	warn("modules/Squish.java", "default occurred when it should not have been able to.");
-                	break;
-                	}
+                    {
+                    warn("modules/Squish.java", "default occurred when it should not have been able to.");
+                    break;
+                    }
                 }
             if (locked)
                 {

@@ -700,10 +700,10 @@ public class Midi
                 case ShortMessage.SYSTEM_RESET: type = "System Reset"; c = -1; break;
                 case ShortMessage.TIMING_CLOCK: type = "Timing Clock"; c = -1; break;
                 case ShortMessage.TUNE_REQUEST: type = "Tune Request"; c = -1; break;
-                default:	// should not happen
-                	{
-                	System.err.println("WARNING(Midi.java): unknown message status " + s.getStatus());
-                	}
+                default:        // should not happen
+                    {
+                    System.err.println("WARNING(Midi.java): unknown message status " + s.getStatus());
+                    }
                 }
             return type + (c == -1 ? "" : (" (Channel " + c + ")"));
             }

@@ -227,38 +227,38 @@ public class ModMath extends Modulation
                 }
             break;
             case SWITCH:
-            	{
-            	if (_switch)	// Currently B
-            		{
-            		if (isTriggered(MOD_A))
-            			{
-            			_switch = !_switch;
-            			val = mod0;
-            			}
-            		else
-            			{
-            			val = mod1;
-            			}
-            		}
-            	else		// Currently A
-            		{
-            		if (isTriggered(MOD_B))
-            			{
-            			_switch = !_switch;
-            			val = mod1;
-            			}
-            		else
-            			{
-            			val = mod0;
-            			}
-            		}
-            	}
+                {
+                if (_switch)    // Currently B
+                    {
+                    if (isTriggered(MOD_A))
+                        {
+                        _switch = !_switch;
+                        val = mod0;
+                        }
+                    else
+                        {
+                        val = mod1;
+                        }
+                    }
+                else            // Currently A
+                    {
+                    if (isTriggered(MOD_B))
+                        {
+                        _switch = !_switch;
+                        val = mod1;
+                        }
+                    else
+                        {
+                        val = mod0;
+                        }
+                    }
+                }
             break;
             default:
-            	{
-            	warn("modules/ModMath.java", "default occurred when it shouldn't be possible");
-            	val = 0;
-            	}
+                {
+                warn("modules/ModMath.java", "default occurred when it shouldn't be possible");
+                val = 0;
+                }
             }
                 
         if (val > 1)
@@ -319,34 +319,34 @@ public class ModMath extends Modulation
                     }
                 break;
             case TRIGGER_DIR:
-            	if (lastMod0 != -1 &&
-            		mod0 - lastMod0 != 0)
-            		{
-            		boolean dir = (lastMod0 > mod0);
-					if (dir != lastDir)  // we changed direction
-						{
-						updateTrigger(0);
-						}
-            		}
-            	break;
+                if (lastMod0 != -1 &&
+                    mod0 - lastMod0 != 0)
+                    {
+                    boolean dir = (lastMod0 > mod0);
+                    if (dir != lastDir)  // we changed direction
+                        {
+                        updateTrigger(0);
+                        }
+                    }
+                break;
             case TRIGGER_CENTER:
-            	if (lastMod0 != -1)
-            		{
-            		if (lastMod0 >= 0.5 && mod0 < 0.5 ||
-            			lastMod0 < 0.5 && mod0 >= 0.5)		// crossed center
-            			updateTrigger(0);
-            		}
-            	break;
+                if (lastMod0 != -1)
+                    {
+                    if (lastMod0 >= 0.5 && mod0 < 0.5 ||
+                        lastMod0 < 0.5 && mod0 >= 0.5)          // crossed center
+                        updateTrigger(0);
+                    }
+                break;
             }
         setModulationOutput(0, val);
 
-		// update direction
-		if (lastMod0 != -1 && 
-			mod0 - lastMod0 != 0)
-			{
-			lastDir = (lastMod0 > mod0);
-			}
-			
+        // update direction
+        if (lastMod0 != -1 && 
+            mod0 - lastMod0 != 0)
+            {
+            lastDir = (lastMod0 > mod0);
+            }
+                        
         lastMod0 = mod0;
         }
 

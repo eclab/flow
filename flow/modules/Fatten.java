@@ -85,185 +85,185 @@ public class Fatten extends Unit
     byte[] tempOrders = null;
     
     public void remap()
-    	{
-    	byte[] orders = getOrders(0);
-    	int halflen = orders.length / 2;
-    	
-    	/// STEP 1: Allocate the arrays if necessary
-    	if (mapping == null)
-    		{
-    		mapping = new int[orders.length];
-    		mappingPos = new int[orders.length];
-    		lowerMappingPos = new int[orders.length];
-    		isLower = new boolean[orders.length];
-    		isMapped = new boolean[orders.length];
-    		for(int i = 0; i < mapping.length; i++)
-    			{
-    			mapping[i] = -1;		// everyone must be remapped
-    			mappingPos[i] = -1;		// this isn't necessary but it'll cause us to fail with an exception if something's wrong
-    			}
-    		}
+        {
+        byte[] orders = getOrders(0);
+        int halflen = orders.length / 2;
+        
+        /// STEP 1: Allocate the arrays if necessary
+        if (mapping == null)
+            {
+            mapping = new int[orders.length];
+            mappingPos = new int[orders.length];
+            lowerMappingPos = new int[orders.length];
+            isLower = new boolean[orders.length];
+            isMapped = new boolean[orders.length];
+            for(int i = 0; i < mapping.length; i++)
+                {
+                mapping[i] = -1;                // everyone must be remapped
+                mappingPos[i] = -1;             // this isn't necessary but it'll cause us to fail with an exception if something's wrong
+                }
+            }
 
-		// STEP 2: Build the isLower array, where isLower[i] is true if partial order *i* is in the lower half
-		for(int i = 0; i < isLower.length; i++)
-			{
-			isLower[i] = false;
-			isMapped[i] = false;			// also clean out isMapped
-			}
+        // STEP 2: Build the isLower array, where isLower[i] is true if partial order *i* is in the lower half
+        for(int i = 0; i < isLower.length; i++)
+            {
+            isLower[i] = false;
+            isMapped[i] = false;                    // also clean out isMapped
+            }
 
-		for(int i = 0; i < halflen; i++)
-			{
-			int o = orders[i];
-			if (o < 0) o += 256;
-			isLower[o] = true;
-			mapping[o] = -1;				// also clean out mapping[], otherwise this can cause serious weird bugs
-			}
-		
-		// STEP 3: Find the unmapped lower partials
-		for(int i = halflen; i < orders.length; i++)
-			{
-			int o = orders[i];
-			if (o < 0) o += 256;
-			int m = mapping[o];
-			if (m != -1 && 		// the partial is mapped to someone
-				isLower[m])		// this someone is in the lower space
-				{
-				isMapped[m] = true;
-				}
-			}
+        for(int i = 0; i < halflen; i++)
+            {
+            int o = orders[i];
+            if (o < 0) o += 256;
+            isLower[o] = true;
+            mapping[o] = -1;                                // also clean out mapping[], otherwise this can cause serious weird bugs
+            }
+                
+        // STEP 3: Find the unmapped lower partials
+        for(int i = halflen; i < orders.length; i++)
+            {
+            int o = orders[i];
+            if (o < 0) o += 256;
+            int m = mapping[o];
+            if (m != -1 &&          // the partial is mapped to someone
+                isLower[m])             // this someone is in the lower space
+                {
+                isMapped[m] = true;
+                }
+            }
 
-					
-		// STEP 4: Map the free upper partials to remaining unmapped lower partials
-		int l = 0;
-		for(int i = halflen; i < orders.length; i++)
-			{
-			int o = orders[i];
-			if (o < 0) o += 256;
-			int m = mapping[o];
-			if (m == -1 || 		// found a partial marked free in the first place
-				!isLower[m])	// found a partial mapped to a partial not in the lower space 
-				{
-				// find the next unmarked lower partial
-				for( ; isMapped[l] || !isLower[l]; l++);
-				
-				// At this point l is now a free lower partial
-				mapping[o] = l;
-				//print("Mapping " + i + "(" + o + ") -> (" + l + ") " + isMapped[l] + " " + isLower[l]);
-				
-				isMapped[l] = true;
-				}
-			}
-			
-	/** Are our top partials uniquely mapped to lower partials? */
-	/*	{
-		boolean[] iL = new boolean[isLower.length];
-		boolean[] iM = new boolean[isMapped.length];
-		for(int i = 0; i < isLower.length; i++)
-			{
-			iL[i] = false;
-			iM[i] = false;
-			}
+                                        
+        // STEP 4: Map the free upper partials to remaining unmapped lower partials
+        int l = 0;
+        for(int i = halflen; i < orders.length; i++)
+            {
+            int o = orders[i];
+            if (o < 0) o += 256;
+            int m = mapping[o];
+            if (m == -1 ||          // found a partial marked free in the first place
+                !isLower[m])    // found a partial mapped to a partial not in the lower space 
+                {
+                // find the next unmarked lower partial
+                for( ; isMapped[l] || !isLower[l]; l++);
+                                
+                // At this point l is now a free lower partial
+                mapping[o] = l;
+                //print("Mapping " + i + "(" + o + ") -> (" + l + ") " + isMapped[l] + " " + isLower[l]);
+                                
+                isMapped[l] = true;
+                }
+            }
+                        
+        /** Are our top partials uniquely mapped to lower partials? */
+        /*      {
+                boolean[] iL = new boolean[isLower.length];
+                boolean[] iM = new boolean[isMapped.length];
+                for(int i = 0; i < isLower.length; i++)
+                {
+                iL[i] = false;
+                iM[i] = false;
+                }
 
-		for(int i = 0; i < halflen; i++)
-			{
-			int o = orders[i];
-			if (o < 0) o += 256;
-			iL[o] = true;
-			}
+                for(int i = 0; i < halflen; i++)
+                {
+                int o = orders[i];
+                if (o < 0) o += 256;
+                iL[o] = true;
+                }
 
-		for(int i = halflen; i < orders.length; i++)
-			{
-        	int ord = orders[i];
-        	if (ord < 0) ord += 256;
-        	int m = mapping[ord];
-			if (m == -1) continue;
-			
-			if (!iL[m])
-				print("+>Mapped to non-lower order " + m);
-			if (iM[m])
-				print("+>Mapped multiply to " + m);
-			iM[m] = true;
-			}
-		}
-	*/
-
-
+                for(int i = halflen; i < orders.length; i++)
+                {
+                int ord = orders[i];
+                if (ord < 0) ord += 256;
+                int m = mapping[ord];
+                if (m == -1) continue;
+                        
+                if (!iL[m])
+                print("+>Mapped to non-lower order " + m);
+                if (iM[m])
+                print("+>Mapped multiply to " + m);
+                iM[m] = true;
+                }
+                }
+        */
 
 
 
 
-		// STEP 5: Map all upper partials, by order, to lower partials by position
-		for(int i = 0; i < halflen; i++)
-			{
-			int o = orders[i];
-			if (o < 0) o += 256;
-			lowerMappingPos[o] = i;
-			}
-		for(int i = halflen; i < orders.length; i++)
-			{
-			int o = orders[i];
-			if (o < 0) o += 256;
-			mappingPos[o] = lowerMappingPos[mapping[o]];
-			}
-
-	/** Do we still have unique orderings? */
-
-		/*
-		boolean[] got = new boolean[orders.length];
-		for(int i = 0; i < orders.length; i++)
-			{
-        	int ord = orders[i];
-        	if (ord < 0) ord += 256;
-			if (got[ord])
-				print("-->Already " + ord);
-			got[ord] = true;
-			}
-		for(int i = 0; i < orders.length; i++)
-			{
-			if (!got[i])
-				print("-->Missing " + i);
-			}
-		*/
 
 
+        // STEP 5: Map all upper partials, by order, to lower partials by position
+        for(int i = 0; i < halflen; i++)
+            {
+            int o = orders[i];
+            if (o < 0) o += 256;
+            lowerMappingPos[o] = i;
+            }
+        for(int i = halflen; i < orders.length; i++)
+            {
+            int o = orders[i];
+            if (o < 0) o += 256;
+            mappingPos[o] = lowerMappingPos[mapping[o]];
+            }
+
+        /** Do we still have unique orderings? */
+
+        /*
+          boolean[] got = new boolean[orders.length];
+          for(int i = 0; i < orders.length; i++)
+          {
+          int ord = orders[i];
+          if (ord < 0) ord += 256;
+          if (got[ord])
+          print("-->Already " + ord);
+          got[ord] = true;
+          }
+          for(int i = 0; i < orders.length; i++)
+          {
+          if (!got[i])
+          print("-->Missing " + i);
+          }
+        */
 
 
-	/** Are our top partials uniquely mapped to lower partials? */
-		/*
-		{
-		boolean[] iL = new boolean[isLower.length];
-		boolean[] iM = new boolean[isMapped.length];
-		for(int i = 0; i < isLower.length; i++)
-			{
-			iL[i] = false;
-			iM[i] = false;
-			}
 
-		for(int i = 0; i < halflen; i++)
-			{
-			int o = orders[i];
-			if (o < 0) o += 256;
-			iL[o] = true;
-			}
 
-		for(int i = halflen; i < orders.length; i++)
-			{
-        	int ord = orders[i];
-        	if (ord < 0) ord += 256;
-        	int m = mapping[ord];
-			if (m == -1) continue;
-			
-			if (!iL[m])
-				print("?>Mapped to non-lower order " + m);
-			if (iM[m])
-				print("?>Mapped multiply to " + m);
-			iM[m] = true;
-			}
-		}
-		*/
+        /** Are our top partials uniquely mapped to lower partials? */
+        /*
+          {
+          boolean[] iL = new boolean[isLower.length];
+          boolean[] iM = new boolean[isMapped.length];
+          for(int i = 0; i < isLower.length; i++)
+          {
+          iL[i] = false;
+          iM[i] = false;
+          }
 
-		// We should be good to go at this point
-    	}
+          for(int i = 0; i < halflen; i++)
+          {
+          int o = orders[i];
+          if (o < 0) o += 256;
+          iL[o] = true;
+          }
+
+          for(int i = halflen; i < orders.length; i++)
+          {
+          int ord = orders[i];
+          if (ord < 0) ord += 256;
+          int m = mapping[ord];
+          if (m == -1) continue;
+                        
+          if (!iL[m])
+          print("?>Mapped to non-lower order " + m);
+          if (iM[m])
+          print("?>Mapped multiply to " + m);
+          iM[m] = true;
+          }
+          }
+        */
+
+        // We should be good to go at this point
+        }
     
     
     public void go()
@@ -276,8 +276,8 @@ public class Fatten extends Unit
 
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
-		byte[] orders = getOrders(0);
-		
+        byte[] orders = getOrders(0);
+                
         double cents = makeVerySensitive(modulate(MOD_DETUNE)) * 100;
         if (cents != lastCents)
             {
@@ -293,113 +293,113 @@ public class Fatten extends Unit
         
 //print("---------");
 /*
-		boolean[] got = new boolean[orders.length];
-		for(int i = 0; i < orders.length; i++)
-			{
-        	int ord = orders[i];
-        	if (ord < 0) ord += 256;
-			if (got[ord])
-				print("-->Already " + ord);
-			got[ord] = true;
-			}
-		for(int i = 0; i < orders.length; i++)
-			{
-			if (!got[i])
-				print("-->Missing " + i);
-			}
+  boolean[] got = new boolean[orders.length];
+  for(int i = 0; i < orders.length; i++)
+  {
+  int ord = orders[i];
+  if (ord < 0) ord += 256;
+  if (got[ord])
+  print("-->Already " + ord);
+  got[ord] = true;
+  }
+  for(int i = 0; i < orders.length; i++)
+  {
+  if (!got[i])
+  print("-->Missing " + i);
+  }
 */
 
         // First step: we need to determine if we need to remap
         
         if (lastOrders == null) 
-        	{
-        	remap();
-			lastOrders = (byte[])(getOrders(0).clone());
-        	}
+            {
+            remap();
+            lastOrders = (byte[])(getOrders(0).clone());
+            }
         else
-        	{
-        	for(int i = 0; i < lastOrders.length; i++)
-        		{
-        		if (lastOrders[i] != orders[i])
-        			{
-        			remap();
-					lastOrders = (byte[])(getOrders(0).clone());
-        			break;
-        			}
-        		}
-        	}
+            {
+            for(int i = 0; i < lastOrders.length; i++)
+                {
+                if (lastOrders[i] != orders[i])
+                    {
+                    remap();
+                    lastOrders = (byte[])(getOrders(0).clone());
+                    break;
+                    }
+                }
+            }
 
 /*
-        print("-----");
-		boolean[] got = new boolean[orders.length];
-		for(int i = 0; i < orders.length; i++)
-			{
-        	int ord = orders[i];
-        	if (ord < 0) ord += 256;
-			if (got[ord])
-				print("-->Already " + ord);
-			got[ord] = true;
-			}
-		for(int i = 0; i < orders.length; i++)
-			{
-			if (!got[i])
-				print("-->Missing " + i);
-			}
+  print("-----");
+  boolean[] got = new boolean[orders.length];
+  for(int i = 0; i < orders.length; i++)
+  {
+  int ord = orders[i];
+  if (ord < 0) ord += 256;
+  if (got[ord])
+  print("-->Already " + ord);
+  got[ord] = true;
+  }
+  for(int i = 0; i < orders.length; i++)
+  {
+  if (!got[i])
+  print("-->Missing " + i);
+  }
 */
 
-	/*
-        print("-----");
-        for(int i = 0; i < amplitudes.length; i++)
-        	print("" + i + " " + amplitudes[i]);
-    */
+        /*
+          print("-----");
+          for(int i = 0; i < amplitudes.length; i++)
+          print("" + i + " " + amplitudes[i]);
+        */
         
         // Mix the upper and lower partials
         if (tempFrequencies == null)
-        	{
-        	tempFrequencies = new double[frequencies.length];
-        	tempAmplitudes = new double[amplitudes.length];
-        	tempOrders = new byte[orders.length];
-        	}
-        	
+            {
+            tempFrequencies = new double[frequencies.length];
+            tempAmplitudes = new double[amplitudes.length];
+            tempOrders = new byte[orders.length];
+            }
+                
         int halflen = orders.length / 2;
         for(int i = 0; i < halflen; i++)
-        	{
-        	tempOrders[i * 2] = orders[i];
-        	tempFrequencies[i * 2] = frequencies[i];
-        	tempAmplitudes[i * 2] = amplitudes[i];
-        	}
-        	
+            {
+            tempOrders[i * 2] = orders[i];
+            tempFrequencies[i * 2] = frequencies[i];
+            tempAmplitudes[i * 2] = amplitudes[i];
+            }
+                
         for(int i = halflen; i < orders.length; i++)
-        	{
-        	int ord = orders[i];
-        	if (ord < 0) ord += 256;
-        	int pos = mappingPos[ord];    
-        	
-        	//print("  " + i + " " + ord + " " + pos);
-        	
-        	tempOrders[pos * 2 + 1] = orders[i];
-        	tempFrequencies[pos * 2 + 1] = tempFrequencies[pos * 2];
-        	tempAmplitudes[pos * 2 + 1] = tempAmplitudes[pos * 2];
-        	}
-        	
+            {
+            int ord = orders[i];
+            if (ord < 0) ord += 256;
+            int pos = mappingPos[ord];    
+                
+            //print("  " + i + " " + ord + " " + pos);
+                
+            tempOrders[pos * 2 + 1] = orders[i];
+            tempFrequencies[pos * 2 + 1] = tempFrequencies[pos * 2];
+            tempAmplitudes[pos * 2 + 1] = tempAmplitudes[pos * 2];
+            }
+                
 /*
-        for(int i = 0; i < tempAmplitudes.length; i++)
-        	print("-> " + i + " " + tempAmplitudes[i]);
+  for(int i = 0; i < tempAmplitudes.length; i++)
+  print("-> " + i + " " + tempAmplitudes[i]);
 */        
 
-		System.arraycopy(tempOrders, 0, orders, 0, orders.length);
-		System.arraycopy(tempFrequencies, 0, frequencies, 0, frequencies.length);
-		System.arraycopy(tempAmplitudes, 0, amplitudes, 0, amplitudes.length);
+        System.arraycopy(tempOrders, 0, orders, 0, orders.length);
+        System.arraycopy(tempFrequencies, 0, frequencies, 0, frequencies.length);
+        System.arraycopy(tempAmplitudes, 0, amplitudes, 0, amplitudes.length);
 
 
 /*
-        print("-----");
-        for(int i = 0; i < amplitudes.length; i++)
-        	print("" + i + " " + orders[i] + " " + frequencies[i] + " " + amplitudes[i]);
+  print("-----");
+  for(int i = 0; i < amplitudes.length; i++)
+  print("" + i + " " + orders[i] + " " + frequencies[i] + " " + amplitudes[i]);
 */
 
         // Next revise partial frequencies
-        	                        
+                                        
         boolean needToSort = false;
                 
         for(int i = 0; i < frequencies.length; i += 2)

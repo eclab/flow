@@ -184,13 +184,13 @@ public class ModulationInput extends InputOutput implements Rebuildable
         add(panel, BorderLayout.CENTER);
         add(dial, BorderLayout.WEST);
 
-		String[] help = mod.wrapHelp(mod.getModulationHelp());
-		if (help != null && help.length > number && help[number] != null)
-			{
-			dial.setToolTipText(help[number]);
-			title.setToolTipText(help[number]);
-			data.setToolTipText(help[number]);
-			}
+        String[] help = mod.wrapHelp(mod.getModulationHelp());
+        if (help != null && help.length > number && help[number] != null)
+            {
+            dial.setToolTipText(help[number]);
+            title.setToolTipText(help[number]);
+            data.setToolTipText(help[number]);
+            }
         }
 
     double[] conversions = new double[] { 0.0, 1.0 / 4.0, 1.0 / 3.0, 1.0 / 2.0, 2.0 / 3.0, 3.0 / 4.0, 1.0 };
@@ -394,14 +394,14 @@ public class ModulationInput extends InputOutput implements Rebuildable
                             {
                             double d = 0;
                             try 
-                            { 
-                            d = Double.parseDouble(field.getText()); 
-                            }
+                                { 
+                                d = Double.parseDouble(field.getText()); 
+                                }
                             catch (Exception ex) 
-                            	{ 
-                            	// ignore
-                            	}
-                            	
+                                { 
+                                // ignore
+                                }
+                                
                             if (d >= 0 && d <= 1)
                                 {
                                 setState(d);
@@ -563,14 +563,14 @@ public class ModulationInput extends InputOutput implements Rebuildable
                 }
                 
             if (getDrawsStateDot())
-            	{
-            	graphics.setPaint(Style.DIAL_DYNAMIC_COLOR());
-            		graphics.fill(new Ellipse2D.Double(
-            				rect.getX() + Style.DIAL_STROKE_WIDTH() * 2, 
-            				rect.getY() + Style.DIAL_STROKE_WIDTH() * 2, 
-            				rect.getWidth() - Style.DIAL_STROKE_WIDTH() * 4, 
-            				rect.getHeight() - Style.DIAL_STROKE_WIDTH() * 4));
-            	}
+                {
+                graphics.setPaint(Style.DIAL_DYNAMIC_COLOR());
+                graphics.fill(new Ellipse2D.Double(
+                        rect.getX() + Style.DIAL_STROKE_WIDTH() * 2, 
+                        rect.getY() + Style.DIAL_STROKE_WIDTH() * 2, 
+                        rect.getWidth() - Style.DIAL_STROKE_WIDTH() * 4, 
+                        rect.getHeight() - Style.DIAL_STROKE_WIDTH() * 4));
+                }
             }
         }
 

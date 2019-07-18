@@ -92,52 +92,52 @@ public class Partials extends Unit implements UnitSource
                 box.add(box2);
                 
                 PushButton sample = new PushButton("Get")
-                	{
-                	public void perform()
-                		{
-	                    Partials partials = (Partials)(getModulation());
-        				int index = partials.getSound().findRegistered(partials);
-        				Output output = getRack().getOutput();
-        				int numSounds = output.getNumSounds();
-						output.lock();
-						try
-							{
-							double[] amplitudesIn = partials.getAmplitudesIn(0);        
-							double[] frequenciesIn = partials.getFrequenciesIn(0);
-							for(int i = 0; i < NUM_PARTIALS; i++)
-								{
-								// compute the frequency and amplitude
-								double m = frequenciesIn[i] / FREQUENCY_RANGE;
-								if (m < 0) m = 0;
-								if (m > 1) m = 1;
-								
-								double a = amplitudesIn[i];
-								if (a < 0) a = 0;
-								if (a > 1) a = 1;
-								
-								// distribute modulation to all the sounds
-								for(int j = 0; j < numSounds; j++)
-									{
-									Partials d = (Partials)(output.getSound(j).getRegistered(index));
+                    {
+                    public void perform()
+                        {
+                        Partials partials = (Partials)(getModulation());
+                        int index = partials.getSound().findRegistered(partials);
+                        Output output = getRack().getOutput();
+                        int numSounds = output.getNumSounds();
+                        output.lock();
+                        try
+                            {
+                            double[] amplitudesIn = partials.getAmplitudesIn(0);        
+                            double[] frequenciesIn = partials.getFrequenciesIn(0);
+                            for(int i = 0; i < NUM_PARTIALS; i++)
+                                {
+                                // compute the frequency and amplitude
+                                double m = frequenciesIn[i] / FREQUENCY_RANGE;
+                                if (m < 0) m = 0;
+                                if (m > 1) m = 1;
+                                                                
+                                double a = amplitudesIn[i];
+                                if (a < 0) a = 0;
+                                if (a > 1) a = 1;
+                                                                
+                                // distribute modulation to all the sounds
+                                for(int j = 0; j < numSounds; j++)
+                                    {
+                                    Partials d = (Partials)(output.getSound(j).getRegistered(index));
 
-									if (d.getModulation(i) instanceof Constant)
-										((Constant)(d.getModulation(i))).setValue(m);
-									if (d.getModulation(i + NUM_PARTIALS) instanceof Constant)
-										((Constant)(d.getModulation(i + NUM_PARTIALS))).setValue(a);
-									}
-								}
-							}
-						finally 
-							{
-							output.unlock();
-							}
-						for(int i = 0; i < NUM_PARTIALS * 2; i++)
-							{
-							mi[i].updateText();
-							}
-						mp[0].repaint();
-                		}
-                	};
+                                    if (d.getModulation(i) instanceof Constant)
+                                        ((Constant)(d.getModulation(i))).setValue(m);
+                                    if (d.getModulation(i + NUM_PARTIALS) instanceof Constant)
+                                        ((Constant)(d.getModulation(i + NUM_PARTIALS))).setValue(a);
+                                    }
+                                }
+                            }
+                        finally 
+                            {
+                            output.unlock();
+                            }
+                        for(int i = 0; i < NUM_PARTIALS * 2; i++)
+                            {
+                            mi[i].updateText();
+                            }
+                        mp[0].repaint();
+                        }
+                    };
                 
                 Box box5 = new Box(BoxLayout.X_AXIS);
                 box5.add(new UnitInput(unit, 0, this));

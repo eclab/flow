@@ -167,8 +167,8 @@ public class DADSR extends Modulation implements ModSource
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.ONE, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
             new String[] {  "Delay Time", "Delay Level", "Attack Time", "Attack Level", "Decay Time", "Sustain Level", "Release Time", "Release Level", "On Tr", "Off Tr" });
         defineOptions(new String[] { "Curve", "One Shot", "Gate Reset", "MIDI Sync", "Fast Release" }, 
-        			new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" }, 
-        			{ "One Shot" }, { "Gate Reset" }, { "MIDI Sync" }, { "No Release" } } );
+            new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" }, 
+                { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" }, { "No Release" } } );
         setModulationOutput(0, 0);  
         }
 
@@ -217,11 +217,11 @@ public class DADSR extends Modulation implements ModSource
         if (oneshot) return;
         
         if (state == DECAY && !quickRelease)
-        	{
-        	released = true;
-        	return;
-        	}
-        	
+            {
+            released = true;
+            return;
+            }
+                
         state = RELEASE;
         start = getSyncTick(sync);
         interval = toTicks(time[RELEASE]);

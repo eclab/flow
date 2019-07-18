@@ -214,10 +214,10 @@ public class PartialLab extends Unit implements UnitSource
                         }
                     break;
                     default:
-                    	{
-                    	warn("modules/PartialLab.java", "default occurred when it shouldn't be possible");
-                    	break;
-                    	}
+                        {
+                        warn("modules/PartialLab.java", "default occurred when it shouldn't be possible");
+                        break;
+                        }
                     }
                 }
             }
