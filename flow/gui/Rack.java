@@ -41,6 +41,7 @@ public class Rack extends JPanel
     String patchInfo = null;
     boolean addModulesAfter;
     
+    public Box subpatchBox;
     public Display display1;
     public Display display2;
     public Oscilloscope osc1;
@@ -59,7 +60,7 @@ public class Rack extends JPanel
     
     public JScrollPane getScrollPane() { return pane; }
     
-    public Out.OutModulePanel findOut()
+    public Out.OutModulePanel findOut()         // hehe
         {
         for(ModulePanel panel : allModulePanels)
             if (panel.getModulation() instanceof Out)
@@ -71,7 +72,7 @@ public class Rack extends JPanel
         {
         super();
         this.output = output;
-
+                        
         box = new Box(BoxLayout.X_AXIS)
             {
             public void paint(Graphics g)
@@ -109,6 +110,9 @@ public class Rack extends JPanel
         displayBox.add(display2);
                 
         add(displayBox, BorderLayout.NORTH);
+        
+        subpatchBox = new Box(BoxLayout.Y_AXIS);
+        add(subpatchBox, BorderLayout.SOUTH);
 
         setTransferHandler(new ModulePanelTransferHandler());
         this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener())
@@ -120,6 +124,22 @@ public class Rack extends JPanel
 
         if (Style.isMac())
             Mac.setup(this);
+        }
+    
+    public void rebuildSubpatches()
+        {
+        subpatchBox.removeAll();
+        for(int i = 1; i < getOutput().getNumGroups(); i++)     // note 1
+            {
+            subpatchBox.add(new SubpatchPanel(this, i));
+            }
+        revalidate();
+        repaint();
+        }
+    
+    public void addSubpatch(SubpatchPanel panel)
+        {
+        subpatchBox.add(panel);
         }
     
     public JFrame sprout()
@@ -303,10 +323,13 @@ public class Rack extends JPanel
                 int num = output.getNumSounds();
                 for(int i = 0; i < num; i++)
                     {
-                    Sound sound = output.getSound(i);
-                    Macro macro = Macro.loadMacro(sound, file);  // Macro.deserializeAsMacro(sound, file);
-                    if (firstModulation == null)
-                        firstModulation = macro;
+                    Sound s = output.getSound(i);
+                    if (s.getGroup() == Output.PRIMARY_GROUP)
+                        {
+                        Macro macro = Macro.loadMacro(s, file);  // Macro.deserializeAsMacro(sound, file);
+                        if (firstModulation == null)
+                            firstModulation = macro;
+                        }
                     }
                 }
             finally 
@@ -365,7 +388,7 @@ public class Rack extends JPanel
             addModulePanel(pan);
             reset();
             repaint();
-                
+            
             // now move to front.  Very inefficient
             move(pan, 0);
             }
@@ -464,20 +487,24 @@ public class Rack extends JPanel
             int len = output.getNumSounds();
             for(int i = 0; i < len; i++)
                 {                       
-                if ((smallerOkay && allModulePanels.size() < output.getSound(i).getNumRegistered()))
+                Sound s = output.getSound(i);
+                if (s.getGroup() == Output.PRIMARY_GROUP)
                     {
-                    return;
-                    }
-                else if (allModulePanels.size() != output.getSound(i).getNumRegistered())
-                    {
-//                    System.err.println("Rack CHECK WARNING: Sound " + i + " differs in length from allModulePanels (" +
-//                        output.getSound(i).getNumRegistered() + " vs " + 
-//                        allModulePanels.size());
-                    //new Throwable().printStackTrace();
-                    return;
+                    if ((smallerOkay && allModulePanels.size() < s.getNumRegistered()))
+                        {
+                        return;
+                        }
+                    else if (allModulePanels.size() != s.getNumRegistered())
+                        {
+                        //                    System.err.println("Rack CHECK WARNING: Sound " + i + " differs in length from allModulePanels (" +
+                        //                        s.getNumRegistered() + " vs " + 
+                        //                        allModulePanels.size());
+                        //new Throwable().printStackTrace();
+                        return;
+                        }
                     }
                 }
-                                
+                                                        
             for(int j = 0; j < output.getSound(0).getNumRegistered(); j++)
                 {
                 Modulation mod = output.getSound(0).getRegistered(j);
@@ -492,15 +519,19 @@ public class Rack extends JPanel
 
             for(int i = 1; i < len; i++)
                 {
-                for(int j = 0; j < output.getSound(i).getNumRegistered(); j++)
+                Sound s = output.getSound(i);
+                if (s.getGroup() == Output.PRIMARY_GROUP)
                     {
-                    Modulation mod = output.getSound(i).getRegistered(j);
-                    if (mod.getClass() != allModulePanels.get(j).getModulation().getClass())
+                    for(int j = 0; j < s.getNumRegistered(); j++)
                         {
-                        System.err.println("WARNING(flow/modules/Rack.java) Rack check: Modulation " + j + " in Sound " + i + 
-                            " is " + mod + " but associated panel holds " + allModulePanels.get(j).getModulation());
-                        //new Throwable().printStackTrace();
-                        return;                                 
+                        Modulation mod = s.getRegistered(j);
+                        if (mod.getClass() != allModulePanels.get(j).getModulation().getClass())
+                            {
+                            System.err.println("WARNING(flow/modules/Rack.java) Rack check: Modulation " + j + " in Sound " + i + 
+                                " is " + mod + " but associated panel holds " + allModulePanels.get(j).getModulation());
+                            //new Throwable().printStackTrace();
+                            return;                                 
+                            }
                         }
                     }
                 }
@@ -679,9 +710,12 @@ public class Rack extends JPanel
                     int numSounds = output.getNumSounds();
                     for(int j = 0; j < numSounds; j++)
                         {
-                        Sound sound = output.getSound(j);
-                        Out o = (Out)(sound.getRegistered(index));
-                        sound.setEmits(o);
+                        Sound s = output.getSound(j);
+                        if (s.getGroup() == Output.PRIMARY_GROUP)
+                            {
+                            Out o = (Out)(s.getRegistered(index));
+                            s.setEmits(o);
+                            }
                         }
                     }
                 finally 
@@ -699,8 +733,11 @@ public class Rack extends JPanel
             int numSounds = output.getNumSounds();
             for(int i = 0; i < numSounds; i++)
                 {
-                Sound sound = output.getSound(i);
-                sound.setEmits(null);
+                Sound s = output.getSound(i);
+                if (s.getGroup() == Output.PRIMARY_GROUP)
+                    {
+                    s.setEmits(null);
+                    }
                 }
             }
         finally 
@@ -849,7 +886,7 @@ public class Rack extends JPanel
             // set up
             output.setMixer(mixers[mixersCombo.getSelectedIndex()]);
             output.getInput().setupMIDI(
-                channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS,
+                new int[] { channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS },
                 mpeChannelsCombo.getSelectedIndex() + 1,
                 devices.get(devicesCombo.getSelectedIndex()));
                 
@@ -1159,8 +1196,12 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                         int len = rack.getOutput().getNumSounds();
                         for(int i = 0; i < len; i++)
                             {
-                            Modulation mod = rack.getOutput().getSound(i).removeRegistered(removed);
-                            rack.getOutput().getSound(i).addRegistered(added, mod);
+                            Sound s = rack.getOutput().getSound(i);
+                            if (s.getGroup() == Output.PRIMARY_GROUP)
+                                {
+                                Modulation mod = s.removeRegistered(removed);
+                                s.addRegistered(added, mod);
+                                }
                             }
                         }
                     finally 
@@ -1227,10 +1268,14 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                             Modulation mod0 = null;
                             for(int i = 0; i < len; i++)
                                 {
-                                Modulation mod = rack.getOutput().getSound(i).getRegistered(removed);
-                                Modulation newmod = (Modulation)(mod.clone());
-                                if (mod0 == null) mod0 = newmod;
-                                rack.getOutput().getSound(i).addRegistered(added, newmod);
+                                Sound s = rack.output.getSound(i);
+                                if (s.getGroup() == Output.PRIMARY_GROUP)
+                                    {
+                                    Modulation mod = s.getRegistered(removed);
+                                    Modulation newmod = (Modulation)(mod.clone());
+                                    if (mod0 == null) mod0 = newmod;
+                                    s.addRegistered(added, newmod);
+                                    }
                                 }
                             ModulePanel mp = mod0.getPanel();
                             mp.setRack(rack);

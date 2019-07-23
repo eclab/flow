@@ -258,7 +258,6 @@ public class AppMenu
                 {
                 rack.output.getSound(0).saveModules(obj);
                 p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(f)));
-                System.err.println(obj);
                 p.println(obj);
                 p.flush();
                 p.close();
@@ -484,6 +483,8 @@ public class AppMenu
         }
 
 
+
+
     // Produces the New Patch menu
     static JMenuItem newPatchMenu(Rack rack)
         {
@@ -522,6 +523,65 @@ public class AppMenu
         return newpatch;
         }
         
+
+    // Produces the New Patch menu
+    static JMenuItem loadSubpatchMenu(Rack rack)
+        {
+        JMenuItem loadsubpatch = new JMenuItem("Load Subpatch");
+        loadsubpatch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()  | InputEvent.SHIFT_MASK));
+        loadsubpatch.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+                if (rack.getOutput().getNumGroups() >= Output.MAX_GROUPS)
+                    {
+                    showSimpleError("Too Many Subpatches", "You can only have up to 15 subpatches", rack);
+                    }
+                else
+                    {
+                    FileDialog fd = new FileDialog((JFrame)(SwingUtilities.getRoot(rack)), "Load Subpatch File...", FileDialog.LOAD);
+                    fd.setFilenameFilter(new FilenameFilter()
+                        {
+                        public boolean accept(File dir, String name)
+                            {
+                            return ensureFileEndsWith(name, PATCH_EXTENSION).equals(name);
+                            }
+                        });
+
+                    if (file != null)
+                        {
+                        fd.setFile(file.getName());
+                        fd.setDirectory(file.getParentFile().getPath());
+                        }
+                    else
+                        {
+                        }
+                                
+                    rack.disableMenuBar();
+                    fd.setVisible(true);
+                    rack.enableMenuBar();
+                    File f = null; // make compiler happy
+                                
+                    if (fd.getFile() != null)
+                        {
+                        f = new File(fd.getDirectory(), fd.getFile());
+                        try 
+                            {
+                            rack.addSubpatch(new SubpatchPanel(rack, f));
+                            rack.revalidate();
+                            rack.repaint();
+                            }
+                        catch (Exception ex)
+                            {
+                            showSimpleError("Error", "An error occurred on loading this file.", rack);
+                            }
+                        }
+                    }
+                }
+            });
+        return loadsubpatch;
+        }
+
 
     static JMenuItem showDisplay(Rack rack)
         {
@@ -581,7 +641,8 @@ public class AppMenu
         {
         final double maxHarm[] = new double[] { 31, 49, 63, 79, 99, 127, 149, 199, 255, 299, 399, 499 };
         final JMenu max = new JMenu("Max Displayed Harmonic");
-        final JRadioButtonMenuItem[] buttons = new JRadioButtonMenuItem[] {
+        final JRadioButtonMenuItem[] buttons = new JRadioButtonMenuItem[] 
+            {
             new JRadioButtonMenuItem("32"),
             new JRadioButtonMenuItem("50"),
             new JRadioButtonMenuItem("64"),
@@ -593,7 +654,8 @@ public class AppMenu
             new JRadioButtonMenuItem("256"),
             new JRadioButtonMenuItem("300"),
             new JRadioButtonMenuItem("400"),
-            new JRadioButtonMenuItem("500")};
+            new JRadioButtonMenuItem("500")
+            };
         
         ButtonGroup group = new ButtonGroup();
         for(int i = 0; i < buttons.length; i++)
@@ -638,13 +700,15 @@ public class AppMenu
         {
         final double minHarm[] = new double[] { 1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125 };
         final JMenu min = new JMenu("Min Displayed Harmonic");
-        final JRadioButtonMenuItem[] buttons = new JRadioButtonMenuItem[] {
+        final JRadioButtonMenuItem[] buttons = new JRadioButtonMenuItem[] 
+            {
             new JRadioButtonMenuItem("Fundamental"),
             new JRadioButtonMenuItem("1/2"),
             new JRadioButtonMenuItem("1/4"),
             new JRadioButtonMenuItem("1/8"),
             new JRadioButtonMenuItem("1/16"),
-            new JRadioButtonMenuItem("1/32") };
+            new JRadioButtonMenuItem("1/32") 
+            };
         
         ButtonGroup group = new ButtonGroup();
         for(int i = 0; i < buttons.length; i++)
@@ -751,6 +815,54 @@ public class AppMenu
         return bend;
         }
 
+    // Produces the Responds to Bend menu
+    static JMenuItem bendOctaveMenu(Rack rack)
+        {
+        JMenu bendOctave = new JMenu("Bend Octaves");
+
+        final JRadioButtonMenuItem[] bendButtons = new JRadioButtonMenuItem[] 
+            {
+            new JRadioButtonMenuItem("1"),
+            new JRadioButtonMenuItem("2"),
+            new JRadioButtonMenuItem("3"),
+            new JRadioButtonMenuItem("4"),
+            new JRadioButtonMenuItem("5"),
+            new JRadioButtonMenuItem("6"),
+            new JRadioButtonMenuItem("7"),
+            new JRadioButtonMenuItem("8")
+            };
+        
+        ButtonGroup group = new ButtonGroup();
+        for(int i = 0; i < bendButtons.length; i++)
+            {
+            bendOctave.add(bendButtons[i]);
+            group.add(bendButtons[i]);
+            }
+        
+        int sel = Prefs.getLastBendOctave();
+        if (sel < 1 || sel > 8)
+            sel = Input.DEFAULT_BEND_OCTAVE;
+        bendButtons[sel - 1].setSelected(true);         // - 1 because octave starts at 1
+        rack.getOutput().getInput().setBendOctave(sel);
+        bendOctave.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+                // yuck
+                int selected = 0;
+                for(int i = 0; i < bendButtons.length; i++)
+                    if (bendButtons[i].isSelected()) 
+                        { 
+                        selected = i; 
+                        break; 
+                        }                
+                rack.getOutput().getInput().setBendOctave(selected + 1);                // + 1 because octave starts at 1
+                Prefs.setLastBendOctave(selected + 1);                                          // + 1 because octave starts at 1
+                }
+            });
+        return bendOctave;
+        }
+
     // Produces the Sync to MIDI Clock menu
     static JMenuItem syncMenu(Rack rack)
         {
@@ -803,6 +915,7 @@ public class AppMenu
         menu.add(resetMenu(rack));
         menu.addSeparator();
         menu.add(playFirstMenu(rack));
+        menu.add(bendOctaveMenu(rack));
         menu.add(bendMenu(rack));
         menu.add(velMenu(rack));
         menu.add(syncMenu(rack));
@@ -837,6 +950,8 @@ public class AppMenu
         menu.add(savePatchMenu(rack));
         menu.add(saveAsPatchMenu(rack));
         menu.add(loadPatchMenu(rack));
+        menu.addSeparator();
+        menu.add(loadSubpatchMenu(rack));
 
         if (!Style.isMac())
             {
@@ -926,7 +1041,7 @@ public class AppMenu
             // remove all existing panels
             rack.closeAll();
             rack.checkOrder();
-                   
+            
             // Add the modulations as a group
             for(int i = 0; i < mods.length; i++)
                 {
@@ -942,7 +1057,7 @@ public class AppMenu
                     mods[i][j].reset();
                     }
                 }
-                                
+                
             // Load ModulePanels for the new Modulations
             for(int j = 0; j < mods[0].length; j++)
                 {

@@ -163,8 +163,12 @@ public class ModulationOutput extends InputOutput
             int numSounds = output.getNumSounds();
             for(int i = 0; i < numSounds; i++)
                 {
-                output.getSound(i).getRegistered(index).setModulation(
-                    output.getSound(i).getRegistered(outIndex), input.number, this.number);
+                Sound s = output.getSound(i);
+                if (s.getGroup() == Output.PRIMARY_GROUP)
+                    {
+                    s.getRegistered(index).setModulation(
+                        s.getRegistered(outIndex), input.number, this.number);
+                    }
                 }
 
             wire.setEnd(input);

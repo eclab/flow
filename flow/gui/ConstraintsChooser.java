@@ -66,7 +66,11 @@ public class ConstraintsChooser extends UnitInput
                     int numSounds = output.getNumSounds();
                     for(int i = 0; i < numSounds; i++)
                         {
-                        ((Unit)(output.getSound(i).getRegistered(index))).setConstraint(val);
+                        Sound s = output.getSound(i);
+                        if (s.getGroup() == Output.PRIMARY_GROUP)
+                            {
+                            ((Unit)(s.getRegistered(index))).setConstraint(val);
+                            }
                         }
                     }
                 finally 
@@ -99,7 +103,11 @@ public class ConstraintsChooser extends UnitInput
                     int numSounds = output.getNumSounds();
                     for(int i = 0; i < numSounds; i++)
                         {
-                        ((Unit)(output.getSound(i).getRegistered(index))).setInvertConstraints(val);
+                        Sound s = output.getSound(i);
+                        if (s.getGroup() == Output.PRIMARY_GROUP)
+                            {
+                            ((Unit)(s.getRegistered(index))).setInvertConstraints(val);
+                            }
                         }
                     }
                 finally 

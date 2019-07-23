@@ -14,56 +14,43 @@ import java.util.LinkedList;
  * Input handles MIDI Input.  It is owned by Output, and it in turn owns Midi, the low-level wrapper for
  * the Java midi subsystem.
  */
+ 
+
+/*
+  ALLOCATION RULES
+        
+  //// WHEN
+  ////
+  //// Group sound reallocation and MIDI assignment occurs:
+  ////
+  //// 1. Initially
+  //// 2. On changing MIDI settings
+  //// 3. On adding or removing a sub-patch
+  //// 4. On changing the MIDI setting of a sub-patch
+            
+  GROUP MIDI ASSIGNMENT
+  Groups are assigned exactly as they are requested.  Sounds have their channels set.
+
+  SOUND MIDI ASSIGNMENT
+  This occurrs on Note On:
+  - If the sound is the PRIMARY GROUP
+  - If the main channel is LOWER MPE
+  The sound is assigned according to our MPE rules
+  - Else if the main channel is UPPER MPE
+  The sound is assigned according to our MPE rules
+  - Else
+  The sound is assigned to the main channel (including being set to OMNI)
+  - If the sound is some other group
+  - The sound is assigned to the group's channel
+*/
+
 
 public class Input
     {
+    Object lock = new Object[0];
     Midi midi;
     MidiClock midiClock;
     Output output;
-    
-    public static final int CC_SUSTAIN_PEDAL = 64;
-    
-    /**
-     * The value which represents OMNI for incoming MIDI channels
-     */
-    public static final int MPE_CONFIGURATION_RPN_NUMBER = 6;
-    public static final int CHANNEL_NONE = -4;
-    
-    public static final int CHANNEL_LOWER_ZONE = -3;
-    public static final int CHANNEL_UPPER_ZONE = -2;
-    public static final int CHANNEL_OMNI = -1;
-    public static final int NUM_SPECIAL_CHANNELS = 3;  // CHANNEL_LOWER_ZONE through CHANNEL_OMNI
-    public static final int DEFAULT_NUM_MPE_CHANNELS = 7;
-    int channel = CHANNEL_OMNI;
-    
-    /**
-     * CC values and NRPN values are all set to this initially
-     * to indicate that the system has not received any value to indicate
-     * what they should be set to.
-     */
-    
-    public static final byte UNSPECIFIED = -1;
-    
-    // The number of mpe channels. This needs to be handled differently depending on the zone.
-    int numMPEChannels = DEFAULT_NUM_MPE_CHANNELS;
-    
-    // The array of channels that are in-zone for the current MPE settings
-    boolean[] mpeChannels = new boolean[NUM_CHANNELS];
-    
-    // The raw bend value
-    int rawBend = 0;
-    
-    public int getRawBend()
-        {
-        return rawBend;
-        }
-    
-    // CC array
-    byte[][] cc = new byte[NUM_CHANNELS][NUM_CC];
-
-    // The array of NRPN values
-    short[] nrpn = new short[NUM_NRPN];
-    boolean[] msbSentLast = new boolean[NUM_NRPN];
     
     public Midi getMidi()
         {
@@ -75,90 +62,25 @@ public class Input
         return midiClock;
         }
     
-    /**
-     * The default value for the bend range in octaves
-     */
-    public static final int DEFAULT_BEND_OCTAVE = 2;
-    // actual bend range in octaves
-    int bendOctave;
-    // current global bend value
-    double globalBend = 1.0;
-    
-    
-    public int getBendOctave()
-        {
-        return bendOctave;
-        }
-    
-    public void setBendOctave(int val)
-        {
-        bendOctave = val;
-        Prefs.setLastBendOctave(val);
-        }
-    
-    
-    // Do we respond to pitch bend?
-    volatile boolean respondsToBend = true;
-    
-    /**
-     * Sets whether we respond to Pitch Bend.
-     */
-    public void setRespondsToBend(boolean val)
-        {
-        respondsToBend = val;
-        }
-    
-    /**
-     * Returns whether we respond to Pitch Bend.
-     */
-    public boolean getRespondsToBend()
-        {
-        return respondsToBend;
-        }
-    
-    // MIDI Channel count
-    static final int NUM_CHANNELS = 16;
-    // The number of CC values.
-    static final int NUM_CC = 128;
-    // The maximum legal CC value
-    static final int MAX_CC_VAL = 127;
-    // The number of NRPN Values.
-    static final int NUM_NRPN = 16384;
-    // The maximum legal NRPN value
-    static final int MAX_NRPN_VAL = 16383;
-    
-    Object lock = new Object[0];
-    // List of sounds with a note-on
-    LinkedList<Sound> notesOn = new LinkedList<Sound>();
-    // List of sounds with a note-off
-    LinkedList<Sound> notesOff = new LinkedList<Sound>();
-    // List of keystrokes currently held down, in order
-    LinkedList<Integer> notesOnMono = new LinkedList<Integer>();
-    
-    boolean sustain = false;
-    ArrayList<Sound> sustainQueue = new ArrayList<Sound>();
-    
-    /**
-     * returns true if we are in MPE mode
-     **/
-    public boolean isMPE()
-        {
-        return channel == CHANNEL_LOWER_ZONE || channel == CHANNEL_UPPER_ZONE;
-        }
-    
     public Output getOutput()
         {
         return output;
         }
-    
+
+
+
     public Input(Output output)
         {
         this.output = output;
+        
+        for(int i = 0; i < channel.length; i++)
+            channel[i] = CHANNEL_NONE;
+        
         bendOctave = Prefs.getLastBendOctave();
-        
-        channel = 0;
-        
-        for(int chan = 0; chan < NUM_CHANNELS; chan++)
+        if (bendOctave < 0 || bendOctave >= 8)
+            bendOctave = DEFAULT_BEND_OCTAVE;
+                
+        for(int chan = 0; chan < NUM_MIDI_CHANNELS; chan++)
             {
             for (int i = 0; i < NUM_CC; i++)
                 cc[chan][i] = UNSPECIFIED;
@@ -169,6 +91,23 @@ public class Input
         
         midi = new Midi(this);
         midiClock = new MidiClock(this);
+
+        ArrayList<Midi.MidiDeviceWrapper> devices = getDevices();
+        setupMIDI(new int[] { CHANNEL_OMNI }, DEFAULT_NUM_MPE_CHANNELS, devices.get(0));
+
+        // by default Output has a single group, so we'll keep that
+        // set up MIDI for first time
+        ArrayList<Midi.MidiDeviceWrapper> devs = getDevices();
+        Midi.MidiDeviceWrapper wrap = devs.get(0);
+        String midiDevice = Prefs.getLastMidiDevice();
+        for(int i = 0; i < devs.size(); i++)
+            {
+            if (devs.get(i).toString().equals(midiDevice))
+                { wrap = devs.get(i); break; }
+            }
+            
+        // we assume we have only one group at startp time
+        setupMIDI(new int[] { Prefs.getLastChannel() }, Prefs.getLastNumMPEChannels(), wrap);
         }
     
     // Output calls this to add a Sound to the Input (it's added to the notesOff list)
@@ -180,71 +119,91 @@ public class Input
             }
         }
     
-    
+
+
+
+
+
     ///// MIDI DEVICES AND SETUP
+
     
+    Midi.MidiDeviceWrapper currentWrapper;
+    
+    public void rebuildMIDI()
+        {
+        setupMIDI((int[])(channel.clone()), numMPEChannels, currentWrapper);            // rebuilds from the same data
+        }
     
     /**
      * Sets MIDI to the new device wrapper and channel.
      */
-    Midi.MidiDeviceWrapper currentWrapper;
-    
-    public void setupMIDI(int channel, int numMPEChannels, Midi.MidiDeviceWrapper mididevicewrapper)
+    public void setupMIDI(int[] channels, int numMPEChannels, Midi.MidiDeviceWrapper midiDeviceWrapper)
         {
-        Prefs.setLastChannel(channel);
-        Prefs.setLastNumMPEChannels(numMPEChannels);
-        this.channel = channel;
+        // set up device
+        midi.setInReceiver(midiDeviceWrapper);
+        currentWrapper = midiDeviceWrapper;
+
+        // assign channels to groups
+        for(int i = 0; i < channels.length; i++)        // may not be the same length as what's passed in
+            channel[i] = CHANNEL_NONE;
+        System.arraycopy(channels, 0, channel, 0, channels.length);
+        
+        // Assign channels for primary group
+        int primaryChannel = channel[Output.PRIMARY_GROUP];
         this.numMPEChannels = numMPEChannels;
-        this.globalBend = 1.0; //1.0 is no bend
-        if (isMPE())
+        for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
             {
-            setupMPEArray();
+            group[i] = Output.NO_GROUP;
+            mpeChannel[i] = false;
             }
-        currentWrapper = mididevicewrapper;
-        midi.setInReceiver(mididevicewrapper);
-        }
-    
-    private void setupMPEArray()
-        {
-        for (int i = 0; i < NUM_CHANNELS; i++)
+                
+        if (primaryChannel == CHANNEL_NONE)
             {
-            int chan = channel;    // channel is volatile
-            if ((chan == CHANNEL_LOWER_ZONE && i <= numMPEChannels)
-                || (chan == CHANNEL_UPPER_ZONE && 15 - i <= numMPEChannels))
-                {
-                mpeChannels[i] = true;
-                }
-            else
-                {
-                mpeChannels[i] = false;
-                }
+            // do nothing
             }
-        }
-    
-    /**
-     * Sets MIDI to the first available device wrapper, and channel 0.
-     */
-    public void setupMIDI()
-        {
-        ArrayList<Midi.MidiDeviceWrapper> devices = getDevices();
-        String str = Prefs.getLastMidiDevice();
-        Midi.MidiDeviceWrapper wrap = null;
-        for (Midi.MidiDeviceWrapper device : devices)
+        else if (primaryChannel == CHANNEL_OMNI)
             {
-            if (device.toString().equals(str))
+            for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
+                group[i] = Output.PRIMARY_GROUP;
+            }
+        else if (primaryChannel == CHANNEL_LOWER_ZONE)
+            {
+            for(int i = 0; i < numMPEChannels + 1; i++)
                 {
-                wrap = device;
+                group[i] = Output.PRIMARY_GROUP;
+                mpeChannel[i] = true;
                 }
             }
-        if (wrap == null)
+        else if (primaryChannel == CHANNEL_UPPER_ZONE)
             {
-            wrap = devices.get(0);
+            for(int i = 0; i < numMPEChannels + 1; i++)
+                {
+                group[NUM_MIDI_CHANNELS - i - 1] = Output.PRIMARY_GROUP;
+                mpeChannel[NUM_MIDI_CHANNELS - i - 1] = true;
+                }
+            }
+        else
+            {
+            group[primaryChannel] = Output.PRIMARY_GROUP;
+            }
+
+        // assign channels for other groups and build
+        for(int i = Output.PRIMARY_GROUP + 1; i < output.getNumGroups(); i++)
+            {
+            if (channel[i] >= 0)
+                {
+                group[channel[i]] = i;
+                mpeChannel[channel[i]] = false;
+                }
             }
         
-        int ch = Prefs.getLastChannel();
-        int num = Prefs.getLastNumMPEChannels();
-        setupMIDI(ch, num, wrap);
+        // clear bend
+        omniBend = NO_BEND;
+        mpeBend = NO_BEND;
+        for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
+            globalBend[i] = NO_BEND;
         }
+    
     
     /**
      * Returns all available MIDI device wrappers.
@@ -257,14 +216,6 @@ public class Input
         }
     
     /**
-     * Returns the current channel for the input.
-     */
-    public int getChannel()
-        {
-        return channel;
-        }
-    
-    /**
      * Returns the current MidiDevice
      */
     public Midi.MidiDeviceWrapper getMidiDevice()
@@ -273,16 +224,242 @@ public class Input
         }
     
     
+    
+
+
+
+    ///// CHANNELS AND MPE
+
+    public static final int NUM_MIDI_CHANNELS = 16;
+    public static final int NUM_SPECIAL_CHANNELS = 3;  // Omni, Lower, Upper.  This is used by Rack.java to offset its pop-up menu
+    public static final int CHANNEL_NONE = -4;
+    public static final int CHANNEL_LOWER_ZONE = -3;
+    public static final int CHANNEL_UPPER_ZONE = -2;
+    public static final int CHANNEL_OMNI = -1;
+    public static final int CHANNEL_GLOBAL_FOR_LOWER_ZONE = 0;
+    public static final int CHANNEL_GLOBAL_FOR_UPPER_ZONE = 15;
+    public static final int DEFAULT_NUM_MPE_CHANNELS = 14;
+    public static final int MPE_CONFIGURATION_RPN_NUMBER = 6;
+
+        
+    // Each group can have a channel, or CHANNEL_NONE.  group[Output.PRIMARY_GROUP] (that is, group[0]) can also have CHANNEL_OMNI, CHANNEL_LOWER_ZONE or CHANNEL_UPPER_ZONE
+    int channel[/*GROUP*/] = new int[Output.MAX_GROUPS];
+    /// each channel is assigned to a unique GROUP, or to null
+    int group[/*CHANNEL*/] = new int[NUM_MIDI_CHANNELS];
+        
+    // The number of mpe channels specified by the user for the primary group
+    int numMPEChannels = DEFAULT_NUM_MPE_CHANNELS;
+    
+    // Those channels that are actually assigned to be MPE channels in the primary group.
+    // The primary group could have requested some, but was overridden by sub-patch
+    // MIDI assignments, so we have to watch for that.
+    boolean[] mpeChannel = new boolean[NUM_MIDI_CHANNELS];
+        
+    /**
+     * returns true if we are in MPE mode
+     **/
+    public boolean isMPE()
+        {
+        return channel[Output.PRIMARY_GROUP] == CHANNEL_LOWER_ZONE || channel[Output.PRIMARY_GROUP] == CHANNEL_UPPER_ZONE;
+        }
+
+    public boolean isOMNI()
+        {
+        return channel[Output.PRIMARY_GROUP] == CHANNEL_OMNI;
+        }
+            
+    public int getGroup(int channel)
+        {
+        return group[channel];
+        }
+        
+    public int getChannel(int group)
+        {
+        return channel[group];
+        }
+    
+    public void setChannel(int group, int channel)
+        {
+        this.channel[group] = channel;
+        }
+    
+    boolean isMPEChannel(int channel)
+        {
+        if (channel < 0) return false;
+        return mpeChannel[channel];
+        }
+    
+    int getMPEGlobalChannel()
+        {
+        if (channel[Output.PRIMARY_GROUP] == CHANNEL_LOWER_ZONE)
+            {
+            return CHANNEL_GLOBAL_FOR_LOWER_ZONE;
+            }
+        else if (channel[1] == CHANNEL_LOWER_ZONE)
+            {
+            return CHANNEL_GLOBAL_FOR_UPPER_ZONE;
+            }
+        else
+            {
+            return CHANNEL_NONE;
+            }
+        }
+
+
+
+
+
+
+
+
+    //// PITCH BEND
+
+    /**
+     * The default value for the bend range in octaves
+     */
+    public static final int DEFAULT_BEND_OCTAVE = 2;
+    public static final double NO_BEND = 1.0;
+    // actual bend range in octaves
+    volatile int bendOctave;
+    // current bend values for each channel.  This is used as the default value when a new sound is allocated to a channel
+    double omniBend;
+    double mpeBend;
+    double[] globalBend = new double[NUM_MIDI_CHANNELS];
+    // Do we respond to pitch bend?
+    volatile boolean respondsToBend = true;
+    volatile int rawBend = 0;
+        
+    // Used by MidiIn.java, MPE.java
+    public int getRawBend() 
+        { 
+        return rawBend; 
+        }
+        
+    public int getBendOctave()
+        {
+        return bendOctave;
+        }
+    
+    public void setBendOctave(int val)
+        {
+        bendOctave = val;
+        }
+    
+    public void setRespondsToBend(boolean val)
+        {
+        respondsToBend = val;
+        }
+    
+    public boolean getRespondsToBend()
+        {
+        return respondsToBend;
+        }
+
+    // Processes a PITCH BEND message.
+    void processPitchBend(ShortMessage sm)
+        {
+        if (!respondsToBend) return;
+        
+        int lsb = sm.getData1();
+        int msb = sm.getData2();
+        
+        // Linux Java distros have a bug: pitch bend data is treated
+        // as a signed two's complement integer, which is wrong, wrong, wrong.
+        // So we have to special-case it here. See:
+        //
+        // https://bugs.openjdk.java.net/browse/JDK-8075073
+        // https://bugs.launchpad.net/ubuntu/+source/openjdk-8/+bug/1755640
+        
+        if (flow.gui.Style.isUnix())
+            {
+            if (msb >= 64)
+                {
+                msb = msb - 64;
+                }
+            else
+                {
+                msb = msb + 64;
+                }
+            }
+        
+        rawBend = (lsb + msb * 128) - 8192;
+        if (rawBend < -8191) rawBend = -8191;
+        
+        double d = Utility.hybridpow(2.0, rawBend / 8191.0 * getBendOctave());
+        omniBend = d;
+        if (sm.getChannel() == getMPEGlobalChannel())
+            {
+            mpeBend = d;
+            }
+        globalBend[sm.getChannel()] = d;
+        
+        synchronized (lock)
+            {
+            for (Sound sound : notesOn)
+                {
+                int c = sound.getChannel();
+                if (c == CHANNEL_OMNI || c == sm.getChannel() || (isMPEChannel(c) && sm.getChannel() == getMPEGlobalChannel()))
+                    {
+                    sound.setBend(d);
+                    }
+                }
+                        
+            for (Sound sound : notesOff)
+                {
+                int c = sound.getChannel();
+                if (c == CHANNEL_OMNI || c == sm.getChannel() || (isMPEChannel(c) && sm.getChannel() == getMPEGlobalChannel()))
+                    {
+                    sound.setBend(d);
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
     ///// CC AND NRPN
+
+
+    boolean sustain = false;
+    ArrayList<Sound> sustainQueue = new ArrayList<Sound>();
+    
+    public static final int CC_SUSTAIN_PEDAL = 64;
+    
+    /**
+     * CC values and NRPN values are all set to this initially
+     * to indicate that the system has not received any value to indicate
+     * what they should be set to.
+     */
+    public static final byte UNSPECIFIED = -1;
+    
+    // CC array
+    byte[][] cc = new byte[NUM_MIDI_CHANNELS + 1][NUM_CC];              // one more for "omni"
+
+    // The array of NRPN values
+    short[] nrpn = new short[NUM_NRPN];
+    boolean[] nrpnMSBWasSentLast = new boolean[NUM_NRPN];
     
     
+    // The number of CC values.
+    static final int NUM_CC = 128;
+    // The maximum legal CC value
+    static final int MAX_CC_VAL = 127;
+    // The number of NRPN Values.
+    static final int NUM_NRPN = 16384;
+    // The maximum legal NRPN value
+    static final int MAX_NRPN_VAL = 16383;
+    
+        
     /**
      * Returns the current value for the given CC on the given channel, or UNSPECIFIED
      */
     public byte getCC(int channel, int num)
         {
         if (channel == CHANNEL_NONE) return UNSPECIFIED;
-        if (channel == CHANNEL_OMNI) channel = 0;
+        if (channel == CHANNEL_OMNI) return cc[NUM_MIDI_CHANNELS][num];
         return cc[channel][num];
         }
     
@@ -293,45 +470,45 @@ public class Input
         {
         return nrpn[num];
         }
-    
+        
     /**
      * Returns the whether the most recent value of NRPN was due to an MSB.
      */
-    public boolean getMSBSentLast(int num)
+    public boolean getNRPNMSBWasSentLast(int num)
         {
-        return msbSentLast[num];
+        return nrpnMSBWasSentLast[num];
         }
     
     // Processes an incoming CC message
     void processCC(ShortMessage sm)
         {
         Midi.CCData ccdata = midi.getParser().processCC(sm, false, false);
-        if (ccdata == null)
+        
+        if (ccdata == null)             // bleah
             {
             return;
             }
+            
         if (ccdata.type == Midi.CCData.TYPE_RAW_CC)
             {
             byte val = (byte)ccdata.value;
             if (val < 0) val = 0;
             if (val > MAX_CC_VAL) val = MAX_CC_VAL;
             cc[ccdata.channel][ccdata.number] = val;
-
-            // if we're OMNI we should route to (say) channel 0
-            if (channel == CHANNEL_OMNI)
-                {
-                ccdata.channel = 0;
-                }
+            cc[CHANNEL_OMNI][ccdata.number] = val;                  // set it for OMNI too
                                 
-            // if it's global mpe, we need to distribute to all the channels
-            if (isMPE() && sm.getChannel() == getMPEGlobalChannel())
+            // if it's global mpe, we need to distribute to all the MPE channels
+            if (sm.getChannel() == getMPEGlobalChannel())
                 {
-                for (int i = 0; i < NUM_CHANNELS; i++)
+                for (int i = 0; i < NUM_MIDI_CHANNELS; i++)
                     {
-                    if (isInMPEZone(i))
+                    if (isMPEChannel(i))
+                        {
                         cc[i][ccdata.number] = val;
+                        }
                     }
                 }
+
 
             output.lock();
             try
@@ -374,12 +551,12 @@ public class Input
                     {
                     nrpn[ccdata.number] = MAX_NRPN_VAL;
                     }
-                msbSentLast[ccdata.number] = false;
+                nrpnMSBWasSentLast[ccdata.number] = false;
                 }
             else
                 {
                 nrpn[ccdata.number] = (short) ccdata.value;
-                msbSentLast[ccdata.number] = ccdata.msbSentLast;
+                nrpnMSBWasSentLast[ccdata.number] = ccdata.msbSentLast;
                 }
             }
         else if (ccdata.type == Midi.CCData.TYPE_RPN)
@@ -390,65 +567,131 @@ public class Input
                     {
                     int msb = ccdata.value;
                     int num = msb >> 7;
+                    // kinda silly to do this since we're just setting channel[] with it, but...
+                    int[] c = new int[channel.length];
+                    System.arraycopy(channel, 0, c, 0, channel.length);
                     if (sm.getChannel() == 0)
                         {
-                        setupMIDI(CHANNEL_LOWER_ZONE, num, currentWrapper);
+                        c[Output.PRIMARY_GROUP] = CHANNEL_LOWER_ZONE;
                         }
                     else
                         {
-                        setupMIDI(CHANNEL_UPPER_ZONE, num, currentWrapper);
+                        c[Output.PRIMARY_GROUP] = CHANNEL_UPPER_ZONE;
                         }
+                    setupMIDI(c, num, currentWrapper);
+                    
+                    // We might want to update the menu too....
+                    Prefs.setLastNumMPEChannels(num);
+                    Prefs.setLastChannel(c[Output.PRIMARY_GROUP]);
                     }
                 }
             }
         }
     
     
-    volatile Sound lastSound = null;
+
+
+
+
+
+
+
+
+
+    // AFTERTOUCH
+        
+        
+    // Processes a POLY AFTERTOUCH message.
+    void processPolyAftertouch(ShortMessage sm)
+        {
+        int i = sm.getData1();
+        double d = sm.getData2() / 127.0;
+        synchronized (lock)
+            {
+            for (Sound sound : notesOn)
+                {
+                int c = sound.getChannel();
+                if (c == CHANNEL_OMNI || c == sm.getChannel() || (isMPEChannel(c) && sm.getChannel() == getMPEGlobalChannel()))
+                    {                
+                    if (sound.getMIDINote() == i)
+                        {
+                        sound.setAftertouch(d);
+                        return;
+                        }
+                    }
+                }
+            }
+        }
+    
+    // Processes a CHANNEL AFTERTOUCH message.
+    void processChannelAftertouch(ShortMessage sm)
+        {
+        double d = sm.getData1() / 127.0;
+        synchronized (lock)
+            {
+            for (Sound sound : notesOn)
+                {
+                int c = sound.getChannel();
+                if (c == CHANNEL_OMNI || c == sm.getChannel() || (isMPEChannel(c) && sm.getChannel() == getMPEGlobalChannel()))
+                    {
+                    sound.setAftertouch(d);
+                    }
+                }
+                
+            for (Sound sound : notesOff)
+                {
+                int c = sound.getChannel();
+                if (c == CHANNEL_OMNI || c == sm.getChannel() || (isMPEChannel(c) && sm.getChannel() == getMPEGlobalChannel()))
+                    {
+                    sound.setAftertouch(d);
+                    }
+                }
+            }
+        }
+    
+
+
+
+
+    
+    
+    // NOTE ON
+        
+    
+    // List of sounds with a note-on
+    LinkedList<Sound> notesOn = new LinkedList<Sound>();
+    // List of sounds with a note-off
+    LinkedList<Sound> notesOff = new LinkedList<Sound>();
+    // List of keystrokes currently held down, in order
+    LinkedList<Integer> notesOnMono = new LinkedList<Integer>();
+    // Last sound which was started in response to a NOTE ON
+    volatile Sound lastPlayedSound = null;
     
     /**
      * Returns the last sound which was played as a result of NOTE_ON, or null.
      */
     public Sound getLastPlayedSound()
         {
-        return lastSound;
+        return lastPlayedSound;
         }
-    
-    /**
-     * Moves all notes to off and calls release on those notes.
-     */
-    public void allOff()
-        {
-        synchronized (lock)
-            {
-            output.lock();
-            try
-                {
-                int num = notesOn.size();
-                for (int i = 0; i < num; i++)
-                    {
-                    Sound sound = notesOn.removeLast();
-                    sound.release();
-                    notesOff.add(sound);
-                    }
-                notesOnMono.clear();
-                } finally
-                {
-                output.unlock();
-                }
-            }
-        }
-    
+        
     // Processes a NOTE ON message.
     void processNoteOn(ShortMessage sm)
         {
-        boolean noteCurrentlyOn = false;
-        
         Sound sound = null;
         int i = sm.getData1();
+        boolean noteCurrentlyOn = false;
+        int group = 0;
         synchronized (lock)
             {
-            if (output.getOnlyPlayFirstSound())
+            group = getGroup(sm.getChannel());
+
+            if (group == Output.NO_GROUP)                       // we have no one who listens in on this channel
+                {
+                return;
+                }
+                        
+            if (group == Output.PRIMARY_GROUP && output.getOnlyPlayFirstSound())
                 {
                 notesOnMono.add(Integer.valueOf(i));
                 sound = output.getSoundUnsafe(0);  // I think I can do this because they're not changing at this point
@@ -461,14 +704,32 @@ public class Input
                     }
                 }
             else
-                {
-                if (notesOff.isEmpty())
+                {                
+                // look through notesOff first
+                for(int j = notesOff.size() - 1; j >= 0; j--)
                     {
-                    sound = notesOn.removeLast();
+                    Sound s = notesOff.get(j);
+                    if (s.getGroup() == group)
+                        {
+                        sound = s;
+                        notesOff.remove(j);
+                        break;
+                        }
                     }
-                else
+                                
+                if (sound == null)
                     {
-                    sound = notesOff.removeLast();
+                    // look through notesOn next
+                    for(int j = notesOn.size() - 1; j >= 0; j--)
+                        {
+                        Sound s = notesOn.get(j);
+                        if (s.getGroup() == group)
+                            {
+                            sound = s;
+                            notesOn.remove(j);
+                            break;
+                            }
+                        }
                     }
                 
                 // handle sustain queue for non-mono sounds.  We need to release the old sound
@@ -487,22 +748,49 @@ public class Input
         output.lock();
         try
             {
-            sound.setChannel(sm.getChannel());
+            // set the channel, including OMNI
+            if (getChannel(group) == CHANNEL_OMNI)
+                {
+                sound.setChannel(CHANNEL_OMNI);
+                }
+            else
+                {
+                sound.setChannel(sm.getChannel());
+                }
+            
             sound.setNote(d);
             sound.setMIDINote(i);
             sound.setVelocity((double) sm.getData2() / 127.0);
-            sound.setBend(globalBend);
+            if (sound.getChannel() == CHANNEL_OMNI)
+                {
+                sound.setBend(omniBend);
+                }
+            else
+                {
+                sound.setBend(globalBend[sound.getChannel()]);
+                }
             if (!noteCurrentlyOn)
                 {
                 sound.gate();
                 }
-            lastSound = sound;
-            
-            } finally
+               
+            if (sound.getGroup() == Output.PRIMARY_GROUP)
+                {
+                lastPlayedSound = sound;
+                }
+                
+            } 
+        finally
             {
             output.unlock();
             }
         }
+    
+    
+    
+    
+    
+    
     
     // Processes a NOTE OFF message.
     void processNoteOff(ShortMessage sm)
@@ -559,9 +847,9 @@ public class Input
                         // "The prevention of per-note control after Note Off allows rapid reuse of unoccupied Channels,
                         // and applies even to notes that are kept active by a Damper Pedal message or a long release envelope."
                         
-                        if (isMPE())
+                        if (isMPEChannel(sound.getChannel()))
                             {
-                            sound.setChannel(Input.CHANNEL_NONE);
+                            sound.setChannel(CHANNEL_NONE);
                             }
                         }
                     else        // just reassign the sound
@@ -569,10 +857,24 @@ public class Input
                         int j = i;
                         i = notesOnMono.getLast().intValue();
                         double d = Math.pow(2.0, (double) (i - 69) / 12.0) * 440.0;
-                        sound.setChannel(sm.getChannel());
+
+                        // set the channel, including OMNI
+                        if (getChannel(sound.getGroup()) == CHANNEL_OMNI)
+                            {
+                            sound.setChannel(CHANNEL_OMNI);
+                            }
+                        else
+                            {
+                            sound.setChannel(sound.getGroup());
+                            }
+
                         sound.setNote(d);
                         sound.setMIDINote(i);
-                        lastSound = sound;
+
+                        if (sound.getGroup() == Output.PRIMARY_GROUP)
+                            {
+                            lastPlayedSound = sound;
+                            }
                         }
                     
                     // either way, let's set the release velocity
@@ -585,148 +887,17 @@ public class Input
             }
         }
     
-    // Processes a POLY AFTERTOUCH message.
-    void processPolyAftertouch(ShortMessage sm)
-        {
-        int i = sm.getData1();
-        double d = sm.getData2() / 127.0;
-        synchronized (lock)
-            {
-            for (Sound sound : notesOn)
-                {
-                if (sound.getMIDINote() == i)
-                    {
-                    sound.setAftertouch(d);
-                    return;
-                    }
-                }
-            }
-        }
     
-    // Processes a CHANNEL AFTERTOUCH message.
-    void processChannelAftertouch(ShortMessage sm)
-        {
-        double d = sm.getData1() / 127.0;
-        synchronized (lock)
-            {
-            if (!isMPE())
-                {
-                for (Sound sound : notesOn)
-                    {
-                    sound.setAftertouch(d);
-                    }
-                
-                for (Sound sound : notesOff)
-                    {
-                    sound.setAftertouch(d);
-                    }
-                }
-            else
-                {
-                for (Sound sound : notesOn)
-                    {
-                    if (sound.getChannel() == sm.getChannel() || sm.getChannel() == getMPEGlobalChannel())
-                        {
-                        sound.setAftertouch(d);
-                        }
-                    }
-                
-                for (Sound sound : notesOff)
-                    {
-                    if (sound.getChannel() == sm.getChannel() || sm.getChannel() == getMPEGlobalChannel())
-                        {
-                        sound.setAftertouch(d);
-                        }
-                    }
-                }
-            }
-        }
-    
-    // Processes a PITCH BEND message.
-    void processPitchBend(ShortMessage sm)
-        {
-        int lsb = sm.getData1();
-        int msb = sm.getData2();
-        
-        // Linux Java distros have a bug: pitch bend data is treated
-        // as a signed two's complement integer, which is wrong, wrong, wrong.
-        // So we have to special-case it here. See:
-        //
-        // https://bugs.openjdk.java.net/browse/JDK-8075073
-        // https://bugs.launchpad.net/ubuntu/+source/openjdk-8/+bug/1755640
-        
-        if (flow.gui.Style.isUnix())
-            {
-            if (msb >= 64)
-                {
-                msb = msb - 64;
-                }
-            else
-                {
-                msb = msb + 64;
-                }
-            }
-        
-        rawBend = (lsb + msb * 128) - 8192;
-        
-        if (rawBend < -8191)
-            {
-            rawBend = -8191;
-            }
-        
-        double d = Utility.hybridpow(2.0, rawBend / 8191.0 * bendOctave);
-        
-        if (!isMPE() || (isMPE() && sm.getChannel() == getMPEGlobalChannel()))
-            {
-            globalBend = d;
-            }
-        
-        synchronized (lock)
-            {
-            if (!isMPE())
-                {
-                if (channel == CHANNEL_OMNI || channel == sm.getChannel())
-                    {
-                    for (Sound sound : notesOn)
-                        {
-                        sound.setBend(d);
-                        }
-                                
-                    for (Sound sound : notesOff)
-                        {
-                        sound.setBend(d);
-                        }
-                    }
-                }
-            else
-                {
-                for (Sound sound : notesOn)
-                    {
-                    if (sound.getChannel() == sm.getChannel() || sm.getChannel() == getMPEGlobalChannel())
-                        {
-                        sound.setBend(d);
-                        }
-                    }
-                
-                for (Sound sound : notesOff)
-                    {
-                    if (sound.getChannel() == sm.getChannel())
-                        {
-                        sound.setBend(d);
-                        }
-                    }
-                }
-            }
-            
-        }
-    
-    boolean isVoiceMessage(ShortMessage m)
-        {
-        return (
-            m.getStatus() >= 0x80 &&
-            m.getStatus() < 0xF0);
-        }
-    
+
+
+
+
+
+
+
+    ////// TOP LEVEL
+
+
     // Pulses the Input.  Called by Output's voice sync thread's go() method.
     void go()
         {
@@ -739,45 +910,46 @@ public class Input
                 continue;
                 }
             ShortMessage sm = (ShortMessage) message;
-            if (isVoiceMessage(sm))
+            if ( sm.getStatus() >= 0x80 && sm.getStatus() < 0xF0 )                      // voice message
                 {
                 Midi.CCData ccdata;
-                
-                if ((sm.getChannel() == channel) || // If it's in our channel
-                    (channel == CHANNEL_OMNI) || // or we're looking for all messages
-                    (isMPE() && isInMPEZone(sm.getChannel())) || // or we're mpe and in the mpe range
-                        (
-                        sm.getCommand() == ShortMessage.CONTROL_CHANGE && // or we're a RPN message for configuring the MPE message
-                        (ccdata = midi.getParser().processCC(sm, false, false)) != null &&
-                        ccdata.type == Midi.CCData.TYPE_RPN &&
-                        ccdata.number == MPE_CONFIGURATION_RPN_NUMBER)
-                    )
+               
+                /* 
+                   if ((sm.getChannel() == channel) || // If it's in our channel
+                   (isOMNI()) || // or we're looking for all messages
+                   (isMPE() && isMPEChannel(sm.getChannel())) || // or we're mpe and in the mpe range
+                   (
+                   sm.getCommand() == ShortMessage.CONTROL_CHANGE && // or we're a RPN message for configuring the MPE message
+                   (ccdata = midi.getParser().processCC(sm, false, false)) != null &&
+                   ccdata.type == Midi.CCData.TYPE_RPN &&
+                   ccdata.number == MPE_CONFIGURATION_RPN_NUMBER)
+                   )
+                   {
+                */
+                int command = sm.getCommand();                  // Note not getStatus().  See below.
+                if (command == ShortMessage.NOTE_OFF || command == ShortMessage.NOTE_ON && sm.getData2() == 0)
                     {
-                    int command = sm.getCommand();                  // Note not getStatus().  See below.
-                    if (command == ShortMessage.NOTE_OFF || command == ShortMessage.NOTE_ON && sm.getData2() == 0)
-                        {
-                        processNoteOff(sm);
-                        }
-                    else if (command == ShortMessage.NOTE_ON)
-                        {
-                        processNoteOn(sm);
-                        }
-                    else if (command == ShortMessage.PITCH_BEND)
-                        {
-                        processPitchBend(sm);
-                        }
-                    else if (command == ShortMessage.CONTROL_CHANGE)
-                        {
-                        processCC(sm);
-                        }
-                    else if (command == ShortMessage.CHANNEL_PRESSURE)
-                        {
-                        processChannelAftertouch(sm);
-                        }
-                    else if (command == ShortMessage.POLY_PRESSURE)
-                        {
-                        processPolyAftertouch(sm);
-                        }
+                    processNoteOff(sm);
+                    }
+                else if (command == ShortMessage.NOTE_ON)
+                    {
+                    processNoteOn(sm);
+                    }
+                else if (command == ShortMessage.PITCH_BEND)
+                    {
+                    processPitchBend(sm);
+                    }
+                else if (command == ShortMessage.CONTROL_CHANGE)
+                    {
+                    processCC(sm);
+                    }
+                else if (command == ShortMessage.CHANNEL_PRESSURE)
+                    {
+                    processChannelAftertouch(sm);
+                    }
+                else if (command == ShortMessage.POLY_PRESSURE)
+                    {
+                    processPolyAftertouch(sm);
                     }
                 }
             }
@@ -785,20 +957,4 @@ public class Input
         midiClock.go();
         }
     
-    private boolean isInMPEZone(int channel)
-        {
-        return mpeChannels[channel];
-        }
-    
-    private int getMPEGlobalChannel()
-        {
-        if (getChannel() == CHANNEL_LOWER_ZONE)
-            {
-            return 0;
-            }
-        else
-            {
-            return 15;
-            }
-        }
     }

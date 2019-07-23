@@ -57,12 +57,15 @@ public class Presets extends JPanel
                     int numSounds = output.getNumSounds();
                     for(int i = 0; i < numSounds; i++)
                         {
-                        Sound sound = output.getSound(i);
-                        Modulation m = sound.getRegistered(index);
-                        if (m instanceof Presetable)
+                        Sound s = output.getSound(i);
+                        if (s.getGroup() == Output.PRIMARY_GROUP)
                             {
-                            Presetable p = (Presetable) m;
-                            p.setPreset(selection);
+                            Modulation m = s.getRegistered(index);
+                            if (m instanceof Presetable)
+                                {
+                                Presetable p = (Presetable) m;
+                                p.setPreset(selection);
+                                }
                             }
                         }
                     }

@@ -82,7 +82,11 @@ public class OptionsChooser extends JPanel implements Rebuildable
                         int numSounds = output.getNumSounds();
                         for(int i = 0; i < numSounds; i++)
                             {
-                            output.getSound(i).getRegistered(index).setOptionValue(optionNumber, (checkbox.isSelected() ? 1 : 0));
+                            Sound s = output.getSound(i);
+                            if (s.getGroup() == Output.PRIMARY_GROUP)
+                                {
+                                s.getRegistered(index).setOptionValue(optionNumber, (checkbox.isSelected() ? 1 : 0));
+                                }
                             }
                         }
                     finally 
@@ -139,7 +143,11 @@ public class OptionsChooser extends JPanel implements Rebuildable
                         int numSounds = output.getNumSounds();
                         for(int i = 0; i < numSounds; i++)
                             {
-                            output.getSound(i).getRegistered(index).setOptionValue(optionNumber, val);
+                            Sound s = output.getSound(i);
+                            if (s.getGroup() == Output.PRIMARY_GROUP)
+                                {
+                                s.getRegistered(index).setOptionValue(optionNumber, val);
+                                }
                             }
                         }
                     finally 

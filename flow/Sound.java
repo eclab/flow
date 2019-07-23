@@ -27,6 +27,10 @@ public class Sound
     /** Default aftertouch setting (0.0 -- no aftertouch) returned by getAftertouch() */
     public static final double DEFAULT_AFTERTOUCH = 0.0;
     
+    int group = Output.PRIMARY_GROUP;
+    public int getGroup() { return group; }
+    public void setGroup(int g) { group = g; }
+    
     // The Sound's output
     Output output;
     // Random number generator: each Sound has a unique random number generator
@@ -66,8 +70,6 @@ public class Sound
         output.register(this);
         }
         
-    /** Returns the number of Modulations / Units registered with this Sound.
-        This does not include Constants.   */
     public int getChannel() { return channel; }
     
     /** Returns a given registered Modulation / Unit */
@@ -189,10 +191,10 @@ public class Sound
         }
 
     /** Resets all Modulations / Units to their initial positions. */
-	public void resetPartialPhases()
-		{
+    public void resetPartialPhases()
+        {
         output.positions = new double[output.numVoices][Unit.NUM_PARTIALS];
-		}
+        }
 
     /** Informs all Modulations / Units that a clock reset, or MIDI CLOCK START, occurred. */
     public void restart()

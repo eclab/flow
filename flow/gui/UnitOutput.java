@@ -167,8 +167,12 @@ public class UnitOutput extends InputOutput
                 // distribute to all sounds
                 for(int i = 0; i < numSounds; i++)
                     {
-                    ((Unit)(output.getSound(i).getRegistered(index))).setConstraintIn(
-                        ((Unit)(output.getSound(i).getRegistered(outIndex))), number);
+                    Sound s = output.getSound(i);
+                    if (s.getGroup() == Output.PRIMARY_GROUP)
+                        {
+                        ((Unit)(s.getRegistered(index))).setConstraintIn(
+                            ((Unit)(s.getRegistered(outIndex))), number);
+                        }
                     }
                 }
             else
@@ -176,8 +180,12 @@ public class UnitOutput extends InputOutput
                 // distribute to all sounds
                 for(int i = 0; i < numSounds; i++)
                     {
-                    ((Unit)(output.getSound(i).getRegistered(index))).setInput(
-                        ((Unit)(output.getSound(i).getRegistered(outIndex))), input.number, number);
+                    Sound s = output.getSound(i);
+                    if (s.getGroup() == Output.PRIMARY_GROUP)
+                        {
+                        ((Unit)(s.getRegistered(index))).setInput(
+                            ((Unit)(s.getRegistered(outIndex))), input.number, number);
+                        }
                     }
                 }
             input.incoming = wire;

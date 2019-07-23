@@ -49,7 +49,7 @@ public class NRPN extends Modulation implements ModSource
             Input in = sound.getOutput().getInput();
             int num = ((int)modulate(i * 2) * 127 * 128) + (int)(modulate(i * 2 + 1) * 127);
             int val = in.getNRPN(num);
-            if (val != Input.UNSPECIFIED && !in.getMSBSentLast(num))                            // it wasn't just an MSB, which we ignore
+            if (val != Input.UNSPECIFIED && !in.getNRPNMSBWasSentLast(num))                            // it wasn't just an MSB, which we ignore
                 current[i] = (val / 128.0) / 127.0;
             setModulationOutput(i, current[i]);
             }

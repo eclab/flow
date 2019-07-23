@@ -111,11 +111,15 @@ public class UnitInput extends InputOutput implements Rebuildable
                     int numSounds = output.getNumSounds();
                     for(int i = 0; i < numSounds; i++)
                         {
-                        Unit a = (Unit)(output.getSound(i).getRegistered(index));
-                        if (number == ConstraintsChooser.INDEX)
-                            a.setConstraintIn(Unit.NIL, 0);
-                        else
-                            a.clearInput(number);
+                        Sound s = output.getSound(i);
+                        if (s.getGroup() == Output.PRIMARY_GROUP)
+                            {
+                            Unit a = (Unit)(s.getRegistered(index));
+                            if (number == ConstraintsChooser.INDEX)
+                                a.setConstraintIn(Unit.NIL, 0);
+                            else
+                                a.clearInput(number);
+                            }
                         }
                     }
                 }

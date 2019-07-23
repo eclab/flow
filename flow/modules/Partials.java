@@ -118,12 +118,16 @@ public class Partials extends Unit implements UnitSource
                                 // distribute modulation to all the sounds
                                 for(int j = 0; j < numSounds; j++)
                                     {
-                                    Partials d = (Partials)(output.getSound(j).getRegistered(index));
+                                    Sound s = output.getSound(j);
+                                    if (s.getGroup() == Output.PRIMARY_GROUP)
+                                        {
+                                        Partials d = (Partials)(s.getRegistered(index));
 
-                                    if (d.getModulation(i) instanceof Constant)
-                                        ((Constant)(d.getModulation(i))).setValue(m);
-                                    if (d.getModulation(i + NUM_PARTIALS) instanceof Constant)
-                                        ((Constant)(d.getModulation(i + NUM_PARTIALS))).setValue(a);
+                                        if (d.getModulation(i) instanceof Constant)
+                                            ((Constant)(d.getModulation(i))).setValue(m);
+                                        if (d.getModulation(i + NUM_PARTIALS) instanceof Constant)
+                                            ((Constant)(d.getModulation(i + NUM_PARTIALS))).setValue(a);
+                                        }
                                     }
                                 }
                             }

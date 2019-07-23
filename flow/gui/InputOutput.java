@@ -66,28 +66,32 @@ public abstract class InputOutput extends JPanel
                 int numSounds = output.getNumSounds();
                 for(int i = 0; i < numSounds; i++)
                     {
-                    if (isUnit())
+                    Sound s = output.getSound(i);
+                    if (s.getGroup() == Output.PRIMARY_GROUP)
                         {
-                        Unit a = (Unit)(output.getSound(i).getRegistered(index));
-                        if (isInput())
+                        if (isUnit())
                             {
-                            a.setInputName(number, val);
+                            Unit a = (Unit)(s.getRegistered(index));
+                            if (isInput())
+                                {
+                                a.setInputName(number, val);
+                                }
+                            else
+                                {
+                                a.setOutputName(number, val);
+                                }
                             }
                         else
                             {
-                            a.setOutputName(number, val);
-                            }
-                        }
-                    else
-                        {
-                        Modulation a = (Modulation)(output.getSound(i).getRegistered(index));
-                        if (isInput())
-                            {
-                            a.setModulationName(number, val);
-                            }
-                        else
-                            {
-                            a.setModulationOutputName(number, val);
+                            Modulation a = (Modulation)(s.getRegistered(index));
+                            if (isInput())
+                                {
+                                a.setModulationName(number, val);
+                                }
+                            else
+                                {
+                                a.setModulationOutputName(number, val);
+                                }
                             }
                         }
                     }

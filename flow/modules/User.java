@@ -86,10 +86,14 @@ public class User extends Modulation implements ModSource
                             try
                                 {
                                 int index = sound.findRegistered(User.this);
-                                for(int s = 0; s < numSounds; s++)
+                                for(int j = 0; j < numSounds; j++)
                                     {
-                                    User user = (User)(output.getSound(s).getRegistered(index));
-                                    user.trigger[_i] = true;
+                                    Sound s = output.getSound(j);
+                                    if (s.getGroup() == Output.PRIMARY_GROUP)
+                                        {
+                                        User user = (User)(s.getRegistered(index));
+                                        user.trigger[_i] = true;
+                                        }
                                     }
                                 }
                             finally 

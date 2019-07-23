@@ -85,10 +85,14 @@ public class Harmonics extends Unit implements UnitSource
                                 // distribute modulation to all the sounds
                                 for(int j = 0; j < numSounds; j++)
                                     {
-                                    Harmonics d = (Harmonics)(output.getSound(j).getRegistered(index));
+                                    Sound s = output.getSound(j);
+                                    if (s.getGroup() == Output.PRIMARY_GROUP)
+                                        {
+                                        Harmonics d = (Harmonics)(s.getRegistered(index));
 
-                                    if (d.getModulation(i) instanceof Constant)
-                                        ((Constant)(d.getModulation(i))).setValue(a);
+                                        if (d.getModulation(i) instanceof Constant)
+                                            ((Constant)(d.getModulation(i))).setValue(a);
+                                        }
                                     }
                                 }
                             }

@@ -87,7 +87,11 @@ public class ModulationInput extends InputOutput implements Rebuildable
             int numSounds = output.getNumSounds();
             for(int i = 0; i < numSounds; i++)
                 {
-                output.getSound(i).getRegistered(index).setModulation(new Constant(state), number);
+                Sound s = output.getSound(i);
+                if (s.getGroup() == Output.PRIMARY_GROUP)
+                    {
+                    s.getRegistered(index).setModulation(new Constant(state), number);
+                    }
                 }
             updateText();
             }
@@ -597,8 +601,12 @@ public class ModulationInput extends InputOutput implements Rebuildable
                     int numSounds = output.getNumSounds();
                     for(int i = 0; i < numSounds; i++)
                         {
-                        Modulation a = (Modulation)(output.getSound(i).getRegistered(index));
-                        a.restoreModulation(number);
+                        Sound s = output.getSound(i);
+                        if (s.getGroup() == Output.PRIMARY_GROUP)
+                            {
+                            Modulation a = (Modulation)(s.getRegistered(index));
+                            a.restoreModulation(number);
+                            }
                         }
                     }
                 }

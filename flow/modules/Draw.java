@@ -103,11 +103,15 @@ public class Draw extends Unit implements UnitSource
 
         for(int i = 0; i < numSounds; i++)
             {
-            Draw draw = (Draw)(output.getSound(i).getRegistered(index));
-            double[] amplitudes = getAmplitudes(0);
-            double[] frequencies = getFrequencies(0);
-            System.arraycopy(amplitudes, 0, draw.getAmplitudes(0), 0, amplitudes.length);
-            System.arraycopy(frequencies, 0, draw.getFrequencies(0), 0, frequencies.length);
+            Sound s = output.getSound(i);
+            if (s.getGroup() == Output.PRIMARY_GROUP)
+                {
+                Draw draw = (Draw)(s.getRegistered(index));
+                double[] amplitudes = getAmplitudes(0);
+                double[] frequencies = getFrequencies(0);
+                System.arraycopy(amplitudes, 0, draw.getAmplitudes(0), 0, amplitudes.length);
+                System.arraycopy(frequencies, 0, draw.getFrequencies(0), 0, frequencies.length);
+                }
             }
         }
 
