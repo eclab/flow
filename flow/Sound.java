@@ -349,8 +349,8 @@ public class Sound
         catch (Exception e) { return 0; }
 
 		int len = array.length();
-		int i = 0;
-		for( ; i < len; i++)		// we load all but the #0
+		int i;
+		for( i = 0 ; i < len; i++)		// we load all but the #0
 			{
 			try { patches[i + 1] = array.getJSONObject(i); }
 			catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch " + (i + 1)); break; };
