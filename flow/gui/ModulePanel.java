@@ -495,8 +495,11 @@ public class ModulePanel extends JPanel implements Transferable
             int index = rack.getIndex(this);
             for(int i = 0; i < numSounds; i++)
                 {
-                Sound sound = output.getSound(i);
-                sound.removeRegistered(index);
+                Sound s = output.getSound(i);
+                if (s.getGroup() == Output.PRIMARY_GROUP)
+                	{
+					s.removeRegistered(index);
+					}
                 }
 
             // Remove from the Rack

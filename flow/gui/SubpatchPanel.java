@@ -51,17 +51,22 @@ public class SubpatchPanel extends JPanel
             body = buildPanel();
             add(body, BorderLayout.CENTER);
                                 
+            /*
             Border border = BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(0, 2, 2, 2),
                 BorderFactory.createLineBorder(Color.GRAY));
             border = BorderFactory.createCompoundBorder(
                 border,
                 BorderFactory.createEmptyBorder(2, 2, 2, 2));
+            */
+            Border border = BorderFactory.createLineBorder(Color.GRAY);
             setBorder(border);
                 
-            titleLabel.setText(" " + rack.getOutput().getPatchName(group));
-            gain.setValue((int)(rack.getOutput().getGain(group) * GAIN_RESOLUTION));
-            midi.setValue(rack.getOutput().getInput().getChannel(group) + 1);
+            Output out = rack.getOutput();
+            titleLabel.setText(" " + out.getPatchName(group));
+            gain.setValue((int)(out.getGain(group) * GAIN_RESOLUTION));
+            sounds.setValue(out.getNumRequestedSounds(group));
+            midi.setValue(out.getInput().getChannel(group) + 1);
             }
         finally     
             {
@@ -74,7 +79,7 @@ public class SubpatchPanel extends JPanel
         rack.getOutput().lock();
         try
             {
-            buildSubpatchPanel(rack, rack.getOutput().loadSubpatch(file));
+            buildSubpatchPanel(rack, rack.getOutput().addGroup(file));
             }
         finally     
             {
@@ -104,7 +109,7 @@ public class SubpatchPanel extends JPanel
         to customize the title bar to something different than the standards. */
     protected Color getTitleBackground()
         {
-        return Color.BLUE;
+        return new Color(128, 128, 128);
         }
         
     /** Returns the foreground color of the title bar.  Override this
@@ -171,9 +176,9 @@ public class SubpatchPanel extends JPanel
             });
         titlePanel.add(removeButton, BorderLayout.WEST);                 
 
-        outer.add(titlePanel, BorderLayout.NORTH);
-        outer.add(Strut.makeVerticalStrut(2), BorderLayout.CENTER);
-                
+        outer.add(titlePanel, BorderLayout.CENTER);
+        outer.add(Strut.makeVerticalStrut(4), BorderLayout.EAST);
+		outer.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         return outer;
         }
 
@@ -200,6 +205,7 @@ public class SubpatchPanel extends JPanel
             };
         soundsLabel.setFont(Style.SMALL_FONT());
         sounds = new JSlider(0, MAX_SOUNDS);
+        sounds.setBorder(null);
         sounds.putClientProperty( "JComponent.sizeVariant", "small" );
         sounds.addChangeListener(new ChangeListener()
             {
@@ -243,6 +249,7 @@ public class SubpatchPanel extends JPanel
             };
         midiLabel.setFont(Style.SMALL_FONT());
         midi = new JSlider(0, Input.NUM_MIDI_CHANNELS);
+        midi.setBorder(null);
         midi.putClientProperty( "JComponent.sizeVariant", "small" );
         midi.addChangeListener(new ChangeListener()
             {
@@ -294,6 +301,7 @@ public class SubpatchPanel extends JPanel
             };
         gainLabel.setFont(Style.SMALL_FONT());
         gain = new JSlider(0, (int)(Out.MAX_GAIN * GAIN_RESOLUTION), 0);
+        gain.setBorder(null);
         gain.putClientProperty( "JComponent.sizeVariant", "small" );
         gain.addChangeListener(new ChangeListener()
             {

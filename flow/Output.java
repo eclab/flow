@@ -52,243 +52,6 @@ import java.io.*;
 
 public class Output
     {
-    //// GROUPS
-    ////
-    //// Each sound is assigned a GROUP.
-    //// By default sounds are assigned to the PRIMARY GROUP.
-    //// Sound 0 is *always* assigned to the PRIMARY GROUP.
-    //// Other sounds are overridden to fill as many slots as possible for
-    //// the other groups according to their numRequestedSounds[]
-        
-    /** Maximum number of possible groups */    
-    public static final int MAX_GROUPS = 16;
-    /** Primary group.  This is always group 0. */
-    public static final int PRIMARY_GROUP = 0;
-    /** Indicates no group has been assigned */
-    public static final int NO_GROUP = -1;
-    int numGroups = 1;
-    
-    public static final double DEFAULT_GAIN = 1.0;
-    int numRequestedSounds[/* Group */] = new int[MAX_GROUPS];
-    JSONObject patch[ /* Group */ ] = new JSONObject[MAX_GROUPS];
-    String patchName[ /* Group */ ] = new String[MAX_GROUPS];       
-    double gain[ /* Group */ ] = new double[MAX_GROUPS];    
-        
-    public static final String EMPTY_JSON = "{ \"flow\":" + Flow.VERSION + ", modules: [ ] }";
-        
-    /** Return the number of groups currently allocated */
-    public int getNumGroups() { return numGroups; }
-
-    /** Sets the number of groups currently allocated */
-    public void setNumGroups(int num) 
-        {
-        if (num < 1) num = 1; 
-        
-        // reset requested sounds
-        int minNum = (num > numGroups ? numGroups : num);
-        for(int i = minNum; i < MAX_GROUPS; i++)
-            {
-            patch[i] = new JSONObject(EMPTY_JSON);
-            patchName[i] = "";
-            numRequestedSounds[i] = 0;
-            }
-
-        numGroups = num; 
-        }
-        
-    public int addGroup() 
-        { 
-        setNumGroups(getNumGroups() + 1);
-        int group = getNumGroups() - 1;
-        gain[group] = DEFAULT_GAIN;
-        return group; 
-        }
-
-    public void removeGroup(int group)
-        {
-        for(int i = group; i < numGroups - 1; i++)
-            {
-            numRequestedSounds[i] = numRequestedSounds[i + 1];
-            patch[i] = patch[i + 1];
-            patchName[i] = patchName[i + 1];
-            gain[i] = gain[i + 1];
-            input.setChannel(i, input.getChannel(i + 1));
-            }
-        setNumGroups(getNumGroups() - 1);
-        assignGroupsToSounds();
-        input.rebuildMIDI();
-        }
-                
-    /** Set the requested number of sounds for a given group. */
-    public void setNumRequestedSounds(int group, int val)
-        {
-        numRequestedSounds[group] = val;
-        }
-
-    /** Return the requested number of sounds for a given group. */
-    public int getNumRequestedSounds(int group)
-        {
-        return numRequestedSounds[group]; 
-        }
-
-    /** Set the gain for a given group. */
-    public void setGain(int group, double val)
-        {
-        gain[group] = val;
-        lock();
-        try
-            {
-            // distribute to the gain of all the Out modules involved
-            for(int i = 0; i < numSounds; i++)
-                {
-                Sound s = getSound(i);
-                if (s.getGroup() == group)
-                    {
-                    ((Out)(s.getEmits())).setModulation(new Constant(val), Out.MOD_GAIN);
-                    }
-                }
-            }
-        finally
-            {
-            unlock();
-            }
-        }
-
-    /** Return the gain for a given group. */
-    public double getGain(int group)
-        {
-        return gain[group]; 
-        }
-
-    /** Set the patch name for a given group. */
-    public void setPatchName(int group, String val)
-        {
-        patchName[group] = val;
-        }
-
-    /** Return the patch name for a given group. */
-    public String getPatchName(int group)
-        {
-        return patchName[group]; 
-        }
-
-    /** Reassign sounds to groups */    
-    public void assignGroupsToSounds()
-        {
-        lock();
-        try
-            {
-            // by default we're the primary group
-            for(int j = 0; j < numSounds; j++)
-                {
-                sounds[j].setGroup(Output.PRIMARY_GROUP);
-                }
-            
-            // override by sub-patches
-            int snd = 1;                                                        // because sound 0 always belongs to the primary group
-            for(int i = 1; i < numGroups; i++)              // note 1, we skip the primary group
-                {
-                for(int j = 0; j < numRequestedSounds[i]; j++)
-                    {
-                    if (snd < numSounds)                            // we still have space
-                        {
-                        sounds[snd].setGroup(i);
-                        snd++;
-                        }
-                    }
-                }
-                                
-            /// FIXME -- this won't save out the subpatches will it?
-            sounds[0].saveModules(patch[0]);                // so we have the latest when we reload them
-                                
-            // reload patches.  We assume we have the correct patches in each group, and the latest and greatest in group 0
-            for(int i = 0; i < numSounds; i++)
-                {
-                int group = sounds[i].getGroup();
-                Modulation[] mods = new Modulation[0];
-                try 
-                    { 
-                    // load modules into an array to prepare to load into the sound
-                    mods = Sound.loadModules(patch[group], Sound.loadFlowVersion(patch[group]));
-                    }
-                catch (Exception ex) { ex.printStackTrace(); }
-                // version
-                                        
-                // remove any old modules from sound
-                int numRegistered = sounds[i].getNumRegistered();
-                for(int j = 0; j < numRegistered; j++)
-                    sounds[i].removeRegistered(0);
-                                                
-                // Add new modules from the array
-                for(int j = 0; j < mods.length; j++)
-                    {
-                    sounds[i].register(mods[j]);
-                    mods[j].setSound(sounds[i]);
-                    if (mods[j] instanceof Out)
-                        {
-                        sounds[i].setEmits((Out)(mods[j]));
-                        }
-                    mods[j].reset();
-                    }
-                }
-
-            // revise gain
-            for(int i = 1; i < numGroups; i++)              // note 1, we skip the primary group
-                {
-                setGain(i, getGain(i));         // this will redistribute
-                }
-
-            }
-        finally
-            {
-            unlock();
-            }
-        }
-
-    public void removeSubpatch(int subpatch)
-        {
-        lock();
-        try
-            {
-            removeGroup(subpatch);
-            }
-        finally 
-            {
-            unlock();
-            }
-        }
-        
-    public int loadSubpatch(File file)
-        {
-        lock();
-        int group = addGroup();
-        setNumRequestedSounds(group, 2);
-        
-        try
-            {
-            try 
-                { 
-                patch[group] = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
-                patchName[group] = Sound.loadName(patch[group]);
-                gain[group] = DEFAULT_GAIN;
-                input.setChannel(group, Input.CHANNEL_NONE);
-                }
-            catch (Exception ex) { ex.printStackTrace(); }
-            assignGroupsToSounds();
-            // I don't *think* this would really be necessary if the channel is CHANNEL_NONE, but...
-            input.rebuildMIDI();
-            }
-        finally 
-            {
-            unlock();
-            }
-        return group;
-        }
-                
-                
-                
-
-            
     /** Sampling rate of sound */
     public static final float SAMPLING_RATE = 44100.0f;
     public static final double NYQUIST = SAMPLING_RATE / 2.0;
@@ -793,7 +556,7 @@ public class Output
     public static void printDenormal(double val, String s)
         {
         if (val > 0 && val <= 2250738585072012e-308)
-            System.err.println(s + " is DENORMAL " + val);
+            System.err.println("Output.printDenormal() WARNING: " + s + " is DENORMAL " + val);
         }
     
 
@@ -1417,7 +1180,301 @@ public class Output
   } 
 */
         }  
+
+
+
+
+
+
+    //// GROUPS
+    ////
+    //// Each sound is assigned a GROUP.
+    //// By default sounds are assigned to the PRIMARY GROUP.
+    //// Sound 0 is *always* assigned to the PRIMARY GROUP.
+    //// Other sounds are overridden to fill as many slots as possible for
+    //// the other groups according to their numRequestedSounds[]
+        
+    /** Maximum number of possible groups */    
+    public static final int MAX_GROUPS = 16;
+    /** Primary group.  This is always group 0. */
+    public static final int PRIMARY_GROUP = 0;
+    /** Indicates no group has been assigned */
+    public static final int NO_GROUP = -1;
+    int numGroups = 1;
+    
+    public static final double DEFAULT_GAIN = 1.0;
+    int numRequestedSounds[/* Group */] = new int[MAX_GROUPS];
+    JSONObject patch[ /* Group */ ] = new JSONObject[MAX_GROUPS];
+    String patchName[ /* Group */ ] = new String[MAX_GROUPS];       
+    double gain[ /* Group */ ] = new double[MAX_GROUPS];    
+        
+    public static final String EMPTY_JSON = "{ \"flow\":" + Flow.VERSION + ", modules: [ ] }";
+        
+    /** Return the number of groups currently allocated */
+    public int getNumGroups() { return numGroups; }
+
+
+	/** Sets the number of groups currently allocated, does not clear new ones */
+   public void setNumGroupsUnsafe(int num) 
+        {
+        if (num < 1) num = 1; 
+        
+        // reset ABOVE num
+        int minNum = num;
+        for(int i = minNum; i < MAX_GROUPS; i++)
+            {
+            patch[i] = new JSONObject(EMPTY_JSON);
+            patchName[i] = "";
+            numRequestedSounds[i] = 0;
+            }
+
+        numGroups = num; 
+        }
+
+    /** Sets the number of groups currently allocated */
+    public void setNumGroups(int num) 
+        {
+        if (num < 1) num = 1; 
+        
+        // reset requested sounds
+        int minNum = (num > numGroups ? numGroups : num);
+        for(int i = minNum; i < MAX_GROUPS; i++)
+            {
+            patch[i] = new JSONObject(EMPTY_JSON);
+            patchName[i] = "";
+            numRequestedSounds[i] = 0;
+            }
+
+        numGroups = num; 
+        }
+        
+    /** Set the requested number of sounds for a given group. */
+    public void setNumRequestedSounds(int group, int val)
+        {
+        numRequestedSounds[group] = val;
+        }
+
+    /** Return the requested number of sounds for a given group. */
+    public int getNumRequestedSounds(int group)
+        {
+        return numRequestedSounds[group]; 
+        }
+
+    /** Set the gain for a given group. */
+    public void setGain(int group, double val)
+        {
+        gain[group] = val;
+        lock();
+        try
+            {
+            // distribute to the gain of all the Out modules involved
+            for(int i = 0; i < numSounds; i++)
+                {
+                Sound s = getSound(i);
+                if (s.getGroup() == group)
+                    {
+                    ((Out)(s.getEmits())).setModulation(new Constant(val), Out.MOD_GAIN);
+                    }
+                }
+            }
+        finally
+            {
+            unlock();
+            }
+        }
+
+    /** Return the gain for a given group. */
+    public double getGain(int group)
+        {
+        return gain[group]; 
+        }
+
+    /** Set the patch name for a given group. */
+    public void setPatchName(int group, String val)
+        {
+        patchName[group] = val;
+        }
+
+    /** Return the patch name for a given group. */
+    public String getPatchName(int group)
+        {
+        return patchName[group]; 
+        }
+        
+    /** Returns all the patches for groups. */
+    public JSONObject[] getPatches() { return patch; }
+
+    /** Returns all the patches for groups. */
+    public String[] getPatchNames() { return patchName; }
+
+    /** Returns all the requested numbers of sounds for groups. */
+    public int[] getNumRequestedSounds() { return numRequestedSounds; }
+
+    /** Returns all the requested numbers of sounds for groups. */
+    public double[] getGain() { return gain; }
+
+    /** Reassign sounds to groups */    
+    public void assignGroupsToSounds()
+        {
+        lock();
+        try
+            {
+            // by default we're the primary group
+            for(int j = 0; j < numSounds; j++)
+                {
+                sounds[j].setGroup(Output.PRIMARY_GROUP);
+                }
+            
+            // override by sub-patches
+            int snd = 1;                                                        // because sound 0 always belongs to the primary group
+            for(int i = 1; i < numGroups; i++)              // note 1, we skip the primary group
+                {
+                for(int j = 0; j < numRequestedSounds[i]; j++)
+                    {
+                    if (snd < numSounds)                            // we still have space
+                        {
+                        sounds[snd].setGroup(i);
+                        snd++;
+                        }
+                    }
+                }
+                                
+            /// FIXME -- this won't save out the subpatches will it?
+            sounds[0].saveModules(patch[0]);                // so we have the latest when we reload them
+                                
+            // reload patches.  We assume we have the correct patches in each group, and the latest and greatest in group 0
+            for(int i = 1; i < numSounds; i++)		// the first sound is already assigned to group 0 and doesn't change, else we'd have to update the GUI module panels
+                {
+                int group = sounds[i].getGroup();
+                Modulation[] mods = new Modulation[0];
+                try 
+                    { 
+                    // load modules into an array to prepare to load into the sound
+                    mods = Sound.loadModules(patch[group], Sound.loadFlowVersion(patch[group]));
+                    }
+                catch (Exception ex) { ex.printStackTrace(); }
+                // version
+                                        
+                // remove any old modules from sound
+                int numRegistered = sounds[i].getNumRegistered();
+                for(int j = 0; j < numRegistered; j++)
+                    sounds[i].removeRegistered(0);
+                                                
+                // Add new modules from the array
+                for(int j = 0; j < mods.length; j++)
+                    {
+                    sounds[i].register(mods[j]);
+                    mods[j].setSound(sounds[i]);
+                    if (mods[j] instanceof Out)
+                        {
+                        sounds[i].setEmits((Out)(mods[j]));
+                        }
+                    mods[j].reset();
+                    }
+                }
+
+            // revise gain
+            for(int i = 1; i < numGroups; i++)              // note 1, we skip the primary group
+                {
+                setGain(i, getGain(i));         // this will redistribute
+                }
+
+            }
+        finally
+            {
+            unlock();
+            }
+        }
+
+    public void removeGroup(int group)
+        {
+        if (group == 0) // can't remove that one
+        	{
+        	System.err.println("Output.removeGroup() WARNING: group is 0, cannot be removed");
+        	}
+        else if (group >= numGroups)
+        	{
+        	System.err.println("Output.removeGroup() WARNING: group >= numGroups, should not exist");
+        	}
+        else
+        	{
+			lock();
+			try
+				{
+				for(int i = group; i < numGroups - 1; i++)
+					{
+					numRequestedSounds[i] = numRequestedSounds[i + 1];
+					patch[i] = patch[i + 1];
+					patchName[i] = patchName[i + 1];
+					gain[i] = gain[i + 1];
+					input.setChannel(i, input.getChannel(i + 1));
+					}
+				setNumGroups(getNumGroups() - 1);
+				assignGroupsToSounds();
+				input.rebuildMIDI();
+				 }
+			finally 
+				{
+				unlock();
+				}
+			}
+       }
+                
+    public int addGroup(File file)
+        {
+        if (numGroups >= MAX_GROUPS - 1)
+        	{
+        	System.err.println("Output.removeGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");
+        	return -1;
+        	}
+		else
+			{
+			lock();
+
+			// increment group
+			setNumGroups(getNumGroups() + 1);
+			int group = getNumGroups() - 1;
+			gain[group] = DEFAULT_GAIN;
+			setNumRequestedSounds(group, 2);
+		
+			try
+				{
+				try 
+					{ 
+					patch[group] = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
+					patchName[group] = Sound.loadName(patch[group]);
+					gain[group] = DEFAULT_GAIN;
+					input.setChannel(group, Input.CHANNEL_NONE);
+					}
+				catch (Exception ex) { ex.printStackTrace(); }
+				assignGroupsToSounds();
+				// I don't *think* this would really be necessary if the channel is CHANNEL_NONE, but...
+				input.rebuildMIDI();
+				}
+			finally 
+				{
+				unlock();
+				}
+			return group;
+			}
+        }
+                
+                
+                
+
+            
+
+
+
+
+
+
+
     /*
+    
+    /// TEST FILTER
+    
+    
       static final double T = 1.0 / 44100.0;
 
       static final double Q = Math.sqrt(0.5);

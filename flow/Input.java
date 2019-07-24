@@ -19,15 +19,6 @@ import java.util.LinkedList;
 /*
   ALLOCATION RULES
         
-  //// WHEN
-  ////
-  //// Group sound reallocation and MIDI assignment occurs:
-  ////
-  //// 1. Initially
-  //// 2. On changing MIDI settings
-  //// 3. On adding or removing a sub-patch
-  //// 4. On changing the MIDI setting of a sub-patch
-            
   GROUP MIDI ASSIGNMENT
   Groups are assigned exactly as they are requested.  Sounds have their channels set.
 
@@ -276,6 +267,11 @@ public class Input
     public int getChannel(int group)
         {
         return channel[group];
+        }
+    
+    public int[] getChannels()
+        {
+        return channel;
         }
     
     public void setChannel(int group, int channel)

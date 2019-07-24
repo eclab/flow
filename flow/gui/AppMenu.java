@@ -143,13 +143,21 @@ public class AppMenu
                 if (file != null)
                     {
                     JSONObject obj = new JSONObject();
-                    Sound.saveName(rack.getPatchName(), obj);
+                    
+                    Output out = rack.getOutput();
+					Sound.saveGroups(out.getPatches(), 
+									out.getInput().getChannels(),
+									out.getNumRequestedSounds(),
+									out.getGain(),
+									out.getNumGroups(), 
+									obj);
+                    Sound.savePatchInfo(rack.getPatchInfo(), obj);
+                    Sound.savePatchDate(rack.getPatchDate(), obj);
+                    Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
                     Sound.saveFlowVersion(obj);
                     Sound.savePatchVersion(rack.getPatchVersion(), obj);
-                    Sound.savePatchInfo(rack.getPatchInfo(), obj);
-                    Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
-                    Sound.savePatchDate(rack.getPatchDate(), obj);
-
+                    Sound.saveName(rack.getPatchName(), obj);
+                    
                     PrintWriter p = null;
 
                     rack.output.lock();
@@ -244,14 +252,24 @@ public class AppMenu
                 
             JSONObject obj = new JSONObject();
 
+                    Output out = rack.getOutput();
+					Sound.saveGroups(out.getPatches(), 
+									out.getInput().getChannels(),
+									out.getNumRequestedSounds(),
+									out.getGain(),
+									out.getNumGroups(), 
+									obj);
+            Sound.savePatchInfo(rack.getPatchInfo(), obj);
+			Sound.savePatchDate(rack.getPatchDate(), obj);
+            Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
+            Sound.saveFlowVersion(obj);
+            Sound.savePatchVersion(rack.getPatchVersion(), obj);
+
             if (rack.getPatchName() == null || rack.getPatchName().trim().equals(""))
                 Sound.saveName(removeExtension(f.getName()), obj);
             else
                 Sound.saveName(rack.getPatchName(), obj);
-            Sound.savePatchVersion(rack.getPatchVersion(), obj);
-            Sound.savePatchInfo(rack.getPatchInfo(), obj);
-            Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
-            Sound.saveFlowVersion(obj);
+                
 
             rack.output.lock();
             try
@@ -350,15 +368,35 @@ public class AppMenu
                                 mods[i] = Sound.loadModules(obj, flowVersion);
                                 }
                                                                                                 
+							// Remove old subpatches
+							rack.getOutput().setNumGroups(1);
+
                             // Create and update Modulations and create ModulePanels
                             load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
+
+							// reload
                             if (obj != null)
                                 {
                                 rack.setPatchVersion(Sound.loadPatchVersion(obj));
                                 rack.setPatchInfo(Sound.loadPatchInfo(obj));
                                 rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
                                 rack.setPatchDate(Sound.loadPatchDate(obj));
+                                
+								Output out = rack.getOutput();
+								int numNewGroups = Sound.loadGroups(out.getPatches(), 
+												out.getInput().getChannels(),
+												out.getNumRequestedSounds(),
+												out.getPatchNames(),
+												out.getGain(),
+												obj);
+								if (numNewGroups > 0)
+									{
+									out.setNumGroupsUnsafe(numNewGroups + 1);
+									out.assignGroupsToSounds();
+									out.getInput().rebuildMIDI();
+									}
                                 }
+                            rack.rebuildSubpatches();
                             rack.checkOrder();
                             }
                         finally 
@@ -512,6 +550,10 @@ public class AppMenu
                         rack.findOut().updatePatchInfo();
                         file = null;
                         // don't reset dirFile
+
+						// Remove old subpatches
+						rack.getOutput().setNumGroups(1);
+                        rack.rebuildSubpatches();
                         }
                     finally 
                         {
@@ -533,9 +575,12 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-                if (rack.getOutput().getNumGroups() >= Output.MAX_GROUPS)
+                // this looks like an error but it's not.  
+                // >= Output.MAX_GROUPS - 1 	means that we've reached #15, which is the highest group
+                // (Output.MAX_GROUPS - 1)		coincidentally is the number of additional groups we can make beyond the PRIMARY group
+                if (rack.getOutput().getNumGroups() >= Output.MAX_GROUPS - 1)
                     {
-                    showSimpleError("Too Many Subpatches", "You can only have up to 15 subpatches", rack);
+                    showSimpleError("Too Many Subpatches", "You can only have up to " + (Output.MAX_GROUPS - 1) + " subpatches", rack);
                     }
                 else
                     {
