@@ -208,19 +208,40 @@ public class Macro extends Unit implements Cloneable
         {
         super(null);    // mod hasn't been set yet
         this.modules = modules;
+        
+        // this fixed a difficult to track down bug.  In Macro.go() we call getOrders, and then modify it.
+        // But since pushOrders just pointer-copies to orders, and by default ordersIn is NIL,
+        // then Macro modifies NIL's orders.  That's not good because NIL is shared between all Sounds,
+        // and thus modifying it is a race condition.  (Plus you're not supposed to modify it).
+        // This breaks the RandomFatten macro, for example.
+        setPushOrders(false);
         }
     
-    /** This is called to build a Macro and loading the sound. */
+    /** This is called to build a Macro and load the sound. */
     public Macro(Sound sound, Modulation[] modules, String patchName)
         {
         super(sound);  // modules hasn't been set yet
         loadModules(modules, patchName);
         setSound(sound);  // distribute to modules
+
+        // this fixed a difficult to track down bug.  In Macro.go() we call getOrders, and then modify it.
+        // But since pushOrders just pointer-copies to orders, and by default ordersIn is NIL,
+        // then Macro modifies NIL's orders.  That's not good because NIL is shared between all Sounds,
+        // and thus modifying it is a race condition.  (Plus you're not supposed to modify it).
+        // This breaks the RandomFatten macro, for example.
+        setPushOrders(false);
         }
         
     public Macro(Sound sound)
         {
         super(sound);
+
+        // this fixed a difficult to track down bug.  In Macro.go() we call getOrders, and then modify it.
+        // But since pushOrders just pointer-copies to orders, and by default ordersIn is NIL,
+        // then Macro modifies NIL's orders.  That's not good because NIL is shared between all Sounds,
+        // and thus modifying it is a race condition.  (Plus you're not supposed to modify it).
+        // This breaks the RandomFatten macro, for example.
+        setPushOrders(false);
         }
                 
     public void loadModules(Modulation[] modules, String patchName)
