@@ -52,12 +52,12 @@ public class SubpatchPanel extends JPanel
             add(body, BorderLayout.CENTER);
                                 
             /*
-            Border border = BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(0, 2, 2, 2),
-                BorderFactory.createLineBorder(Color.GRAY));
-            border = BorderFactory.createCompoundBorder(
-                border,
-                BorderFactory.createEmptyBorder(2, 2, 2, 2));
+              Border border = BorderFactory.createCompoundBorder(
+              BorderFactory.createEmptyBorder(0, 2, 2, 2),
+              BorderFactory.createLineBorder(Color.GRAY));
+              border = BorderFactory.createCompoundBorder(
+              border,
+              BorderFactory.createEmptyBorder(2, 2, 2, 2));
             */
             Border border = BorderFactory.createLineBorder(Color.GRAY);
             setBorder(border);
@@ -178,7 +178,7 @@ public class SubpatchPanel extends JPanel
 
         outer.add(titlePanel, BorderLayout.CENTER);
         outer.add(Strut.makeVerticalStrut(4), BorderLayout.EAST);
-		outer.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+        outer.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         return outer;
         }
 

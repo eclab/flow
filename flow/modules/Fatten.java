@@ -97,7 +97,7 @@ public class Fatten extends Unit
         fat.tempAmplitudes = null;
         fat.tempOrders = null;
         return fat;
-		}
+        }
     
     public void remap()
         {
@@ -161,7 +161,7 @@ public class Fatten extends Unit
                 {
                 // find the next unmarked lower partial
                 for( ; isMapped[l] || !isLower[l]; l++);
-            		             
+                                     
                 // At this point l is now a free lower partial
                 mapping[o] = l;
 //                print("Mapping " + i + "(" + o + ") -> (" + l + ") " + isMapped[l] + " " + isLower[l]);
@@ -349,7 +349,7 @@ public class Fatten extends Unit
             if (ord < 0) ord += 256;
             int pos = mappingPos[ord]; 
                 
-            tempOrders[pos * 2 + 1] = orders[i];		// notice it's orders[i], not orders[pos*2].  This is correct.
+            tempOrders[pos * 2 + 1] = orders[i];                // notice it's orders[i], not orders[pos*2].  This is correct.
             tempFrequencies[pos * 2 + 1] = tempFrequencies[pos * 2];
             tempAmplitudes[pos * 2 + 1] = tempAmplitudes[pos * 2];
             }

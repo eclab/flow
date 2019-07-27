@@ -135,11 +135,11 @@ public class AppMenu
             public void actionPerformed(ActionEvent e)
                 {
                 /*
-                Modulation[] mods = new Modulation[rack.allModulePanels.size()];
-                for(int i = 0; i < mods.length; i++)
-                    {
-                    mods[i] = rack.allModulePanels.get(i).getModulation();
-                    }
+                  Modulation[] mods = new Modulation[rack.allModulePanels.size()];
+                  for(int i = 0; i < mods.length; i++)
+                  {
+                  mods[i] = rack.allModulePanels.get(i).getModulation();
+                  }
                 */
                      
                 if (file != null)
@@ -147,12 +147,12 @@ public class AppMenu
                     JSONObject obj = new JSONObject();
                     
                     Output out = rack.getOutput();
-					Sound.saveGroups(out.getPatches(), 
-									out.getInput().getChannels(),
-									out.getNumRequestedSounds(),
-									out.getGain(),
-									out.getNumGroups(), 
-									obj);
+                    Sound.saveGroups(out.getPatches(), 
+                        out.getInput().getChannels(),
+                        out.getNumRequestedSounds(),
+                        out.getGain(),
+                        out.getNumGroups(), 
+                        obj);
                     Sound.savePatchInfo(rack.getPatchInfo(), obj);
                     Sound.savePatchDate(rack.getPatchDate(), obj);
                     Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
@@ -165,11 +165,11 @@ public class AppMenu
                     rack.output.lock();
                     try
                         {
-                		int numModulePanels = rack.allModulePanels.size();
-                		for(int i = 0; i < numModulePanels; i++)
-                    		{
-                    		rack.allModulePanels.get(i).updateForSave();
-                    		}
+                        int numModulePanels = rack.allModulePanels.size();
+                        for(int i = 0; i < numModulePanels; i++)
+                            {
+                            rack.allModulePanels.get(i).updateForSave();
+                            }
                         rack.output.getSound(0).saveModules(obj);
                         p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(file)));
                         System.out.println(obj);
@@ -224,11 +224,11 @@ public class AppMenu
         */
 
 /*
-        Modulation[] mods = new Modulation[rack.allModulePanels.size()];
-        for(int i = 0; i < mods.length; i++)
-            {
-            mods[i] = rack.allModulePanels.get(i).getModulation();
-            }
+  Modulation[] mods = new Modulation[rack.allModulePanels.size()];
+  for(int i = 0; i < mods.length; i++)
+  {
+  mods[i] = rack.allModulePanels.get(i).getModulation();
+  }
 */
                      
         FileDialog fd = new FileDialog((Frame)(SwingUtilities.getRoot(rack)), "Save Patch to Sysex File...", FileDialog.SAVE);
@@ -261,15 +261,15 @@ public class AppMenu
                 
             JSONObject obj = new JSONObject();
 
-			Output out = rack.getOutput();
-			Sound.saveGroups(out.getPatches(), 
-							out.getInput().getChannels(),
-							out.getNumRequestedSounds(),
-							out.getGain(),
-							out.getNumGroups(), 
-							obj);
+            Output out = rack.getOutput();
+            Sound.saveGroups(out.getPatches(), 
+                out.getInput().getChannels(),
+                out.getNumRequestedSounds(),
+                out.getGain(),
+                out.getNumGroups(), 
+                obj);
             Sound.savePatchInfo(rack.getPatchInfo(), obj);
-			Sound.savePatchDate(rack.getPatchDate(), obj);
+            Sound.savePatchDate(rack.getPatchDate(), obj);
             Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
             Sound.saveFlowVersion(obj);
             Sound.savePatchVersion(rack.getPatchVersion(), obj);
@@ -282,11 +282,11 @@ public class AppMenu
             rack.output.lock();
             try
                 {
-				int numModulePanels = rack.allModulePanels.size();
-				for(int i = 0; i < numModulePanels; i++)
-					{
-					rack.allModulePanels.get(i).updateForSave();
-					}
+                int numModulePanels = rack.allModulePanels.size();
+                for(int i = 0; i < numModulePanels; i++)
+                    {
+                    rack.allModulePanels.get(i).updateForSave();
+                    }
                 rack.output.getSound(0).saveModules(obj);
                 p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(f)));
                 p.println(obj);
@@ -381,13 +381,13 @@ public class AppMenu
                                 mods[i] = Sound.loadModules(obj, flowVersion);
                                 }
                                                                                                 
-							// Remove old subpatches
-							rack.getOutput().setNumGroups(1);
+                            // Remove old subpatches
+                            rack.getOutput().setNumGroups(1);
 
                             // Create and update Modulations and create ModulePanels
                             load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
 
-							// reload
+                            // reload
                             if (obj != null)
                                 {
                                 rack.setPatchVersion(Sound.loadPatchVersion(obj));
@@ -395,19 +395,19 @@ public class AppMenu
                                 rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
                                 rack.setPatchDate(Sound.loadPatchDate(obj));
                                 
-								Output out = rack.getOutput();
-								int numNewGroups = Sound.loadGroups(out.getPatches(), 
-												out.getInput().getChannels(),
-												out.getNumRequestedSounds(),
-												out.getPatchNames(),
-												out.getGain(),
-												obj);
-								if (numNewGroups > 0)
-									{
-									out.setNumGroupsUnsafe(numNewGroups + 1);
-									out.assignGroupsToSounds();
-									out.getInput().rebuildMIDI();
-									}
+                                Output out = rack.getOutput();
+                                int numNewGroups = Sound.loadGroups(out.getPatches(), 
+                                    out.getInput().getChannels(),
+                                    out.getNumRequestedSounds(),
+                                    out.getPatchNames(),
+                                    out.getGain(),
+                                    obj);
+                                if (numNewGroups > 0)
+                                    {
+                                    out.setNumGroupsUnsafe(numNewGroups + 1);
+                                    out.assignGroupsToSounds();
+                                    out.getInput().rebuildMIDI();
+                                    }
                                 }
                             rack.rebuildSubpatches();
                             rack.checkOrder();
@@ -563,8 +563,8 @@ public class AppMenu
                         file = null;
                         // don't reset dirFile
 
-						// Remove old subpatches
-						rack.getOutput().setNumGroups(1);
+                        // Remove old subpatches
+                        rack.getOutput().setNumGroups(1);
                         rack.rebuildSubpatches();
                         }
                     finally 
@@ -588,8 +588,8 @@ public class AppMenu
             public void actionPerformed(ActionEvent e)
                 {
                 // this looks like an error but it's not.  
-                // >= Output.MAX_GROUPS - 1 	means that we've reached #15, which is the highest group
-                // (Output.MAX_GROUPS - 1)		coincidentally is the number of additional groups we can make beyond the PRIMARY group
+                // >= Output.MAX_GROUPS - 1     means that we've reached #15, which is the highest group
+                // (Output.MAX_GROUPS - 1)              coincidentally is the number of additional groups we can make beyond the PRIMARY group
                 if (rack.getOutput().getNumGroups() >= Output.MAX_GROUPS - 1)
                     {
                     showSimpleError("Too Many Subpatches", "You can only have up to " + (Output.MAX_GROUPS - 1) + " subpatches", rack);
@@ -1041,7 +1041,7 @@ public class AppMenu
             if (c == flow.modules.Out.class)
                 { } // do nothing
             else if (flow.Miscellaneous.class.isAssignableFrom(c))
-            	miscellaneous.add(m);
+                miscellaneous.add(m);
             else if (flow.UnitSource.class.isAssignableFrom(c))
                 unitSources.add(m);
             else if (flow.ModSource.class.isAssignableFrom(c))

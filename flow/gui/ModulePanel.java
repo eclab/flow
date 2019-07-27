@@ -52,9 +52,9 @@ public class ModulePanel extends JPanel implements Transferable
         JPanel pan2 = new JPanel();
         pan2.setLayout(new BorderLayout());
         if (getFillPanel())
-        	pan2.add(buildPanel(), BorderLayout.CENTER);
-		else
-			pan2.add(buildPanel(), BorderLayout.NORTH);
+            pan2.add(buildPanel(), BorderLayout.CENTER);
+        else
+            pan2.add(buildPanel(), BorderLayout.NORTH);
                 
         add(pan2, BorderLayout.CENTER);
                 
@@ -497,9 +497,9 @@ public class ModulePanel extends JPanel implements Transferable
                 {
                 Sound s = output.getSound(i);
                 if (s.getGroup() == Output.PRIMARY_GROUP)
-                	{
-					s.removeRegistered(index);
-					}
+                    {
+                    s.removeRegistered(index);
+                    }
                 }
 
             // Remove from the Rack
@@ -538,12 +538,12 @@ public class ModulePanel extends JPanel implements Transferable
         }
         
     /** Called prior to attempting to save the patch out to a file to give the
-    	ModulePanel a chance to revise the module first.  For example, if the ModulePanel
-    	has a TextArea that needs to be lazily written to a string.  By default this method
-    	does nothing. */ 
+        ModulePanel a chance to revise the module first.  For example, if the ModulePanel
+        has a TextArea that needs to be lazily written to a string.  By default this method
+        does nothing. */ 
     public void updateForSave()
-    	{
-    	}
+        {
+        }
 
     /** Called by doLoad(...) when loading a file.  Override this however you see fit (see doLoad()) */
     public void loadFile(File file, Rack rack) { }

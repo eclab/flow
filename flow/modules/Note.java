@@ -54,33 +54,33 @@ public class Note extends Modulation implements Miscellaneous
         }
     
     public void setData(JSONObject data, int moduleVersion, int patchVersion) throws Exception 
-    	{
-    	try
-    		{
-    		text = data.getString("text");
-    		}
-    	catch (Exception ex)
-    		{
-    		text = "";
-    		}
+        {
+        try
+            {
+            text = data.getString("text");
+            }
+        catch (Exception ex)
+            {
+            text = "";
+            }
 
-    	try
-    		{
-    		width = data.getInt("width");
-    		}
-    	catch (Exception ex)
-    		{
-    		width = 0;
-    		}
-    	}  
+        try
+            {
+            width = data.getInt("width");
+            }
+        catch (Exception ex)
+            {
+            width = 0;
+            }
+        }  
     
     public JSONObject getData() 
-    	{
-    	JSONObject obj = new JSONObject();
-    	obj.put("text", text);
-    	obj.put("width", width);
-    	return obj;
-    	}
+        {
+        JSONObject obj = new JSONObject();
+        obj.put("text", text);
+        obj.put("width", width);
+        return obj;
+        }
 
     public ModulePanel getPanel()
         {
@@ -91,73 +91,73 @@ public class Note extends Modulation implements Miscellaneous
             public boolean getFillPanel() { return true; }
             
             public void updateForSave()
-            	{
-            	// this lock/unlock is unnecessary, since I know that we're already locked
-            	// when updateForSave is called.  But just for some cargo cult programming...
-            	
-            	getSound().getOutput().lock();
-            	try
-            		{
-            		width = area.getWidth();
-            		Document doc = area.getDocument();
-            		text = doc.getText(0, doc.getLength());
-            		}
-            	catch (Exception ex)
-            		{
-            		text = "";
-            		}
-            	finally	
-            		{
-            		getSound().getOutput().unlock();
-            		}
-            	}
+                {
+                // this lock/unlock is unnecessary, since I know that we're already locked
+                // when updateForSave is called.  But just for some cargo cult programming...
+                
+                getSound().getOutput().lock();
+                try
+                    {
+                    width = area.getWidth();
+                    Document doc = area.getDocument();
+                    text = doc.getText(0, doc.getLength());
+                    }
+                catch (Exception ex)
+                    {
+                    text = "";
+                    }
+                finally 
+                    {
+                    getSound().getOutput().unlock();
+                    }
+                }
             
             public JComponent buildPanel()
                 {               
-            	area = new JTextArea(text);
-            	area.setFont(flow.gui.Style.SMALL_FONT());
-				area.setLineWrap(true);
-				area.setWrapStyleWord(true);
-            	final JScrollPane pane = new JScrollPane(area);
-            	pane.setMinimumSize(new Dimension(Math.max(1, width), 0));
-            	pane.setPreferredSize(pane.getMinimumSize());
-				final JPanel panel = new JPanel();
-				panel.setLayout(new BorderLayout());
-				panel.add(pane, BorderLayout.CENTER);
+                area = new JTextArea(text);
+                area.setFont(flow.gui.Style.SMALL_FONT());
+                area.setLineWrap(true);
+                area.setWrapStyleWord(true);
+                final JScrollPane pane = new JScrollPane(area);
+                pane.setMinimumSize(new Dimension(Math.max(1, width), 0));
+                pane.setPreferredSize(pane.getMinimumSize());
+                final JPanel panel = new JPanel();
+                panel.setLayout(new BorderLayout());
+                panel.add(pane, BorderLayout.CENTER);
 
-				JButton left = new JButton(I_DOWN);
-            	left.setPressedIcon(I_DOWN_PRESSED);
-				left.setBorder(null);
-				left.addActionListener(new ActionListener()
-					{
-					public void actionPerformed(ActionEvent e)
+                JButton left = new JButton(I_DOWN);
+                left.setPressedIcon(I_DOWN_PRESSED);
+                left.setBorder(null);
+                left.addActionListener(new ActionListener()
+                    {
+                    public void actionPerformed(ActionEvent e)
                         {
-                    	pane.setMinimumSize(new Dimension(pane.getWidth() / 2, 0));
-            			pane.setPreferredSize(pane.getMinimumSize());
+                        pane.setMinimumSize(new Dimension(pane.getWidth() / 2, 0));
+                        pane.setPreferredSize(pane.getMinimumSize());
                         panel.revalidate();
-                        }					
-                	});
+                        }                                       
+                    });
 
-				JButton right = new JButton(I_UP);
-            	right.setPressedIcon(I_UP_PRESSED);
-				right.setBorder(null);
-				right.addActionListener(new ActionListener()
-					{
-					public void actionPerformed(ActionEvent e)
+                JButton right = new JButton(I_UP);
+                right.setPressedIcon(I_UP_PRESSED);
+                right.setBorder(null);
+                right.addActionListener(new ActionListener()
+                    {
+                    public void actionPerformed(ActionEvent e)
                         {
-            			pane.setMinimumSize(new Dimension(pane.getWidth() * 2, 0));
-            			pane.setPreferredSize(pane.getMinimumSize());
+                        pane.setMinimumSize(new Dimension(pane.getWidth() * 2, 0));
+                        pane.setPreferredSize(pane.getMinimumSize());
                         panel.revalidate();
-                        }					
-                	});
-				
-				Box box = new Box(BoxLayout.X_AXIS);
-				box.add(box.createGlue());
-				box.add(left);
-				box.add(Strut.makeHorizontalStrut(4));
-				box.add(right);
-				panel.add(box, BorderLayout.SOUTH);
-            	return panel;
+                        }                                       
+                    });
+                                
+                Box box = new Box(BoxLayout.X_AXIS);
+                box.add(box.createGlue());
+                box.add(left);
+                box.add(Strut.makeHorizontalStrut(4));
+                box.add(right);
+                panel.add(box, BorderLayout.SOUTH);
+                return panel;
                 }
             };
         }

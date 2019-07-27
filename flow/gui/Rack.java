@@ -331,13 +331,13 @@ public class Rack extends JPanel
                             firstModulation = macro;
                         }
                     }
-				ModulePanel pan = firstModulation.getPanel(); 
-				addModulePanel(pan);
-				reset();
-				repaint();
+                ModulePanel pan = firstModulation.getPanel(); 
+                addModulePanel(pan);
+                reset();
+                repaint();
  
-            	// now move to front.  Very inefficient
-            	move(pan, 0);
+                // now move to front.  Very inefficient
+                move(pan, 0);
                 }
             finally 
                 {
@@ -357,15 +357,15 @@ public class Rack extends JPanel
         {
         output.lock();
         try
-        	{
-        	addModulePanel(modulation.getPanel());
-        	reset();
-        	repaint();
-        	}
+            {
+            addModulePanel(modulation.getPanel());
+            reset();
+            repaint();
+            }
         finally
-        	{
-        	output.unlock();
-        	}
+            {
+            output.unlock();
+            }
         }
   
     /** Builds a ModulePanel for a Modulation of the class moduleClass and adds it to the BEGINNING the Rack. */

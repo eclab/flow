@@ -340,57 +340,57 @@ public class Sound
         else return version;
         }
                 
-     /** Loads all the groups EXCEPT THE FIRST GROUP, if any, from a JSONObject, and returns the number of NEW groups. */
+    /** Loads all the groups EXCEPT THE FIRST GROUP, if any, from a JSONObject, and returns the number of NEW groups. */
     public static int loadGroups(JSONObject[] patches, int[] midi, int[] sounds, String[] patchNames, double[] gain, JSONObject obj) throws JSONException
         {
         JSONArray array = null;
         
-        try { array = obj.getJSONArray("sub"); }  		// no groups at all
+        try { array = obj.getJSONArray("sub"); }                // no groups at all
         catch (Exception e) { return 0; }
 
-		int len = array.length();
-		int i;
-		for( i = 0 ; i < len; i++)		// we load all but the #0
-			{
-			try { patches[i + 1] = array.getJSONObject(i); }
-			catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch " + (i + 1)); break; };
-			try { patchNames[i + 1] = Sound.loadName(patches[i + 1]); }
-			catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch name " + (i + 1)); break; };
-			try { gain[i + 1] = patches[i + 1].getDouble("gain"); }
-			catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid gain " + (i + 1)); break; };
-			try { sounds[i + 1] = patches[i + 1].getInt("voices"); }
-			catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid numRequestedSounds " + (i + 1)); break; };
-			try { midi[i + 1] = patches[i + 1].getInt("midi") - 1; }
-			catch (NullPointerException e) { midi[i + 1] = Input.CHANNEL_NONE; }		// this might not exist if there's no current midi channel
-			catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
-			}
-		return i;
+        int len = array.length();
+        int i;
+        for( i = 0 ; i < len; i++)              // we load all but the #0
+            {
+            try { patches[i + 1] = array.getJSONObject(i); }
+            catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch " + (i + 1)); break; };
+            try { patchNames[i + 1] = Sound.loadName(patches[i + 1]); }
+            catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch name " + (i + 1)); break; };
+            try { gain[i + 1] = patches[i + 1].getDouble("gain"); }
+            catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid gain " + (i + 1)); break; };
+            try { sounds[i + 1] = patches[i + 1].getInt("voices"); }
+            catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid numRequestedSounds " + (i + 1)); break; };
+            try { midi[i + 1] = patches[i + 1].getInt("midi") - 1; }
+            catch (NullPointerException e) { midi[i + 1] = Input.CHANNEL_NONE; }            // this might not exist if there's no current midi channel
+            catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
+            }
+        return i;
         }
 
-   /** Stores all the groups EXCEPT THE FIRST GROUP, if any, to a JSONArray, stored in the given object. */
+    /** Stores all the groups EXCEPT THE FIRST GROUP, if any, to a JSONArray, stored in the given object. */
     public static void saveGroups(JSONObject[] patches, int[] midi, int[] sounds, double[] gain, int numPatches, JSONObject obj) throws JSONException
         {
         if (numPatches > 1)
-        	{
-			JSONArray array = new JSONArray();
+            {
+            JSONArray array = new JSONArray();
 
-			for(int i = 1; i < numPatches; i++)		// note 1
-				{
-				if (midi[i] >= 0) 
-					{ 
-					patches[i].put("midi", midi[i] + 1);
-					};
-				patches[i].put("voices", sounds[i]);
-				patches[i].put("gain", gain[i]);
-				array.put(patches[i]);
-				}
-				
-			obj.put("sub", array);
-			}
-		else
-			{
-        	System.err.println("Output.saveGroups() WARNING: there aren't any groups to save");
-			}
+            for(int i = 1; i < numPatches; i++)             // note 1
+                {
+                if (midi[i] >= 0) 
+                    { 
+                    patches[i].put("midi", midi[i] + 1);
+                    };
+                patches[i].put("voices", sounds[i]);
+                patches[i].put("gain", gain[i]);
+                array.put(patches[i]);
+                }
+                                
+            obj.put("sub", array);
+            }
+        else
+            {
+            // System.err.println("Sound.saveGroups() WARNING: there aren't any groups to save");
+            }
         }
         
     }

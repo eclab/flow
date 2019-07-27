@@ -1214,8 +1214,8 @@ public class Output
     public int getNumGroups() { return numGroups; }
 
 
-	/** Sets the number of groups currently allocated, does not clear new ones */
-   public void setNumGroupsUnsafe(int num) 
+    /** Sets the number of groups currently allocated, does not clear new ones */
+    public void setNumGroupsUnsafe(int num) 
         {
         if (num < 1) num = 1; 
         
@@ -1343,7 +1343,7 @@ public class Output
             sounds[0].saveModules(patch[0]);                // so we have the latest when we reload them
                                 
             // reload patches.  We assume we have the correct patches in each group, and the latest and greatest in group 0
-            for(int i = 1; i < numSounds; i++)		// the first sound is already assigned to group 0 and doesn't change, else we'd have to update the GUI module panels
+            for(int i = 1; i < numSounds; i++)          // the first sound is already assigned to group 0 and doesn't change, else we'd have to update the GUI module panels
                 {
                 int group = sounds[i].getGroup();
                 Modulation[] mods = new Modulation[0];
@@ -1389,74 +1389,74 @@ public class Output
     public void removeGroup(int group)
         {
         if (group == 0) // can't remove that one
-        	{
-        	System.err.println("Output.removeGroup() WARNING: group is 0, cannot be removed");
-        	}
+            {
+            System.err.println("Output.removeGroup() WARNING: group is 0, cannot be removed");
+            }
         else if (group >= numGroups)
-        	{
-        	System.err.println("Output.removeGroup() WARNING: group >= numGroups, should not exist");
-        	}
+            {
+            System.err.println("Output.removeGroup() WARNING: group >= numGroups, should not exist");
+            }
         else
-        	{
-			lock();
-			try
-				{
-				for(int i = group; i < numGroups - 1; i++)
-					{
-					numRequestedSounds[i] = numRequestedSounds[i + 1];
-					patch[i] = patch[i + 1];
-					patchName[i] = patchName[i + 1];
-					gain[i] = gain[i + 1];
-					input.setChannel(i, input.getChannel(i + 1));
-					}
-				setNumGroups(getNumGroups() - 1);
-				assignGroupsToSounds();
-				input.rebuildMIDI();
-				 }
-			finally 
-				{
-				unlock();
-				}
-			}
-       }
+            {
+            lock();
+            try
+                {
+                for(int i = group; i < numGroups - 1; i++)
+                    {
+                    numRequestedSounds[i] = numRequestedSounds[i + 1];
+                    patch[i] = patch[i + 1];
+                    patchName[i] = patchName[i + 1];
+                    gain[i] = gain[i + 1];
+                    input.setChannel(i, input.getChannel(i + 1));
+                    }
+                setNumGroups(getNumGroups() - 1);
+                assignGroupsToSounds();
+                input.rebuildMIDI();
+                }
+            finally 
+                {
+                unlock();
+                }
+            }
+        }
                 
     public int addGroup(File file)
         {
         if (numGroups >= MAX_GROUPS - 1)
-        	{
-        	System.err.println("Output.removeGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");
-        	return -1;
-        	}
-		else
-			{
-			lock();
+            {
+            System.err.println("Output.removeGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");
+            return -1;
+            }
+        else
+            {
+            lock();
 
-			// increment group
-			setNumGroups(getNumGroups() + 1);
-			int group = getNumGroups() - 1;
-			gain[group] = DEFAULT_GAIN;
-			setNumRequestedSounds(group, 2);
-		
-			try
-				{
-				try 
-					{ 
-					patch[group] = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
-					patchName[group] = Sound.loadName(patch[group]);
-					gain[group] = DEFAULT_GAIN;
-					input.setChannel(group, Input.CHANNEL_NONE);
-					}
-				catch (Exception ex) { ex.printStackTrace(); }
-				assignGroupsToSounds();
-				// I don't *think* this would really be necessary if the channel is CHANNEL_NONE, but...
-				input.rebuildMIDI();
-				}
-			finally 
-				{
-				unlock();
-				}
-			return group;
-			}
+            // increment group
+            setNumGroups(getNumGroups() + 1);
+            int group = getNumGroups() - 1;
+            gain[group] = DEFAULT_GAIN;
+            setNumRequestedSounds(group, 2);
+                
+            try
+                {
+                try 
+                    { 
+                    patch[group] = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
+                    patchName[group] = Sound.loadName(patch[group]);
+                    gain[group] = DEFAULT_GAIN;
+                    input.setChannel(group, Input.CHANNEL_NONE);
+                    }
+                catch (Exception ex) { ex.printStackTrace(); }
+                assignGroupsToSounds();
+                // I don't *think* this would really be necessary if the channel is CHANNEL_NONE, but...
+                input.rebuildMIDI();
+                }
+            finally 
+                {
+                unlock();
+                }
+            return group;
+            }
         }
                 
                 
@@ -1472,48 +1472,48 @@ public class Output
 
     /*
     
-    /// TEST FILTER
+   /// TEST FILTER
     
     
-      static final double T = 1.0 / 44100.0;
+   static final double T = 1.0 / 44100.0;
 
-      static final double Q = Math.sqrt(0.5);
-      static final double CUTOFF = 1000.0;
-      static final double O = CUTOFF * 2 * Math.PI; //O = 2.0 / T * Math.tan(CUTOFF * Math.PI);
-      static final double OOQTT = O * O * Q * T * T;
-      static final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
-      static final double IJ = 1.0 / J;
-      static final double b0 = IJ * OOQTT;
-      static final double b1 = IJ * 2 * OOQTT;
-      static final double b2 = IJ * OOQTT;
-      static final double a1 = IJ * (-8 * Q + 2 * OOQTT);
-      static final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
+   static final double Q = Math.sqrt(0.5);
+   static final double CUTOFF = 1000.0;
+   static final double O = CUTOFF * 2 * Math.PI; //O = 2.0 / T * Math.tan(CUTOFF * Math.PI);
+   static final double OOQTT = O * O * Q * T * T;
+   static final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
+   static final double IJ = 1.0 / J;
+   static final double b0 = IJ * OOQTT;
+   static final double b1 = IJ * 2 * OOQTT;
+   static final double b2 = IJ * OOQTT;
+   static final double a1 = IJ * (-8 * Q + 2 * OOQTT);
+   static final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
 
-      double[] N = new double[2];
-      double[] M = new double[2];
-      double lowPassFilter(double d, double cut, double res)
-      {
-      double Q = (res * 10 + 1) * 0.7071;
-      final double CUTOFF = cut * 20000 + 25;
-      final double O = CUTOFF * 2 * Math.PI;
-      final double OOQTT = O * O * Q * T * T;
-      final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
-      final double IJ = 1.0 / (J < 0.001 ? 0.001 : J ;
-      final double b0 = IJ * OOQTT;
-      final double b1 = IJ * 2 * OOQTT;
-      final double b2 = IJ * OOQTT;
-      final double a1 = IJ * (-8 * Q + 2 * OOQTT);
-      final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
+   double[] N = new double[2];
+   double[] M = new double[2];
+   double lowPassFilter(double d, double cut, double res)
+   {
+   double Q = (res * 10 + 1) * 0.7071;
+   final double CUTOFF = cut * 20000 + 25;
+   final double O = CUTOFF * 2 * Math.PI;
+   final double OOQTT = O * O * Q * T * T;
+   final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
+   final double IJ = 1.0 / (J < 0.001 ? 0.001 : J ;
+   final double b0 = IJ * OOQTT;
+   final double b1 = IJ * 2 * OOQTT;
+   final double b2 = IJ * OOQTT;
+   final double a1 = IJ * (-8 * Q + 2 * OOQTT);
+   final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
 
-      double y = d * b0 + N[0] * b1 + N[1] * b2 - a1 * M[0] - a2 * M[1];
-      N[1] = N[0];
-      N[0] = d;
-      M[1] = M[0];
-      M[0] = y;
-      if (y < WELL_ABOVE_SUBNORMALS && y > 0) System.err.println("subnormal");
-      if (y != y) System.err.println("NAN");
-      return y;
-      }    
+   double y = d * b0 + N[0] * b1 + N[1] * b2 - a1 * M[0] - a2 * M[1];
+   N[1] = N[0];
+   N[0] = d;
+   M[1] = M[0];
+   M[0] = y;
+   if (y < WELL_ABOVE_SUBNORMALS && y > 0) System.err.println("subnormal");
+   if (y != y) System.err.println("NAN");
+   return y;
+   }    
     */
         
 
