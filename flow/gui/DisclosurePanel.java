@@ -114,7 +114,9 @@ public class DisclosurePanel extends JPanel
             }
         disclosureToggle.setSelected(disclosed);
         }
-                
+    
+    public JToggleButton getToggle() { return disclosureToggle; }
+    
     public boolean isDisclosed() { return disclosed; }
         
     public Component getAbridgedComponent()

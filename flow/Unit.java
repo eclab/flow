@@ -136,7 +136,7 @@ public class Unit extends Modulation
              
     /** Called to update the Unit.  Override this as you see fit, but be sure to call super.go().
         By default this method clears all triggers.   It also pushes orders from input 0, unless 
-        setCopyOrders(false) has been called. */    
+        setPushOrders(false) has been called. */    
     public void go()
         {
         super.go();

@@ -69,6 +69,7 @@ public class Modules
     flow.modules.MPE.class,
     flow.modules.Normalize.class,
     flow.modules.Noise.class,
+    flow.modules.Note.class,
     flow.modules.NRPN.class,
     flow.modules.Out.class,
     flow.modules.PartialLab.class,

@@ -16,7 +16,7 @@ import org.json.*;
 */
 
 
-public class In extends Unit
+public class In extends Unit implements Miscellaneous
     {
     private static final long serialVersionUID = 1;
 

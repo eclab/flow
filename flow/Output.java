@@ -526,7 +526,7 @@ public class Output
     double[][] positions;
 
     // 0.05 is about 3 32-sample periods before we get to near to 100%
-    static final double PARTIALS_INTERPOLATION_ALPHA = 0.05;
+    static final double PARTIALS_INTERPOLATION_ALPHA = 0.1;
     static final double ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA = 1.0 - PARTIALS_INTERPOLATION_ALPHA;
     
     /** A value that's significantly higher than IEEE 754 subnormals, used by Output.java and Smooth.java

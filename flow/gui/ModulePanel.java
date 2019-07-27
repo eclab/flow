@@ -30,6 +30,8 @@ public class ModulePanel extends JPanel implements Transferable
     
     JLabel titleLabel;
     JComponent titlePanel;
+    
+    public boolean getFillPanel() { return false; }
         
     public ModulePanel(Modulation mod)
         {
@@ -49,10 +51,12 @@ public class ModulePanel extends JPanel implements Transferable
                 
         JPanel pan2 = new JPanel();
         pan2.setLayout(new BorderLayout());
-        pan2.add(buildPanel(), BorderLayout.NORTH);
+        if (getFillPanel())
+        	pan2.add(buildPanel(), BorderLayout.CENTER);
+		else
+			pan2.add(buildPanel(), BorderLayout.NORTH);
                 
         add(pan2, BorderLayout.CENTER);
-                
                 
         Border border = BorderFactory.createCompoundBorder(
             BorderFactory.createEmptyBorder(0, 2, 2, 2),
@@ -91,11 +95,7 @@ public class ModulePanel extends JPanel implements Transferable
         to customize the title bar to something different than the standards. */
     protected Color getTitleBackground()
         {
-        if (modulation instanceof flow.modules.Out)
-            return Color.BLACK;
-        else if (modulation instanceof flow.modules.In)
-            return Color.BLACK;
-        else if (modulation instanceof flow.modules.Choice)
+        if (modulation instanceof flow.Miscellaneous)
             return Color.BLACK;
         else if (modulation instanceof flow.modules.Macro)
             return new Color(32, 100, 32);
@@ -536,6 +536,14 @@ public class ModulePanel extends JPanel implements Transferable
         {
         return null;
         }
+        
+    /** Called prior to attempting to save the patch out to a file to give the
+    	ModulePanel a chance to revise the module first.  For example, if the ModulePanel
+    	has a TextArea that needs to be lazily written to a string.  By default this method
+    	does nothing. */ 
+    public void updateForSave()
+    	{
+    	}
 
     /** Called by doLoad(...) when loading a file.  Override this however you see fit (see doLoad()) */
     public void loadFile(File file, Rack rack) { }

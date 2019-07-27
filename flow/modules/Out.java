@@ -29,7 +29,7 @@ import org.json.*;
    <p>Finally there is a GAIN which amplifies the audio output volume.
 */
 
-public class Out extends Unit
+public class Out extends Unit implements Miscellaneous
     {
     private static final long serialVersionUID = 1;
 
@@ -138,7 +138,7 @@ public class Out extends Unit
         if (macro == null)  // going to the output
             {
             pushFrequencies(0);
-            pushOrders(0);                      // already pushed in super.go()
+            //pushOrders(0);                      // already pushed in super.go()
 
             copyAmplitudes(0);
             double[] amplitudes = getAmplitudes(0);

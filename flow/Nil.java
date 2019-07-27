@@ -24,6 +24,6 @@ public class Nil extends Unit
         {
         super(null);
         }
-                        
+        
     public String toString() { return "<NIL>"; }
     }

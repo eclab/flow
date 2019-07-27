@@ -326,27 +326,26 @@ public class Rack extends JPanel
                     Sound s = output.getSound(i);
                     if (s.getGroup() == Output.PRIMARY_GROUP)
                         {
-                        Macro macro = Macro.loadMacro(s, file);  // Macro.deserializeAsMacro(sound, file);
+                        Macro macro = Macro.loadMacro(s, file);
                         if (firstModulation == null)
                             firstModulation = macro;
                         }
                     }
+				ModulePanel pan = firstModulation.getPanel(); 
+				addModulePanel(pan);
+				reset();
+				repaint();
+ 
+            	// now move to front.  Very inefficient
+            	move(pan, 0);
                 }
             finally 
                 {
                 output.unlock();
                 }
-            ModulePanel pan = firstModulation.getPanel(); 
-            addModulePanel(pan);
-            reset();
-            repaint();
- 
-            // now move to front.  Very inefficient
-            move(pan, 0);
             }
         catch (Exception ex)
             {
-            output.unlock();
             ex.printStackTrace();
             }
         }
@@ -356,9 +355,17 @@ public class Rack extends JPanel
         been registered with all of the Sounds already. */ 
     public void addModulation(Modulation modulation)
         {
-        addModulePanel(modulation.getPanel());
-        reset();
-        repaint();
+        output.lock();
+        try
+        	{
+        	addModulePanel(modulation.getPanel());
+        	reset();
+        	repaint();
+        	}
+        finally
+        	{
+        	output.unlock();
+        	}
         }
   
     /** Builds a ModulePanel for a Modulation of the class moduleClass and adds it to the BEGINNING the Rack. */

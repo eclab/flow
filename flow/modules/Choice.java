@@ -9,7 +9,7 @@ import flow.gui.*;
 import java.awt.*;
 import javax.swing.*;
 
-public class Choice extends Unit
+public class Choice extends Unit implements Miscellaneous
     {       
     private static final long serialVersionUID = 1;
         

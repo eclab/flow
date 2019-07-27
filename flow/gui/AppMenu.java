@@ -134,11 +134,13 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
+                /*
                 Modulation[] mods = new Modulation[rack.allModulePanels.size()];
                 for(int i = 0; i < mods.length; i++)
                     {
                     mods[i] = rack.allModulePanels.get(i).getModulation();
                     }
+                */
                      
                 if (file != null)
                     {
@@ -163,6 +165,11 @@ public class AppMenu
                     rack.output.lock();
                     try
                         {
+                		int numModulePanels = rack.allModulePanels.size();
+                		for(int i = 0; i < numModulePanels; i++)
+                    		{
+                    		rack.allModulePanels.get(i).updateForSave();
+                    		}
                         rack.output.getSound(0).saveModules(obj);
                         p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(file)));
                         System.out.println(obj);
@@ -216,11 +223,13 @@ public class AppMenu
           }
         */
 
+/*
         Modulation[] mods = new Modulation[rack.allModulePanels.size()];
         for(int i = 0; i < mods.length; i++)
             {
             mods[i] = rack.allModulePanels.get(i).getModulation();
             }
+*/
                      
         FileDialog fd = new FileDialog((Frame)(SwingUtilities.getRoot(rack)), "Save Patch to Sysex File...", FileDialog.SAVE);
                 
@@ -252,13 +261,13 @@ public class AppMenu
                 
             JSONObject obj = new JSONObject();
 
-                    Output out = rack.getOutput();
-					Sound.saveGroups(out.getPatches(), 
-									out.getInput().getChannels(),
-									out.getNumRequestedSounds(),
-									out.getGain(),
-									out.getNumGroups(), 
-									obj);
+			Output out = rack.getOutput();
+			Sound.saveGroups(out.getPatches(), 
+							out.getInput().getChannels(),
+							out.getNumRequestedSounds(),
+							out.getGain(),
+							out.getNumGroups(), 
+							obj);
             Sound.savePatchInfo(rack.getPatchInfo(), obj);
 			Sound.savePatchDate(rack.getPatchDate(), obj);
             Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
@@ -269,11 +278,15 @@ public class AppMenu
                 Sound.saveName(removeExtension(f.getName()), obj);
             else
                 Sound.saveName(rack.getPatchName(), obj);
-                
 
             rack.output.lock();
             try
                 {
+				int numModulePanels = rack.allModulePanels.size();
+				for(int i = 0; i < numModulePanels; i++)
+					{
+					rack.allModulePanels.get(i).updateForSave();
+					}
                 rack.output.getSound(0).saveModules(obj);
                 p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(f)));
                 p.println(obj);
@@ -447,7 +460,6 @@ public class AppMenu
                 rack.enableMenuBar();
                 File f = null; // make compiler happy
                 if (fd.getFile() != null)
-                    //try
                     {
                     f = new File(fd.getDirectory(), fd.getFile());
                     rack.output.lock();
@@ -1018,9 +1030,7 @@ public class AppMenu
         ArrayList<JMenuItem> modShapers = new ArrayList<>();
         ArrayList<JMenuItem> unitSources = new ArrayList<>();
         ArrayList<JMenuItem> unitShapers = new ArrayList<>();
-        //JMenuItem outMenu = null;
-        JMenuItem inMenu = null;
-        JMenuItem optMenu = null;
+        ArrayList<JMenuItem> miscellaneous = new ArrayList<>();
 
         Class[] modules = Modules.getModules();
         for(int i = 0; i < modules.length; i++)
@@ -1030,10 +1040,8 @@ public class AppMenu
                         
             if (c == flow.modules.Out.class)
                 { } // do nothing
-            else if (c == flow.modules.In.class)
-                inMenu = m;
-            else if (c == flow.modules.Choice.class)
-                optMenu = m;
+            else if (flow.Miscellaneous.class.isAssignableFrom(c))
+            	miscellaneous.add(m);
             else if (flow.UnitSource.class.isAssignableFrom(c))
                 unitSources.add(m);
             else if (flow.ModSource.class.isAssignableFrom(c))
@@ -1066,8 +1074,9 @@ public class AppMenu
         menu.add(sub);
                         
         sub = new JMenu("Other");
-        sub.add(inMenu);
-        sub.add(optMenu);
+        for(JMenuItem m : miscellaneous)
+            sub.add(m);
+        menu.add(sub);
         menu.add(sub);
                         
         return menu;
