@@ -47,7 +47,7 @@
 \begin{document}
 
 \noindent {\Huge\bf {\name}}\\[0.5em]
-{\large \bf An Open-source Fully Modular Additive Synthesizer\\[0.2em]
+{\large \bf An Open-source, Fully Modular, Polyphonic and Multitimbral, Additive Synthesizer\\[0.2em]
 Version 3\\[0.2em]
 https://github.com/eclab/flow\\\\[0.2em]
 By Sean Luke\\[0.2em]
@@ -55,7 +55,6 @@ Department of Computer Science\\[0.25em]
 George Mason University\\[0.2em]
 sean@cs.gmu.edu}
 
-\vspace{1em}
 %\setcounter{tocdepth}{1}
 \tableofcontents
 
@@ -63,7 +62,7 @@ sean@cs.gmu.edu}
 
 \section{Introduction}
 
-{\name} is a {\bf fully modular additive polyphonic software synthesizer.}  It is free open source and written in Java, and designed to be extended with new, easy to write modules.  You can also create your own patches, then store them as modules to be used in larger patches. 
+{\name} is a {\bf fully modular, polyphonic and multitimbral, additive software synthesizer.}  It is free open source and written in Java, and designed to be extended with new, easy to write modules.  You can also create your own patches, then store them as modules to be used in larger patches. 
 
 There have been many additive synthesizers, even semi-modular additive synths, but a fully-modular additive synthesizer is not very common.   It's been fun to write this.  Hopefully this software will inspire others to design similar systems.
 
@@ -384,6 +383,44 @@ Patches have four pieces of auxiliary text information stored in them: a {\it pa
 
 A patch doesn't need to have an author, date, version, or info: but it ought to have a name.  This is because if you load a patch as a Macro, the Macro's module will be titled with the patch name so you can tell what it is.  If you save a patch that has no name (yet), {\name} will set the patch name to the filename (minus the extension).
 
+\subsection{Multitimbral Patches}
+
+Flow can be set up to play more than one patch at a time. This is particularly useful because Flow is a very computationally costly: if you have attached Flow to a DAW and you want to play more than one Flow patch through the DAW, you'd probably rather not run multiple copies of the application, each tuned with a small number of voices.
+
+In most synthesizers, a multitimbral patch is different from a single patch.  You'd make a bunch of single patches, then make one multitimbral patch which combines them.  Flow's multitmbral patch model is different.  In Flow, you load a single patch, then you attach one or more additional single patches to it as {\bf subpatches}.  The original patch is known as the {\bf primary patch}.  You can save this combined patch out to a standard file and load it again.
+
+Subpatches are added to the primary patch by choosing {\it Load Subpatch...} in the {\it File} menu.  You can remove a subpatch by clicking on its close box, just like removing a module.
+
+Only the primary patch can be edited: the subpatches will appear as thin rows beneath its modules.  For each subpatch you can make the following settings:
+
+\begin{itemize}
+\item {\bf Voices Requested}\quad Here you stipulate how many voices you'd like to allocate to this subpatch.  Voices allocated to a subpatch are taken out of voices available to the main patch. 
+
+\item {\bf Voices Allocated}\quad Obviously not every subpatch can have a maximal number of voices.  Here you can see how many voices were {\it actually} allocated.  The allocation strategy is simple: for each subpatch from top to bottom, Flow attempts to give that subpatch every voice it asked for.  Flow must reserve at least one voice for the main patch, so there are at most 15 voices available to distribute (or whatever the polyphony was that you specified in your tuning parameters).  If Flow runs out of voices, a subpatch may get fewer voices than it asked for, and later subpatches may get no voices at all.  
+
+You can see the number of remaining voices for the primary patch by looking at its {\bf Out} module.  If the title just says {\it Out}, then it has full voices.  Otherwise it'll say something like {\it Out (13 Voices)}.
+
+One very confusing situation arises when you have selected {\it Monophonic} from the {\it Play} menu.  Here Flow only uses a single voice: that voice must go to the primary patch, so the subpatches all have zero voices allocated.  To make this situation clear, the subpatches will show {\bf [M]} (for ``monophonic'') for the number of voices allocated.
+
+\item {\bf MIDI Channel}\quad This specifies which MIDI channel is used by the subpatch (or, if no MIDI channel, ``Off'').  If multiple subpatches request the same MIDI Channel, the earlier (higher) one will prevail.    Subpatches also get MIDI channel priority over the primary patch, so if a subpatch and the primary patch are using the same MIDI channel, the subpatch gets it.
+
+This has interesting implications when the primary patch is set to ``Any Channel'', ``MPE Lower Zone'', or ``MPE Upper Zone''.  Let's start with ``Any Channel''.  If your primary patch is set to this, then it responds to any channel {\it except} for the ones allocated to the subpatches.
+
+MPE is more complicated.  Recall that if you are using MPE, then you also specify the number of MPE channels.  If you have chosen MPE Lower Zone with \(n\) channels, then normally the patch would be allocated MIDI channel 1 for its {\it MPE Global Channel} and channels \(2\ ...\ n + 1\) for the requested MIDI channels.  However if a subpatch has allocated one of those channels, it will take it from the primary patch.  This will disrupt MPE.
+
+Thus if you have chosen MPE Upper Zone with \(n\) channels, you want your subpatches to request channels somewhere in the range \(n+2\ ...\ 16\).  For example, if you have 3 subpatches, you might set up MPE Upper Zone with \(n=12\) (so MPE needs channels \(1\ ...\ 13\)), and then use channels 14, 15, and 16 for the subpatches.
+
+If you have instead chosen the MPE Upper Zone with \(n\) channels, then the MPE Global Channel is 16 and the MPE channels go down from there, that is, they're assigned to \(16 - n\ ...\ 15\). Once again, you want your subpatches to stay out of this region, so you'd assign to subpatches channels in the region \(1\ ...\ 16 - n - 1\).  For example, if you have 3 subpatches, you might once again set up MPE Upper Zone with \(n=12\) (so MPE needs channels \(4\ ...\ 16\)), and then use channels 1, 2, and 3 for the subpatches.
+
+Subpatches cannot themselves use MPE, nor can the be assigned to ``Any Channel''.  Only the primary patch can.
+
+\item {\bf Gain}\quad This sets the overall volume of the subpatch in the final mix.  This is exactly the same as the {\it Gain} knob on the {\bf Out} module of the primary patch, discussed later in Section~\ref{outmodule}.  And in fact, the Gain knob can be modulated: if your subpatch was originally modulating its Gain knob before you loaded it as a subpatch, it will {\it continue} to modulate the gain, overriding the setting you make here.  In general it's probably not  wise to modulate the Gain knob.
+\end{itemize}
+
+Flow mixes the primary patch and subpatch voices as follows: each voice is amplified according to its the gain of its patch or subpatch, and then the voices are added together.  Finally all the voices are pushed through the reverb.  This means that {\bf reverb is global}: the settings you make in the primary patch will affect all voices, even ones in subpatches.  We may change that in the future.
+
+\paragraph{Strategy}  I am an old-school synthesizer guy: I tend to use my DAW to automate all my hardware synthesizers, then mix them in analog and record the final result.  I will use Flow's multitmbral patches to follow a similar strategy as follows.  I lay down each track on a different MIDI channel, targeting a different subpatch, and listen to all of them together.  I need more polyphony than my computer can provide, I will (temporarily) reduce the number of partials.  Then I will either play the final result directly into the DAW to record it (if I didn't have to reduce the number of partials), or increase the partials again and record each patch separately and mix the final result in the DAW.
+
 \bump
 \section{The Modules}
 
@@ -438,14 +475,14 @@ The {\it On Tr} option restarts the LFO whenever it receives a trigger (as if a 
 \item The current pressure (aftertouch) value.  This responds to both channel and polyphonic pressure.
 \item The pitch bend value.  This value is the actual MIDI bend signal, so extreme bend low is 0.0, extreme bend high is 1.0, and no bend is 0.5.
 \item The MIDI clock.  This triggers every MIDI clock pulse.  Additionally, when the clock is running, the value is 1.0, else 0.0.  When a MIDI START message is received, the clock will also go to 0.0 prior to the first pulse (at which point the clock is considered running, so it goes to 1.0).  You will probably need to divide the MIDI clock pulse to something more useful for your purposes: for example getting a trigger every beat (every 24 pulses).  To do something like this, try using the {\it Trigger 2A} through {\it Trigger 192A} options in the {\bf Mod Math} module.
-\item Eight CCs.  You can specify the CC parameter.  The resulting value (0...127) is mapped to 0.0 ... 1.0.  If a CC changes, its modulation will trigger; thus you can set up buttons on your controller to trigger events. Note that CC values 6, 38, 98, 99, 100, and 101 are invalid: they are used by {\name} for NRPN.  If you set to them, you won't get any resulting modulation.  Additionally note that CC parameters \(\geq 120\) were historically reserved for special system functions; you can use them, but you should feel bad about it.   The first CC value is set to 74 by default, which is convenient for MPE users, and the second CC is set to 1 by default, which which corresponds to your controller's Mod Wheel.  You can change these of course.  If you need more than 8 CCs, just create another MIDIIn module.
+\item Eight CCs.  You can specify the CC parameter.  The resulting value (0...127) is mapped to \(0.0\ ...\ 1.0\).  If a CC changes, its modulation will trigger; thus you can set up buttons on your controller to trigger events. Note that CC values 6, 38, 98, 99, 100, and 101 are invalid: they are used by {\name} for NRPN.  If you set to them, you won't get any resulting modulation.  Additionally note that CC parameters \(\geq 120\) were historically reserved for special system functions; you can use them, but you should feel bad about it.   The first CC value is set to 74 by default, which is convenient for MPE users, and the second CC is set to 1 by default, which which corresponds to your controller's Mod Wheel.  You can change these of course.  If you need more than 8 CCs, just create another MIDIIn module.
 \end{itemize}
 
 Keep in mind that gate, velocity, pitch bend, note, and clock information are already passed to all the modules internally; so this is really auxiliary stuff that might be useful for you to hook up.   See also the {\bf NRPN} module, next.
 
 \paragraph{NRPN}  A source of MIDI NRPN information.  NRPN works similarly to CC in that it has parameters, each of which can be set to values.  The parameters range from 0...16383 and are set using two numbers: the {\it Most Significant Byte} (MSB) and the {\it Least Significant Byte} (LSB).  Each ranges 0...127.  The parameter number \(\text{P} = \text{MSB} \times 128 + \text{LSB}\).  When you set the MSB and LSB to specific values, to the right of the LSB you'll see the resulting parameter number.  Some synthesizers only use the MSB or the LSB.  
 
-Like parameters, values also can be in the range 0...16383.  {\name} always expects incoming NRPN data in ``Fine'' or ``14-bit'' mode: that is, the whole value range 0...16383 is mapped to modulation values 0.0 ... 1.0.  If you need more than 6 NRPNs, just create another NRPN module.\footnote{A technical note.  NRPN data comes in chunks of four different types: MSB, LSB, Increment, and Decrement.  Flow's NRPN module doesn't update its value when it receives an MSB chunk.  It waits until an LSB, Increment, or Decrement shows up.}  See also {\bf MIDIIn}, previous.
+Like parameters, values also can be in the range 0...16383.  {\name} always expects incoming NRPN data in ``Fine'' or ``14-bit'' mode: that is, the whole value range 0...16383 is mapped to modulation values \(0.0\ ...\ 1.0\).  If you need more than 6 NRPNs, just create another NRPN module.\footnote{A technical note.  NRPN data comes in chunks of four different types: MSB, LSB, Increment, and Decrement.  Flow's NRPN module doesn't update its value when it receives an MSB chunk.  It waits until an LSB, Increment, or Decrement shows up.}  See also {\bf MIDIIn}, previous.
 
 \paragraph{PartialMod}  This is an unusual and experimental modulation source.  It takes an input in the form of a set of partials, and a modulation (``Partial'') which indicates {\it which} partial.  Then it outputs as a modulation the value of that partial, bounded to between 0 and 1.  PartialMod can smoothly interpolate between partial values or not.
 
