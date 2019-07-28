@@ -372,9 +372,9 @@ public class Macro extends Unit implements Cloneable
         return obj;
         }
     
-    public static Macro loadMacro(Sound sound, File file) throws Exception
+    public static Macro loadMacro(Sound sound, JSONObject obj) throws Exception
         {
-        JSONObject obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
+        obj.remove("sub");  // strip out subgroups
         return new Macro(sound, 
             Sound.loadModules(obj, Sound.loadFlowVersion(obj)), 
             Sound.loadName(obj));

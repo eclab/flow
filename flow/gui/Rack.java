@@ -14,6 +14,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
 import java.io.*;
+import java.util.zip.*;
 
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
@@ -330,13 +331,26 @@ public class Rack extends JPanel
             output.lock();
             try
                 {
+                JSONObject obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
+
+                // check for subpatches
+                JSONArray array = null;
+                try { array = obj.getJSONArray("sub"); }
+                catch (Exception ex2) { }
+
+                if (array != null && array.length() > 0)  //  uh oh
+                    {
+                    AppMenu.showSimpleMessage("Patch with Subpatches",
+                        "This file contains a patch which has subpatches.\nThey will be discarded.\nOnly the primary patch will be loaded as a macro.", this);
+                    }
+
                 int num = output.getNumSounds();
                 for(int i = 0; i < num; i++)
                     {
                     Sound s = output.getSound(i);
                     if (s.getGroup() == Output.PRIMARY_GROUP)
                         {
-                        Macro macro = Macro.loadMacro(s, file);
+                        Macro macro = Macro.loadMacro(s, obj);
                         if (firstModulation == null)
                             firstModulation = macro;
                         }
@@ -348,6 +362,11 @@ public class Rack extends JPanel
  
                 // now move to front.  Very inefficient
                 move(pan, 0);
+                }
+            catch(Exception ex)
+                {
+                AppMenu.showSimpleError("Error", "An error occurred on loading this file.", this);
+                ex.printStackTrace();
                 }
             finally 
                 {
@@ -390,11 +409,14 @@ public class Rack extends JPanel
                 int num = output.getNumSounds();
                 for(int i = 0; i < num; i++)
                     {
-                    Sound sound = output.getSound(i);
-                    Modulation modulation = (Modulation)(moduleClass.getConstructor(Sound.class).newInstance(sound));
-                    modulation.reset();
-                    if (firstModulation == null)
-                        firstModulation = modulation;
+                    Sound s = output.getSound(i);
+                    if (s.getGroup() == Output.PRIMARY_GROUP)
+                        {
+                        Modulation modulation = (Modulation)(moduleClass.getConstructor(Sound.class).newInstance(s));
+                        modulation.reset();
+                        if (firstModulation == null)
+                            firstModulation = modulation;
+                        }
                     }
                 }
             finally 
@@ -452,8 +474,12 @@ public class Rack extends JPanel
             int len = getOutput().getNumSounds();
             for(int i = 0; i < len; i++)
                 {
-                Modulation mod = getOutput().getSound(i).removeRegistered(removed);
-                getOutput().getSound(i).addRegistered(position, mod);
+                Sound s = output.getSound(i);
+                if (s.getGroup() == Output.PRIMARY_GROUP)
+                    {
+                    Modulation mod = s.removeRegistered(removed);
+                    s.addRegistered(position, mod);
+                    }
                 }
             }
         finally 
@@ -1285,7 +1311,7 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                             Modulation mod0 = null;
                             for(int i = 0; i < len; i++)
                                 {
-                                Sound s = rack.output.getSound(i);
+                                Sound s = rack.getOutput().getSound(i);
                                 if (s.getGroup() == Output.PRIMARY_GROUP)
                                     {
                                     Modulation mod = s.getRegistered(removed);

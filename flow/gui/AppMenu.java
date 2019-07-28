@@ -624,13 +624,27 @@ public class AppMenu
                         f = new File(fd.getDirectory(), fd.getFile());
                         try 
                             {
-                            rack.addSubpatch(new SubpatchPanel(rack, f));
+                            JSONObject obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))); 
+
+                            // check for subpatches
+                            JSONArray array = null;
+                            try { array = obj.getJSONArray("sub"); }
+                            catch (Exception ex2) { }
+
+                            if (array != null && array.length() > 0)  //  uh oh
+                                {
+                                showSimpleMessage("Patch with Subpatches",
+                                    "This file contains a patch which itself has subpatches.\nThey will be discarded.\nOnly the primary patch will be loaded as a subpatch.", rack);
+                                }
+
+                            rack.addSubpatch(new SubpatchPanel(rack, obj));
                             rack.revalidate();
                             rack.repaint();
                             }
                         catch (Exception ex)
                             {
                             showSimpleError("Error", "An error occurred on loading this file.", rack);
+                            ex.printStackTrace();
                             }
                         }
                     }
@@ -1101,16 +1115,19 @@ public class AppMenu
             // Add the modulations as a group
             for(int i = 0; i < mods.length; i++)
                 {
-                Sound sound = output.getSound(i);
-                for(int j = 0; j < mods[i].length; j++)
+                Sound s = output.getSound(i);
+                if (s.getGroup() == Output.PRIMARY_GROUP)
                     {
-                    sound.register(mods[i][j]);
-                    mods[i][j].setSound(sound);
-                    if (mods[i][j] instanceof Out)
+                    for(int j = 0; j < mods[i].length; j++)
                         {
-                        sound.setEmits((Out)(mods[i][j]));
+                        s.register(mods[i][j]);
+                        mods[i][j].setSound(s);
+                        if (mods[i][j] instanceof Out)
+                            {
+                            s.setEmits((Out)(mods[i][j]));
+                            }
+                        mods[i][j].reset();
                         }
-                    mods[i][j].reset();
                     }
                 }
                 

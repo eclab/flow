@@ -14,6 +14,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
 import java.io.*;
+import org.json.*;
 
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
@@ -52,14 +53,6 @@ public class SubpatchPanel extends JPanel
             body = buildPanel();
             add(body, BorderLayout.CENTER);
                                 
-            /*
-              Border border = BorderFactory.createCompoundBorder(
-              BorderFactory.createEmptyBorder(0, 2, 2, 2),
-              BorderFactory.createLineBorder(Color.GRAY));
-              border = BorderFactory.createCompoundBorder(
-              border,
-              BorderFactory.createEmptyBorder(2, 2, 2, 2));
-            */
             Border border = BorderFactory.createLineBorder(Color.GRAY);
             setBorder(border);
                 
@@ -76,12 +69,13 @@ public class SubpatchPanel extends JPanel
             }
         }
     
-    public SubpatchPanel(Rack rack, File file)
+    public SubpatchPanel(Rack rack, JSONObject obj)
         {
         rack.getOutput().lock();
         try
             {
-            buildSubpatchPanel(rack, rack.getOutput().addGroup(file));
+            obj.remove("sub");  // strip out subgroups
+            buildSubpatchPanel(rack, rack.getOutput().addGroup(obj));
             }
         finally     
             {

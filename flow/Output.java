@@ -1207,7 +1207,7 @@ public class Output
     JSONObject patch[ /* Group */ ] = new JSONObject[MAX_GROUPS];
     String patchName[ /* Group */ ] = new String[MAX_GROUPS];       
     double gain[ /* Group */ ] = new double[MAX_GROUPS];    
-        
+
     public static final String EMPTY_JSON = "{ \"flow\":" + Flow.VERSION + ", modules: [ ] }";
         
     /** Return the number of groups currently allocated */
@@ -1444,7 +1444,7 @@ public class Output
             }
         }
                 
-    public int addGroup(File file)
+    public int addGroup(JSONObject obj)
         {
         if (numGroups >= MAX_GROUPS - 1)
             {
@@ -1465,7 +1465,7 @@ public class Output
                 {
                 try 
                     { 
-                    patch[group] = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(file)))); 
+                    patch[group] = obj; 
                     patchName[group] = Sound.loadName(patch[group]);
                     gain[group] = DEFAULT_GAIN;
                     input.setChannel(group, Input.CHANNEL_NONE);
