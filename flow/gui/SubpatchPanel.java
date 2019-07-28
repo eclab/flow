@@ -28,6 +28,7 @@ public class SubpatchPanel extends JPanel
     JSlider gain;
     JSlider midi;
     JSlider sounds;
+    JLabel allocatedLabel;
     PushButton swap; 
     int group;
         
@@ -67,6 +68,7 @@ public class SubpatchPanel extends JPanel
             gain.setValue((int)(out.getGain(group) * GAIN_RESOLUTION));
             sounds.setValue(out.getNumRequestedSounds(group));
             midi.setValue(out.getInput().getChannel(group) + 1);
+            updateSoundAllocation();
             }
         finally     
             {
@@ -184,7 +186,7 @@ public class SubpatchPanel extends JPanel
 
 
     public static final int GAIN_RESOLUTION = 25;
-    public static final int MAX_SOUNDS = 16;
+    public static final int MAX_SOUNDS = 15;            // we can't achieve 16, so no reason suggesting it...
     /** Builds the JComponent displayed in the main body (all but the title bar) of the
         ModulePanel.  Override this to customize as you see fit, by creating UnitInputs,
         UnitOutputs, ModulationInputs, ModulationOutputs, OptionsChoosers, and ConstraintsChoosers. */
@@ -197,10 +199,20 @@ public class SubpatchPanel extends JPanel
         final int titleWidth = (int)sacrificialLabel.getPreferredSize().getWidth();
         final int titleHeight = (int)sacrificialLabel.getPreferredSize().getHeight();
 
-        JLabel soundsTitle = new JLabel("  Num Sounds: ");
-        soundsTitle.setFont(Style.SMALL_FONT());
-        JLabel soundsLabel = new JLabel("")
+        JLabel allocatedTitle = new JLabel("Allocated: ");
+        allocatedTitle.setFont(Style.SMALL_FONT());
+        allocatedLabel = new JLabel("")
             {
+            public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
+            };
+        allocatedLabel.setFont(Style.SMALL_FONT());
+
+        JLabel soundsTitle = new JLabel("Voices Requested: ");
+        soundsTitle.setFont(Style.SMALL_FONT());
+        final JLabel soundsLabel = new JLabel("")
+            {
+            public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
             public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         soundsLabel.setFont(Style.SMALL_FONT());
@@ -228,6 +240,9 @@ public class SubpatchPanel extends JPanel
                         {
                         out.setNumRequestedSounds(group, sounds.getValue());
                         out.assignGroupsToSounds();
+                        SubpatchPanel[] sub = rack.getSubpatches();
+                        for(int i = 0; i < sub.length; i++)
+                            sub[i].updateSoundAllocation();
                         }
                     finally 
                         {
@@ -236,15 +251,21 @@ public class SubpatchPanel extends JPanel
                     }
                 }
             });
+            
+        box.add(Strut.makeHorizontalStrut(10));
         box.add(soundsTitle);
         box.add(soundsLabel);
         box.add(sounds);
+        box.add(Strut.makeHorizontalStrut(10));
+        box.add(allocatedTitle);
+        box.add(allocatedLabel);
         box.add(Strut.makeHorizontalStrut(10));
 
         JLabel midiTitle = new JLabel("MIDI Channel: ");
         midiTitle.setFont(Style.SMALL_FONT());
         JLabel midiLabel = new JLabel("")
             {
+            public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
             public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         midiLabel.setFont(Style.SMALL_FONT());
@@ -317,6 +338,7 @@ public class SubpatchPanel extends JPanel
         box.add(gainTitle);
         box.add(gainLabel);
         box.add(gain);
+        box.add(Strut.makeHorizontalStrut(10));
                 
         // later
         /*
@@ -335,7 +357,28 @@ public class SubpatchPanel extends JPanel
 
         return box;
         }
-            
+    
+    public void updateSoundAllocation()
+        {
+        Output out = rack.getOutput();
+        out.lock();
+        try
+            {
+            if (out.getOnlyPlayFirstSound())
+                {
+                allocatedLabel.setText("[M]");
+                }
+            else
+                {
+                allocatedLabel.setText("" + out.getNumSounds(group));
+                }
+            }
+        finally 
+            {
+            out.unlock();
+            }
+        }
+                
     public void close()
         {
         rack.remove(this);

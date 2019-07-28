@@ -705,13 +705,15 @@ Partial Filter can be set to be {\it Relative}.  When relative, the partials are
 
 \subsection{Special Modules}
 
-There are four special modules: {\bf In}, {\bf Out}, {\bf Choice}, and {\bf Macro}.  The {\bf Out} module is critical in every patch.  {\bf In} and {\bf Macro} enable {\it macros}\.---\,and {\bf Out} helps out here as well.
+There are currently four special modules: {\bf In}, {\bf Out}, {\bf Choice}, {\bf Note}, and {\bf Macro}.  The {\bf Out} module is critical in every patch, and is discussed below in Section~\ref{outmodule}.  {\bf In} and {\bf Macro} enable {\it macros}\.---\,and {\bf Out} helps out here as well\,---\,as discussed below in Sectino~\ref{creatingmacros}.
 
 \paragraph{Choice}  The Choice module is an odd duck: it doesn't produce any sounds or modulation at all.  Instead, it enables you to change a module's checkboxes and comboboxes using a modulation signal.  To do this, note that Choice has a modulation input and a sound input port both called {\bf Target}.   Plug one of your target module's modulation or sound outputs into the appropriate Target port: this tells Choice what target module it should be modifying.  Don't attach to both of them, or Choice will just use the sound input port.
 
 After this is done, you will find you can select an option (a combobox or a checkbox) via the {\it Option} dial.\footnote{At present, the constraints facility is not part of the available options.  This might change in the future.} Once this is done, you can change the value of the selected option via the {\it Value} dial.  This might be particularly interesting to do via an LFO.
 
 Note that when you change the value, it's not immediately reflected (or reflected at all!) in the target module's GUI.  This is because updating the GUI in real time could be very costly.  But it's been change!  You can convince yourself of this by dragging the module and moving it.  Similarly, if you click on the option combo box or check box, the result is not directly reflected in the Option dial.
+
+\paragraph{Note} This module doesn't process sound at all. Instead, it lets you leave a note or comment.  You can change the width of the Note panel with two arrow-like buttons at the bottom.   You can have as many Note modules as you like; they'll each save their comments independently as part of your patch.
 
 \subsubsection{The \textit{Out} Module in Basic Use}  
 \label{outmodule}

@@ -273,6 +273,8 @@ public class Out extends Unit implements Miscellaneous
         final ModulePanel[] panel = new ModulePanel[1];
         final boolean[] oldClipped = new boolean[] { false };        
         final boolean[] oldGlitched = new boolean[] { false };        
+        final boolean[] oldPlayFirst = new boolean[] { false };        
+        final int[] oldNumVoices = new int[] { -1 };            // -1 will force an update the first time
         
         final JLabel example = new JLabel("  (Audio)");
         example.setFont(Style.SMALL_FONT());
@@ -430,16 +432,40 @@ public class Out extends Unit implements Miscellaneous
                 Output out = panel[0].getRack().getOutput();
                 boolean clipped = out.getAndResetClipped();
                 boolean glitched = out.getAndResetGlitched();
+                boolean playFirst = out.getOnlyPlayFirstSound();
+                int numVoices = out.getNumSounds(Output.PRIMARY_GROUP);
                 
-                if (clipped != oldClipped[0] || glitched != oldGlitched[0])
+                if (numVoices != oldNumVoices[0] || clipped != oldClipped[0] || glitched != oldGlitched[0] || playFirst != oldPlayFirst[0])
                     {
                     oldClipped[0] = clipped;
                     oldGlitched[0] = glitched;
-                    
+                    oldPlayFirst[0] = playFirst;
+                    oldNumVoices[0] = numVoices;
 
+                    String labeladdendum = null;
+                    if (playFirst)
+                        {
+                        // I don't like this so...
+                        labeladdendum = null;  // labeladdendum = "   (Monophonic)";
+                        }
+                    else if (numVoices < Output.getNumVoices())  // we don't have a fully complement
+                        {
+                        if (numVoices == 1)
+                            {
+                            labeladdendum = "   (1 Voice)";
+                            }                               
+                        else
+                            {
+                            labeladdendum = "   (" + numVoices + " Voices)";
+                            }
+                        } 
+                    
                     panel[0].getTitlePanel().setBackground(glitched ? Color.RED : (clipped ? Color.YELLOW : Color.BLACK));
                     panel[0].getTitleLabel().setForeground(glitched ? Color.WHITE : (clipped ? Color.BLACK : Color.WHITE));
-                    panel[0].getTitleLabel().setText(glitched ? "  Glitch" : (clipped ? "  Clip" : "  Out"));
+                    String label = glitched ? "  Glitch" : (clipped ? "  Clip" : "  Out");
+                    if (labeladdendum != null)
+                        label = label + labeladdendum;
+                    panel[0].getTitleLabel().setText(label);
                     panel[0].getRack().repaint();
                     }
                 }

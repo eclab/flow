@@ -1310,6 +1310,30 @@ public class Output
     /** Returns all the requested numbers of sounds for groups. */
     public int[] getNumRequestedSounds() { return numRequestedSounds; }
 
+    /** Returns the number of allocated sounds for the given group. */
+    public int getNumSounds(int group) 
+        { 
+        int counter = 0;
+        lock();
+        try
+            {
+            for(int j = 0; j < numSounds; j++)
+                {
+                if (sounds[j].getGroup() == group)
+                    counter++;
+                }
+            }
+        catch (Exception ex) 
+            {
+            ex.printStackTrace(); 
+            }
+        finally
+            {
+            unlock();
+            }
+        return counter; 
+        }
+
     /** Returns all the requested numbers of sounds for groups. */
     public double[] getGain() { return gain; }
 

@@ -814,8 +814,10 @@ public class AppMenu
                 {
                 rack.getOutput().setOnlyPlayFirstSound(playFirst.isSelected());
                 Prefs.setLastOneVoice(playFirst.isSelected());
+                rack.rebuildSubpatches();       // So they say "[M]"
                 }
             });
+        rack.rebuildSubpatches();       // So they say "[M]"
         return playFirst;
         }
 

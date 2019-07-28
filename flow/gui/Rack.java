@@ -141,6 +141,16 @@ public class Rack extends JPanel
         {
         subpatchBox.add(panel);
         }
+        
+    public SubpatchPanel[] getSubpatches()
+        {
+        SubpatchPanel[] patches = new SubpatchPanel[subpatchBox.getComponentCount()];
+        for(int i = 0; i < patches.length; i++)
+            {
+            patches[i] = (SubpatchPanel)(subpatchBox.getComponent(i));
+            }
+        return patches;
+        }
     
     public JFrame sprout()
         {
