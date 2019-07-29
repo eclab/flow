@@ -430,6 +430,9 @@ public class Input
      * what they should be set to.
      */
     public static final byte UNSPECIFIED = -1;
+
+	/** The "channel" for OMNI, (which is normally -1) to be used in the CC array instead. */
+    public static final byte CC_OMNI = NUM_MIDI_CHANNELS;
     
     // CC array
     byte[][] cc = new byte[NUM_MIDI_CHANNELS + 1][NUM_CC];              // one more for "omni"
@@ -491,7 +494,7 @@ public class Input
             if (val < 0) val = 0;
             if (val > MAX_CC_VAL) val = MAX_CC_VAL;
             cc[ccdata.channel][ccdata.number] = val;
-            cc[CHANNEL_OMNI][ccdata.number] = val;                  // set it for OMNI too
+            cc[CC_OMNI][ccdata.number] = val;                  // set it for OMNI too
                                 
             // if it's global mpe, we need to distribute to all the MPE channels
             if (sm.getChannel() == getMPEGlobalChannel())
