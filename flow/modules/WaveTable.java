@@ -36,6 +36,8 @@ public class WaveTable extends Unit implements UnitSource
     public static final int MOD_POSITION = 0;
 
     public static final String[] FILENAME_EXTENSIONS = new String[] { ".WAV", ".wav" };
+
+    public static final double MINIMUM_AMPLITUDE = 0.001;
     
     public String name = null;
 
@@ -227,8 +229,8 @@ public class WaveTable extends Unit implements UnitSource
                                 System.arraycopy(b, WAVETABLE_SIZE, b, 0, sampleSize - WAVETABLE_SIZE);
                                 System.arraycopy(buffer, 0, b, sampleSize - WAVETABLE_SIZE, WAVETABLE_SIZE);
                                 System.arraycopy(b, 0, a, 0, sampleSize);
-                                                                
-                                // Note no window.  Should still be okay (I think?)
+                                                      
+                                // is Hanning COLA?          
                                 a = FFT.applyHanningWindow(a);
                                 double[] harmonics = FFT.getHarmonics(a);
                                 double[] finished = new double[harmonics.length / 2 / RESAMPLING];
@@ -279,7 +281,7 @@ finished[s-1] /= RESAMPLING * RESAMPLING;
                                 // Note no window.  Should still be okay (I think?)
                                 double[] harmonics = FFT.getHarmonics(buffer);
                                 double[] finished = new double[harmonics.length / 2];
-                                for (int s=1 ; s < harmonics.length / 2 + 1; s++)
+                                for (int s=1 ; s < harmonics.length / 2; s++)				// we skip the DC offset (0) and set the Nyquist frequency bin (harmonics.length / 2) to 0
                                     {
                                     finished[s - 1] = (harmonics[s] >= MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
                                     }
@@ -343,7 +345,6 @@ finished[s-1] /= RESAMPLING * RESAMPLING;
         }
 
 
-    static final double MINIMUM_AMPLITUDE = 0.001;
 
 
     //// SERIALIZATION STUFF

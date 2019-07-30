@@ -557,6 +557,12 @@ public class ModulePanel extends JPanel implements Transferable
     /** A convenience method for loading a file in a ModulePanel. */
     public File doLoad(String title, final String[] filenameExtensions)
         {
+        return doLoad(title, filenameExtensions, true);
+        }
+        
+    /** A convenience method for loading a file in a ModulePanel. */
+    public File doLoad(String title, final String[] filenameExtensions, boolean callLoadFile)
+        {
         Rack rack = getRack();
         FileDialog fd = new FileDialog((JFrame)(SwingUtilities.getRoot(rack)), title, FileDialog.LOAD);
         fd.setFilenameFilter(new FilenameFilter()
@@ -583,7 +589,10 @@ public class ModulePanel extends JPanel implements Transferable
             try
                 {
                 f = new File(fd.getDirectory(), fd.getFile());
-                loadFile(f, rack);
+                if (callLoadFile)
+                	{
+                	loadFile(f, rack);
+                	}
                 AppMenu.dirFile = f;
                 }                       
             catch (Exception ex)

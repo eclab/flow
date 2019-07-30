@@ -12,6 +12,7 @@ import java.awt.event.*;
 import java.util.*;
 import java.io.*;
 import org.json.*;
+import flow.utilities.*;
 
 /** 
     A Unit which allows a user to load, save, and graphically edit all the partials.
@@ -44,8 +45,11 @@ public class Draw extends Unit implements UnitSource
     public static final int DO_CLEAR = 5;
     public static final int DO_SAVE = 6;
     public static final int DO_LOAD = 7;
+    public static final int DO_LOAD_WAVE = 8;
     
     public static final String FILENAME_EXTENSION = ".partials";
+    public static final int MAXIMUM_SAMPLES = 2048;
+    public static final int WINDOW_SIZE = 65;
 
     public transient double[] backupFrequencies;
     public transient double[] backupAmplitudes;
@@ -292,7 +296,7 @@ public class Draw extends Unit implements UnitSource
                                 
                 Box box = new Box(BoxLayout.X_AXIS);
                 
-                PushButton button = new PushButton("Menu", new String[] { "Undo / Redo", "Capture", "Standardize Frequencies", "Normalize Amplitudes", "Maximize Amplitudes", "Clear Amplitudes", "Save As...", "Load..." })
+                PushButton button = new PushButton("Menu", new String[] { "Undo / Redo", "Capture", "Standardize Frequencies", "Normalize Amplitudes", "Maximize Amplitudes", "Clear Amplitudes", "Save Partials As...", "Load Partials...", "Load Wave..." })
                     {
                     public void perform(int val)
                         {
@@ -414,6 +418,11 @@ public class Draw extends Unit implements UnitSource
                                 doLoad("Load Partials...", FILENAME_EXTENSION);
                                 break;
                                 }
+                            case DO_LOAD_WAVE:
+                                {
+                                doLoadWave(panel);
+                                break;
+                                }
                             default:
                                 {
                                 warn("modules/Draw.java", "default occured when it shouldn't be possible");
@@ -481,6 +490,117 @@ public class Draw extends Unit implements UnitSource
 
                 return panel;
                 }
+
+
+    public void doLoadWave(JComponent root)
+    	{
+        //// FIRST we have the user choose a file
+        Rack rack = getRack();
+        
+	    File file = doLoad("Load Wave...", new String[] { "wav", "WAV" }, false);
+	    if (file == null) return;
+	            
+        
+        double[] waves = null;
+        double[] buffer = new double[256];
+        int count = 0;
+        
+        WavFile wavFile = null;
+        try 
+        	{
+        	double[] _waves = new double[MAXIMUM_SAMPLES];
+        	wavFile = WavFile.openWavFile(file);
+                
+            while(true)
+            	{
+				// Read frames into buffer
+				int framesRead = wavFile.readFrames(buffer, buffer.length);
+				if (count + framesRead > MAXIMUM_SAMPLES)
+					{
+					AppMenu.showSimpleError("File Too Large", "This file may contain no more than " + MAXIMUM_SAMPLES + " samples.", rack);
+					return;
+					}
+				System.arraycopy(buffer, 0, _waves, count, framesRead);
+				count += framesRead;
+				if (framesRead < buffer.length) 
+					break;
+				}
+			waves = new double[count];
+			System.arraycopy(_waves, 0, waves, 0, count);
+        	}
+        catch (IOException ex)
+			{
+			AppMenu.showSimpleError("File Error", "An error occurred on reading the file.", rack);
+			return;
+			}
+		catch (WavFileException ex)
+			{
+			AppMenu.showSimpleError("Not a proper WAV file", "WAV files must be mono 16-bit.", rack);
+			return;
+			}
+
+        try
+        	{
+        	wavFile.close();
+        	}
+        catch (Exception ex) { }
+        
+		int desiredSampleSize = Unit.NUM_PARTIALS * 2;				// because we have up to 256 samples
+		int currentSampleSize = waves.length;
+					
+		/// Resample to Flow's sampling rate
+		double[] newvals = WindowedSinc.interpolate(
+			waves,
+			currentSampleSize,
+			desiredSampleSize,		// notice desired and current are swapped -- because these are SIZES, not RATES
+			WINDOW_SIZE,
+			true);           
+		
+		// Note no window.  Should still be okay (I think?)
+		double[] harmonics = FFT.getHarmonics(newvals);
+		double[] finished = new double[harmonics.length / 2];		// must be 256
+		for (int s=1 ; s < harmonics.length / 2; s++)			// we skip the DC offset (0) and set the Nyquist frequency bin (harmonics.length / 2) to 0
+			{
+			finished[s - 1] = (harmonics[s] >= WaveTable.MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
+			}
+
+		double max = 0;
+		for(int i = 0; i < finished.length; i++)
+			{
+			if (max < finished[i])
+				max = finished[i];
+			}
+			
+		if (max > 0)
+			{
+			for(int i = 0; i < finished.length; i++)
+				{
+				finished[i] /= max;
+				}
+			}
+								
+		rack.getOutput().lock();
+
+		int index = sound.findRegistered(Draw.this);
+		Output output = sound.getOutput();
+		int numSounds = output.getNumSounds();
+
+		try
+			{
+			for(int i = 0; i < numSounds; i++)
+				{
+				Draw unit = (Draw)(output.getSound(i).getRegistered(index));
+				unit.standardizeFrequencies();
+				double[] amplitudes = unit.getAmplitudes(0);
+				System.arraycopy(finished, 0, amplitudes, 0, Math.min(finished.length, amplitudes.length));
+				}
+			}
+		finally 
+			{
+			rack.getOutput().unlock();
+			}
+		}
+
             };
         display.setModulePanel(p);
         return p;
@@ -520,4 +640,12 @@ public class Draw extends Unit implements UnitSource
             frequencies[i] = freqs.optDouble(i, i);
             }
         } 
+
     }
+    
+    
+    
+    
+    
+    
+    
