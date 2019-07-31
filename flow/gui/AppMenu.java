@@ -346,21 +346,96 @@ public class AppMenu
                     fd.setFile(file.getName());
                     fd.setDirectory(file.getParentFile().getPath());
                     }
-                else
-                    {
-                    }
                 
                 rack.disableMenuBar();
                 fd.setVisible(true);
                 rack.enableMenuBar();
-                File f = null; // make compiler happy
-                
-                String[] patchName = new String[1];
                 
                 if (fd.getFile() != null)
-                    //try
                     {
-                    f = new File(fd.getDirectory(), fd.getFile());
+                    doLoad(rack, fd, true);
+                    }
+                }
+            });
+        return load;
+        }
+        
+    // Produces the Load Patch menu
+    static JMenuItem loadPrimaryPatchMenu(Rack rack)
+        {
+        JMenuItem load = new JMenuItem("Load Primary Patch...");
+        load.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK | InputEvent.ALT_MASK));
+        load.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+                
+                // do demotion if necessary
+                
+				int result = rack.showMultiOption(rack, 
+					new String[] { }, 
+					new JComponent[] { }, 
+					"Demote Primary Patch", 
+					"Demote or clear the existing primary patch on load?",
+					new String[] { "Demote", "Clear", "Cancel" });
+
+		                if (result == 2) return;
+
+                FileDialog fd = new FileDialog((JFrame)(SwingUtilities.getRoot(rack)), "Load Primary Patch File...", FileDialog.LOAD);
+                fd.setFilenameFilter(new FilenameFilter()
+                    {
+                    public boolean accept(File dir, String name)
+                        {
+                        return ensureFileEndsWith(name, PATCH_EXTENSION).equals(name);
+                        }
+                    });
+
+                if (file != null)
+                    {
+                    fd.setFile(file.getName());
+                    fd.setDirectory(file.getParentFile().getPath());
+                    }
+                
+                rack.disableMenuBar();
+                fd.setVisible(true);
+                rack.enableMenuBar();                
+                if (fd.getFile() != null)
+                    {
+                	rack.getOutput().lock();
+                    
+                    if (result == 0)  // demote
+                    	{
+						try
+							{
+							if (!rack.getOutput().copyPrimaryGroup())
+								{
+								showSimpleError("Cannot demote", "There are too many subpatches.\nRemove a subpatch first.", rack);	
+								return;
+								}
+							else
+								{
+								rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
+								}
+							}
+						finally 
+							{
+							rack.getOutput().unlock();
+							}
+						}
+					doLoad(rack, fd, false);
+					}
+                }
+            });
+        return load;
+        }
+
+
+
+	static void doLoad(Rack rack, FileDialog fd, boolean clearSubpatches)
+		{
+		                String[] patchName = new String[1];
+
+                    File f = new File(fd.getDirectory(), fd.getFile());
                     rack.output.lock();
                     try
                         {
@@ -382,7 +457,10 @@ public class AppMenu
                                 }
                                                                                                 
                             // Remove old subpatches
-                            rack.getOutput().setNumGroups(1);
+                            if (clearSubpatches)
+                            	{
+                            	rack.getOutput().setNumGroups(1);
+                            	}
 
                             // Create and update Modulations and create ModulePanels
                             load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
@@ -395,19 +473,22 @@ public class AppMenu
                                 rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
                                 rack.setPatchDate(Sound.loadPatchDate(obj));
                                 
-                                Output out = rack.getOutput();
-                                int numNewGroups = Sound.loadGroups(out.getPatches(), 
-                                    out.getInput().getChannels(),
-                                    out.getNumRequestedSounds(),
-                                    out.getPatchNames(),
-                                    out.getGain(),
-                                    obj);
-                                if (numNewGroups > 0)
-                                    {
-                                    out.setNumGroupsUnsafe(numNewGroups + 1);
-                                    out.assignGroupsToSounds();
-                                    out.getInput().rebuildMIDI();
-                                    }
+                                if (clearSubpatches)
+                                	{
+									Output out = rack.getOutput();
+									int numNewGroups = Sound.loadGroups(out.getPatches(), 
+										out.getInput().getChannels(),
+										out.getNumRequestedSounds(),
+										out.getPatchNames(),
+										out.getGain(),
+										obj);
+									if (numNewGroups > 0)
+										{
+										out.setNumGroupsUnsafe(numNewGroups + 1);
+										out.assignGroupsToSounds();
+										out.getInput().rebuildMIDI();
+										}
+									}
                                 }
                             rack.rebuildSubpatches();
                             rack.checkOrder();
@@ -422,11 +503,8 @@ public class AppMenu
                     catch(Exception ex) { ex.printStackTrace(); showSimpleError("Patch Reading Error", "The patch could not be loaded", rack); }
                     file = f;
                     dirFile = f;
-                    }
-                }
-            });
-        return load;
-        }
+                    		} 
+
 
 
     // Produces the Load Patch as Macro menu
@@ -546,43 +624,100 @@ public class AppMenu
                 {
                 if (showSimpleConfirm("New Patch", "Clear the existing patch?", rack))
                     {
-                    rack.output.lock();
-                    try
-                        {
-                        rack.closeAll();
-                        rack.checkOrder();
-                        rack.add(Out.class);
-                        rack.setPatchName(null);
-                        rack.setPatchVersion(null);
-                        rack.setPatchInfo(null);
-                        rack.setPatchAuthor(null);
-                        rack.setPatchDate(null);
-                                                
-                        // reset Out
-                        rack.findOut().updatePatchInfo();
-                        file = null;
-                        // don't reset dirFile
-
-                        // Remove old subpatches
-                        rack.getOutput().setNumGroups(1);
-                        rack.rebuildSubpatches();
-                        }
-                    finally 
-                        {
-                        rack.output.unlock();
-                        }
+                    doNew(rack, true);
                     }
                 }
             });
         return newpatch;
         }
         
+    // Produces the Push Primary Patch menu
+    static JMenuItem newPrimaryPatchMenu(Rack rack)
+        {
+        JMenuItem newpatch = new JMenuItem("New Primary Patch");
+        newpatch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK));
+        newpatch.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+				int result = rack.showMultiOption(rack, 
+					new String[] { }, 
+					new JComponent[] { }, 
+					"Demote Primary Patch", 
+					"Demote or clear the existing primary patch?",
+					new String[] { "Demote", "Clear", "Cancel" });
+
+	                    rack.getOutput().lock();
+						try
+							{
+							if (result == 2) return;
+							if (result == 0)
+								{
+								if (!rack.getOutput().copyPrimaryGroup())
+									{
+									showSimpleError("Cannot demote", "There are too many subpatches.\nRemove a subpatch first.", rack);	
+									return;
+									}
+								else
+									{
+									rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
+									doNew(rack, false);
+									rack.rebuildSubpatches();
+									}
+								}
+							else
+								{
+									doNew(rack, false);
+									rack.rebuildSubpatches();
+								}
+							}
+						finally 
+							{
+							rack.getOutput().unlock();
+							}
+                    }
+            });
+        return newpatch;
+        }
+        
+    static void doNew(Rack rack, boolean clearSubpatches)
+    	{
+		rack.output.lock();
+		try
+			{
+			rack.closeAll();
+			rack.checkOrder();
+			rack.add(Out.class);
+			rack.setPatchName(null);
+			rack.setPatchVersion(null);
+			rack.setPatchInfo(null);
+			rack.setPatchAuthor(null);
+			rack.setPatchDate(null);
+									
+			// reset Out
+			rack.findOut().updatePatchInfo();
+			file = null;
+			// don't reset dirFile
+
+			if (clearSubpatches)
+				{
+				// Remove old subpatches
+				rack.getOutput().setNumGroups(1);
+				rack.rebuildSubpatches();
+				}
+			}
+		finally 
+			{
+			rack.output.unlock();
+			}
+    	}
+        
 
     // Produces the New Patch menu
     static JMenuItem loadSubpatchMenu(Rack rack)
         {
-        JMenuItem loadsubpatch = new JMenuItem("Load Subpatch");
-        loadsubpatch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()  | InputEvent.SHIFT_MASK));
+        JMenuItem loadsubpatch = new JMenuItem("Load Subpatch...");
+        loadsubpatch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK));
         loadsubpatch.addActionListener(new ActionListener()
             {
             public void actionPerformed(ActionEvent e)
@@ -1024,6 +1159,8 @@ public class AppMenu
         menu.add(saveAsPatchMenu(rack));
         menu.add(loadPatchMenu(rack));
         menu.addSeparator();
+        menu.add(newPrimaryPatchMenu(rack));
+        menu.add(loadPrimaryPatchMenu(rack));
         menu.add(loadSubpatchMenu(rack));
 
         if (!Style.isMac())

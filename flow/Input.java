@@ -259,6 +259,13 @@ public class Input
         return channel[Output.PRIMARY_GROUP] == CHANNEL_OMNI;
         }
             
+    public void swapGroups(int i, int j)
+        {
+        int temp = channel[i];
+        channel[i] = channel[j];
+        channel[j] = temp;
+        }
+        
     public int getGroup(int channel)
         {
         return group[channel];

@@ -19,7 +19,7 @@ import org.json.*;
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
 
-public class SubpatchPanel extends JPanel
+public class SubpatchPanel extends JPanel implements Transferable
     {
     Rack rack;
     JComponent title;
@@ -49,12 +49,22 @@ public class SubpatchPanel extends JPanel
             setLayout(new BorderLayout());
             title = buildTitle();
             add(title, BorderLayout.WEST);
+			title.addMouseListener(new MouseAdapter()
+				{
+				public void mousePressed(MouseEvent e)
+					{
+					getTransferHandler().exportAsDrag(SubpatchPanel.this, e, TransferHandler.MOVE);
+					}
+				});
                                                 
             body = buildPanel();
             add(body, BorderLayout.CENTER);
                                 
             Border border = BorderFactory.createLineBorder(Color.GRAY);
             setBorder(border);
+
+        this.setTransferHandler(new SubpatchPanelTransferHandler());
+        this.setDropTarget(new DropTarget(this, new SubpatchPanelDropTargetListener()));
                 
             Output out = rack.getOutput();
             titleLabel.setText(" " + out.getPatchName(group));
@@ -379,4 +389,29 @@ public class SubpatchPanel extends JPanel
         rack.getOutput().removeGroup(group);
         rack.rebuildSubpatches();
         }
+
+////// DRAG AND DROP JUNK
+
+                
+    public Object getTransferData(DataFlavor flavor) 
+        {
+        if (flavor.equals(Rack.subpatchflavor))
+            return this;
+        else
+            return null;
+        }
+                
+    public DataFlavor[] getTransferDataFlavors() 
+        {
+        return new DataFlavor[] { Rack.subpatchflavor };
+        }
+
+    public boolean isDataFlavorSupported(DataFlavor flavor) 
+        {
+        return (flavor.equals(Rack.subpatchflavor));
+        }
+        
+
+
+
     }

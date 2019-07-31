@@ -610,7 +610,7 @@ public class ModulePanel extends JPanel implements Transferable
                 
     public Object getTransferData(DataFlavor flavor) 
         {
-        if (flavor.equals(Rack.flavor))
+        if (flavor.equals(Rack.moduleflavor))
             return this;
         else
             return null;
@@ -618,12 +618,12 @@ public class ModulePanel extends JPanel implements Transferable
                 
     public DataFlavor[] getTransferDataFlavors() 
         {
-        return new DataFlavor[] { Rack.flavor };
+        return new DataFlavor[] { Rack.moduleflavor };
         }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) 
         {
-        return (flavor.equals(Rack.flavor));
+        return (flavor.equals(Rack.moduleflavor));
         }
         
     }

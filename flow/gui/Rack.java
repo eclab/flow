@@ -1091,13 +1091,15 @@ public class Rack extends JPanel
 
 
     /// Drag-and-drop data flavor
-    static DataFlavor flavor = null;
+    static DataFlavor moduleflavor = null;
+    static DataFlavor subpatchflavor = null;
     
     static
         {
         try
             {
-            flavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=flow.gui.ModulePanel");
+            moduleflavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=flow.gui.ModulePanel");
+            subpatchflavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=flow.gui.SubpatchPanel");
             }
         catch (ClassNotFoundException ex)
             {
@@ -1115,23 +1117,6 @@ public class Rack extends JPanel
 
 class ModulePanelTransferHandler extends TransferHandler implements DragSourceMotionListener 
     {
-    /*
-      public boolean canImport(TransferHandler.TransferSupport support) 
-      {
-      if (!support.isDrop() || !support.isDataFlavorSupported(Rack.flavor)) return false;
-        
-      if ((support.getDropAction() & TransferHandler.COPY) == TransferHandler.COPY)
-      {
-      return true;
-      }
-      else if ((support.getDropAction() & TransferHandler.MOVE) == TransferHandler.MOVE)
-      {
-      return true;
-      }
-      else return false;
-      }
-    */
-
     public Transferable createTransferable(JComponent c) 
         {
         if (c instanceof ModulePanel) 
@@ -1161,15 +1146,14 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
         
         try 
             {
-            if (dtde.getTransferable().isDataFlavorSupported(Rack.flavor))
+            if (dtde.getTransferable().isDataFlavorSupported(Rack.moduleflavor))
                 {
-                transferableObj = dtde.getTransferable().getTransferData(Rack.flavor);
+                transferableObj = dtde.getTransferable().getTransferData(Rack.moduleflavor);
                 } 
-            
             } 
         catch (Exception ex) {  }
         
-        if (transferableObj != null)
+        if (transferableObj != null && transferableObj instanceof ModulePanel)
             {
             ModulePanel droppedPanel = (ModulePanel)transferableObj;
             Rack rack = droppedPanel.getRack();
@@ -1347,3 +1331,119 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
             }
         }
     }
+
+
+
+class SubpatchPanelTransferHandler extends TransferHandler implements DragSourceMotionListener 
+    {
+    public Transferable createTransferable(JComponent c) 
+        {
+        if (c instanceof SubpatchPanel) 
+            {
+            return (Transferable) c;
+            }
+        else return null;
+        }
+
+    public int getSourceActions(JComponent c) 
+        {
+        if (c instanceof SubpatchPanel) 		// can't copy subpatch panels
+            {
+            return TransferHandler.MOVE;
+            }
+        else return TransferHandler.NONE;
+        }
+
+    public void dragMouseMoved(DragSourceDragEvent dsde) {}
+    } 
+
+class SubpatchPanelDropTargetListener extends DropTargetAdapter 
+    {
+    public void drop(DropTargetDropEvent dtde) 
+        {
+        Object transferableObj = null;
+        
+        try 
+            {
+            if (dtde.getTransferable().isDataFlavorSupported(Rack.subpatchflavor))
+                {
+                transferableObj = dtde.getTransferable().getTransferData(Rack.subpatchflavor);
+                } 
+            } 
+        catch (Exception ex) {  }
+        
+        if (transferableObj != null && transferableObj instanceof SubpatchPanel)
+            {
+            SubpatchPanel droppedPanel = (SubpatchPanel)transferableObj;
+            Rack rack = droppedPanel.getRack();
+                
+            Point p = dtde.getLocation();
+            Component comp = dtde.getDropTargetContext().getComponent();
+            
+            int newpos = -2;
+            int oldpos = -1;
+            
+            if (dtde.getDropAction() == DnDConstants.ACTION_MOVE)
+                {
+                if (comp instanceof SubpatchPanel)
+                    {
+                    if (comp == droppedPanel) return;  // no change
+                    boolean before = (p.getY() < comp.getHeight() / 2);
+					
+                    for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
+                        {
+                        if (rack.subpatchBox.getComponent(i) == comp)
+                            {
+                            newpos = (before ? i - 1 : i);
+                            break;
+                            }
+                        }
+                    }
+                else if (comp == rack)  // we dragged to the beginning
+                    {
+                    newpos = -1;
+                    }
+                else
+                    {
+                    //System.err.println("Drag failed");  // wasn't a mod panel I guess
+                    return;
+                    }
+
+				for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
+					{
+					if (rack.subpatchBox.getComponent(i) == droppedPanel)
+						{
+						oldpos = i;
+						break;
+						}
+					}
+
+				if (oldpos == -1)
+					{
+					System.err.println("WARNING(flow/modules/Rack.java) SubpatchPanelDropTargetListener: no such removed panel " + droppedPanel);
+					return;
+					}
+				else if (newpos == -2)
+					{
+					System.err.println("WARNING(flow/modules/Rack.java) SubpatchPanelDropTargetListener: no such added panel relative to " + comp);
+					return;
+					}
+				else 
+                    {
+                    // reorganize sounds
+                    rack.getOutput().lock();
+                    try
+                        {
+                        rack.getOutput().moveGroup(oldpos + 1, newpos + 1);
+						rack.rebuildSubpatches();
+                        }
+                    finally 
+                        {
+                        rack.getOutput().unlock();
+                        }
+                    }
+                }
+            }
+        }
+	}
+    
