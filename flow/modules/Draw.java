@@ -492,114 +492,114 @@ public class Draw extends Unit implements UnitSource
                 }
 
 
-    public void doLoadWave(JComponent root)
-    	{
-        //// FIRST we have the user choose a file
-        Rack rack = getRack();
+            public void doLoadWave(JComponent root)
+                {
+                //// FIRST we have the user choose a file
+                Rack rack = getRack();
         
-	    File file = doLoad("Load Wave...", new String[] { "wav", "WAV" }, false);
-	    if (file == null) return;
-	            
+                File file = doLoad("Load Wave...", new String[] { "wav", "WAV" }, false);
+                if (file == null) return;
+                    
         
-        double[] waves = null;
-        double[] buffer = new double[256];
-        int count = 0;
+                double[] waves = null;
+                double[] buffer = new double[256];
+                int count = 0;
         
-        WavFile wavFile = null;
-        try 
-        	{
-        	double[] _waves = new double[MAXIMUM_SAMPLES];
-        	wavFile = WavFile.openWavFile(file);
+                WavFile wavFile = null;
+                try 
+                    {
+                    double[] _waves = new double[MAXIMUM_SAMPLES];
+                    wavFile = WavFile.openWavFile(file);
                 
-            while(true)
-            	{
-				// Read frames into buffer
-				int framesRead = wavFile.readFrames(buffer, buffer.length);
-				if (count + framesRead > MAXIMUM_SAMPLES)
-					{
-					AppMenu.showSimpleError("File Too Large", "This file may contain no more than " + MAXIMUM_SAMPLES + " samples.", rack);
-					return;
-					}
-				System.arraycopy(buffer, 0, _waves, count, framesRead);
-				count += framesRead;
-				if (framesRead < buffer.length) 
-					break;
-				}
-			waves = new double[count];
-			System.arraycopy(_waves, 0, waves, 0, count);
-        	}
-        catch (IOException ex)
-			{
-			AppMenu.showSimpleError("File Error", "An error occurred on reading the file.", rack);
-			return;
-			}
-		catch (WavFileException ex)
-			{
-			AppMenu.showSimpleError("Not a proper WAV file", "WAV files must be mono 16-bit.", rack);
-			return;
-			}
+                    while(true)
+                        {
+                        // Read frames into buffer
+                        int framesRead = wavFile.readFrames(buffer, buffer.length);
+                        if (count + framesRead > MAXIMUM_SAMPLES)
+                            {
+                            AppMenu.showSimpleError("File Too Large", "This file may contain no more than " + MAXIMUM_SAMPLES + " samples.", rack);
+                            return;
+                            }
+                        System.arraycopy(buffer, 0, _waves, count, framesRead);
+                        count += framesRead;
+                        if (framesRead < buffer.length) 
+                            break;
+                        }
+                    waves = new double[count];
+                    System.arraycopy(_waves, 0, waves, 0, count);
+                    }
+                catch (IOException ex)
+                    {
+                    AppMenu.showSimpleError("File Error", "An error occurred on reading the file.", rack);
+                    return;
+                    }
+                catch (WavFileException ex)
+                    {
+                    AppMenu.showSimpleError("Not a proper WAV file", "WAV files must be mono 16-bit.", rack);
+                    return;
+                    }
 
-        try
-        	{
-        	wavFile.close();
-        	}
-        catch (Exception ex) { }
+                try
+                    {
+                    wavFile.close();
+                    }
+                catch (Exception ex) { }
         
-		int desiredSampleSize = Unit.NUM_PARTIALS * 2;				// because we have up to 256 samples
-		int currentSampleSize = waves.length;
-					
-		/// Resample to Flow's sampling rate
-		double[] newvals = WindowedSinc.interpolate(
-			waves,
-			currentSampleSize,
-			desiredSampleSize,		// notice desired and current are swapped -- because these are SIZES, not RATES
-			WINDOW_SIZE,
-			true);           
-		
-		// Note no window.  Should still be okay (I think?)
-		double[] harmonics = FFT.getHarmonics(newvals);
-		double[] finished = new double[harmonics.length / 2];		// must be 256
-		for (int s=1 ; s < harmonics.length / 2; s++)			// we skip the DC offset (0) and set the Nyquist frequency bin (harmonics.length / 2) to 0
-			{
-			finished[s - 1] = (harmonics[s] >= WaveTable.MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
-			}
+                int desiredSampleSize = Unit.NUM_PARTIALS * 2;                          // because we have up to 256 samples
+                int currentSampleSize = waves.length;
+                                        
+                /// Resample to Flow's sampling rate
+                double[] newvals = WindowedSinc.interpolate(
+                    waves,
+                    currentSampleSize,
+                    desiredSampleSize,              // notice desired and current are swapped -- because these are SIZES, not RATES
+                    WINDOW_SIZE,
+                    true);           
+                
+                // Note no window.  Should still be okay (I think?)
+                double[] harmonics = FFT.getHarmonics(newvals);
+                double[] finished = new double[harmonics.length / 2];           // must be 256
+                for (int s=1 ; s < harmonics.length / 2; s++)                   // we skip the DC offset (0) and set the Nyquist frequency bin (harmonics.length / 2) to 0
+                    {
+                    finished[s - 1] = (harmonics[s] >= WaveTable.MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
+                    }
 
-		double max = 0;
-		for(int i = 0; i < finished.length; i++)
-			{
-			if (max < finished[i])
-				max = finished[i];
-			}
-			
-		if (max > 0)
-			{
-			for(int i = 0; i < finished.length; i++)
-				{
-				finished[i] /= max;
-				}
-			}
-								
-		rack.getOutput().lock();
+                double max = 0;
+                for(int i = 0; i < finished.length; i++)
+                    {
+                    if (max < finished[i])
+                        max = finished[i];
+                    }
+                        
+                if (max > 0)
+                    {
+                    for(int i = 0; i < finished.length; i++)
+                        {
+                        finished[i] /= max;
+                        }
+                    }
+                                                                
+                rack.getOutput().lock();
 
-		int index = sound.findRegistered(Draw.this);
-		Output output = sound.getOutput();
-		int numSounds = output.getNumSounds();
+                int index = sound.findRegistered(Draw.this);
+                Output output = sound.getOutput();
+                int numSounds = output.getNumSounds();
 
-		try
-			{
-			for(int i = 0; i < numSounds; i++)
-				{
-				Draw unit = (Draw)(output.getSound(i).getRegistered(index));
-				unit.standardizeFrequencies();
-				double[] amplitudes = unit.getAmplitudes(0);
-				System.arraycopy(finished, 0, amplitudes, 0, Math.min(finished.length, amplitudes.length));
-				}
-			}
-		finally 
-			{
-			rack.getOutput().unlock();
-			}
-		}
+                try
+                    {
+                    for(int i = 0; i < numSounds; i++)
+                        {
+                        Draw unit = (Draw)(output.getSound(i).getRegistered(index));
+                        unit.standardizeFrequencies();
+                        double[] amplitudes = unit.getAmplitudes(0);
+                        System.arraycopy(finished, 0, amplitudes, 0, Math.min(finished.length, amplitudes.length));
+                        }
+                    }
+                finally 
+                    {
+                    rack.getOutput().unlock();
+                    }
+                }
 
             };
         display.setModulePanel(p);

@@ -1347,7 +1347,7 @@ class SubpatchPanelTransferHandler extends TransferHandler implements DragSource
 
     public int getSourceActions(JComponent c) 
         {
-        if (c instanceof SubpatchPanel) 		// can't copy subpatch panels
+        if (c instanceof SubpatchPanel)                 // can't copy subpatch panels
             {
             return TransferHandler.MOVE;
             }
@@ -1389,7 +1389,7 @@ class SubpatchPanelDropTargetListener extends DropTargetAdapter
                     {
                     if (comp == droppedPanel) return;  // no change
                     boolean before = (p.getY() < comp.getHeight() / 2);
-					
+                                        
                     for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
                         {
                         if (rack.subpatchBox.getComponent(i) == comp)
@@ -1409,33 +1409,33 @@ class SubpatchPanelDropTargetListener extends DropTargetAdapter
                     return;
                     }
 
-				for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
-					{
-					if (rack.subpatchBox.getComponent(i) == droppedPanel)
-						{
-						oldpos = i;
-						break;
-						}
-					}
+                for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
+                    {
+                    if (rack.subpatchBox.getComponent(i) == droppedPanel)
+                        {
+                        oldpos = i;
+                        break;
+                        }
+                    }
 
-				if (oldpos == -1)
-					{
-					System.err.println("WARNING(flow/modules/Rack.java) SubpatchPanelDropTargetListener: no such removed panel " + droppedPanel);
-					return;
-					}
-				else if (newpos == -2)
-					{
-					System.err.println("WARNING(flow/modules/Rack.java) SubpatchPanelDropTargetListener: no such added panel relative to " + comp);
-					return;
-					}
-				else 
+                if (oldpos == -1)
+                    {
+                    System.err.println("WARNING(flow/modules/Rack.java) SubpatchPanelDropTargetListener: no such removed panel " + droppedPanel);
+                    return;
+                    }
+                else if (newpos == -2)
+                    {
+                    System.err.println("WARNING(flow/modules/Rack.java) SubpatchPanelDropTargetListener: no such added panel relative to " + comp);
+                    return;
+                    }
+                else 
                     {
                     // reorganize sounds
                     rack.getOutput().lock();
                     try
                         {
                         rack.getOutput().moveGroup(oldpos + 1, newpos + 1);
-						rack.rebuildSubpatches();
+                        rack.rebuildSubpatches();
                         }
                     finally 
                         {
@@ -1445,5 +1445,5 @@ class SubpatchPanelDropTargetListener extends DropTargetAdapter
                 }
             }
         }
-	}
+    }
     

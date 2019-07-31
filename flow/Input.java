@@ -438,7 +438,7 @@ public class Input
      */
     public static final byte UNSPECIFIED = -1;
 
-	/** The "channel" for OMNI, (which is normally -1) to be used in the CC array instead. */
+    /** The "channel" for OMNI, (which is normally -1) to be used in the CC array instead. */
     public static final byte CC_OMNI = NUM_MIDI_CHANNELS;
     
     // CC array

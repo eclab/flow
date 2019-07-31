@@ -281,7 +281,7 @@ finished[s-1] /= RESAMPLING * RESAMPLING;
                                 // Note no window.  Should still be okay (I think?)
                                 double[] harmonics = FFT.getHarmonics(buffer);
                                 double[] finished = new double[harmonics.length / 2];
-                                for (int s=1 ; s < harmonics.length / 2; s++)				// we skip the DC offset (0) and set the Nyquist frequency bin (harmonics.length / 2) to 0
+                                for (int s=1 ; s < harmonics.length / 2; s++)                           // we skip the DC offset (0) and set the Nyquist frequency bin (harmonics.length / 2) to 0
                                     {
                                     finished[s - 1] = (harmonics[s] >= MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
                                     }

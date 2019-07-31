@@ -372,14 +372,14 @@ public class AppMenu
                 
                 // do demotion if necessary
                 
-				int result = rack.showMultiOption(rack, 
-					new String[] { }, 
-					new JComponent[] { }, 
-					"Demote Primary Patch", 
-					"Demote or clear the existing primary patch on load?",
-					new String[] { "Demote", "Clear", "Cancel" });
+                int result = rack.showMultiOption(rack, 
+                    new String[] { }, 
+                    new JComponent[] { }, 
+                    "Demote Primary Patch", 
+                    "Demote or clear the existing primary patch on load?",
+                    new String[] { "Demote", "Clear", "Cancel" });
 
-		                if (result == 2) return;
+                if (result == 2) return;
 
                 FileDialog fd = new FileDialog((JFrame)(SwingUtilities.getRoot(rack)), "Load Primary Patch File...", FileDialog.LOAD);
                 fd.setFilenameFilter(new FilenameFilter()
@@ -401,29 +401,29 @@ public class AppMenu
                 rack.enableMenuBar();                
                 if (fd.getFile() != null)
                     {
-                	rack.getOutput().lock();
+                    rack.getOutput().lock();
                     
                     if (result == 0)  // demote
-                    	{
-						try
-							{
-							if (!rack.getOutput().copyPrimaryGroup())
-								{
-								showSimpleError("Cannot demote", "There are too many subpatches.\nRemove a subpatch first.", rack);	
-								return;
-								}
-							else
-								{
-								rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
-								}
-							}
-						finally 
-							{
-							rack.getOutput().unlock();
-							}
-						}
-					doLoad(rack, fd, false);
-					}
+                        {
+                        try
+                            {
+                            if (!rack.getOutput().copyPrimaryGroup())
+                                {
+                                showSimpleError("Cannot demote", "There are too many subpatches.\nRemove a subpatch first.", rack);     
+                                return;
+                                }
+                            else
+                                {
+                                rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
+                                }
+                            }
+                        finally 
+                            {
+                            rack.getOutput().unlock();
+                            }
+                        }
+                    doLoad(rack, fd, false);
+                    }
                 }
             });
         return load;
@@ -431,79 +431,79 @@ public class AppMenu
 
 
 
-	static void doLoad(Rack rack, FileDialog fd, boolean clearSubpatches)
-		{
-		                String[] patchName = new String[1];
+    static void doLoad(Rack rack, FileDialog fd, boolean clearSubpatches)
+        {
+        String[] patchName = new String[1];
 
-                    File f = new File(fd.getDirectory(), fd.getFile());
-                    rack.output.lock();
-                    try
-                        {
-                        JSONObject obj = null;
-                        int flowVersion = 0;
-                        try 
-                            { 
-                            obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))); 
-                            flowVersion = Sound.loadFlowVersion(obj);
-                            }
-                        catch (Exception ex) { ex.printStackTrace(); }
-                        // version
-                        try
-                            {
-                            Modulation[][] mods = new Modulation[rack.getOutput().getNumSounds()][];
-                            for(int i = 0; i < mods.length; i++)
-                                {
-                                mods[i] = Sound.loadModules(obj, flowVersion);
-                                }
+        File f = new File(fd.getDirectory(), fd.getFile());
+        rack.output.lock();
+        try
+            {
+            JSONObject obj = null;
+            int flowVersion = 0;
+            try 
+                { 
+                obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))); 
+                flowVersion = Sound.loadFlowVersion(obj);
+                }
+            catch (Exception ex) { ex.printStackTrace(); }
+            // version
+            try
+                {
+                Modulation[][] mods = new Modulation[rack.getOutput().getNumSounds()][];
+                for(int i = 0; i < mods.length; i++)
+                    {
+                    mods[i] = Sound.loadModules(obj, flowVersion);
+                    }
                                                                                                 
-                            // Remove old subpatches
-                            if (clearSubpatches)
-                            	{
-                            	rack.getOutput().setNumGroups(1);
-                            	}
+                // Remove old subpatches
+                if (clearSubpatches)
+                    {
+                    rack.getOutput().setNumGroups(1);
+                    }
 
-                            // Create and update Modulations and create ModulePanels
-                            load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
+                // Create and update Modulations and create ModulePanels
+                load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
 
-                            // reload
-                            if (obj != null)
-                                {
-                                rack.setPatchVersion(Sound.loadPatchVersion(obj));
-                                rack.setPatchInfo(Sound.loadPatchInfo(obj));
-                                rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
-                                rack.setPatchDate(Sound.loadPatchDate(obj));
+                // reload
+                if (obj != null)
+                    {
+                    rack.setPatchVersion(Sound.loadPatchVersion(obj));
+                    rack.setPatchInfo(Sound.loadPatchInfo(obj));
+                    rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
+                    rack.setPatchDate(Sound.loadPatchDate(obj));
                                 
-                                if (clearSubpatches)
-                                	{
-									Output out = rack.getOutput();
-									int numNewGroups = Sound.loadGroups(out.getPatches(), 
-										out.getInput().getChannels(),
-										out.getNumRequestedSounds(),
-										out.getPatchNames(),
-										out.getGain(),
-										obj);
-									if (numNewGroups > 0)
-										{
-										out.setNumGroupsUnsafe(numNewGroups + 1);
-										out.assignGroupsToSounds();
-										out.getInput().rebuildMIDI();
-										}
-									}
-                                }
-                            rack.rebuildSubpatches();
-                            rack.checkOrder();
-                            }
-                        finally 
+                    if (clearSubpatches)
+                        {
+                        Output out = rack.getOutput();
+                        int numNewGroups = Sound.loadGroups(out.getPatches(), 
+                            out.getInput().getChannels(),
+                            out.getNumRequestedSounds(),
+                            out.getPatchNames(),
+                            out.getGain(),
+                            obj);
+                        if (numNewGroups > 0)
                             {
-                            rack.output.unlock();
+                            out.setNumGroupsUnsafe(numNewGroups + 1);
+                            out.assignGroupsToSounds();
+                            out.getInput().rebuildMIDI();
                             }
-                        rack.scrollToRight();
-                        ((Out.OutModulePanel)(rack.findOut())).updatePatchInfo();
                         }
-                    catch(Exception ex) { ex.printStackTrace(); showSimpleError("Patch Reading Error", "The patch could not be loaded", rack); }
-                    file = f;
-                    dirFile = f;
-                    		} 
+                    }
+                rack.rebuildSubpatches();
+                rack.checkOrder();
+                }
+            finally 
+                {
+                rack.output.unlock();
+                }
+            rack.scrollToRight();
+            ((Out.OutModulePanel)(rack.findOut())).updatePatchInfo();
+            }
+        catch(Exception ex) { ex.printStackTrace(); showSimpleError("Patch Reading Error", "The patch could not be loaded", rack); }
+        file = f;
+        dirFile = f;
+        } 
 
 
 
@@ -640,77 +640,77 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-				int result = rack.showMultiOption(rack, 
-					new String[] { }, 
-					new JComponent[] { }, 
-					"Demote Primary Patch", 
-					"Demote or clear the existing primary patch?",
-					new String[] { "Demote", "Clear", "Cancel" });
+                int result = rack.showMultiOption(rack, 
+                    new String[] { }, 
+                    new JComponent[] { }, 
+                    "Demote Primary Patch", 
+                    "Demote or clear the existing primary patch?",
+                    new String[] { "Demote", "Clear", "Cancel" });
 
-	                    rack.getOutput().lock();
-						try
-							{
-							if (result == 2) return;
-							if (result == 0)
-								{
-								if (!rack.getOutput().copyPrimaryGroup())
-									{
-									showSimpleError("Cannot demote", "There are too many subpatches.\nRemove a subpatch first.", rack);	
-									return;
-									}
-								else
-									{
-									rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
-									doNew(rack, false);
-									rack.rebuildSubpatches();
-									}
-								}
-							else
-								{
-									doNew(rack, false);
-									rack.rebuildSubpatches();
-								}
-							}
-						finally 
-							{
-							rack.getOutput().unlock();
-							}
+                rack.getOutput().lock();
+                try
+                    {
+                    if (result == 2) return;
+                    if (result == 0)
+                        {
+                        if (!rack.getOutput().copyPrimaryGroup())
+                            {
+                            showSimpleError("Cannot demote", "There are too many subpatches.\nRemove a subpatch first.", rack);     
+                            return;
+                            }
+                        else
+                            {
+                            rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
+                            doNew(rack, false);
+                            rack.rebuildSubpatches();
+                            }
+                        }
+                    else
+                        {
+                        doNew(rack, false);
+                        rack.rebuildSubpatches();
+                        }
                     }
+                finally 
+                    {
+                    rack.getOutput().unlock();
+                    }
+                }
             });
         return newpatch;
         }
         
     static void doNew(Rack rack, boolean clearSubpatches)
-    	{
-		rack.output.lock();
-		try
-			{
-			rack.closeAll();
-			rack.checkOrder();
-			rack.add(Out.class);
-			rack.setPatchName(null);
-			rack.setPatchVersion(null);
-			rack.setPatchInfo(null);
-			rack.setPatchAuthor(null);
-			rack.setPatchDate(null);
-									
-			// reset Out
-			rack.findOut().updatePatchInfo();
-			file = null;
-			// don't reset dirFile
+        {
+        rack.output.lock();
+        try
+            {
+            rack.closeAll();
+            rack.checkOrder();
+            rack.add(Out.class);
+            rack.setPatchName(null);
+            rack.setPatchVersion(null);
+            rack.setPatchInfo(null);
+            rack.setPatchAuthor(null);
+            rack.setPatchDate(null);
+                                                                        
+            // reset Out
+            rack.findOut().updatePatchInfo();
+            file = null;
+            // don't reset dirFile
 
-			if (clearSubpatches)
-				{
-				// Remove old subpatches
-				rack.getOutput().setNumGroups(1);
-				rack.rebuildSubpatches();
-				}
-			}
-		finally 
-			{
-			rack.output.unlock();
-			}
-    	}
+            if (clearSubpatches)
+                {
+                // Remove old subpatches
+                rack.getOutput().setNumGroups(1);
+                rack.rebuildSubpatches();
+                }
+            }
+        finally 
+            {
+            rack.output.unlock();
+            }
+        }
         
 
     // Produces the New Patch menu

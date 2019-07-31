@@ -1213,19 +1213,19 @@ public class Output
     /** Return the number of groups currently allocated */
     public int getNumGroups() { return numGroups; }
 
-	/** Moves group i to JUST ABOVE current position j */ 
-	public void moveGroup(int i, int j)
-		{
-		if (i == j)
-			{
-			return;  // nothing will change
+    /** Moves group i to JUST ABOVE current position j */ 
+    public void moveGroup(int i, int j)
+        {
+        if (i == j)
+            {
+            return;  // nothing will change
             // System.err.println("Output.moveGroup() WARNING: group and location cannot be the same");
-			}
-		else if (i == j + 1)
-			{
-			return;  // nothing will change
+            }
+        else if (i == j + 1)
+            {
+            return;  // nothing will change
             // System.err.println("Output.moveGroup() WARNING: group cannot be 1 below location");
-			}
+            }
         else if (i == 0)
             {
             System.err.println("Output.moveGroup() WARNING: group is 0, cannot be moved");
@@ -1243,45 +1243,45 @@ public class Output
             System.err.println("Output.removeGroup() WARNING: location >= numGroups - 1, should not exist");
             }
         else
-        	{
-		lock();
-		try
-			{
-			int n = numRequestedSounds[i];
-			JSONObject p = patch[i];
-			String pn = patchName[i];
-			double g = gain[i];
-			int c = input.getChannel(i);
-			removeGroup(i);
-			
-			setNumGroups(getNumGroups() + 1);
-			if (i < j)
-				j--;			// it was shifted in removal
-				
-			for(int q = numGroups - 1; q > j + 1; q--)
-				{
-				numRequestedSounds[q] = numRequestedSounds[q - 1];
-				patch[q] = patch[q - 1];
-				patchName[q] = patchName[q - 1];
-				gain[q] = gain[q - 1];
-				input.setChannel(q, input.getChannel(q - 1));
-				}
+            {
+            lock();
+            try
+                {
+                int n = numRequestedSounds[i];
+                JSONObject p = patch[i];
+                String pn = patchName[i];
+                double g = gain[i];
+                int c = input.getChannel(i);
+                removeGroup(i);
+                        
+                setNumGroups(getNumGroups() + 1);
+                if (i < j)
+                    j--;                    // it was shifted in removal
+                                
+                for(int q = numGroups - 1; q > j + 1; q--)
+                    {
+                    numRequestedSounds[q] = numRequestedSounds[q - 1];
+                    patch[q] = patch[q - 1];
+                    patchName[q] = patchName[q - 1];
+                    gain[q] = gain[q - 1];
+                    input.setChannel(q, input.getChannel(q - 1));
+                    }
 
-			numRequestedSounds[j + 1] = n;
-			patch[j + 1] = p;
-			patchName[j + 1] = pn;
-			gain[j + 1] = g;
-			input.setChannel(j + 1, c);
-			
-			assignGroupsToSounds();
-			input.rebuildMIDI();
-			}
-		finally 
-			{
-			unlock();
-			}
-			}
-		}
+                numRequestedSounds[j + 1] = n;
+                patch[j + 1] = p;
+                patchName[j + 1] = pn;
+                gain[j + 1] = g;
+                input.setChannel(j + 1, c);
+                        
+                assignGroupsToSounds();
+                input.rebuildMIDI();
+                }
+            finally 
+                {
+                unlock();
+                }
+            }
+        }
 
     /** Sets the number of groups currently allocated, does not clear new ones */
     public void setNumGroupsUnsafe(int num) 
@@ -1523,26 +1523,26 @@ public class Output
         else
             {
             lock();
-			try
-				{
-				// copy patch info
-				sounds[0].saveModules(patch[0]);                // so we have the latest when we reload them
-				addGroup(patch[0]);
+            try
+                {
+                // copy patch info
+                sounds[0].saveModules(patch[0]);                // so we have the latest when we reload them
+                addGroup(patch[0]);
 
-				// revise other information
-				numRequestedSounds[numGroups - 1] = numRequestedSounds[0];
-				patch[numGroups - 1] = patch[0];
-				patchName[numGroups - 1] = patchName[0];
-				gain[numGroups - 1] = 1.0;
-				input.setChannel(numGroups - 1, input.getChannel(0));
-				
-				for(int i = 0; i < numGroups; i++)
-					System.err.println(patchName[i]);
+                // revise other information
+                numRequestedSounds[numGroups - 1] = numRequestedSounds[0];
+                patch[numGroups - 1] = patch[0];
+                patchName[numGroups - 1] = patchName[0];
+                gain[numGroups - 1] = 1.0;
+                input.setChannel(numGroups - 1, input.getChannel(0));
+                                
+                for(int i = 0; i < numGroups; i++)
+                    System.err.println(patchName[i]);
 
-				// rebuild
+                // rebuild
                 assignGroupsToSounds();
                 input.rebuildMIDI();
-				}
+                }
             finally 
                 {
                 unlock();
@@ -1554,8 +1554,8 @@ public class Output
     public int addGroup(JSONObject obj)
         {
         // copy the patch so it can be modified by others
-		obj = new JSONObject(obj, JSONObject.getNames(obj));
-		
+        obj = new JSONObject(obj, JSONObject.getNames(obj));
+                
         if (numGroups >= MAX_GROUPS - 1)
             {
             System.err.println("Output.removeGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");

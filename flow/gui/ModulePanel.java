@@ -590,9 +590,9 @@ public class ModulePanel extends JPanel implements Transferable
                 {
                 f = new File(fd.getDirectory(), fd.getFile());
                 if (callLoadFile)
-                	{
-                	loadFile(f, rack);
-                	}
+                    {
+                    loadFile(f, rack);
+                    }
                 AppMenu.dirFile = f;
                 }                       
             catch (Exception ex)
