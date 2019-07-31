@@ -109,7 +109,7 @@ public class AppMenu
   }
 */
 
-    static JMenuItem quitPatchMenu(Rack rack)
+    static JMenuItem quitMenu(Rack rack)
         {
         JMenuItem quit = new JMenuItem("Exit");
 
@@ -376,8 +376,8 @@ public class AppMenu
                     new String[] { }, 
                     new JComponent[] { }, 
                     "Demote Primary Patch", 
-                    "Demote or clear the existing primary patch on load?",
-                    new String[] { "Demote", "Clear", "Cancel" });
+                    "Demote or just replace the existing primary patch on load?",
+                    new String[] { "Demote", "Replace", "Cancel" });
 
                 if (result == 2) return;
 
@@ -1161,12 +1161,13 @@ public class AppMenu
         menu.addSeparator();
         menu.add(newPrimaryPatchMenu(rack));
         menu.add(loadPrimaryPatchMenu(rack));
+        menu.addSeparator();
         menu.add(loadSubpatchMenu(rack));
 
         if (!Style.isMac())
             {
             menu.addSeparator();
-            menu.add(quitPatchMenu(rack));
+            menu.add(quitMenu(rack));
             }
 
         return menu;

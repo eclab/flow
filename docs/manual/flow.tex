@@ -47,7 +47,7 @@
 \begin{document}
 
 \noindent {\Huge\bf {\name}}\\[0.5em]
-{\large \bf An Open-source, Fully Modular, Polyphonic and Multitimbral, Additive Synthesizer\\[0.2em]
+{\large \bf An Open-source, Fully Modular, Multitimbral, Polyphonic Additive Synthesizer\\[0.2em]
 Version 3\\[0.2em]
 https://github.com/eclab/flow\\\\[0.2em]
 By Sean Luke\\[0.2em]
@@ -121,7 +121,7 @@ is to create a series of modules which either generate sets of partials or modif
 
 {\name} is in contrast closer to a {\bf fully modular synthesis} approach: you can organize as many modules as you like, and wire them up however you like, just like a hardware modular synthesizer. Since they're not in a line, modules can be fed from, and feed into, {\it multiple} other modules.  There's no reason you can't have modules wired up in cycles or other patterns.  And just like in a hardware modular synthesizer, if you don't wire the modules up at all, you don't get any sound. 
 
-Note however that unlike a classical fully-modular synthesizer, a software synthesizer like {\name} can easily be (and is) {\bf polyphonic}, and you can save and load patches.  And of course, unlike a traditional modular synthesizer, {\name} is additive.
+Note however that unlike a classical fully-modular synthesizer, a software synthesizer like {\name} can easily be (and is) {\bf polyphonic} and {\bf multitmbral}, and you can save and load patches.  And of course, unlike a traditional modular synthesizer, {\name} is additive.
 
 {\name} has another powerful trick up its sleeve: after you have saved your collection of wired modules out as a {\bf patch}, you then have the option of loading that patch to operate as a {\bf self-contained module in another patch!}  When a patch is loaded in this way, it is called a {\bf macro}.  And yes, you can have macros which contain macros which contain macros.
 
@@ -132,9 +132,10 @@ At present {\name} has the following specifications.  They may change:
 
 \begin{center}
 \begin{tabular}{rl}
-Number of Partials&64, 128, or 256 (User-selectable.  Partials are at present without phase)\\
-Polyphony&8 Voices (Adjustable from 1--16)\\
-Partials Update Rate&Every 32 Samples\\
+Number of Partials&64, 128, or 256, user-selectable.  Phase is disregarded.\\
+Polyphony&1--16, user-selectable.\\
+Multitimbrality&Up to 16 unique sounds, each on its own MIDI channel.  Compatible with MPE.\\
+Partials Update Rate&Every 32 samples\\
 Audio Sampling Rate&44,100 Hz\\
 Audio Bit Depth&16 bit\\
 Channels&Mono (that is, not stereo)\\
@@ -168,8 +169,11 @@ How do we tamp down glitches?  By playing with a few parameters. If you select {
 \item {\bf Audio Buffer Size} (default: 1152, which is crummy, but the best Java on the Mac can do)\qquad This is the size of the audio buffer that {\name} keeps filled for your operating system to tap into to generate sounds.  You want a low buffer if you can (much less latency); but a bigger buffer makes it easier for Flow to keep up.  Some operating systems require a large buffer size: for example, OS X typically needs at least 1152 . On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{audioloopback} for more information.  I can't help you much regarding Windows.
 
 \item {\bf Partials} (64--256, default: 128)\qquad This is the number of partials passed around from module to module.  More partials will produce a richer sound, particularly in bass notes, but incur a much higher load.
-\end{itemize}
 
+\item {\bf Voices Per Thread} (1, 2, 4, 8, 16, default: 8)\qquad This is the number of voices which will be assigned to a single CPU thread in the partials-updating stage of synthesis.  More voices per thread means fewer threads.  You'd like as many voices assigned to a given thread as possible, because switching threads incurs significant computational overhead.  However if you have too many voices on a thread, then they cannot take advantage of the parallelism afforded by your laptop's nifty multi-core CPU and you won't have fast partials updates.  Also if you have very few voices per thread, then you'll have many more threads in the partials-updating stage and this may nudge out the critical output threads, resulting in more glitches.  You have to find a balance.  
+
+\item {\bf Outputs Per Thread} (1, 2, 4, 8, 16, default: 2)\qquad This is the number of voices which will be assigned to a single CPU thread in the sound-output stage of synthesis.  More voices per thread means fewer threads.  You'd like as many voices assigned to a given thread as possible, because switching threads incurs significant computational overhead.  However if you have too many voices on a thread, then they cannot take advantage of the parallelism afforded by your laptop's nifty multi-core CPU and you will glitch because Flow can't service the audio output fast enough.  You have to find a balance.  
+\end{itemize}
 
 \subsection{Adding, Moving, Copying, and Closing Modules}  Modules are added to the rack by choosing them from the {\bf Modules} menu.  You can move a module to another location by dragging its title bar.  You can also copy a module to another location by dragging its title bar while holding the Control key (on the Mac, you can also hold the Option key).  Finally, you can delete a module by clicking on its close box: the little white dot to the left of its title.
 
@@ -284,7 +288,7 @@ A warning about oscilloscopes: like displays, they show the data of the most rec
 
 \subsection{Playing Sounds}
 
-If you directly connect a partials source to your Out module, it'll start playing.  In fact, {\bf all voices} might start playing: there's nothing to stop them!  It won't sound good.   Probably at this point you're just testing your patch and want to hear just a single voice.  To do this, select the menu option {\bf Monophonic} in the {\bf Play} menu.\footnote{You might also choose {\bf Monophonic} if you'd like a monophonic synth.  Flow does {\it last note priority}, meaning that if, while playing monophonically, you hold down note A, then hold down note B, then hold down note C, then let go of C, then B will begin to sound, and if you let go of B, then A will begin to sound.}
+If you directly connect a partials source to your Out module, it'll start playing.  In fact, {\bf all voices} might start playing: there's nothing to stop them!  It won't sound good.   Probably at this point you're just testing your patch and want to hear just a single voice.  To do this, select the menu option {\bf Monophonic} in the {\bf Play} menu.  The word "(Mono") will appear in the {\bf Out} module.\footnote{You might also choose {\bf Monophonic} if you'd like a monophonic synth.  Flow does {\it last note priority}, meaning that if, while playing monophonically, you hold down note A, then hold down note B, then hold down note C, then let go of C, then B will begin to sound, and if you let go of B, then A will begin to sound.}
 
 Ultimately you'll probably set things up with a {\bf VCA} (see the last entry in Section~\ref{unitshapers}) which won't play the sound unless a key is pressed and an {\bf Envelope} (typically a {\bf DADSR Envelope}: see Section~\ref{modsources}) sends the appropriate modulation signal.  That way different voices are played when you play different keys.  At this point you'll want to uncheck {\bf Play 1 Voice Only} so you can play more than one voice.
 
@@ -389,7 +393,7 @@ Flow can be set up to play more than one patch at a time. This is particularly u
 
 In most synthesizers, a multitimbral patch is different from a single patch.  You'd make a bunch of single patches, then make one multitimbral patch which combines them.  Flow's multitmbral patch model is different.  In Flow, you load a single patch, then you attach one or more additional single patches to it as {\bf subpatches}.  The original patch is known as the {\bf primary patch}.  You can save this combined patch out to a standard file and load it again.
 
-Subpatches are added to the primary patch by choosing {\it Load Subpatch...} in the {\it File} menu.  You can remove a subpatch by clicking on its close box, just like removing a module.
+Subpatches are added to the primary patch by choosing {\it Load Subpatch...} in the {\it File} menu.  You can remove a subpatch by clicking on its close box, just like removing a module.  You can also drag subpatches to reorder them relative to one another, just like modules.
 
 Only the primary patch can be edited: the subpatches will appear as thin rows beneath its modules.  For each subpatch you can make the following settings:
 
@@ -400,7 +404,7 @@ Only the primary patch can be edited: the subpatches will appear as thin rows be
 
 You can see the number of remaining voices for the primary patch by looking at its {\bf Out} module.  If the title just says {\it Out}, then it has full voices.  Otherwise it'll say something like {\it Out (13 Voices)}.
 
-One very confusing situation arises when you have selected {\it Monophonic} from the {\it Play} menu.  Here Flow only uses a single voice: that voice must go to the primary patch, so the subpatches all have zero voices allocated.  To make this situation clear, the subpatches will show {\bf [M]} (for ``monophonic'') for the number of voices allocated.
+One very confusing situation arises when you have selected {\it Monophonic} from the {\it Play} menu.  Here Flow only uses a single voice: that voice must go to the primary patch, so the subpatches all have zero voices allocated.  To make this situation clear, the subpatches will show {\bf [M]} (for ``monophonic'') for the number of voices allocated, and the word "(Mono") will appear in the {\bf Out} module of the primary patch.
 
 \item {\bf MIDI Channel}\quad This specifies which MIDI channel is used by the subpatch (or, if no MIDI channel, ``Off'').  If multiple subpatches request the same MIDI Channel, the earlier (higher) one will prevail.    Subpatches also get MIDI channel priority over the primary patch, so if a subpatch and the primary patch are using the same MIDI channel, the subpatch gets it.
 
@@ -412,12 +416,18 @@ Thus if you have chosen MPE Upper Zone with \(n\) channels, you want your subpat
 
 If you have instead chosen the MPE Upper Zone with \(n\) channels, then the MPE Global Channel is 16 and the MPE channels go down from there, that is, they're assigned to \(16 - n\ ...\ 15\). Once again, you want your subpatches to stay out of this region, so you'd assign to subpatches channels in the region \(1\ ...\ 16 - n - 1\).  For example, if you have 3 subpatches, you might once again set up MPE Upper Zone with \(n=12\) (so MPE needs channels \(4\ ...\ 16\)), and then use channels 1, 2, and 3 for the subpatches.
 
-Subpatches cannot themselves use MPE, nor can the be assigned to ``Any Channel''.  Only the primary patch can.
+Subpatches cannot use MPE, nor can the be assigned to ``Any Channel''.  Only the primary patch can.
 
 \item {\bf Gain}\quad This sets the overall volume of the subpatch in the final mix.  This is exactly the same as the {\it Gain} knob on the {\bf Out} module of the primary patch, discussed later in Section~\ref{outmodule}.  And in fact, the Gain knob can be modulated: if your subpatch was originally modulating its Gain knob before you loaded it as a subpatch, it will {\it continue} to modulate the gain, overriding the setting you make here.  In general it's probably not  wise to modulate the Gain knob.
 \end{itemize}
 
 Flow mixes the primary patch and subpatch voices as follows: each voice is amplified according to its the gain of its patch or subpatch, and then the voices are added together.  Finally all the voices are pushed through the reverb.  This means that {\bf reverb is global}: the settings you make in the primary patch will affect all voices, even ones in subpatches.  We may change that in the future.
+
+\paragraph{Loading and Clearing Just the Primary Patch}  Obviously you could load a new primary patch or clear it by choosing {\it Load Patch...} or {\it New Patch}: but this will clear out the subpatches as well.  There are times when you'd just like to replace the primary patch but keep the existing subpatches around.
+
+If you choose {\it New Primary Patch}, you will clear the primary patch but not the subpatches.  You'll be asked if you wanted to optionally {\it demote} the primary patch, that is, to make it a subpatch rather than eliminate it. 
+
+Similarly, if you choose {\it Load Primary Patch...}, you will load a new primary patch, replacing the original, but will keep the subpatches.  You will likewise be asked if you would like to optionally {\it demote} the primary patch just as before.
 
 \paragraph{Strategy}  I am an old-school synthesizer guy: I tend to use my DAW to automate all my hardware synthesizers, then mix them in analog and record the final result.  I will use Flow's multitmbral patches to follow a similar strategy as follows.  I lay down each track on a different MIDI channel, targeting a different subpatch, and listen to all of them together.  I need more polyphony than my computer can provide, I will (temporarily) reduce the number of partials.  Then I will either play the final result directly into the DAW to record it (if I didn't have to reduce the number of partials), or increase the partials again and record each patch separately and mix the final result in the DAW.
 
@@ -568,7 +578,11 @@ In addition to sequencing modulation signals, Seq can also be used in combinatio
 % --- Bell is not completed yet -- 
 %\paragraph{Bell}   An experimental bell module (not working yet) which lets you specify the pitch, peak amplitude, and attack/decay of 10 different bell partials, in addition to the total length.
 
-\paragraph{Draw}   Lets you draw partials, which are then output,   You can constrain the partials being drawn to a variety of subsets.  You can also save your scribbles and load them again, clear them, maximize, normalize, and standardize them, and (importantly) take a snapshot of partials from an incoming source.  The module can be collapsed to a smaller size if you wish.
+\paragraph{Draw}   Lets you draw partials, which are then output,   You can constrain the partials being drawn to a variety of subsets.  When you click on the {\it Menu} button, you can also save your scribbles and load them again, clear them, maximize, normalize, and standardize them, and (importantly) take a snapshot of partials from an incoming source.  The module can be collapsed to a smaller size if you wish.
+
+Draw also allows you to load {\it single-cycle waveforms}, that is, sound files which start and end at zero and represent a single cycle of a sound wave.  You can do this by choosing {\it Load Wave...} from the {\it Menu} button.  Wave files must be mono, and cannot be very long (presently at most 2048 samples).  After loading, Flow converts them (naturally) into harmonics.
+
+A good source of single-cycle waves is the AdventureKid Single Cycle Waveforms collection, available at https:/\!/www.adventurekid.se/akrt/waveforms/\quad Flow can read all of these.
 }
 
 \paragraph{Drawbars}   Produces the sine wave equivalents of the drawbars of a classic tone wheel organ.  There are a number of preset options.
