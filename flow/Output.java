@@ -1513,7 +1513,7 @@ public class Output
             }
         }
 
-    public boolean copyPrimaryGroup()
+    public boolean copyPrimaryGroup(boolean resetMIDI)
         {
         if (numGroups >= MAX_GROUPS - 1)
             {
@@ -1534,7 +1534,9 @@ public class Output
                 patch[numGroups - 1] = patch[0];
                 patchName[numGroups - 1] = patchName[0];
                 gain[numGroups - 1] = 1.0;
-                input.setChannel(numGroups - 1, input.getChannel(0));
+                input.setChannel(numGroups - 1, 
+                	resetMIDI ? Input.CHANNEL_NONE:
+                	input.getChannel(0));
                                 
                 for(int i = 0; i < numGroups; i++)
                     System.err.println(patchName[i]);

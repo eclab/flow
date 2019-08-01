@@ -369,14 +369,13 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-                
                 // do demotion if necessary
                 
                 int result = rack.showMultiOption(rack, 
                     new String[] { }, 
                     new JComponent[] { }, 
                     "Demote Primary Patch", 
-                    "Demote or just replace the existing primary patch on load?",
+                    "Demote or replace the existing primary patch on load?",
                     new String[] { "Demote", "Replace", "Cancel" });
 
                 if (result == 2) return;
@@ -402,27 +401,26 @@ public class AppMenu
                 if (fd.getFile() != null)
                     {
                     rack.getOutput().lock();
-                    
-                    if (result == 0)  // demote
-                        {
                         try
                             {
-                            if (!rack.getOutput().copyPrimaryGroup())
-                                {
-                                showSimpleError("Cannot demote", "There are too many subpatches.\nRemove a subpatch first.", rack);     
-                                return;
-                                }
-                            else
-                                {
-                                rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
-                                }
-                            }
-                        finally 
-                            {
-                            rack.getOutput().unlock();
-                            }
-                        }
-                    doLoad(rack, fd, false);
+						if (result == 0)  // demote
+							{
+								if (!rack.getOutput().copyPrimaryGroup(true))
+									{
+									showSimpleError("Cannot demote", "There are too many subpatches.\nRemove a subpatch first.", rack);     
+									return;
+									}
+								else
+									{
+									rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
+									}
+								}
+						doLoad(rack, fd, false);
+							}
+							finally 
+								{
+								rack.getOutput().unlock();
+								}
                     }
                 }
             });
@@ -653,7 +651,7 @@ public class AppMenu
                     if (result == 2) return;
                     if (result == 0)
                         {
-                        if (!rack.getOutput().copyPrimaryGroup())
+                        if (!rack.getOutput().copyPrimaryGroup(true))
                             {
                             showSimpleError("Cannot demote", "There are too many subpatches.\nRemove a subpatch first.", rack);     
                             return;
