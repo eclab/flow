@@ -401,26 +401,26 @@ public class AppMenu
                 if (fd.getFile() != null)
                     {
                     rack.getOutput().lock();
-                        try
+                    try
+                        {
+                        if (result == 0)  // demote
                             {
-						if (result == 0)  // demote
-							{
-								if (!rack.getOutput().copyPrimaryGroup(true))
-									{
-									showSimpleError("Cannot demote", "There are too many subpatches.\nRemove a subpatch first.", rack);     
-									return;
-									}
-								else
-									{
-									rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
-									}
-								}
-						doLoad(rack, fd, false);
-							}
-							finally 
-								{
-								rack.getOutput().unlock();
-								}
+                            if (!rack.getOutput().copyPrimaryGroup(true))
+                                {
+                                showSimpleError("Cannot demote", "There are too many subpatches.\nRemove a subpatch first.", rack);     
+                                return;
+                                }
+                            else
+                                {
+                                rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
+                                }
+                            }
+                        doLoad(rack, fd, false);
+                        }
+                    finally 
+                        {
+                        rack.getOutput().unlock();
+                        }
                     }
                 }
             });

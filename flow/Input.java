@@ -739,11 +739,11 @@ public class Input
                     }
                     
                 if (sound == null)
-                	{
-                	// this happens when our group received MIDI but has no sounds allocated to it.
+                    {
+                    // this happens when our group received MIDI but has no sounds allocated to it.
                     //System.err.println("WARNING(Input.java): Couldn't find the sound to turn on!!!");
-                	return;		// we have failed
-                	}
+                    return;         // we have failed
+                    }
                 
                 // handle sustain queue for non-mono sounds.  We need to release the old sound
                 if (sustain && sustainQueue.contains(sound))
