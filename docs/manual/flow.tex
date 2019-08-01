@@ -144,6 +144,8 @@ MIDI Features&MPE, Clock, Channel and Polyphonic Aftertouch, Pitch Bend, NRPN, R
 \end{center}
 
 
+\bump
+
 \begin{figure}[t]
 \begin{center}\includegraphics[width=6.5in]{screenshot}\end{center}
 \vspace{-3em}
@@ -152,7 +154,6 @@ MIDI Features&MPE, Clock, Channel and Polyphonic Aftertouch, Pitch Bend, NRPN, R
 \end{figure}
 
 
-\bump
 \section{Using {\name}}
 
 After you fire up {\name}, you're presented with a near-empty {\bf rack} (except for the {\bf Out} module) and can start adding {\bf modules} to it.  Then you tweak the parameters of modules and wire them up by dragging from output jacks to input jacks or to dials.  The result might look something like the example patch in Figure~\ref{screenshot}.
@@ -181,16 +182,17 @@ By default, modules are added to the beginning of the rack.  You might find this
 
 \subsection{Partial and Modulation Signals}  Modules can send and receive two kinds of signals.  First, a module can send or receive {\bf sets of partials} to/from other modules.  Since this is an additive synthesizer, a set of partials is essentially a sound being emitted from a module.  Additionally, a module can send or receive a {\bf modulation signal}.  This is a single number, ranging from 0 to 1, which can change over time.  Modulation signals are used to change parameters in modules in real time.  
 
-Modules can send any number of partials and modulation signals, and they can receive any number of the same.  But some modules are intended {\it primarily} to {\bf create modulation signals} (their title bars are red), to {\bf shape incoming modulation signals and emit new versions} (light red title bars), to {\bf create partials} (blue), or to {\bf shape incoming modulation signals and emit new versions} (light blue).  A few system-level modules, such as the {\bf Out} module, have black title bars.  Macros (see Section~\ref{aboutmacros}) have green title bars.
-
-Figure~\ref{simplepatch} shows a very simple patch: a Sawtooth wave run through a low pass filter whose cutoff frequency is modulated by a sine-wave LFO.   Notice the special module {\bf Out}.  If you attach a module to the jack labelled {\it A (Audio)} on this module, then the module's partials will be used to produce the final output sound.  We've attached the jack {\it Out} on the module {\bf Filter} to the jack {\it A (Audio)} in the module {\bf Out}, so the Filter's output is being routed directly to audio.   For more information on the capabilities of the {\bf Out} module, see Section~\ref{outmodule}.
-
 \begin{wrapfigure}{r}{2.6in}
+\vspace{-1em}
 \includegraphics[width=2.6in]{simplepatch.png}
 \caption{A Simple, and Terrible, Patch}
 \vspace{-1em}
 \label{simplepatch}
 \end{wrapfigure}
+
+Modules can send any number of partials and modulation signals, and they can receive any number of the same.  But some modules are intended {\it primarily} to {\bf create modulation signals} (their title bars are red), to {\bf shape incoming modulation signals and emit new versions} (light red title bars), to {\bf create partials} (blue), or to {\bf shape incoming modulation signals and emit new versions} (light blue).  A few system-level modules, such as the {\bf Out} module, have black title bars.  Macros (see Section~\ref{aboutmacros}) have green title bars.
+
+Figure~\ref{simplepatch} shows a very simple patch: a Sawtooth wave run through a low pass filter whose cutoff frequency is modulated by a sine-wave LFO.   Notice the special module {\bf Out}.  If you attach a module to the jack labelled {\it A (Audio)} on this module, then the module's partials will be used to produce the final output sound.  We've attached the jack {\it Out} on the module {\bf Filter} to the jack {\it A (Audio)} in the module {\bf Out}, so the Filter's output is being routed directly to audio.   For more information on the capabilities of the {\bf Out} module, see Section~\ref{outmodule}.
 
 The Filter is also receiving partials (which it's filtering).  These partials are coming from the {\bf Sawtooth} module.  Its {\it Out} jack is attached to the {\bf Filter}'s {\it Input} jack.  Notice that the wires connecting Partials input and output jacks are thick, solid (random) colors.  You make these wires by just dragging from an output jack to your chosen input jack.
 
@@ -223,7 +225,7 @@ Modulation signals not only carry a time-varying number, but also can send a {\b
 
 In a classic modular synthesizer, control signals take the form of either gates or control voltage (CV), hence the term ``gate/CV''.  In a very real sense, modulation and triggers together perform the same function as gate/CV, albeit combined into a single wire.
 
-\subsection{Responding to Notes} To support polyphony, MPE, and other features, {\name} differs from a classic modular synthesizer design in that you don't feed modules the current pitch or volume information in the form of Gate/CV signals. Rather, every module is automatically informed when a note has been pressed and it has been released.  There's no reason to send a gate or CV signal to an envelope, for example, as it already knows the note has been pressed.
+\subsection{Responding to Notes} {\name} differs from a classic modular synthesizer design in that you don't feed modules the current pitch or volume information in the form of Gate/CV signals. Rather, every module is automatically informed when a note has been pressed and it has been released.  There's no reason to send a gate or CV signal to an envelope, for example, as it already knows the note has been pressed.
 
 It's best to think of the Rack not as a single Rack, but as \(N\) parallel copies of that Rack, where \(N\) is the polyphony of the synthesizer.  Each time a note is pressed, one Rack copy is assigned to that note, and the modules are all told that a note has been pressed (and later that it has been released).  Modules can query other information as appropriate, such as aftertouch or pitch bend.  At the end of pipeline, the {\it Out} module produces a set of partials with frequencies (normally starting at 1.0) and amplitudes.  These frequencies are each multiplied against the note pitch, and the amplitudes are multiplied against the note volume: sine waves are produced and added up, and this becomes the final sound.
 
@@ -243,6 +245,8 @@ In addition to input and output jacks and dials, modules also sport options in t
 \end{wrapfigure}
 
 Some modules are outfitted with {\bf Constraints}: for example the {\bf Filter} module has a jack called {\it Only}, a checkbox called {\it Not}, and an unlabelled combobox (presently set to ``None'').  The constraints facility allows you to constrain which partials are being modified by the module and which are just passed through unchanged. 
+
+\enlargethispage{1em}
 
 \subsection{Partials Displays and Oscilloscopes}
 
@@ -270,7 +274,7 @@ What this is saying is that the nearest partial to the mouse pointer (the one in
 \paragraph{Optional Display Features}
 By default, partial frequencies are displayed linearly.  You can change this to a logarithmic plot by choosing {\bf Log-Axis Display} in the {\bf Options} menu.  There are two scaling options as well.  You can instruct Flow to provide enough room to display up to some \(N\) number of harmonics to the right of the fundamental by choosing the appropriate value under {\bf Max Displayed Harmonic} in the {\bf Options} menu.  The default is 150. If you're doing a logarithmic plot (this won't affect a linear display), you can also select how much room should be provided to the left of the fundamental by selecting {\bf Min Displayed Harmonic} from the {\bf Options} menu.  The default is 1/16.
 
-Displays can also be set to {\it Waterfall Mode}, where the partials become dots (brighter dots are higher amplitude) and scroll by in time.  To try this out, choose {\bf Waterfall Display} in the {\bf Options} menu.
+Displays can also be set to {\it Waterfall Mode}, where the partials become dots (brighter dots are higher amplitude) and scroll by in time.  To try this out, choose {\bf Waterfall Display} in the {\bf Options} menu.  Finally, you can hide (or display) the displays with the menu option {\it Show Displays}: hiding the displays uses less computer power.
 
 \begin{wrapfigure}{r}{1in}
 \includegraphics[height=1in]{oscilloscope}
@@ -280,11 +284,11 @@ Displays can also be set to {\it Waterfall Mode}, where the partials become dots
 \end{wrapfigure}
 
 \paragraph{Oscilloscopes}
-You might also find the oscilloscopes handy to understand what a modulation signal looks like.  The left oscilloscope shows the modulation signal of anything connected to the {\it 1 (Scope)} jack in {\bf Out}.  Notice for example, that in Figure~\ref{simplepatch}, the LFO is wired up to modulate the {\it 1 (Scope)} jack: this will cause it to be displayed in the left oscilloscope display.  Similarly, the right oscilloscope shows the modulation signal of anything connected to the {\it 2 (Aux)} jack.  Oscilloscopes have axes (the horizontal axis passes through the 0.5 position).  These axes change colors from blue to green (or from green to blue) any time the modulation triggers.
-
-Oscilloscopes don't currently display any text when you hover over them.  Maybe they should!
+You might also find the oscilloscopes handy to understand what a modulation signal looks like.  The left oscilloscope shows the modulation signal of anything connected to the {\it 1 (Scope)} jack in {\bf Out}.  Notice for example, that in Figure~\ref{simplepatch}, the LFO is wired up to modulate the {\it 1 (Scope)} jack: this will cause it to be displayed in the left oscilloscope display.  Similarly, the right oscilloscope shows the modulation signal of anything connected to the {\it 2 (Aux)} jack.  Oscilloscopes have axes (the horizontal axis passes through the 0.5 position).  These axes change colors from blue to green (or from green to blue) any time the modulation triggers.  Oscilloscopes don't currently display any text when you hover over them.  Maybe they should!
 
 A warning about oscilloscopes: like displays, they show the data of the most recently pressed note.  This can be confusing if (for example) you're using an LFO.  You've just reset the LFO with a note-on, but instead of resetting from its current position, it magically jumps to something much higher and resets from there.  This is because the voice being allocated for your note has its LFO at that position at the moment, {\it not the voice you've just been watching}, and the oscilloscope suddenly jumped to it.
+
+\enlargethispage{1em}
 
 \subsection{Playing Sounds}
 
@@ -299,8 +303,6 @@ So how do you play a using keyboard?  You attach it to {\name} by selecting {\bf
 To set up a MIDI Polyphonic Expression (MPE) device, go to {\bf MIDI and Audio Preferences} in the {\bf Play} menu, and change the MIDI Channel to either the MPE Lower Zone or the MPE Upper Zone, as determined by your MPE Controller.  You can then specify the number of MPE channels in the Zone.  {\name} also responds to an MPE Configuration Message (or MCM) sent over MIDI from your controller.
 
 MPE devices are often designed to link certain behaviors to attack velocity, pitch bend, aftertouch, CC 74, and release velocity.  All of these are accessible via the {\bf MIDI In} module.  However, pitch bend and attack velocity also do specific things in Flow.  If you wanted Flow to respond in some {\it non-bend} way when you perform the bend behavior on a Roli Seaboard (say), you need a way to disable bend.  To do this, you can deselect {\bf Responds to Bend} in the {\bf Play} menu.  Similarly, you can disable {\bf Velocity Sensitive} in the {\bf Play} menu.  The Bend and Attack Velocity signals still will be sent to the MIDI In module, where you can tap into them to make your patch do what you like.
-
-\bump
 
 \subsubsection{Routing MIDI from a Digital Audio Workstation}
 \label{routingmidi}
@@ -338,8 +340,6 @@ This procedure will create a bunch of of virtual devices with names like {\tt Vi
 
 Note that {\name} is a standalone application, not a VST or AU.  By default it sends its audio to the default audio device on your computer, which is probably your computer's speakers.  If you want to route the audio to your DAW, you'll need a loopback device for audio similar to the one for MIDI discussed in Section~\ref{routingmidi}.  This is because neither Java nor your DAW will create their own audio devices, so neither can connect to the other.  You need an intermediary.
 
-
-\bump
 
 \paragraph{Making an Audio Loopback Device}  This varies depending on your operating system.
 \begin{itemize}
@@ -387,11 +387,19 @@ Patches have four pieces of auxiliary text information stored in them: a {\it pa
 
 A patch doesn't need to have an author, date, version, or info: but it ought to have a name.  This is because if you load a patch as a Macro, the Macro's module will be titled with the patch name so you can tell what it is.  If you save a patch that has no name (yet), {\name} will set the patch name to the filename (minus the extension).
 
+\begin{figure}[t]
+\begin{center}\includegraphics[width=6.5in]{subpatches}\end{center}
+\vspace{-3em}
+\caption{Primary patch and three subpatches.}
+\label{subpatches}
+\end{figure}
+
+
 \subsection{Multitimbral Patches}
 
 Flow can be set up to play more than one patch at a time. This is particularly useful because Flow is a very computationally costly: if you have attached Flow to a DAW and you want to play more than one Flow patch through the DAW, you'd probably rather not run multiple copies of the application, each tuned with a small number of voices.
 
-In most synthesizers, a multitimbral patch is different from a single patch.  You'd make a bunch of single patches, then make one multitimbral patch which combines them.  Flow's multitmbral patch model is different.  In Flow, you load a single patch, then you attach one or more additional single patches to it as {\bf subpatches}.  The original patch is known as the {\bf primary patch}.  You can save this combined patch out to a standard file and load it again.
+In most synthesizers, a multitimbral patch is different from a single patch.  You'd make a bunch of single patches, then make one multitimbral patch which combines them.  Flow's multitmbral patch model is different.  In Flow, you load a single patch, then you attach one or more additional single patches to it as {\bf subpatches}.  The original patch is known as the {\bf primary patch}.  You can save this combined patch out to a standard file and load it again.  An example of a primary patch and three subpatches is shown in Figure~\ref{subpatches}.
 
 Subpatches are added to the primary patch by choosing {\it Load Subpatch...} in the {\it File} menu.  You can remove a subpatch by clicking on its close box, just like removing a module.  You can also drag subpatches to reorder them relative to one another, just like modules.
 
