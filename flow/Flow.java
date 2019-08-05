@@ -17,7 +17,7 @@ import java.util.*;
 public class Flow
     {
     // Flow Version
-    public static int VERSION = 3;
+    public static int VERSION = 4;
     
     public static void main(String[] args)
         {
