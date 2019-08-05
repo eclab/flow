@@ -70,9 +70,28 @@ public class Group
         maxNote = n; 
         if (maxNote > 127) maxNote = 127;
         if (maxNote < 0) maxNote = 0;
-        if (minNote > maxNote)
+        if (maxNote < minNote)
             maxNote = minNote;
         }
+        
+    /** Sets both the minimum and maximum note to the given values.
+    	If min > max, then max is set to min */
+    public void setBothNotes(int min, int max)
+    	{
+    	if (min > 127) min = 127;
+    	if (min < 0) min = 0;
+    	if (max > 127) max = 127;
+    	if (max < 0) max = 0;
+    	if (max < min) max = min;
+    	minNote = min;
+    	maxNote = max;
+    	}
+    
+    /** Sets both the minimum and maximum note to the given value. */
+    public void setBothNotes(int n)
+    	{
+    	setBothNotes(n, n);
+    	}
     
     /** Returns true if the note is between the min and max notes, inclusive. */
     public boolean isNoteInRange(int note) { return note >= minNote && note <= maxNote; }

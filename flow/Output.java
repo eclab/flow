@@ -1433,11 +1433,6 @@ public class Output
                 for(int i = g; i < numGroups - 1; i++)
                     {
                     group[i] = group[i + 1];
-//                    numRequestedSounds[i] = numRequestedSounds[i + 1];
-//                    patch[i] = patch[i + 1];
-//                    patchName[i] = patchName[i + 1];
-//                    gain[i] = gain[i + 1];
-//                    input.setChannel(i, input.getChannel(i + 1));
                     }
                 setNumGroups(getNumGroups() - 1);
                 assignGroupsToSounds();

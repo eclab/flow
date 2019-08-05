@@ -27,13 +27,19 @@ public class SubpatchPanel extends JPanel implements Transferable
     JComponent titlePanel;
     JComponent body;
     JSlider gain;
+    JLabel gainLabel;
     JSlider midi;
+    JLabel midiLabel;
     JSlider sounds;
-    JLabel noteLabel;
+    JLabel soundsLabel;
     JSlider note;
+    JLabel noteLabel;
     JLabel allocatedLabel;
+    JLabel summary;
     PushButton swap; 
     int group;
+    
+    public static final int STRUT_WIDTH = 4;
         
     public SubpatchPanel(Rack rack, int group)
         {
@@ -81,7 +87,7 @@ public class SubpatchPanel extends JPanel implements Transferable
                 }
             else
                 {
-                note.setValue(min);
+                note.setValue(min + 1);
                 }
             updateSoundAllocation();
             }
@@ -229,13 +235,14 @@ public class SubpatchPanel extends JPanel implements Transferable
 
         JLabel soundsTitle = new JLabel("Voices Requested: ");
         soundsTitle.setFont(Style.SMALL_FONT());
-        final JLabel soundsLabel = new JLabel("")
+        soundsLabel = new JLabel("")
             {
             public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
             public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         soundsLabel.setFont(Style.SMALL_FONT());
         sounds = new JSlider(0, MAX_SOUNDS);
+        sounds.setSnapToTicks(true);
         sounds.setBorder(null);
         sounds.putClientProperty( "JComponent.sizeVariant", "small" );
         sounds.addChangeListener(new ChangeListener()
@@ -268,27 +275,33 @@ public class SubpatchPanel extends JPanel implements Transferable
                         out.unlock();
                         }
                     }
+                
+                buildSummary();
                 }
             });
+        Dimension d = sounds.getPreferredSize();
+        d.width /= 2;
+        sounds.setPreferredSize(d);
             
-        box.add(Strut.makeHorizontalStrut(10));
+        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
         box.add(soundsTitle);
         box.add(soundsLabel);
         box.add(sounds);
-        box.add(Strut.makeHorizontalStrut(10));
+        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
         box.add(allocatedTitle);
         box.add(allocatedLabel);
-        box.add(Strut.makeHorizontalStrut(10));
+        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
 
         JLabel midiTitle = new JLabel("MIDI Channel: ");
         midiTitle.setFont(Style.SMALL_FONT());
-        JLabel midiLabel = new JLabel("")
+        midiLabel = new JLabel("")
             {
             public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
             public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         midiLabel.setFont(Style.SMALL_FONT());
         midi = new JSlider(0, Input.NUM_MIDI_CHANNELS);
+        midi.setSnapToTicks(true);
         midi.setBorder(null);
         midi.putClientProperty( "JComponent.sizeVariant", "small" );
         midi.addChangeListener(new ChangeListener()
@@ -324,35 +337,46 @@ public class SubpatchPanel extends JPanel implements Transferable
                         out.unlock();
                         }
                     }
+                buildSummary();
                 }
             });
+        d = midi.getPreferredSize();
+        d.width /= 2;
+        midi.setPreferredSize(d);
         box.add(midiTitle);
         box.add(midiLabel);
         box.add(midi);
-        box.add(Strut.makeHorizontalStrut(10));
+        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
+
+        box.add(Stretch.makeHorizontalStretch());
+
+        box = new Box(BoxLayout.X_AXIS);
+        vbox.add(box);
 
         JLabel noteTitle = new JLabel("Note: ");
         noteTitle.setFont(Style.SMALL_FONT());
-        JLabel noteLabel = new JLabel("")
+     	noteLabel = new JLabel("")
             {
             public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
             public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
+            
         noteLabel.setFont(Style.SMALL_FONT());
         note = new JSlider(0, 128);
+        note.setSnapToTicks(true);
         note.setBorder(null);
         note.putClientProperty( "JComponent.sizeVariant", "small" );
         note.addChangeListener(new ChangeListener()
             {
             public void stateChanged(ChangeEvent e) 
                 {
-                if (note.getValue() == 0)
+                int v = note.getValue() - 1;
+                if (v < 0)
                     {
                     noteLabel.setText("All");
                     }
                 else
                     {
-                    int v = note.getValue() - 1;
                     noteLabel.setText("" + notes[v % 12] + (v / 12));
                     }
 
@@ -362,16 +386,13 @@ public class SubpatchPanel extends JPanel implements Transferable
                     out.lock();
                     try
                         {
-                        if (note.getValue() == 0)
+                        if (v < 0)
                             {
-                            out.getGroup(group).setMinNote(0);
-                            out.getGroup(group).setMaxNote(127);
+                            out.getGroup(group).setBothNotes(0, 127);
                             }
                         else
                             {
-                            int v = note.getValue() - 1;
-                            out.getGroup(group).setMinNote(v);
-                            out.getGroup(group).setMaxNote(v);
+                            out.getGroup(group).setBothNotes(v);
                             }
                         }
                     finally 
@@ -379,21 +400,26 @@ public class SubpatchPanel extends JPanel implements Transferable
                         out.unlock();
                         }
                     }
+                buildSummary();
                 }
             });
+        d = note.getPreferredSize();
+        d.width *= 1.5;
+        note.setPreferredSize(d);
         box.add(noteTitle);
         box.add(noteLabel);
         box.add(note);
-        box.add(Strut.makeHorizontalStrut(10));
+        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
 
         JLabel gainTitle = new JLabel("Gain: ");
         gainTitle.setFont(Style.SMALL_FONT());
-        JLabel gainLabel = new JLabel("")
+        gainLabel = new JLabel("")
             {
             public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         gainLabel.setFont(Style.SMALL_FONT());
         gain = new JSlider(0, (int)(Out.MAX_GAIN * GAIN_RESOLUTION), 0);
+        gain.setSnapToTicks(true);
         gain.setBorder(null);
         gain.putClientProperty( "JComponent.sizeVariant", "small" );
         gain.addChangeListener(new ChangeListener()
@@ -405,12 +431,14 @@ public class SubpatchPanel extends JPanel implements Transferable
 
                 // this one is real-time
                 rack.getOutput().getGroup(group).setGain(val);
+
+                buildSummary();
                 }
             });
         box.add(gainTitle);
         box.add(gainLabel);
         box.add(gain);
-        box.add(Strut.makeHorizontalStrut(10));
+        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
                 
         // later
         /*
@@ -430,9 +458,21 @@ public class SubpatchPanel extends JPanel implements Transferable
 
         box = new Box(BoxLayout.X_AXIS);
         vbox.add(box);
+        
+        summary = new JLabel();
+        summary.setFont(Style.SMALL_FONT());
+        buildSummary();
 
-        return vbox;
+        return new DisclosurePanel(summary, vbox);
         }
+        
+    public void buildSummary()
+    	{
+    	summary.setText("Voices: " + allocatedLabel.getText() + " / " + soundsLabel.getText() +
+    		"     Midi: " + midiLabel.getText() +
+    		"     Note: " + noteLabel.getText() +
+    		"     Gain: " + gainLabel.getText());
+    	}
     
     public void updateSoundAllocation()
         {
@@ -453,6 +493,7 @@ public class SubpatchPanel extends JPanel implements Transferable
             {
             out.unlock();
             }
+        buildSummary();
         }
                 
     public void close()

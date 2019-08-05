@@ -369,9 +369,9 @@ public class Sound
             catch (org.json.JSONException e) { groups[i + 1].setChannel(Input.CHANNEL_NONE); }                  // this isn't in the documentation
             catch (NullPointerException e) { groups[i + 1].setChannel(Input.CHANNEL_NONE); }            // this might not exist if there's no current midi channel
             catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
-            try {  groups[i + 1].setMinNote(patch.getInt("note") - 1); groups[i + 1].setMaxNote(patch.getInt("note") - 1); }
-            catch (org.json.JSONException e) { groups[i + 1].setMinNote(0); groups[i + 1].setMaxNote(127); }                    // this isn't in the documentation
-            catch (NullPointerException e) { groups[i + 1].setMinNote(0); groups[i + 1].setMaxNote(127); }            // this might not exist if there's no current midi channel
+            try {  groups[i + 1].setBothNotes(patch.getInt("note")); }
+            catch (org.json.JSONException e) { groups[i + 1].setBothNotes(0, 127); }	// this isn't in the documentation
+            catch (NullPointerException e) { groups[i + 1].setBothNotes(0, 127); }		// this might not exist if there's no current midi channel
             catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
             }
         return i;

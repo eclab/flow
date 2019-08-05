@@ -16,26 +16,6 @@ import java.util.LinkedList;
  */
  
 
-/*
-  ALLOCATION RULES
-        
-  GROUP MIDI ASSIGNMENT
-  Groups are assigned exactly as they are requested.  Sounds have their channels set.
-
-  SOUND MIDI ASSIGNMENT
-  This occurrs on Note On:
-  - If the sound is the PRIMARY GROUP
-  - If the main channel is LOWER MPE
-  The sound is assigned according to our MPE rules
-  - Else if the main channel is UPPER MPE
-  The sound is assigned according to our MPE rules
-  - Else
-  The sound is assigned to the main channel (including being set to OMNI)
-  - If the sound is some other group
-  - The sound is assigned to the group's channel
-*/
-
-
 public class Input
     {
     Object lock = new Object[0];
@@ -57,8 +37,6 @@ public class Input
         {
         return output;
         }
-
-
 
     public Input(Output output)
         {
@@ -113,9 +91,9 @@ public class Input
 
     ///// MIDI DEVICES AND SETUP
 
-    // this is O(groups)
     public static final int ANY_NOTE = -1;
         
+    // this is O(groups) unfortunately
     public int findGroup(int channel, int note)
         {
         for(int i = 1; i < Output.MAX_GROUPS; i++)
@@ -167,6 +145,8 @@ public class Input
         // set up device
         midi.setInReceiver(midiDeviceWrapper);
         currentWrapper = midiDeviceWrapper;
+
+		primaryGroup().setChannel(primaryChannel);
 
         // clear mpe channels
         this.numMPEChannels = numMPEChannels;
@@ -241,14 +221,8 @@ public class Input
         return c == CHANNEL_LOWER_ZONE || c == CHANNEL_UPPER_ZONE;
         }
 
-/*
-  public boolean isOMNI()
-  {
-  return channel[Output.PRIMARY_GROUP] == CHANNEL_OMNI;
-  }
-*/
-            
-    // O(n)
+
+    // This is unfortunately O(n)
     boolean isMPEChannel(int channel)
         {
         int g = findGroup(channel, ANY_NOTE);
@@ -390,7 +364,6 @@ public class Input
 
 
     ///// CC AND NRPN
-
 
     boolean sustain = false;
     ArrayList<Sound> sustainQueue = new ArrayList<Sound>();
@@ -703,7 +676,6 @@ public class Input
                 if (sound == null)
                     {
                     // this happens when our group received MIDI but has no sounds allocated to it.
-                    //System.err.println("WARNING(Input.java): Couldn't find the sound to turn on!!!");
                     return;         // we have failed
                     }
                 
@@ -800,7 +772,7 @@ public class Input
                 boolean onlyPlayFirstSound = output.getOnlyPlayFirstSound();
                 if (sound == null)
                     {
-                    //System.err.println("WARNING(Input.java): Couldn't find the sound to turn off!!!");
+                    // This happens when we receive a NOTE_OFF but we have no group which is currently assigned to that channel or note range
                     }
                 else
                     {
@@ -871,9 +843,6 @@ public class Input
 
 
 
-
-
-
     ////// TOP LEVEL
 
 
@@ -893,18 +862,6 @@ public class Input
                 {
                 Midi.CCData ccdata;
                
-                /* 
-                   if ((sm.getChannel() == channel) || // If it's in our channel
-                   (isOMNI()) || // or we're looking for all messages
-                   (isMPE() && isMPEChannel(sm.getChannel())) || // or we're mpe and in the mpe range
-                   (
-                   sm.getCommand() == ShortMessage.CONTROL_CHANGE && // or we're a RPN message for configuring the MPE message
-                   (ccdata = midi.getParser().processCC(sm, false, false)) != null &&
-                   ccdata.type == Midi.CCData.TYPE_RPN &&
-                   ccdata.number == MPE_CONFIGURATION_RPN_NUMBER)
-                   )
-                   {
-                */
                 int command = sm.getCommand();                  // Note not getStatus().  See below.
                 if (command == ShortMessage.NOTE_OFF || command == ShortMessage.NOTE_ON && sm.getData2() == 0)
                     {
