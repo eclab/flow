@@ -928,8 +928,7 @@ public class Rack extends JPanel
             {
             // set up
             output.setMixer(mixers[mixersCombo.getSelectedIndex()]);
-            output.getInput().setupMIDI(
-                new int[] { channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS },
+            output.getInput().setupMIDI(channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS,
                 mpeChannelsCombo.getSelectedIndex() + 1,
                 devices.get(devicesCombo.getSelectedIndex()));
                 

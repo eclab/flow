@@ -27,6 +27,10 @@ public class Sound
     /** Default aftertouch setting (0.0 -- no aftertouch) returned by getAftertouch() */
     public static final double DEFAULT_AFTERTOUCH = 0.0;
     
+    int noteCounter = -1;
+    public int getNoteCounter() { return noteCounter; }
+    public void incrementNoteCounter() { noteCounter++; }
+    
     int group = Output.PRIMARY_GROUP;
     public int getGroup() { return group; }
     public void setGroup(int g) { group = g; }
@@ -341,7 +345,7 @@ public class Sound
         }
                 
     /** Loads all the groups EXCEPT THE FIRST GROUP, if any, from a JSONObject, and returns the number of NEW groups. */
-    public static int loadGroups(JSONObject[] patches, int[] midi, int[] sounds, String[] patchNames, double[] gain, JSONObject obj) throws JSONException
+    public static int loadGroups(Group[] groups, JSONObject obj) throws JSONException
         {
         JSONArray array = null;
         
@@ -352,23 +356,29 @@ public class Sound
         int i;
         for( i = 0 ; i < len; i++)              // we load all but the #0
             {
-            try { patches[i + 1] = array.getJSONObject(i); }
+            JSONObject patch = array.getJSONObject(i);
+            try { groups[i + 1].setPatch(patch); }
             catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch " + (i + 1)); break; };
-            try { patchNames[i + 1] = Sound.loadName(patches[i + 1]); }
+            try { groups[i + 1].setPatchName(Sound.loadName(patch)); }
             catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch name " + (i + 1)); break; };
-            try { gain[i + 1] = patches[i + 1].getDouble("gain"); }
+            try { groups[i + 1].setGain(patch.getDouble("gain")); }
             catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid gain " + (i + 1)); break; };
-            try { sounds[i + 1] = patches[i + 1].getInt("voices"); }
+            try { groups[i + 1].setNumRequestedSounds(patch.getInt("voices")); }
             catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid numRequestedSounds " + (i + 1)); break; };
-            try { midi[i + 1] = patches[i + 1].getInt("midi") - 1; }
-            catch (NullPointerException e) { midi[i + 1] = Input.CHANNEL_NONE; }            // this might not exist if there's no current midi channel
+            try { groups[i + 1].setChannel(patch.getInt("midi") - 1); }
+            catch (org.json.JSONException e) { groups[i + 1].setChannel(Input.CHANNEL_NONE); }                  // this isn't in the documentation
+            catch (NullPointerException e) { groups[i + 1].setChannel(Input.CHANNEL_NONE); }            // this might not exist if there's no current midi channel
+            catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
+            try {  groups[i + 1].setMinNote(patch.getInt("note") - 1); groups[i + 1].setMaxNote(patch.getInt("note") - 1); }
+            catch (org.json.JSONException e) { groups[i + 1].setMinNote(0); groups[i + 1].setMaxNote(127); }                    // this isn't in the documentation
+            catch (NullPointerException e) { groups[i + 1].setMinNote(0); groups[i + 1].setMaxNote(127); }            // this might not exist if there's no current midi channel
             catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
             }
         return i;
         }
 
     /** Stores all the groups EXCEPT THE FIRST GROUP, if any, to a JSONArray, stored in the given object. */
-    public static void saveGroups(JSONObject[] patches, int[] midi, int[] sounds, double[] gain, int numPatches, JSONObject obj) throws JSONException
+    public static void saveGroups(Group[] group, int numPatches, JSONObject obj) throws JSONException
         {
         if (numPatches > 1)
             {
@@ -376,13 +386,18 @@ public class Sound
 
             for(int i = 1; i < numPatches; i++)             // note 1
                 {
-                if (midi[i] >= 0) 
+                JSONObject patch = group[i].getPatch();
+                if (group[i].getChannel() >= 0) 
                     { 
-                    patches[i].put("midi", midi[i] + 1);
+                    patch.put("midi", group[i].getChannel() + 1);
                     };
-                patches[i].put("voices", sounds[i]);
-                patches[i].put("gain", gain[i]);
-                array.put(patches[i]);
+                if (group[i].getMinNote() == group[i].getMaxNote() )            // for now we assume that != means full range
+                    { 
+                    patch.put("note", group[i].getMinNote());
+                    };
+                patch.put("voices", group[i].getNumRequestedSounds());
+                patch.put("gain", group[i].getGain());
+                array.put(patch);
                 }
                                 
             obj.put("sub", array);

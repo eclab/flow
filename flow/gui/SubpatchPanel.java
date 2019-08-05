@@ -29,6 +29,8 @@ public class SubpatchPanel extends JPanel implements Transferable
     JSlider gain;
     JSlider midi;
     JSlider sounds;
+    JLabel noteLabel;
+    JSlider note;
     JLabel allocatedLabel;
     PushButton swap; 
     int group;
@@ -67,10 +69,20 @@ public class SubpatchPanel extends JPanel implements Transferable
             this.setDropTarget(new DropTarget(this, new SubpatchPanelDropTargetListener()));
                 
             Output out = rack.getOutput();
-            titleLabel.setText(" " + out.getPatchName(group));
-            gain.setValue((int)(out.getGain(group) * GAIN_RESOLUTION));
-            sounds.setValue(out.getNumRequestedSounds(group));
-            midi.setValue(out.getInput().getChannel(group) + 1);
+            titleLabel.setText(" " + out.getGroup(group).getPatchName());
+            gain.setValue((int)(out.getGroup(group).getGain() * GAIN_RESOLUTION));
+            sounds.setValue(out.getGroup(group).getNumRequestedSounds());
+            midi.setValue(out.getGroup(group).getChannel() + 1);
+            int min = out.getGroup(group).getMinNote();
+            int max = out.getGroup(group).getMaxNote();
+            if (min != max)             // FIXME: we assume that this means they're full range for now.
+                {
+                note.setValue(0);
+                }
+            else
+                {
+                note.setValue(min);
+                }
             updateSoundAllocation();
             }
         finally     
@@ -96,6 +108,7 @@ public class SubpatchPanel extends JPanel implements Transferable
     // close box
     static final ImageIcon I_CLOSE = iconFor("BellyButton.png");
     static final ImageIcon I_CLOSE_PRESSED = iconFor("BellyButtonPressed.png");
+    public static final String[] notes = new String[] { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" };
 
     static ImageIcon iconFor(String name)
         {
@@ -195,8 +208,10 @@ public class SubpatchPanel extends JPanel implements Transferable
         ModulePanel.  Override this to customize as you see fit, by creating UnitInputs,
         UnitOutputs, ModulationInputs, ModulationOutputs, OptionsChoosers, and ConstraintsChoosers. */
     protected JComponent buildPanel()
-        {               
+        {        
+        Box vbox = new Box(BoxLayout.Y_AXIS);       
         Box box = new Box(BoxLayout.X_AXIS);
+        vbox.add(box);
 
         JLabel sacrificialLabel = new JLabel("8.88");
         sacrificialLabel.setFont(Style.SMALL_FONT());
@@ -242,7 +257,7 @@ public class SubpatchPanel extends JPanel implements Transferable
                     out.lock();
                     try
                         {
-                        out.setNumRequestedSounds(group, sounds.getValue());
+                        out.getGroup(group).setNumRequestedSounds(sounds.getValue());
                         out.assignGroupsToSounds();
                         SubpatchPanel[] sub = rack.getSubpatches();
                         for(int i = 0; i < sub.length; i++)
@@ -293,18 +308,16 @@ public class SubpatchPanel extends JPanel implements Transferable
                     {
                     Output out = rack.getOutput();
                     out.lock();
-                    Input in = out.getInput();
                     try
                         {
                         if (midi.getValue() == 0)
                             {
-                            in.setChannel(group, Input.CHANNEL_NONE);
+                            out.getGroup(group).setChannel(Input.CHANNEL_NONE);
                             }
                         else
                             {
-                            in.setChannel(group, midi.getValue() - 1);
+                            out.getGroup(group).setChannel(midi.getValue() - 1);
                             }
-                        in.rebuildMIDI();
                         }
                     finally 
                         {
@@ -316,6 +329,61 @@ public class SubpatchPanel extends JPanel implements Transferable
         box.add(midiTitle);
         box.add(midiLabel);
         box.add(midi);
+        box.add(Strut.makeHorizontalStrut(10));
+
+        JLabel noteTitle = new JLabel("Note: ");
+        noteTitle.setFont(Style.SMALL_FONT());
+        JLabel noteLabel = new JLabel("")
+            {
+            public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
+            };
+        noteLabel.setFont(Style.SMALL_FONT());
+        note = new JSlider(0, 128);
+        note.setBorder(null);
+        note.putClientProperty( "JComponent.sizeVariant", "small" );
+        note.addChangeListener(new ChangeListener()
+            {
+            public void stateChanged(ChangeEvent e) 
+                {
+                if (note.getValue() == 0)
+                    {
+                    noteLabel.setText("All");
+                    }
+                else
+                    {
+                    int v = note.getValue() - 1;
+                    noteLabel.setText("" + notes[v % 12] + (v / 12));
+                    }
+
+                if (!note.getValueIsAdjusting())
+                    {
+                    Output out = rack.getOutput();
+                    out.lock();
+                    try
+                        {
+                        if (note.getValue() == 0)
+                            {
+                            out.getGroup(group).setMinNote(0);
+                            out.getGroup(group).setMaxNote(127);
+                            }
+                        else
+                            {
+                            int v = note.getValue() - 1;
+                            out.getGroup(group).setMinNote(v);
+                            out.getGroup(group).setMaxNote(v);
+                            }
+                        }
+                    finally 
+                        {
+                        out.unlock();
+                        }
+                    }
+                }
+            });
+        box.add(noteTitle);
+        box.add(noteLabel);
+        box.add(note);
         box.add(Strut.makeHorizontalStrut(10));
 
         JLabel gainTitle = new JLabel("Gain: ");
@@ -336,7 +404,7 @@ public class SubpatchPanel extends JPanel implements Transferable
                 gainLabel.setText(String.format("%1.2f", val));
 
                 // this one is real-time
-                rack.getOutput().setGain(group, val);
+                rack.getOutput().getGroup(group).setGain(val);
                 }
             });
         box.add(gainTitle);
@@ -359,7 +427,11 @@ public class SubpatchPanel extends JPanel implements Transferable
                         
         box.add(Stretch.makeHorizontalStretch());
 
-        return box;
+
+        box = new Box(BoxLayout.X_AXIS);
+        vbox.add(box);
+
+        return vbox;
         }
     
     public void updateSoundAllocation()

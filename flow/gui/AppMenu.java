@@ -147,12 +147,7 @@ public class AppMenu
                     JSONObject obj = new JSONObject();
                     
                     Output out = rack.getOutput();
-                    Sound.saveGroups(out.getPatches(), 
-                        out.getInput().getChannels(),
-                        out.getNumRequestedSounds(),
-                        out.getGain(),
-                        out.getNumGroups(), 
-                        obj);
+                    Sound.saveGroups(out.getGroups(), out.getNumGroups(), obj);
                     Sound.savePatchInfo(rack.getPatchInfo(), obj);
                     Sound.savePatchDate(rack.getPatchDate(), obj);
                     Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
@@ -262,12 +257,7 @@ public class AppMenu
             JSONObject obj = new JSONObject();
 
             Output out = rack.getOutput();
-            Sound.saveGroups(out.getPatches(), 
-                out.getInput().getChannels(),
-                out.getNumRequestedSounds(),
-                out.getGain(),
-                out.getNumGroups(), 
-                obj);
+            Sound.saveGroups(out.getGroups(), out.getNumGroups(), obj);
             Sound.savePatchInfo(rack.getPatchInfo(), obj);
             Sound.savePatchDate(rack.getPatchDate(), obj);
             Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
@@ -412,7 +402,7 @@ public class AppMenu
                                 }
                             else
                                 {
-                                rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
+                                rack.getOutput().getGroup(rack.getOutput().getNumGroups() - 1).setPatchName(rack.getPatchName());
                                 }
                             }
                         doLoad(rack, fd, false);
@@ -474,17 +464,11 @@ public class AppMenu
                     if (clearSubpatches)
                         {
                         Output out = rack.getOutput();
-                        int numNewGroups = Sound.loadGroups(out.getPatches(), 
-                            out.getInput().getChannels(),
-                            out.getNumRequestedSounds(),
-                            out.getPatchNames(),
-                            out.getGain(),
-                            obj);
+                        int numNewGroups = Sound.loadGroups(out.getGroups(), obj);
                         if (numNewGroups > 0)
                             {
                             out.setNumGroupsUnsafe(numNewGroups + 1);
                             out.assignGroupsToSounds();
-                            out.getInput().rebuildMIDI();
                             }
                         }
                     }
@@ -658,7 +642,7 @@ public class AppMenu
                             }
                         else
                             {
-                            rack.getOutput().setPatchName(rack.getOutput().getNumGroups() - 1, rack.getPatchName());
+                            rack.getOutput().getGroup(rack.getOutput().getNumGroups() - 1).setPatchName(rack.getPatchName());
                             doNew(rack, false);
                             rack.rebuildSubpatches();
                             }

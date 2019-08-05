@@ -64,9 +64,6 @@ public class Input
         {
         this.output = output;
         
-        for(int i = 0; i < channel.length; i++)
-            channel[i] = CHANNEL_NONE;
-        
         bendOctave = Prefs.getLastBendOctave();
         if (bendOctave < 0 || bendOctave >= 8)
             bendOctave = DEFAULT_BEND_OCTAVE;
@@ -84,7 +81,6 @@ public class Input
         midiClock = new MidiClock(this);
 
         ArrayList<Midi.MidiDeviceWrapper> devices = getDevices();
-        setupMIDI(new int[] { CHANNEL_OMNI }, DEFAULT_NUM_MPE_CHANNELS, devices.get(0));
 
         // by default Output has a single group, so we'll keep that
         // set up MIDI for first time
@@ -97,8 +93,8 @@ public class Input
                 { wrap = devs.get(i); break; }
             }
             
-        // we assume we have only one group at startp time
-        setupMIDI(new int[] { Prefs.getLastChannel() }, Prefs.getLastNumMPEChannels(), wrap);
+        // we assume we have only one group at startup time
+        setupMIDI(Prefs.getLastChannel(), Prefs.getLastNumMPEChannels(), wrap);
         }
     
     // Output calls this to add a Sound to the Input (it's added to the notesOff list)
@@ -117,76 +113,63 @@ public class Input
 
     ///// MIDI DEVICES AND SETUP
 
+    // this is O(groups)
+    public static final int ANY_NOTE = -1;
+        
+    public int findGroup(int channel, int note)
+        {
+        for(int i = 1; i < Output.MAX_GROUPS; i++)
+            {
+            Group g = output.getGroup(i);
+            if ((g.getChannel() == channel) &&
+                    (note == ANY_NOTE ||
+                    (g.getMinNote() <= note && g.getMaxNote() >= note)))
+                {
+                return i;
+                }
+            }
+                        
+        Group g = primaryGroup();
+        if (g.getChannel() == channel)
+            {
+            return Output.PRIMARY_GROUP; 
+            }
+        else if (g.getChannel() == CHANNEL_OMNI)
+            {
+            return Output.PRIMARY_GROUP;
+            }
+        else if (g.getChannel() == CHANNEL_LOWER_ZONE)
+            {
+            // legal channels are 0 ... 0 + numMPEChannels inclusive
+            if (channel <= numMPEChannels)
+                {
+                return Output.PRIMARY_GROUP;
+                }
+            }
+        else if (g.getChannel() == CHANNEL_UPPER_ZONE)
+            {
+            // legal channels are 15 ... 15 - numMPEChannels inclusive
+            if (channel >= 15 - numMPEChannels)
+                {
+                return Output.PRIMARY_GROUP;
+                }
+            }
+        return Output.NO_GROUP;
+        }
     
     Midi.MidiDeviceWrapper currentWrapper;
-    
-    public void rebuildMIDI()
-        {
-        setupMIDI((int[])(channel.clone()), numMPEChannels, currentWrapper);            // rebuilds from the same data
-        }
     
     /**
      * Sets MIDI to the new device wrapper and channel.
      */
-    public void setupMIDI(int[] channels, int numMPEChannels, Midi.MidiDeviceWrapper midiDeviceWrapper)
+    public void setupMIDI(int primaryChannel, int numMPEChannels, Midi.MidiDeviceWrapper midiDeviceWrapper)
         {
         // set up device
         midi.setInReceiver(midiDeviceWrapper);
         currentWrapper = midiDeviceWrapper;
 
-        // assign channels to groups
-        for(int i = 0; i < channels.length; i++)        // may not be the same length as what's passed in
-            channel[i] = CHANNEL_NONE;
-        System.arraycopy(channels, 0, channel, 0, channels.length);
-        
-        // Assign channels for primary group
-        int primaryChannel = channel[Output.PRIMARY_GROUP];
+        // clear mpe channels
         this.numMPEChannels = numMPEChannels;
-        for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
-            {
-            group[i] = Output.NO_GROUP;
-            mpeChannel[i] = false;
-            }
-                
-        if (primaryChannel == CHANNEL_NONE)
-            {
-            // do nothing
-            }
-        else if (primaryChannel == CHANNEL_OMNI)
-            {
-            for(int i = 0; i < NUM_MIDI_CHANNELS; i++)
-                group[i] = Output.PRIMARY_GROUP;
-            }
-        else if (primaryChannel == CHANNEL_LOWER_ZONE)
-            {
-            for(int i = 0; i < numMPEChannels + 1; i++)
-                {
-                group[i] = Output.PRIMARY_GROUP;
-                mpeChannel[i] = true;
-                }
-            }
-        else if (primaryChannel == CHANNEL_UPPER_ZONE)
-            {
-            for(int i = 0; i < numMPEChannels + 1; i++)
-                {
-                group[NUM_MIDI_CHANNELS - i - 1] = Output.PRIMARY_GROUP;
-                mpeChannel[NUM_MIDI_CHANNELS - i - 1] = true;
-                }
-            }
-        else
-            {
-            group[primaryChannel] = Output.PRIMARY_GROUP;
-            }
-
-        // assign channels for other groups and build
-        for(int i = Output.PRIMARY_GROUP + 1; i < output.getNumGroups(); i++)
-            {
-            if (channel[i] >= 0)
-                {
-                group[channel[i]] = i;
-                mpeChannel[channel[i]] = false;
-                }
-            }
         
         // clear bend
         omniBend = NO_BEND;
@@ -232,12 +215,12 @@ public class Input
     public static final int DEFAULT_NUM_MPE_CHANNELS = 14;
     public static final int MPE_CONFIGURATION_RPN_NUMBER = 6;
 
-        
+
     // Each group can have a channel, or CHANNEL_NONE.  group[Output.PRIMARY_GROUP] (that is, group[0]) can also have CHANNEL_OMNI, CHANNEL_LOWER_ZONE or CHANNEL_UPPER_ZONE
-    int channel[/*GROUP*/] = new int[Output.MAX_GROUPS];
+    // int channel[/*GROUP*/] = new int[Output.MAX_GROUPS];
     /// each channel is assigned to a unique GROUP, or to null
-    int group[/*CHANNEL*/] = new int[NUM_MIDI_CHANNELS];
-        
+    //  int group[/*CHANNEL*/] = new int[NUM_MIDI_CHANNELS];
+
     // The number of mpe channels specified by the user for the primary group
     int numMPEChannels = DEFAULT_NUM_MPE_CHANNELS;
     
@@ -245,60 +228,43 @@ public class Input
     // The primary group could have requested some, but was overridden by sub-patch
     // MIDI assignments, so we have to watch for that.
     boolean[] mpeChannel = new boolean[NUM_MIDI_CHANNELS];
-        
+    
+    Group primaryGroup() { return output.getGroup(Output.PRIMARY_GROUP); }
+    int primaryChannel() { return primaryGroup().getChannel(); }
+    
     /**
      * returns true if we are in MPE mode
      **/
     public boolean isMPE()
         {
-        return channel[Output.PRIMARY_GROUP] == CHANNEL_LOWER_ZONE || channel[Output.PRIMARY_GROUP] == CHANNEL_UPPER_ZONE;
+        int c = primaryChannel();
+        return c == CHANNEL_LOWER_ZONE || c == CHANNEL_UPPER_ZONE;
         }
 
-    public boolean isOMNI()
-        {
-        return channel[Output.PRIMARY_GROUP] == CHANNEL_OMNI;
-        }
+/*
+  public boolean isOMNI()
+  {
+  return channel[Output.PRIMARY_GROUP] == CHANNEL_OMNI;
+  }
+*/
             
-    public void swapGroups(int i, int j)
-        {
-        int temp = channel[i];
-        channel[i] = channel[j];
-        channel[j] = temp;
-        }
-        
-    public int getGroup(int channel)
-        {
-        return group[channel];
-        }
-        
-    public int getChannel(int group)
-        {
-        return channel[group];
-        }
-    
-    public int[] getChannels()
-        {
-        return channel;
-        }
-    
-    public void setChannel(int group, int channel)
-        {
-        this.channel[group] = channel;
-        }
-    
+    // O(n)
     boolean isMPEChannel(int channel)
         {
-        if (channel < 0) return false;
-        return mpeChannel[channel];
+        int g = findGroup(channel, ANY_NOTE);
+        if (g != Output.PRIMARY_GROUP) return false;            // this includes NO_GROUP
+        int c = primaryChannel();
+        return (c == CHANNEL_LOWER_ZONE || c == CHANNEL_UPPER_ZONE);
         }
     
     int getMPEGlobalChannel()
         {
-        if (channel[Output.PRIMARY_GROUP] == CHANNEL_LOWER_ZONE)
+        int c = primaryChannel();
+        if (c == CHANNEL_LOWER_ZONE)
             {
             return CHANNEL_GLOBAL_FOR_LOWER_ZONE;
             }
-        else if (channel[1] == CHANNEL_LOWER_ZONE)
+        else if (c == CHANNEL_UPPER_ZONE)
             {
             return CHANNEL_GLOBAL_FOR_UPPER_ZONE;
             }
@@ -573,22 +539,16 @@ public class Input
                     {
                     int msb = ccdata.value;
                     int num = msb >> 7;
-                    // kinda silly to do this since we're just setting channel[] with it, but...
-                    int[] c = new int[channel.length];
-                    System.arraycopy(channel, 0, c, 0, channel.length);
+                    int c = CHANNEL_UPPER_ZONE;
                     if (sm.getChannel() == 0)
                         {
-                        c[Output.PRIMARY_GROUP] = CHANNEL_LOWER_ZONE;
-                        }
-                    else
-                        {
-                        c[Output.PRIMARY_GROUP] = CHANNEL_UPPER_ZONE;
+                        c = CHANNEL_LOWER_ZONE;
                         }
                     setupMIDI(c, num, currentWrapper);
                     
                     // We might want to update the menu too....
                     Prefs.setLastNumMPEChannels(num);
-                    Prefs.setLastChannel(c[Output.PRIMARY_GROUP]);
+                    Prefs.setLastChannel(c);
                     }
                 }
             }
@@ -687,17 +647,19 @@ public class Input
         Sound sound = null;
         int i = sm.getData1();
         boolean noteCurrentlyOn = false;
-        int group = 0;
+        int g = 0;
         synchronized (lock)
             {
-            group = getGroup(sm.getChannel());
-
-            if (group == Output.NO_GROUP)                       // we have no one who listens in on this channel
+            g = findGroup(sm.getChannel(), i);
+            
+            // we have no one who listens in on this channel
+            if (g == Output.NO_GROUP)                       
                 {
                 return;
                 }
-                        
-            if (group == Output.PRIMARY_GROUP && output.getOnlyPlayFirstSound())
+            
+            // we are in the primary group AND we're monophonic
+            if (g == Output.PRIMARY_GROUP && output.getOnlyPlayFirstSound())
                 {
                 notesOnMono.add(Integer.valueOf(i));
                 sound = output.getSoundUnsafe(0);  // I think I can do this because they're not changing at this point
@@ -715,7 +677,7 @@ public class Input
                 for(int j = notesOff.size() - 1; j >= 0; j--)
                     {
                     Sound s = notesOff.get(j);
-                    if (s.getGroup() == group)
+                    if (s.getGroup() == g)
                         {
                         sound = s;
                         notesOff.remove(j);
@@ -729,7 +691,7 @@ public class Input
                     for(int j = notesOn.size() - 1; j >= 0; j--)
                         {
                         Sound s = notesOn.get(j);
-                        if (s.getGroup() == group)
+                        if (s.getGroup() == g)
                             {
                             sound = s;
                             notesOn.remove(j);
@@ -762,7 +724,7 @@ public class Input
         try
             {
             // set the channel, including OMNI
-            if (getChannel(group) == CHANNEL_OMNI)
+            if (output.getGroup(g).getChannel() == CHANNEL_OMNI)
                 {
                 sound.setChannel(CHANNEL_OMNI);
                 }
@@ -773,6 +735,7 @@ public class Input
             
             sound.setNote(d);
             sound.setMIDINote(i);
+            sound.incrementNoteCounter();
             sound.setVelocity((double) sm.getData2() / 127.0);
             if (sound.getChannel() == CHANNEL_OMNI)
                 {
@@ -810,6 +773,7 @@ public class Input
         {
         Sound sound = null;
         int i = sm.getData1();
+        
         synchronized (lock)
             {
             notesOnMono.remove(Integer.valueOf(i));
@@ -872,7 +836,7 @@ public class Input
                         double d = Math.pow(2.0, (double) (i - 69) / 12.0) * 440.0;
 
                         // set the channel, including OMNI
-                        if (getChannel(sound.getGroup()) == CHANNEL_OMNI)
+                        if (output.getGroup(sound.getGroup()).getChannel() == CHANNEL_OMNI)
                             {
                             sound.setChannel(CHANNEL_OMNI);
                             }
@@ -883,6 +847,7 @@ public class Input
 
                         sound.setNote(d);
                         sound.setMIDINote(i);
+                        sound.incrementNoteCounter();
 
                         if (sound.getGroup() == Output.PRIMARY_GROUP)
                             {
@@ -893,7 +858,8 @@ public class Input
                     // either way, let's set the release velocity
                     sound.setReleaseVelocity((double) sm.getData2() / 127.0);
                     }
-                } finally
+                } 
+            finally
                 {
                 output.unlock();
                 }
