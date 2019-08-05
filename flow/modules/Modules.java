@@ -53,6 +53,7 @@ public class Modules
     flow.modules.Fatten.class,
     flow.modules.Fill.class,
     flow.modules.Filter.class,
+    flow.modules.Fix.class,
     flow.modules.FlangeFilter.class,
     flow.modules.Geiger.class,
     flow.modules.In.class,
