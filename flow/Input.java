@@ -678,7 +678,7 @@ public class Input
                     // this happens when our group received MIDI but has no sounds allocated to it.
                     return;         // we have failed
                     }
-                
+                                    
                 // handle sustain queue for non-mono sounds.  We need to release the old sound
                 if (sustain && sustainQueue.contains(sound))
                     {

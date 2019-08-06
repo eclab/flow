@@ -210,7 +210,6 @@ public class SubpatchPanel extends JPanel implements Transferable
 
 
     public static final int GAIN_RESOLUTION = 25;
-    public static final int MAX_SOUNDS = 15;            // we can't achieve 16, so no reason suggesting it...
     /** Builds the JComponent displayed in the main body (all but the title bar) of the
         ModulePanel.  Override this to customize as you see fit, by creating UnitInputs,
         UnitOutputs, ModulationInputs, ModulationOutputs, OptionsChoosers, and ConstraintsChoosers. */
@@ -244,7 +243,7 @@ public class SubpatchPanel extends JPanel implements Transferable
             public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         soundsLabel.setFont(Style.SMALL_FONT());
-        sounds = new JSlider(0, MAX_SOUNDS);
+        sounds = new JSlider(0, Output.getNumSounds() - 1);		// we need to leave one sound for the primary
         sounds.setSnapToTicks(true);
         sounds.setBorder(null);
         sounds.putClientProperty( "JComponent.sizeVariant", "small" );

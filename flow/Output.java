@@ -78,7 +78,7 @@ public class Output
         Obviously more voices, more CPU usage.
     */
     public static final int DEFAULT_NUM_VOICES = 8;
-    public static final int MAX_VOICES = 16;
+    public static final int MAX_VOICES = 32;
     static int numVoices = -1;
     
     public static int getNumVoices() { return numVoices; }
@@ -522,7 +522,13 @@ public class Output
     double[][] positions;
 
     // 0.05 is about 3 32-sample periods before we get to near to 100%
-    static final double PARTIALS_INTERPOLATION_ALPHA = 0.1;
+    // 0.03 is about 3 32-sample periods before we get to near to 95%
+    // 0.025 is about 3 32-sample periods before we get to near to 92%
+    // 0.02 is about 3 32-sample periods before we get to near to 86%
+    // the problem is that if we move too rapidly, we get a slight, uhm, breathy click when partials move fast.
+    // Warmth.flow is a good example of the sound.  I can't reproduce the sound audibly at 0.025, so that's what I'm
+    // going with.
+    static final double PARTIALS_INTERPOLATION_ALPHA = 0.025;
     static final double ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA = 1.0 - PARTIALS_INTERPOLATION_ALPHA;
     
     /** A value that's significantly higher than IEEE 754 subnormals, used by Output.java and Smooth.java
@@ -730,15 +736,15 @@ public class Output
                   currentFrequencies[ii][jj] = -1;
                 */
   
-                lightweightOutputSemaphores = new boolean[MAX_VOICES];
-                outputLocks = new Object[MAX_VOICES];
-                for (int i = 0; i < MAX_VOICES; i++) 
+                lightweightOutputSemaphores = new boolean[numVoices];
+                outputLocks = new Object[numVoices];
+                for (int i = 0; i < numVoices; i++) 
                     {
                     outputLocks[i] = new Object[0];
                     lightweightOutputSemaphores[i] = true;
                     }
 
-                for(int i = 0; i < MAX_VOICES; i += numOutputsPerThread)
+                for(int i = 0; i < numVoices; i += numOutputsPerThread)
                     {
                     final int _i = i;
                     Thread thread = new Thread(new Runnable()
@@ -749,7 +755,7 @@ public class Output
                                 {
                                 blockOutputUntil(_i, true); 
                                 
-                                int n = MAX_VOICES;
+                                int n = numVoices;
                                 if (n >  _i + numOutputsPerThread)
                                     n =  _i + numOutputsPerThread;
                                         
@@ -937,7 +943,7 @@ public class Output
                         for (int j = 0; j < numVoicesPerThread; j++)
                             {
                             int voice = _i * numVoicesPerThread + j;
-                            if (voice > numSounds) 
+                            if (voice >= numSounds) 
                                 break;
                             else
                                 {
@@ -989,23 +995,23 @@ public class Output
     //// The primary voice thread signals TRUE, then blocks until FALSE.
     //// The reverse is true for the per-voice threads.
     
-    void blockVoiceUntil(int voice, boolean val)
+    void blockVoiceUntil(int thread, boolean val)
         {
-        synchronized(voiceLocks[voice])
+        synchronized(voiceLocks[thread])
             {
-            while(lightweightSemaphores[voice] != val)
+            while(lightweightSemaphores[thread] != val)
                 {
-                try { voiceLocks[voice].wait(); } catch (Exception e) { }
+                try { voiceLocks[thread].wait(); } catch (Exception e) { }
                 }
             }
         }
                 
-    void signalVoice(int voice, boolean val)
+    void signalVoice(int thread, boolean val)
         {
-        synchronized(voiceLocks[voice])
+        synchronized(voiceLocks[thread])
             {
-            lightweightSemaphores[voice] = val;
-            voiceLocks[voice].notify();
+            lightweightSemaphores[thread] = val;
+            voiceLocks[thread].notify();
             }
         }
 
@@ -1068,7 +1074,7 @@ public class Output
                 }
             else
                 {
-                int numThreads = numSounds / numVoicesPerThread;
+                int numThreads = (int)(Math.ceil(numSounds / (double)numVoicesPerThread));
                 if (!soundThreadsStarted)
                     {
                     startPerVoiceThreads(numThreads);
