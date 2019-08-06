@@ -76,7 +76,8 @@ public class SubpatchPanel extends JPanel implements Transferable
                 
             Output out = rack.getOutput();
             titleLabel.setText(" " + out.getGroup(group).getPatchName());
-            gain.setValue((int)(out.getGroup(group).getGain() * GAIN_RESOLUTION));
+            gain.setValue((int)(out.getGroup(group).getGain() * GAIN_RESOLUTION * Out.MAX_GAIN));
+
             sounds.setValue(out.getGroup(group).getNumRequestedSounds());
             midi.setValue(out.getGroup(group).getChannel() + 1);
             int min = out.getGroup(group).getMinNote();
@@ -215,16 +216,18 @@ public class SubpatchPanel extends JPanel implements Transferable
         UnitOutputs, ModulationInputs, ModulationOutputs, OptionsChoosers, and ConstraintsChoosers. */
     protected JComponent buildPanel()
         {        
-        Box vbox = new Box(BoxLayout.Y_AXIS);       
-        Box box = new Box(BoxLayout.X_AXIS);
-        vbox.add(box);
+        JPanel pane = new JPanel();
+        pane.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
 
         JLabel sacrificialLabel = new JLabel("8.88");
         sacrificialLabel.setFont(Style.SMALL_FONT());
         final int titleWidth = (int)sacrificialLabel.getPreferredSize().getWidth();
         final int titleHeight = (int)sacrificialLabel.getPreferredSize().getHeight();
 
-        JLabel allocatedTitle = new JLabel("Allocated: ");
+
+        JLabel allocatedTitle = new JLabel("   Allocated: ");
         allocatedTitle.setFont(Style.SMALL_FONT());
         allocatedLabel = new JLabel("")
             {
@@ -233,7 +236,7 @@ public class SubpatchPanel extends JPanel implements Transferable
             };
         allocatedLabel.setFont(Style.SMALL_FONT());
 
-        JLabel soundsTitle = new JLabel("Voices Requested: ");
+        JLabel soundsTitle = new JLabel("Max Voices: ", SwingConstants.RIGHT);
         soundsTitle.setFont(Style.SMALL_FONT());
         soundsLabel = new JLabel("")
             {
@@ -282,17 +285,79 @@ public class SubpatchPanel extends JPanel implements Transferable
         Dimension d = sounds.getPreferredSize();
         d.width /= 2;
         sounds.setPreferredSize(d);
-            
-        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
-        box.add(soundsTitle);
-        box.add(soundsLabel);
-        box.add(sounds);
-        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
-        box.add(allocatedTitle);
-        box.add(allocatedLabel);
-        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
+        
+        c.gridx = 0;
+        c.gridy = 0;
+        pane.add(soundsTitle, c);
+    
+        c.gridx = 1;
+        pane.add(soundsLabel, c);
+    
+        c.gridx = 2;
+        pane.add(sounds, c);
+        
+        c.gridx = 3;
+        pane.add(allocatedTitle, c);
+    
+        c.gridx = 4;
+        pane.add(allocatedLabel, c);
+        
 
-        JLabel midiTitle = new JLabel("MIDI Channel: ");
+        JLabel gainTitle = new JLabel("   Gain: ");
+        gainTitle.setFont(Style.SMALL_FONT());
+        gainLabel = new JLabel("")
+            {
+            public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
+            };
+        gainLabel.setFont(Style.SMALL_FONT());
+        double g = rack.getOutput().getGroup(group).getGain();
+        
+        gain = new JSlider(0, (int)(Out.MAX_GAIN * GAIN_RESOLUTION), 0);
+        gain.setSnapToTicks(true);
+        gain.setBorder(null);
+        gain.putClientProperty( "JComponent.sizeVariant", "small" );
+        gain.addChangeListener(new ChangeListener()
+            {
+            public void stateChanged(ChangeEvent e) 
+                {
+                double val = gain.getValue() / (double) GAIN_RESOLUTION;
+                gainLabel.setText(String.format("%1.2f", val));
+
+                // this one is real-time
+                rack.getOutput().lock();
+                try
+                	{
+	                rack.getOutput().getGroup(group).setGain(val / Out.MAX_GAIN);		// so we go from 0...1
+	                rack.getOutput().redistributeGains();
+	                }
+	            finally
+	            	{
+	            	rack.getOutput().unlock();
+	            	}
+
+                buildSummary();
+                }
+            });
+
+        c.gridx = 5;
+        pane.add(gainTitle, c);
+    
+        c.gridx = 6;
+        pane.add(gainLabel, c);
+    
+        c.gridx = 7;
+        pane.add(gain, c);
+        
+        c.gridx = 8;
+        c.weightx = 1.0;
+        pane.add(Stretch.makeHorizontalStretch(), c);
+        c.weightx = 0.0;
+        
+
+
+
+
+        JLabel midiTitle = new JLabel("MIDI Channel: ", SwingConstants.RIGHT);
         midiTitle.setFont(Style.SMALL_FONT());
         midiLabel = new JLabel("")
             {
@@ -343,17 +408,19 @@ public class SubpatchPanel extends JPanel implements Transferable
         d = midi.getPreferredSize();
         d.width /= 2;
         midi.setPreferredSize(d);
-        box.add(midiTitle);
-        box.add(midiLabel);
-        box.add(midi);
-        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
-
-        box.add(Stretch.makeHorizontalStretch());
-
-        box = new Box(BoxLayout.X_AXIS);
-        vbox.add(box);
-
-        JLabel noteTitle = new JLabel("Note: ");
+        
+        c.gridx = 0;
+        c.gridy = 1;
+        pane.add(midiTitle, c);
+        
+        c.gridx = 1;
+        pane.add(midiLabel, c);
+        
+        c.gridx = 2;
+        pane.add(midi, c);
+        
+                
+        JLabel noteTitle = new JLabel("   MIDI Note: ");
         noteTitle.setFont(Style.SMALL_FONT());
      	noteLabel = new JLabel("")
             {
@@ -373,7 +440,7 @@ public class SubpatchPanel extends JPanel implements Transferable
                 int v = note.getValue() - 1;
                 if (v < 0)
                     {
-                    noteLabel.setText("All");
+                    noteLabel.setText("Any");
                     }
                 else
                     {
@@ -406,64 +473,28 @@ public class SubpatchPanel extends JPanel implements Transferable
         d = note.getPreferredSize();
         d.width *= 1.5;
         note.setPreferredSize(d);
-        box.add(noteTitle);
-        box.add(noteLabel);
-        box.add(note);
-        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
 
-        JLabel gainTitle = new JLabel("Gain: ");
-        gainTitle.setFont(Style.SMALL_FONT());
-        gainLabel = new JLabel("")
-            {
-            public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
-            };
-        gainLabel.setFont(Style.SMALL_FONT());
-        gain = new JSlider(0, (int)(Out.MAX_GAIN * GAIN_RESOLUTION), 0);
-        gain.setSnapToTicks(true);
-        gain.setBorder(null);
-        gain.putClientProperty( "JComponent.sizeVariant", "small" );
-        gain.addChangeListener(new ChangeListener()
-            {
-            public void stateChanged(ChangeEvent e) 
-                {
-                double val = gain.getValue() / (double) GAIN_RESOLUTION;
-                gainLabel.setText(String.format("%1.2f", val));
+        c.gridx = 3;
+        pane.add(noteTitle, c);
 
-                // this one is real-time
-                rack.getOutput().getGroup(group).setGain(val);
+        c.gridx = 4;
+        pane.add(noteLabel, c);
 
-                buildSummary();
-                }
-            });
-        box.add(gainTitle);
-        box.add(gainLabel);
-        box.add(gain);
-        box.add(Strut.makeHorizontalStrut(STRUT_WIDTH));
-                
-        // later
-        /*
-          swap = new PushButton("Make Primary")
-          {
-          public void perform()
-          {
-          rack.swapSubpatch(group);
-          }
-          };
+        c.gridx = 5;
+        c.gridwidth = 3;
+        pane.add(note, c);
+        c.gridwidth = 0;
 
-          box.add(swap);
-        */
-                        
-        box.add(Stretch.makeHorizontalStretch());
+        c.gridx = 8;
+        c.weightx = 1.0;
+        pane.add(Stretch.makeHorizontalStretch(), c);
+        c.weightx = 0.0;
 
-
-        box = new Box(BoxLayout.X_AXIS);
-        vbox.add(box);
-        
         summary = new JLabel();
         summary.setFont(Style.SMALL_FONT());
         buildSummary();
 
-        return new DisclosurePanel(summary, vbox);
+        return new DisclosurePanel(summary, pane);
         }
         
     public void buildSummary()

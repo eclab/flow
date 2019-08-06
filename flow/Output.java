@@ -1497,8 +1497,21 @@ public class Output
                                 
                 try 
                     { 
-                    g.setNumRequestedSounds(2);
+                    // determine gain.  This will be costly.
+                    // we have to build a patch to find Out.
+                    // We could do this by searching through the patch JSON, but this is simpler and stupider
+                    
                     g.setGain(Group.DEFAULT_GAIN);
+                    Modulation[] mods = Sound.loadModules(obj, Sound.loadFlowVersion(obj));
+                    for(int i = 0; i < mods.length; i++)
+                    	{
+                    	if (mods[i] instanceof Out)  // got it
+                    		{
+                    		g.setGain(((Out)mods[i]).modulate(Out.MOD_GAIN));
+                    		break;
+                    		}
+                    	}                    
+                    g.setNumRequestedSounds(2);
                     g.setPatch(obj); 
                     g.setPatchName(Sound.loadName(g.getPatch()));
                     g.setChannel(Input.CHANNEL_NONE);

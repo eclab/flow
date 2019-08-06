@@ -21,7 +21,7 @@ public class Group
     int numRequestedSounds = 0;
     JSONObject patch = new JSONObject(EMPTY_JSON);
     String patchName;
-    double gain = DEFAULT_GAIN;;
+    double gain = DEFAULT_GAIN;
         
     /** Returns the group's current channel.  This can be any of
     	Input.CHANNEL_NONE, or 0 ... 15.  If this group is the Primary group,

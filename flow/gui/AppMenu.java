@@ -157,7 +157,7 @@ public class AppMenu
                     
                     PrintWriter p = null;
 
-                    rack.output.lock();
+                    rack.getOutput().lock();
                     try
                         {
                         int numModulePanels = rack.allModulePanels.size();
@@ -165,7 +165,7 @@ public class AppMenu
                             {
                             rack.allModulePanels.get(i).updateForSave();
                             }
-                        rack.output.getSound(0).saveModules(obj);
+                        rack.getOutput().getSound(0).saveModules(obj);
                         p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(file)));
                         System.out.println(obj);
                         p.println(obj);
@@ -179,7 +179,7 @@ public class AppMenu
                         }
                     finally 
                         {
-                        rack.output.unlock();
+                        rack.getOutput().unlock();
                         }
                     }
                 else
@@ -269,7 +269,7 @@ public class AppMenu
             else
                 Sound.saveName(rack.getPatchName(), obj);
 
-            rack.output.lock();
+            rack.getOutput().lock();
             try
                 {
                 int numModulePanels = rack.allModulePanels.size();
@@ -277,7 +277,7 @@ public class AppMenu
                     {
                     rack.allModulePanels.get(i).updateForSave();
                     }
-                rack.output.getSound(0).saveModules(obj);
+                rack.getOutput().getSound(0).saveModules(obj);
                 p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(f)));
                 p.println(obj);
                 p.flush();
@@ -291,7 +291,7 @@ public class AppMenu
                 }
             finally 
                 {
-                rack.output.unlock();
+                rack.getOutput().unlock();
                 }
             file = f;
             dirFile = f;
@@ -424,7 +424,7 @@ public class AppMenu
         String[] patchName = new String[1];
 
         File f = new File(fd.getDirectory(), fd.getFile());
-        rack.output.lock();
+        rack.getOutput().lock();
         try
             {
             JSONObject obj = null;
@@ -454,6 +454,7 @@ public class AppMenu
                 load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
 
                 // reload
+                Output out = rack.getOutput();
                 if (obj != null)
                     {
                     rack.setPatchVersion(Sound.loadPatchVersion(obj));
@@ -463,21 +464,20 @@ public class AppMenu
                                 
                     if (clearSubpatches)
                         {
-                        Output out = rack.getOutput();
                         int numNewGroups = Sound.loadGroups(out.getGroups(), obj);
                         if (numNewGroups > 0)
                             {
                             out.setNumGroupsUnsafe(numNewGroups + 1);
-                            out.assignGroupsToSounds();
                             }
                         }
                     }
+                out.assignGroupsToSounds();
                 rack.rebuildSubpatches();
                 rack.checkOrder();
                 }
             finally 
                 {
-                rack.output.unlock();
+                rack.getOutput().unlock();
                 }
             rack.scrollToRight();
             ((Out.OutModulePanel)(rack.findOut())).updatePatchInfo();
@@ -522,7 +522,7 @@ public class AppMenu
                 if (fd.getFile() != null)
                     {
                     f = new File(fd.getDirectory(), fd.getFile());
-                    rack.output.lock();
+                    rack.getOutput().lock();
                     try
                         {
                         rack.addMacro(f);
@@ -539,7 +539,7 @@ public class AppMenu
                         }
                     finally 
                         {
-                        rack.output.unlock();
+                        rack.getOutput().unlock();
                         }
                     dirFile = f;
                     }
@@ -664,7 +664,7 @@ public class AppMenu
         
     static void doNew(Rack rack, boolean clearSubpatches)
         {
-        rack.output.lock();
+        rack.getOutput().lock();
         try
             {
             rack.closeAll();
@@ -687,10 +687,12 @@ public class AppMenu
                 rack.getOutput().setNumGroups(1);
                 rack.rebuildSubpatches();
                 }
+                
+        	rack.getOutput().assignGroupsToSounds();
             }
         finally 
             {
-            rack.output.unlock();
+            rack.getOutput().unlock();
             }
         }
         
@@ -1225,7 +1227,7 @@ public class AppMenu
     static void load(Modulation[][] mods, Rack rack, String patchName)
         {
         Output output = rack.getOutput();
-        rack.output.lock();
+        rack.getOutput().lock();
         try
             {
             // remove all existing panels
@@ -1267,7 +1269,7 @@ public class AppMenu
             }
         finally 
             {
-            rack.output.unlock();
+            rack.getOutput().unlock();
             }
         }
 
