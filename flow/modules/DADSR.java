@@ -85,7 +85,10 @@ public class DADSR extends Modulation implements ModSource
     public static final int CURVE_X_16 = 4;
     public static final int CURVE_X_32 = 5;
     public static final int CURVE_STEP = 6;
-        
+    public static final int CURVE_X_2_X_8 = 7;
+    public static final int CURVE_X_4_X_16 = 8;
+    public static final int CURVE_X_8_X_32 = 9;
+
     public static final int MOD_DELAY_TIME = 0;
     public static final int MOD_DELAY_LEVEL = 1;
     public static final int MOD_ATTACK_TIME = 2;
@@ -167,7 +170,7 @@ public class DADSR extends Modulation implements ModSource
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.ONE, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
             new String[] {  "Delay Time", "Delay Level", "Attack Time", "Attack Level", "Decay Time", "Sustain Level", "Release Time", "Release Level", "On Tr", "Off Tr" });
         defineOptions(new String[] { "Curve", "One Shot", "Gate Reset", "MIDI Sync", "Fast Release" }, 
-            new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step" }, 
+            new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32" }, 
                 { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" }, { "No Release" } } );
         setModulationOutput(0, 0);  
         }
@@ -306,7 +309,7 @@ public class DADSR extends Modulation implements ModSource
                 
 
         double alpha = (tick - start) / interval;
-
+		
         switch(curve)
             {
             case CURVE_LINEAR:
@@ -357,6 +360,36 @@ public class DADSR extends Modulation implements ModSource
             case CURVE_STEP:
                 {
                 alpha = 1.0;
+                }
+            break;
+            case CURVE_X_2_X_8:
+                {
+                alpha = (1-alpha) * (1-alpha);
+				double beta = alpha;		// x^2
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;		// x^8
+                alpha = 1 - (alpha + beta) * 0.5;
+                }
+            break;
+            case CURVE_X_4_X_16:
+                {
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+				double beta = alpha;		// x^4
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;		// x^16
+                alpha = 1 - (alpha + beta) * 0.5;
+                }
+            break;
+            case CURVE_X_8_X_32:
+                {
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+				double beta = alpha;		// x^8
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;		// x^32
+                alpha = 1 - (alpha + beta) * 0.5;
                 }
             break;
             default:
