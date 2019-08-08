@@ -237,7 +237,7 @@ public class AppMenu
         else
             {
             String name = rack.getPatchName();
-            if (name == null) name = "Untitled";
+            if (name == null) name = Sound.UNTITLED_PATCH_NAME;
             fd.setFile(name + PATCH_EXTENSION);
             if (dirFile != null)
                 fd.setDirectory(dirFile.getParentFile().getPath());
@@ -322,6 +322,12 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
+    			if (rack.modified)
+    				{
+    				if (!showSimpleConfirm("Load Patch?", "This patch has newly loaded primary or subpatches.\nClear the existing patch?", rack))
+    					return;
+    				}
+
                 FileDialog fd = new FileDialog((JFrame)(SwingUtilities.getRoot(rack)), "Load Patch File...", FileDialog.LOAD);
                 fd.setFilenameFilter(new FilenameFilter()
                     {
@@ -469,7 +475,12 @@ public class AppMenu
                             {
                             out.setNumGroupsUnsafe(numNewGroups + 1);
                             }
+                        rack.modified = false;
                         }
+                    else
+                    	{
+                    	rack.modified = true;
+                    	}
                     }
                 out.assignGroupsToSounds();
                 rack.rebuildSubpatches();
@@ -583,7 +594,7 @@ public class AppMenu
 
 
     // Display a simple (OK / Cancel) confirmation message.  Return the result (ok = true, cancel = false).
-    static boolean showSimpleConfirm(String title, String message, Rack rack)
+    public static boolean showSimpleConfirm(String title, String message, Rack rack)
         {
         rack.disableMenuBar();
         boolean result = (JOptionPane.showConfirmDialog(rack, message, title,
@@ -591,7 +602,17 @@ public class AppMenu
         rack.enableMenuBar();
         return result;
         }
+        
 
+    // Display a simple (OK / Cancel) text-input message message.  Return the result, or null if cancelled.
+    public static String showSimpleInput(String title, String message, String initialText, Rack rack)
+        {
+        rack.disableMenuBar();
+        // This is poorly documented by the Java team
+        String result = (String)(JOptionPane.showInputDialog(rack, message, title, JOptionPane. QUESTION_MESSAGE, null,  null, initialText));
+        rack.enableMenuBar();
+        return result;
+        }
 
 
 
@@ -686,7 +707,12 @@ public class AppMenu
                 // Remove old subpatches
                 rack.getOutput().setNumGroups(1);
                 rack.rebuildSubpatches();
+                rack.modified = false;
                 }
+            else
+            	{
+                rack.modified = true;
+            	}
                 
         	rack.getOutput().assignGroupsToSounds();
             }
@@ -757,6 +783,7 @@ public class AppMenu
                                 }
 
                             rack.addSubpatch(new SubpatchPanel(rack, obj));
+                            rack.modified = true;
                             rack.revalidate();
                             rack.repaint();
                             }

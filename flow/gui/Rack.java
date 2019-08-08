@@ -49,6 +49,7 @@ public class Rack extends JPanel
     public Oscilloscope osc2;
     public Box displayBox;
     boolean showsDisplays = true;
+    boolean modified = false;
     
     // A list of all current module panels.  Note that this isn't all the
     // *Modulations* in use -- Constants and NILs don't get panels.  But they're
@@ -212,7 +213,7 @@ public class Rack extends JPanel
         { 
         patchName = val; 
         String p = patchName;
-        if (p == null) p = "Untitled";
+        if (p == null) p = Sound.UNTITLED_PATCH_NAME;
         Object frame = SwingUtilities.getWindowAncestor(this);
         if (frame != null && frame instanceof JFrame)
             {

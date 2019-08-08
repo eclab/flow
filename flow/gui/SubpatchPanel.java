@@ -243,7 +243,7 @@ public class SubpatchPanel extends JPanel implements Transferable
             public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         soundsLabel.setFont(Style.SMALL_FONT());
-        sounds = new JSlider(0, Output.getNumSounds() - 1);		// we need to leave one sound for the primary
+        sounds = new JSlider(0, rack.getOutput().getNumSounds() - 1);		// we need to leave one sound for the primary
         sounds.setSnapToTicks(true);
         sounds.setBorder(null);
         sounds.putClientProperty( "JComponent.sizeVariant", "small" );
@@ -301,7 +301,8 @@ public class SubpatchPanel extends JPanel implements Transferable
         c.gridx = 4;
         pane.add(allocatedLabel, c);
         
-
+        
+        
         JLabel gainTitle = new JLabel("   Gain: ");
         gainTitle.setFont(Style.SMALL_FONT());
         gainLabel = new JLabel("")
@@ -347,7 +348,34 @@ public class SubpatchPanel extends JPanel implements Transferable
         c.gridx = 7;
         pane.add(gain, c);
         
+        PushButton rename = new PushButton("Rename")
+        	{
+        	public void perform()
+        		{
+                rack.getOutput().lock();
+                try
+                	{
+                	String result = AppMenu.showSimpleInput("Rename", "Provide a name for this patch.", 
+                		rack.getOutput().getGroup(group).getPatchName(), rack);
+                	if (result != null)
+                		{
+						rack.getOutput().getGroup(group).setPatchName(result);
+						titleLabel.setText(" " + result);
+						// I don't think we need to distribute this to the sounds
+                		}
+	                }
+	            finally
+	            	{
+	            	rack.getOutput().unlock();
+	            	}
+                }
+        	};
         c.gridx = 8;
+        pane.add(rename, c);
+        
+
+
+        c.gridx = 9;
         c.weightx = 1.0;
         pane.add(Stretch.makeHorizontalStretch(), c);
         c.weightx = 0.0;
