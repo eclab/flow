@@ -47,6 +47,7 @@ public class Draw extends Unit implements UnitSource
     public static final int DO_LOAD = 7;
     public static final int DO_LOAD_WAVE = 8;
     
+    public static final String UNTITLED_PARTIALS_NAME = "Untitled";
     public static final String FILENAME_EXTENSION = ".partials";
     public static final int MAXIMUM_SAMPLES = 2048;
     public static final int WINDOW_SIZE = 65;
@@ -248,7 +249,7 @@ public class Draw extends Unit implements UnitSource
                 { 
                 FileDialog fd = new FileDialog((Frame)(SwingUtilities.getRoot(root)), "Save Partials...", FileDialog.SAVE);
                 
-                fd.setFile("Untitled.partials");
+                fd.setFile(UNTITLED_PARTIALS_NAME + FILENAME_EXTENSION);			// "Untitled.partials"
                 if (AppMenu.dirFile != null)
                     fd.setDirectory(AppMenu.dirFile.getParentFile().getPath());
                 

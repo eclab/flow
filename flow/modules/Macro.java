@@ -37,7 +37,7 @@ public class Macro extends Unit implements Cloneable
     Modulation[] modules = new Modulation[0];
     Out out;
     ArrayList<In> ins = new ArrayList<>();
-    String patchName = "Untitled";
+    String patchName = Sound.UNTITLED_PATCH_NAME;
     
     boolean[] unitOuts = new boolean[4];
     boolean[] unitIns = new boolean[4];

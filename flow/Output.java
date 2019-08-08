@@ -456,10 +456,14 @@ public class Output
     // Contains the latest partials for the Output Thread to emit.  
     static class Swap
         {
-        int count;
-        int reads;
+//        double[][] amplitudes3;
+//        double[][] amplitudes2;
         double[][] amplitudes;
         double[][] frequencies;
+//        int pos;
+//        int pos2;
+//        int pos3;
+//        int curpos;
         byte[][] orders;
         double[] pitches;
         double[] velocities;
@@ -467,13 +471,11 @@ public class Output
         float reverbRoomSize = 0.5f;
         float reverbDamp = 0.5f;
         boolean dephase[];
-        //float c = 0.0f;
-        //float r = 0.0f;
               
         public Swap()
             {
-            count = 1;
-            reads = 1;
+//            amplitudes2 = new double[numVoices][Unit.NUM_PARTIALS];
+//            amplitudes3 = new double[numVoices][Unit.NUM_PARTIALS];
             amplitudes = new double[numVoices][Unit.NUM_PARTIALS];
             frequencies = new double[numVoices][Unit.NUM_PARTIALS];
             orders = new byte[numVoices][Unit.NUM_PARTIALS];
@@ -497,23 +499,39 @@ public class Output
     void checkAndSwap()
         {
         // notice that we're effectively spin-waiting here.  
-//        totalOutputTicks++;
         if (emitsReady)
             {
             Swap temp = swap;
             swap = with;
             with = temp;
-            swap.reads++;
+/*
+			swap.amplitudes3 = with.amplitudes3;
+			swap.amplitudes2 = with.amplitudes2;  
+			
+			for(int i = 0; i < swap.amplitudes2.length; i++)
+				System.arraycopy(swap.amplitudes2[i], 0, swap.amplitudes3[i], 0, swap.amplitudes2[i].length);
+
+			for(int i = 0; i < swap.amplitudes.length; i++)
+				System.arraycopy(swap.amplitudes[i], 0, swap.amplitudes[i], 0, swap.amplitudes[i].length);
+			
+			with.pos3 = with.pos2;
+			with.pos2 = with.pos;
+			with.curpos = with.pos;
+			with.pos = with.pos + SKIP;
+
+			swap.pos3 = with.pos3;
+			swap.pos2 = with.pos2;
+			swap.curpos = with.curpos;
+			swap.pos = with.pos;
+*/			
             emitsReady = false;
             }
         else
             {
             Thread.currentThread().yield();
-//            totalOutputWaits++;
             }
         }
-        
-        
+      
     float[][] freeverbInput = new float[2][1];
     float[][] freeverbOutput = new float[2][1];
     FreeVerb freeverb = new FreeVerb();
@@ -586,8 +604,9 @@ public class Output
                 double amplitude = amp[i];
                 int oi = orders[i];
                 if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
-                                                        
-                if (ca[oi] != amplitude)
+					
+					                                                        
+//                if (ca[oi] != amplitude)			// this will never be exactly equal, so no need to check for it
                     {
                     // incoming amplitudes are pre-denormalized by the voice threads.
                     // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
@@ -599,6 +618,27 @@ public class Output
                     amplitude = aa + bb;
                     ca[oi] = amplitude;
                     }
+
+
+/*
+		// LAGRANGE ATTEMPT
+		// there's a bug I think in my code but it really makes very little difference.
+		
+			boolean doit = false;
+			//doit = true;
+			
+			if (doit)
+				{
+		// let's try something else
+				double xl = _with.pos3;
+				double xm = _with.pos2;
+				double xh = _with.pos;
+				double x = _with.curpos;
+				amplitude = _with.amplitudes[s][i] * (x - xl) * (x - xm) / ((xh - xl) * (xh - xm)) +
+							_with.amplitudes3[s][i] * (x - xh) * (x - xm) / ((xl - xh) * (xl - xm)) +
+							_with.amplitudes2[s][i] * (x - xl) * (x - xh) / ((xm - xl) * (xm - xh));				
+				}
+*/
 
                 double frequency = freq[i];
                                                                 
@@ -707,16 +747,6 @@ public class Output
 
 
 
-    // long lastTimeFoo = 0;
-    // int timeCountFoo = 0;
-    
-    /*
-      double filter = 0;
-      double filter2 = 0;
-      double filter3 = 0;
-      double filter4 = 0;
-    */
-    
     double samples[][] = new double[0][SKIP];
 
     // Starts the output thread.  Called from the constructor.
@@ -822,7 +852,16 @@ public class Output
                             blockOutputUntil(snd, false);
                             }
                         }
-                                      
+                        
+/*
+                    with.curpos++;
+                    if (with.curpos >= with.pos)
+                    	{
+                    	//System.err.println("Long wait " + with.curpos + " " + with.pos);
+                    	with.curpos = with.pos;
+                    	}
+*/
+                    
                     if (with.reverbWet > 0.0f)
                         {        
                         freeverb.setWet(with.reverbWet);
@@ -872,33 +911,11 @@ public class Output
                             freeverb.compute(1, freeverbInput, freeverbOutput);
                             d = (freeverbOutput[0][0] + freeverbOutput[1][0]) / 2; 
                             }
-                            
-                        /*
-                          filter = (1 - 0.5) * filter + 0.5 * d;
-                          d = filter;
-                          filter2 = (1 - 0.5) * filter2 + 0.5 * d;
-                          d = filter2;
-                          filter3 = (1 - 0.5) * filter3 + 0.5 * d;
-                          d = filter3;
-                          filter4 = (1 - 0.5) * filter4 + 0.5 * d;
-                          d = filter4;
-                        */
-
-//                        d = lowPassFilter(d, with.c, with.r);
-                        
+                                                    
                         int val = (int)(d);
                         audioBuffer[skipPos * 2 + 1] = (byte)((val >> 8) & 255);
                         audioBuffer[skipPos * 2] = (byte)(val & 255);
                         tick++;                                 /// See documentation elsewhere about threadsafe nature of tick
-                        
-                        //  timeCountFoo++;
-                        //  if (timeCountFoo > 44100)
-                        //  {
-                        //  long vv = System.currentTimeMillis();
-                        //  //System.err.println("-> " + (vv - lastTimeFoo));
-                        //  lastTimeFoo = vv;
-                        //  timeCountFoo = 0;
-                        //  }
                         }
                     
                     sdl.write(audioBuffer, 0, SKIP * 2);
@@ -1017,20 +1034,9 @@ public class Output
 
 
 
-//    int totalPartialsTicks;
-//    int totalPartialsWaits;
-//      int totalOutputTicks;
-//      int totalOutputWaits;
-//    static final int NUM_TICKS_PER_PRINT = 1024 * 5;
-//    int avgTimeTick = 0;
-//    long lastTime = -1;
-    
     double[] zeroAmplitudes = new double[Unit.NUM_PARTIALS];
     double[] zeroFrequencies = new double[Unit.NUM_PARTIALS];
     byte[] standardOrders = new byte[Unit.NUM_PARTIALS];
-    
-    // int timeCountFoo2 = 0;
-    // long lastTimeFoo2 = 0;
     
     /** Called to pulse the Output.  This will cause the Output to wait until the user is no longer
         modifying modules via the GUI, then have all the Sounds produce new partials by calling
@@ -1039,17 +1045,6 @@ public class Output
         or via calling startPrimaryVoiceThread(). */ 
     public void go()
         {
-        /*
-          timeCountFoo2++;
-          if (timeCountFoo2 > 44100 / 32)
-          {
-          long vv = System.currentTimeMillis();
-          System.err.println("+> " + (vv - lastTimeFoo2));
-          lastTimeFoo2 = vv;
-          timeCountFoo2 = 0;
-          }
-        */
-
         lock();
         try
             {
@@ -1101,10 +1096,8 @@ public class Output
             }
 
         // Spin-wait.  It's both faster and more efficient than a mutex in this case, but it eats up cycles
-//        totalPartialsTicks++;
         if (emitsReady)
             {
-//            totalPartialsWaits++;
             Thread.currentThread().yield();
 
             while(emitsReady)
@@ -1122,6 +1115,10 @@ public class Output
                 Unit emits = sounds[i].getEmits();
                 if (emits != null)
                     {
+//                    System.arraycopy(swap.amplitudes2[i], 0, swap.amplitudes3[i], 0, swap.amplitudes2[i].length); 
+//                    System.arraycopy(swap.amplitudes[i], 0, swap.amplitudes2[i], 0, swap.amplitudes[i].length); 
+
+
                     System.arraycopy(emits.amplitudes[0], 0, swap.amplitudes[i], 0, emits.amplitudes[0].length); 
                     undenormalize(swap.amplitudes[i]);
                     System.arraycopy(emits.frequencies[0], 0, swap.frequencies[i], 0, emits.frequencies[0].length);
@@ -1129,6 +1126,10 @@ public class Output
                     }
                 else
                     {
+//                    System.arraycopy(zeroAmplitudes[i], 0, swap.amplitudes3, 0, zeroAmplitudes.length); 
+//                    System.arraycopy(zeroAmplitudes, 0, swap.amplitudes2, 0, zeroAmplitudes.length); 
+                    
+                    
                     System.arraycopy(zeroAmplitudes, 0, swap.amplitudes[i], 0, zeroAmplitudes.length); 
                     System.arraycopy(zeroFrequencies, 0, swap.frequencies[i], 0, zeroFrequencies.length); 
                     System.arraycopy(standardOrders, 0, swap.orders[i], 0, standardOrders.length); 
@@ -1152,35 +1153,14 @@ public class Output
                 swap.reverbWet = (float)(out.modulate(out.MOD_REVERB_WET));
                 swap.reverbDamp = (float)(out.modulate(out.MOD_REVERB_DAMP));
                 swap.reverbRoomSize = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE));
-                //swap.c = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE + 1));
-                //swap.r = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE + 2));
                 }
             }
         finally 
             {
             unlock();
             }
-            
-        swap.count++;
+    	
         emitsReady = true;
-/*
-  avgTimeTick++;
-  if (avgTimeTick == NUM_TICKS_PER_PRINT)
-  {
-  avgTimeTick = 0;
-  if (lastTime == -1)
-  lastTime = System.currentTimeMillis();
-  else
-  {
-  long time = System.currentTimeMillis();
-  System.err.println("H% " + String.format("%.2f", (totalPartialsWaits / (double)totalPartialsTicks)) +
-  ": " + String.format("%.2f", (swap.reads / (double)swap.count)) + " " + swap.reads + " " + swap.count +
-  " O% " + String.format("%.2f", (totalOutputWaits / (double)totalOutputTicks)) + 
-  " Wait " + String.format("%.2f", (time - lastTime) / (double)NUM_TICKS_PER_PRINT));
-  lastTime = time;
-  }
-  } 
-*/
         }  
 
 
@@ -1519,7 +1499,7 @@ public class Output
                     	}                    
                     g.setNumRequestedSounds(2);
                     g.setPatch(obj); 
-                    g.setPatchName(Sound.loadName(g.getPatch()));
+//                    g.setPatchName(Sound.loadName(g.getPatch()));
                     g.setChannel(Input.CHANNEL_NONE);
                     }
                 catch (Exception ex) { ex.printStackTrace(); }
@@ -1534,62 +1514,6 @@ public class Output
         }
                 
                 
-                
-
-            
-
-
-
-
-
-
-
-    /*
-    
-   /// TEST FILTER
-    
-    
-   static final double T = 1.0 / 44100.0;
-
-   static final double Q = Math.sqrt(0.5);
-   static final double CUTOFF = 1000.0;
-   static final double O = CUTOFF * 2 * Math.PI; //O = 2.0 / T * Math.tan(CUTOFF * Math.PI);
-   static final double OOQTT = O * O * Q * T * T;
-   static final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
-   static final double IJ = 1.0 / J;
-   static final double b0 = IJ * OOQTT;
-   static final double b1 = IJ * 2 * OOQTT;
-   static final double b2 = IJ * OOQTT;
-   static final double a1 = IJ * (-8 * Q + 2 * OOQTT);
-   static final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
-
-   double[] N = new double[2];
-   double[] M = new double[2];
-   double lowPassFilter(double d, double cut, double res)
-   {
-   double Q = (res * 10 + 1) * 0.7071;
-   final double CUTOFF = cut * 20000 + 25;
-   final double O = CUTOFF * 2 * Math.PI;
-   final double OOQTT = O * O * Q * T * T;
-   final double J = 4.0 * Q + 2.0 * O * T + OOQTT;
-   final double IJ = 1.0 / (J < 0.001 ? 0.001 : J ;
-   final double b0 = IJ * OOQTT;
-   final double b1 = IJ * 2 * OOQTT;
-   final double b2 = IJ * OOQTT;
-   final double a1 = IJ * (-8 * Q + 2 * OOQTT);
-   final double a2 = IJ * (4 * Q - 2 * O * T + OOQTT);
-
-   double y = d * b0 + N[0] * b1 + N[1] * b2 - a1 * M[0] - a2 * M[1];
-   N[1] = N[0];
-   N[0] = d;
-   M[1] = M[0];
-   M[0] = y;
-   if (y < WELL_ABOVE_SUBNORMALS && y > 0) System.err.println("subnormal");
-   if (y != y) System.err.println("NAN");
-   return y;
-   }    
-    */
-        
 
     final static double[] MIXING = new double[]
     {

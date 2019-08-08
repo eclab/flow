@@ -20,7 +20,6 @@ public class Group
     int maxNote = 127;
     int numRequestedSounds = 0;
     JSONObject patch = new JSONObject(EMPTY_JSON);
-    String patchName;
     double gain = DEFAULT_GAIN;
         
     /** Returns the group's current channel.  This can be any of
@@ -114,14 +113,29 @@ public class Group
         }
 
     /** Returns the group's patch name. */
-    public String getPatchName() { return patchName; }
+    public String getPatchName() 
+    	{
+    	try
+    		{
+    		return Sound.loadName(getPatch());
+    		}
+    	catch (Exception e)		// maybe we don't have a patch?
+    		{
+            System.err.println("Group.getPatchName() WARNING: no patch ");
+    		return Sound.UNTITLED_PATCH_NAME;
+    		}
+    	}
 
-    /** Sets the group's patch name. */
     public void setPatchName(String p) 
         { 
-        if (p == null)
-            p = "";
-        patchName = p; 
+        try
+        	{
+        	Sound.saveName(p, getPatch());
+    		}
+    	catch (Exception e)		// maybe we don't have a patch?
+    		{
+            System.err.println("Group.setPatchName() WARNING: no patch ");
+    		}
         }
 
     /** Returns the group's current gain value (normally 0...1). */

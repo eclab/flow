@@ -274,11 +274,13 @@ public class Sound
         {
         obj.put("name", name);
         }
-                
+        
+    public static final String UNTITLED_PATCH_NAME = "Untitled";
+           
     /** Loads the patch name from the given object. */
     public static String loadName(JSONObject obj) throws JSONException
         {
-        return obj.optString("name", "Untitled");
+        return obj.optString("name", UNTITLED_PATCH_NAME);
         }
                 
     /** Stores the patch version to the given object. */
@@ -359,8 +361,8 @@ public class Sound
             JSONObject patch = array.getJSONObject(i);
             try { groups[i + 1].setPatch(patch); }
             catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch " + (i + 1)); break; };
-            try { groups[i + 1].setPatchName(Sound.loadName(patch)); }
-            catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch name " + (i + 1)); break; };
+			// try { groups[i + 1].setPatchName(Sound.loadName(patch)); }
+            // catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch name " + (i + 1)); break; };
             try { groups[i + 1].setGain(patch.getDouble("gain")); }
             catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid gain " + (i + 1)); break; };
             try { groups[i + 1].setNumRequestedSounds(patch.getInt("voices")); }

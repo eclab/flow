@@ -314,7 +314,7 @@ public class Out extends Unit implements Miscellaneous
             public void updatePatchInfo()
                 {
                 String t = getRack().getPatchName();
-                if (t == null || t.trim().equals("")) t = "Untitled";
+                if (t == null || t.trim().equals("")) t = Sound.UNTITLED_PATCH_NAME;
                 else t = t.trim();
                 _name.setText(t);
 
