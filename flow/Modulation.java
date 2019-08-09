@@ -101,7 +101,6 @@ public abstract class Modulation implements Cloneable
         if (sound != null)              // this is the case for constants
             sound.register(this);
         defineModulationOutputs(new String[] { "Mod" });
-        resetAllTriggers();
         }
 
     /** Returns the version number for this Modulation.  By default this
@@ -157,7 +156,11 @@ public abstract class Modulation implements Cloneable
         Be sure to call super.go(); */
     public void go() 
         { 
-        resetAllTriggered(); 
+        // reset all triggers
+        for(int i = 0; i < triggered.length; i++)
+            {
+            resetTrigger(i);
+            }
         }
                 
 
@@ -371,18 +374,13 @@ public abstract class Modulation implements Cloneable
     /** Returns the modulation value for the modulation currently at Input Modulation port INDEX */
     public final double modulate(int index)
         {
-/*
-  double d = modulations[index].getModulationOutput(modulationIndexes[index]);
-  testDenormals(d, "" + this);
-  return d;
-*/
         return modulations[index].getModulationOutput(modulationIndexes[index]);
         }
         
     /** Returns the trigger count for the modulation currently at Input Modulation port INDEX */
-    public int getTrigger(int index)
+    public int getTriggerCount(int index)
         {
-        return modulations[index].getOutputTrigger(modulationIndexes[index]);
+        return modulations[index].getOutputTriggerCount(modulationIndexes[index]);
         }
 
     /** Returns the trigger value for the modulation currently at Input Modulation port INDEX */
@@ -574,7 +572,7 @@ public abstract class Modulation implements Cloneable
         
     public static int NO_TRIGGER = 0;
     boolean[] triggered;
-    int[] trigger;
+    int[] triggerCount;
     double[] modulationOutputs;
     String[] modulationOutputNames = new String[] { "Mod" };
 
@@ -582,7 +580,7 @@ public abstract class Modulation implements Cloneable
     public void defineModulationOutputs(String[] names)
         {
         modulationOutputs = new double[names.length];
-        trigger = new int[names.length];
+        triggerCount = new int[names.length];
         triggered = new boolean[names.length];
         modulationOutputNames = names;
         }
@@ -609,52 +607,22 @@ public abstract class Modulation implements Cloneable
         If any given String is null or empty, no tooltip is generated for it.  */
     public String[] getModulationOutputHelp() { return null; }
 
-    // Resets all output port modulation triggers
-    void resetAllTriggered()
-        {
-        for(int i = 0; i < triggered.length; i++)
-            {
-            triggered[i] = false;
-            }
-        }
-    
     /** Resets all triggers of Output Modulation ports and their trigger counts. */
-    protected void resetAllTriggers()
+    protected void resetTrigger(int num)
         {
-        for(int i = 0; i < triggered.length; i++)
-            {
-            resetTrigger(i);
-            }
-        }
-
-    /** Resets all triggers of Output Modulation ports and their trigger counts. */
-    // this is public, rather than protected, so Macro can access it
-    public void resetTrigger(int num)
-        {
-        triggered[num] = false;
-        trigger[num] = NO_TRIGGER;
-        }
-
-    /** Sets trigger NUM of Output Modulation port, and sets its count to VAL. */
-    // this is public, rather than protected, so Macro can access it
-    public void setTrigger(int num, int val)
-        {
-        trigger[num] = val;
-        triggered[num] = true;
+        setTriggerValues(false, NO_TRIGGER, num);
         }
 
     /** Sets trigger NUM of Output Modulation port, and increments its count. */
-    // this is public, rather than protected, so Macro can access it
-    public void updateTrigger(int num)
+    protected void updateTrigger(int num)
         {
-        trigger[num]++;
-        triggered[num] = true;
+        setTriggerValues(true, triggerCount[num] + 1, num);
         }
 
     /** Returns the trigger count for the trigger of Output Modulation port NUM. */
-    public int getOutputTrigger(int num)
+    public int getOutputTriggerCount(int num)
         {
-        return trigger[num];
+        return triggerCount[num];
         }
 
     /** Returns whether the trigger of Output Modulation port NUM is set. */
@@ -664,10 +632,11 @@ public abstract class Modulation implements Cloneable
         }
         
     /** Sets trigger NUM of Output Modulation port to the given ISTRIGGERED value, and sets its count to TRIGGERCOUNT. */
-    public void setTriggerValues(boolean isTriggered, int triggerCount, int num)
+    // this is public, rather than protected, so Macro can override it
+    public void setTriggerValues(boolean isTriggered, int _triggerCount, int num)
         {
         triggered[num] = isTriggered;
-        trigger[num] = triggerCount;
+        triggerCount[num] = _triggerCount;
         }
     
     /** Returns the clock tick value.  If we are syncing to MIDI clock,
@@ -751,8 +720,10 @@ public abstract class Modulation implements Cloneable
         System.err.println("\nSOUND " + sound);
         for(int i = 0; i < modulations.length; i++)                     
             System.err.println("" + i + " MOD IN: " + modulations[i] + " DEFAULT: " + defaultModulations[i]);
+        for(int i = 0; i < modulationOutputs.length; i++)                       
+            System.err.println("" + i + " MOD OUT: " + modulationOutputs[i]);
         for(int i = 0; i < triggered.length; i++)                       
-            System.err.println("" + i + " TRIGGER: " + trigger[i] + " TRIGGERED: " + triggered[i]);
+            System.err.println("" + i + " TRIGGER: " + triggerCount[i] + " TRIGGERED: " + triggered[i]);
         for(int i = 0; i < getNumOptions(); i++)
             {
             System.err.println("" + i + " OPTION: " + getOptionName(i) + " VAL: " + 
@@ -809,7 +780,7 @@ public abstract class Modulation implements Cloneable
         obj.modulationOutputs = (double[])(modulationOutputs.clone());
         // Current output triggers
         obj.triggered = (boolean[])(triggered.clone());
-        obj.trigger = (int[])(trigger.clone());
+        obj.triggerCount = (int[])(triggerCount.clone());
 
         return obj;
         }

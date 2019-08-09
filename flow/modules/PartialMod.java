@@ -67,7 +67,6 @@ public class PartialMod extends Unit implements ModSource
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineOptions(new String[] { "Interpolate" }, new String[][] { { "Interpolate"} } );
         interpolate = true;
-        resetAllTriggers();
         }
                 
     public static final int OPTION_INTERPOLATE = 0;

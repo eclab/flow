@@ -79,7 +79,7 @@ public class Map extends Modulation
         {
         super.go();
         
-        setTriggerValues(isTriggered(MOD_SIGNAL), getTrigger(MOD_SIGNAL), 0);
+        setTriggerValues(isTriggered(MOD_SIGNAL), getTriggerCount(MOD_SIGNAL), 0);
 
         double signal = modulate(MOD_SIGNAL);
         double bound_a = modulate(MOD_BOUND_A);

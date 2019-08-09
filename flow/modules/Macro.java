@@ -108,38 +108,28 @@ public class Macro extends Unit implements Cloneable
 
     public String getNameForModulation() { return patchName; }
     
-    public void resetTrigger(int num)
+    public int getTriggerCount(int num)
         {
-        if (out != null)
-            out.resetTrigger(num);
-        }
-    
-    public void setTrigger(int num, int val)
-        {
-        if (out != null)
-            out.setTrigger(num, val);
-        }
-    
-    public void updateTrigger(int num)
-        {
-        if (out != null)
-            out.updateTrigger(num);
-        }
-    
-    public int getTrigger(int num)
-        {
-        if (out != null)
-            return out.getTrigger(num);
+        if (out != null && out.getNumModulationOutputs() > num)
+            return out.getTriggerCount(num);
         else return NO_TRIGGER;
         }
     
     public boolean isTriggered(int num)
         {
-        if (out != null)
+        if (out != null && out.getNumModulationOutputs() > num)
             return out.isTriggered(num);
         else return false;
         }
     
+    public void setTriggerValues(boolean isTriggered, int triggerCount, int num)
+        {
+        if (out != null && out.getNumModulationOutputs() > num)
+        	{
+	        out.setTriggerValues(isTriggered, triggerCount, num);
+	        }
+        }
+
     public void reset()
         {
         super.reset();
