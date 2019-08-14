@@ -97,6 +97,8 @@ public class Output
 
     public static final double DEFAULT_VOLUME_MULTIPLIER = 2000;
 
+    public static final float DEFAULT_MASTER_GAIN = 0.0f;
+
     // If a partial's volume is very low, we don't even bother computing its sample contribution, but just set it to zero.
     static final double MINIMUM_VOLUME_SQUARED = (1.0 / 65536 / 256) * (1.0 / 65536 / 256);  // 0.0001 * 0.0001;
 
@@ -127,6 +129,7 @@ public class Output
         numVoicesPerThread = Prefs.getLastNumVoicesPerThread();
         numOutputsPerThread = Prefs.getLastNumOutputsPerThread();
         bufferSize = Prefs.getLastBufferSize();
+        masterGain = Prefs.getLastMasterGain();
         //skip = Prefs.getLastSkip();   
         }
     
@@ -193,7 +196,8 @@ public class Output
                 sdl = AudioSystem.getSourceDataLine( audioFormat, mixer );
             sdl.open(audioFormat, bufferSize);
             sdl.start();
-            this.mixer = mixer;
+
+ 			this.mixer = mixer;
             }
         catch (LineUnavailableException ex) { throw new RuntimeException(ex); }
         }
@@ -868,6 +872,8 @@ public class Output
                         freeverb.setRoomSize(with.reverbRoomSize);
                         freeverb.setDamp(with.reverbDamp);
                         }
+                        
+                    double gain = masterGain;
 
                     for (int skipPos = 0; skipPos < SKIP; skipPos++)
                         {
@@ -883,18 +889,7 @@ public class Output
                                 d += samples[snd][skipPos];
                                 }
                             }
-                                                            
-                        if (d > 32767)
-                            {
-                            d = 32767;
-                            clipped = true;
-                            }
-                        if (d < -32768)
-                            {
-                            d = -32768;
-                            clipped = true;
-                            }
-                        
+                            
                         // add reverb?
                         if (with.reverbWet > 0.0f)
                             {
@@ -912,6 +907,19 @@ public class Output
                             d = (freeverbOutput[0][0] + freeverbOutput[1][0]) / 2; 
                             }
                                                     
+                        d *= masterGain;
+                                                            
+                        if (d > 32767)
+                            {
+                            d = 32767;
+                            clipped = true;
+                            }
+                        if (d < -32768)
+                            {
+                            d = -32768;
+                            clipped = true;
+                            }
+                        
                         int val = (int)(d);
                         audioBuffer[skipPos * 2 + 1] = (byte)((val >> 8) & 255);
                         audioBuffer[skipPos * 2] = (byte)(val & 255);
@@ -1430,38 +1438,99 @@ public class Output
             }
         }
 
+    public void swapWithPrimaryGroup(int g)
+        {
+		lock();
+		try
+			{
+			// save patch info
+			sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
+			Group primary = group[0];
+			group[0] = group[g];
+			group[g] = primary;
+			assignGroupsToSounds();
+			}
+		finally 
+			{
+			unlock();
+			}
+        }
+
+
+    public boolean copyPrimaryGroup(int to, boolean resetMIDI)
+        {
+		lock();
+		try
+			{
+			// save patch info
+			sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
+			group[to] = new Group(group[0]);
+			if (resetMIDI)
+				{
+				group[to].setChannel(Input.CHANNEL_NONE);
+				}
+							
+				// rebuild
+				assignGroupsToSounds();
+			}
+		finally 
+			{
+			unlock();
+			}
+		return true;
+        }
+
     public boolean copyPrimaryGroup(boolean resetMIDI)
         {
-        if (numGroups >= MAX_GROUPS - 1)
-            {
-            System.err.println("Output.removeGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");
-            return false;
-            }
-        else
-            {
-            lock();
-            try
-                {
-                // copy patch info
-                sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
-                addGroup(group[0].getPatch());
-
-                // revise other information
-                group[numGroups - 1] = group[0];            
-                if (resetMIDI)
-                    group[numGroups - 1].setChannel(Input.CHANNEL_NONE);
-                                
-                // rebuild
-                assignGroupsToSounds();
-                }
-            finally 
-                {
-                unlock();
-                }
-            return true;
-            }
+		lock();
+		try
+			{
+			// save patch info
+			sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
+			if (addGroup(new Group(group[0])))
+				{
+				if (resetMIDI)
+					group[numGroups - 1].setChannel(Input.CHANNEL_NONE);
+							
+				// rebuild
+				assignGroupsToSounds();
+				}
+			else
+				{
+				return false;
+				}
+			}
+		finally 
+			{
+			unlock();
+			}
+		return true;
         }
-                
+        
+public boolean addGroup(Group g)
+	{
+	if (numGroups >= MAX_GROUPS - 1)
+		{
+		System.err.println("Output.addGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");
+		return false;
+		}
+	else
+		{
+		lock();
+		try
+			{
+			// increment group
+			setNumGroups(getNumGroups() + 1);
+			group[getNumGroups() - 1] = g;
+			}
+		finally
+			{
+			unlock();
+			} 
+		return true;
+		}
+	}
+	        
     public int addGroup(JSONObject obj)
         {
         // copy the patch so it can be modified by others
@@ -1499,7 +1568,6 @@ public class Output
                     	}                    
                     g.setNumRequestedSounds(2);
                     g.setPatch(obj); 
-//                    g.setPatchName(Sound.loadName(g.getPatch()));
                     g.setChannel(Input.CHANNEL_NONE);
                     }
                 catch (Exception ex) { ex.printStackTrace(); }
@@ -1512,8 +1580,21 @@ public class Output
             return getNumGroups() - 1;
             }
         }
+    
+    static volatile double masterGain = 1.0;
+    
+	public double getMasterGain() 
+		{ 
+		return masterGain;
+		}      
                 
-                
+	public void setMasterGain(double val) 
+		{ 
+		masterGain = val;
+        Prefs.setLastMasterGain(val);
+		}      
+
+	public static final double MAX_MASTER_GAIN = 4.0;
 
     final static double[] MIXING = new double[]
     {

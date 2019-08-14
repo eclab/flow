@@ -71,8 +71,8 @@ public class SubpatchPanel extends JPanel implements Transferable
             Border border = BorderFactory.createLineBorder(Color.GRAY);
             setBorder(border);
 
-            this.setTransferHandler(new SubpatchPanelTransferHandler());
-            this.setDropTarget(new DropTarget(this, new SubpatchPanelDropTargetListener()));
+            this.setTransferHandler(new ModulePanelTransferHandler());
+            this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener()));
                 
             Output out = rack.getOutput();
             titleLabel.setText(" " + out.getGroup(group).getPatchName());
@@ -216,10 +216,11 @@ public class SubpatchPanel extends JPanel implements Transferable
     protected JComponent buildPanel()
         {        
         JPanel pane = new JPanel();
+        	
         pane.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-
+		
         JLabel sacrificialLabel = new JLabel("8.88");
         sacrificialLabel.setFont(Style.SMALL_FONT());
         final int titleWidth = (int)sacrificialLabel.getPreferredSize().getWidth();
@@ -287,18 +288,22 @@ public class SubpatchPanel extends JPanel implements Transferable
         
         c.gridx = 0;
         c.gridy = 0;
+		c.weightx = 0.0;
         pane.add(soundsTitle, c);
     
         c.gridx = 1;
         pane.add(soundsLabel, c);
     
         c.gridx = 2;
+		c.weightx = 0.5;
         pane.add(sounds, c);
         
         c.gridx = 3;
+		c.weightx = 0.0;
         pane.add(allocatedTitle, c);
     
         c.gridx = 4;
+		c.weightx = 0.0;
         pane.add(allocatedLabel, c);
         
         
@@ -346,6 +351,7 @@ public class SubpatchPanel extends JPanel implements Transferable
         pane.add(gainLabel, c);
     
         c.gridx = 7;
+		c.weightx = 0.5;
         pane.add(gain, c);
         
         PushButton rename = new PushButton("Rename")
@@ -370,7 +376,9 @@ public class SubpatchPanel extends JPanel implements Transferable
 	            	}
                 }
         	};
+
         c.gridx = 8;
+		c.weightx = 0.0;
         pane.add(rename, c);
         
 
@@ -378,7 +386,6 @@ public class SubpatchPanel extends JPanel implements Transferable
         c.gridx = 9;
         c.weightx = 1.0;
         pane.add(Stretch.makeHorizontalStretch(), c);
-        c.weightx = 0.0;
         
 
 
@@ -438,12 +445,15 @@ public class SubpatchPanel extends JPanel implements Transferable
         
         c.gridx = 0;
         c.gridy = 1;
-        pane.add(midiTitle, c);
+ 		c.weightx = 0.0;
+       	pane.add(midiTitle, c);
         
         c.gridx = 1;
+		c.weightx = 0.0;
         pane.add(midiLabel, c);
         
         c.gridx = 2;
+		c.weightx = 0.5;
         pane.add(midi, c);
         
                 
@@ -509,19 +519,29 @@ public class SubpatchPanel extends JPanel implements Transferable
 
         c.gridx = 5;
         c.gridwidth = 3;
+		c.weightx = 0.5;
         pane.add(note, c);
-        c.gridwidth = 0;
+        c.gridwidth = 1;
 
         c.gridx = 8;
+        c.weightx = 0.0;
+        pane.add(Stretch.makeHorizontalStretch(), c);
+
+        c.gridx = 9;
         c.weightx = 1.0;
         pane.add(Stretch.makeHorizontalStretch(), c);
-        c.weightx = 0.0;
+
+		JPanel pp = new JPanel();
+		pp.setLayout(new BorderLayout());
+		pp.add(pane, BorderLayout.WEST);
+		pp.add(Stretch.makeHorizontalStretch(), BorderLayout.CENTER);
+		
 
         summary = new JLabel();
         summary.setFont(Style.SMALL_FONT());
         buildSummary();
 
-        return new DisclosurePanel(summary, pane);
+        return new DisclosurePanel(summary, pp);
         }
         
     public void buildSummary()
@@ -566,7 +586,7 @@ public class SubpatchPanel extends JPanel implements Transferable
                 
     public Object getTransferData(DataFlavor flavor) 
         {
-        if (flavor.equals(Rack.subpatchflavor))
+        if (flavor.equals(Rack.moduleflavor))
             return this;
         else
             return null;
@@ -574,15 +594,11 @@ public class SubpatchPanel extends JPanel implements Transferable
                 
     public DataFlavor[] getTransferDataFlavors() 
         {
-        return new DataFlavor[] { Rack.subpatchflavor };
+        return new DataFlavor[] { Rack.moduleflavor };
         }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) 
         {
-        return (flavor.equals(Rack.subpatchflavor));
+        return (flavor.equals(Rack.moduleflavor));
         }
-        
-
-
-
     }

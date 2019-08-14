@@ -12,6 +12,9 @@ import javax.swing.border.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
+import org.json.*;
+import java.io.*;
+import java.util.zip.*;
 
 
 public class Flow
@@ -32,7 +35,7 @@ public class Flow
             sound.reset();
             }
 
-        Rack rack = new Rack(output);
+        final Rack rack = new Rack(output);
         rack.smallerOkay = true;
         for (Modulation mod : sound0.getRegistered())
             {
@@ -49,6 +52,25 @@ public class Flow
 
         rack.sprout();
                 
-        output.startPrimaryVoiceThread();       
+        output.startPrimaryVoiceThread();  
+        
+        if (args.length == 1)
+        	{
+        	SwingUtilities.invokeLater(new Runnable() 
+        		{
+        		public void run()
+        			{
+					try
+						{
+						File f = new File(args[0]);
+						AppMenu.doLoad(rack, new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))), true);
+						AppMenu.setLastFile(f);
+		            	rack.setPatchFile(f);
+						rack.setPatchName(rack.getPatchName());
+						}
+					catch(Exception ex) { System.err.println("Couldn't load file " + args[0]);  System.err.println(ex); }
+					}
+				});
+			}
         }
     }

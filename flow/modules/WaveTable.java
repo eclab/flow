@@ -153,10 +153,14 @@ public class WaveTable extends Unit implements UnitSource
 // perhaps we could share this if we were careful...
         for(int i = 0; i < numSounds; i++)
             {
-            WaveTable unit = (WaveTable)(output.getSound(i).getRegistered(index));
+            Sound s = output.getSound(i);
+            if (s.getGroup() == Output.PRIMARY_GROUP)
+            {
+            WaveTable unit = (WaveTable)(s.getRegistered(index));
             unit.waveTable = new double[wt.length][];
             for(int j = 0; j < wt.length; j++)
                 unit.waveTable[j] = (double[]) wt[j].clone();
+                }
             }
         }
 

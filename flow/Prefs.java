@@ -378,4 +378,24 @@ public class Prefs
         return getLastX("AudioDevice");         // null is default
         }
 
+    public static void setLastMasterGain(double gain) { setLastX("" + gain, "MasterGain"); }
+    public static double getLastMasterGain() 
+        { 
+        String s = getLastX("MasterGain"); 
+        try
+            {
+            if (s != null)
+            	{
+            	double d = Double.parseDouble(s);
+            	if (d < 0 || d > Output.MAX_MASTER_GAIN || d != d)
+            		return Output.DEFAULT_MASTER_GAIN;
+            	else
+            		return d; 
+            	}
+            }
+        catch (NumberFormatException e) { }
+        return Output.DEFAULT_MASTER_GAIN;                       
+        }
+
+
     }

@@ -244,32 +244,32 @@ public class Seq extends Modulation
                 break;
             case CURVE_X_2_X_8:
                 {
-                alpha = (1-alpha) * (1-alpha);
-				double beta = alpha;		// x^2
+                alpha = alpha * alpha;
+                double beta = alpha;		// x^2
                 alpha = alpha * alpha;
                 alpha = alpha * alpha;		// x^8
-                alpha = 1 - (alpha + beta) * 0.5;
+                alpha = (alpha + beta) * 0.5;
                 }
             break;
             case CURVE_X_4_X_16:
                 {
-                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
                 alpha = alpha * alpha;
 				double beta = alpha;		// x^4
                 alpha = alpha * alpha;
                 alpha = alpha * alpha;		// x^16
-                alpha = 1 - (alpha + beta) * 0.5;
+                alpha = (alpha + beta) * 0.5;
                 }
             break;
             case CURVE_X_8_X_32:
                 {
-                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
                 alpha = alpha * alpha;
                 alpha = alpha * alpha;
 				double beta = alpha;		// x^8
                 alpha = alpha * alpha;
                 alpha = alpha * alpha;		// x^32
-                alpha = 1 - (alpha + beta) * 0.5;
+                alpha = (alpha + beta) * 0.5;
                 }
             break;
                 default:

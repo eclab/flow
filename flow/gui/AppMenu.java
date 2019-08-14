@@ -76,6 +76,12 @@ public class AppMenu
         return setup;
         }       
 
+	public static void setLastFile(File _file)
+		{
+		file = _file;
+		dirFile = _file.getParentFile();
+		}
+		
     // last file selected by open/save/save as
     static File file = null;
 
@@ -142,7 +148,9 @@ public class AppMenu
                   }
                 */
                      
-                if (file != null)
+				File ff = rack.getPatchFile();
+            	
+            	if (ff != null)
                     {
                     JSONObject obj = new JSONObject();
                     
@@ -166,7 +174,7 @@ public class AppMenu
                             rack.allModulePanels.get(i).updateForSave();
                             }
                         rack.getOutput().getSound(0).saveModules(obj);
-                        p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(file)));
+                        p = new PrintWriter(new GZIPOutputStream(new FileOutputStream(ff)));
                         System.out.println(obj);
                         p.println(obj);
                         p.close();
@@ -228,11 +236,15 @@ public class AppMenu
                      
         FileDialog fd = new FileDialog((Frame)(SwingUtilities.getRoot(rack)), "Save Patch to Sysex File...", FileDialog.SAVE);
                 
-        if (file != null)
+		File ff = file;	// rare occurrence
+		if (rack.getPatchFile() != null)
+			ff = rack.getPatchFile();
+
+        if (ff != null)
             {
-            fd.setFile(file.getName());
+            fd.setFile(ff.getName());
             // dirFile should always exist if file exists
-            fd.setDirectory(file.getParentFile().getPath());
+            fd.setDirectory(ff.getParentFile().getPath());
             }
         else
             {
@@ -295,7 +307,8 @@ public class AppMenu
                 }
             file = f;
             dirFile = f;
-            rack.setPatchName(removeExtension(f.getName()));
+            rack.setPatchFile(f);
+            rack.setPatchName(rack.getPatchName());
             }
         }
 
@@ -322,9 +335,9 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-    			if (rack.modified)
+    			if (rack.subpatchBox.getComponentCount() > 0)
     				{
-    				if (!showSimpleConfirm("Load Patch?", "This patch has newly loaded primary or subpatches.\nClear the existing patch?", rack))
+    				if (!showSimpleConfirm("Load Patch?", "This patch has subpatches.\nAre you sure you want to load a new patch?", rack))
     					return;
     				}
 
@@ -350,6 +363,8 @@ public class AppMenu
                 if (fd.getFile() != null)
                     {
                     doLoad(rack, fd, true);
+		            rack.setPatchFile(new File(fd.getDirectory(), fd.getFile()));
+					rack.setPatchName(rack.getPatchName());
                     }
                 }
             });
@@ -424,80 +439,80 @@ public class AppMenu
         }
 
 
-
     static void doLoad(Rack rack, FileDialog fd, boolean clearSubpatches)
         {
         String[] patchName = new String[1];
 
         File f = new File(fd.getDirectory(), fd.getFile());
-        rack.getOutput().lock();
         try
             {
-            JSONObject obj = null;
-            int flowVersion = 0;
-            try 
-                { 
-                obj = new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))); 
-                flowVersion = Sound.loadFlowVersion(obj);
-                }
-            catch (Exception ex) { ex.printStackTrace(); }
-            // version
-            try
-                {
-                Modulation[][] mods = new Modulation[rack.getOutput().getNumSounds()][];
-                for(int i = 0; i < mods.length; i++)
-                    {
-                    mods[i] = Sound.loadModules(obj, flowVersion);
-                    }
-                                                                                                
-                // Remove old subpatches
-                if (clearSubpatches)
-                    {
-                    rack.getOutput().setNumGroups(1);
-                    }
-
-                // Create and update Modulations and create ModulePanels
-                load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
-
-                // reload
-                Output out = rack.getOutput();
-                if (obj != null)
-                    {
-                    rack.setPatchVersion(Sound.loadPatchVersion(obj));
-                    rack.setPatchInfo(Sound.loadPatchInfo(obj));
-                    rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
-                    rack.setPatchDate(Sound.loadPatchDate(obj));
-                                
-                    if (clearSubpatches)
-                        {
-                        int numNewGroups = Sound.loadGroups(out.getGroups(), obj);
-                        if (numNewGroups > 0)
-                            {
-                            out.setNumGroupsUnsafe(numNewGroups + 1);
-                            }
-                        rack.modified = false;
-                        }
-                    else
-                    	{
-                    	rack.modified = true;
-                    	}
-                    }
-                out.assignGroupsToSounds();
-                rack.rebuildSubpatches();
-                rack.checkOrder();
-                }
-            finally 
-                {
-                rack.getOutput().unlock();
-                }
-            rack.scrollToRight();
-            ((Out.OutModulePanel)(rack.findOut())).updatePatchInfo();
+            doLoad(rack, new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))), clearSubpatches);
             }
         catch(Exception ex) { ex.printStackTrace(); showSimpleError("Patch Reading Error", "The patch could not be loaded", rack); }
         file = f;
         dirFile = f;
         } 
 
+
+
+
+    public static void doLoad(Rack rack, JSONObject obj, boolean clearSubpatches) throws Exception
+        {
+        String[] patchName = new String[1];
+        rack.getOutput().lock();
+		int flowVersion = 0;
+		try 
+			{ 
+			flowVersion = Sound.loadFlowVersion(obj);
+			}
+		catch (Exception ex) { ex.printStackTrace(); }
+		// version
+		try
+			{
+			Modulation[][] mods = new Modulation[rack.getOutput().getNumSounds()][];
+			for(int i = 0; i < mods.length; i++)
+				{
+				mods[i] = Sound.loadModules(obj, flowVersion);
+				}
+																							
+			// Remove old subpatches
+			if (clearSubpatches)
+				{
+				rack.getOutput().setNumGroups(1);
+				}
+
+			// Create and update Modulations and create ModulePanels
+			load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
+
+			// reload
+			Output out = rack.getOutput();
+			if (obj != null)
+				{
+				rack.setPatchVersion(Sound.loadPatchVersion(obj));
+				rack.setPatchInfo(Sound.loadPatchInfo(obj));
+				rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
+				rack.setPatchDate(Sound.loadPatchDate(obj));
+							
+				if (clearSubpatches)
+					{
+					int numNewGroups = Sound.loadGroups(out.getGroups(), obj);
+					if (numNewGroups > 0)
+						{
+						out.setNumGroupsUnsafe(numNewGroups + 1);
+						}
+					}
+				}
+			out.assignGroupsToSounds();
+			rack.rebuildSubpatches();
+			rack.checkOrder();
+			}
+		finally 
+			{
+			rack.getOutput().unlock();
+			}
+		rack.scrollToRight();
+		((Out.OutModulePanel)(rack.findOut())).updatePatchInfo();
+        } 
 
 
     // Produces the Load Patch as Macro menu
@@ -625,7 +640,8 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-                if (showSimpleConfirm("New Patch", "Clear the existing patch?", rack))
+                if (showSimpleConfirm("New Patch", "Clear the existing patch " + 
+                	(rack.subpatchBox.getComponentCount() > 0 ? "and subpatches?" : ""), rack))
                     {
                     doNew(rack, true);
                     }
@@ -707,12 +723,7 @@ public class AppMenu
                 // Remove old subpatches
                 rack.getOutput().setNumGroups(1);
                 rack.rebuildSubpatches();
-                rack.modified = false;
                 }
-            else
-            	{
-                rack.modified = true;
-            	}
                 
         	rack.getOutput().assignGroupsToSounds();
             }
@@ -783,7 +794,6 @@ public class AppMenu
                                 }
 
                             rack.addSubpatch(new SubpatchPanel(rack, obj));
-                            rack.modified = true;
                             rack.revalidate();
                             rack.repaint();
                             }
@@ -1172,7 +1182,6 @@ public class AppMenu
         menu.addSeparator();
         menu.add(newPrimaryPatchMenu(rack));
         menu.add(loadPrimaryPatchMenu(rack));
-        menu.addSeparator();
         menu.add(loadSubpatchMenu(rack));
 
         if (!Style.isMac())

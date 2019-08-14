@@ -2,7 +2,7 @@
 
 
 # Flow 
-A Polyphonic Modular Additive Synthesizer (Version 2)
+A Polyphonic, Multitimbral, Modular Additive Synthesizer (Version 4)
  
 By Sean Luke (sean@cs.gmu.edu) \
 With Help from Bryan Hoyle \
@@ -18,13 +18,9 @@ Related projects:
 
 ## About
 
-Flow is a fully-modular polyphonic additive software synthesizer written in pure Java.  It runs on OS X, Linux, and Windows.
+Flow is a fully-modular multitimbral and polyphonic additive software synthesizer written in pure Java.  It runs on OS X, Linux, and Windows.
 Flow is an experimental academic research project, and there are a number of rough edges.  This version is an early prerelease 
 and should be expected to have bugs.  Please let us know what you find.
-
-Flow is in **prerelease**.  This means that changes will be made to it in successive versions which could be entirely non-backward
-compatible.  These changes may and likely will break patches you made with earlier versions.  We make no guarantees of 
-consistency at this stage.
 
 Flow has about [50 modules](https://www.youtube.com/watch?v=TClQupjaBHE) of different shapes and sizes, and currently supports up to 16 voices at up to 256 partials and 44.1KHz with a rate of one new partial update every 32 samples.  Flow is a very computationally expensive program and will keep your laptop 
 quite warm and your fan busy.  You need to have some fairly good hardware to run Flow successfully (for reference, Flow was 
@@ -46,11 +42,6 @@ developed on a 2.8Ghz i7 2015 Macbook Pro Retina).
 ### Patches
 
 * Flow's demo patches are located [here](flow/patches).   Contribute some!   You can get a zip file of all of them [here](https://github.com/eclab/flow/blob/master/flow/patches.zip?raw=true).
-
-## Major Non-Backward Compatible Changes since Version 0 that will Break Your Patches
-
-* Filter is now a state-variable, Resonant filter.  It's totally different.
-* Shift has a much larger range now: its bound is 3x the previous size.  This means that to get Shift to work like it used to, set its bound to 1/3 what you used to have it (for convenience, if the bound used to be 1.0, just double-click on the dial and choose "1/3").
 
 ## Install and Run Flow
 

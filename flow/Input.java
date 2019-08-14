@@ -757,7 +757,8 @@ public class Input
                     break;
                     }
                 Sound sound1 = (Sound) iterator.next();
-                if (sound1.getMIDINote() != i)
+                // Unlike, say, aftertouch, I *think* the right behavior here is simply to match the channel
+                if (sound1.getMIDINote() != i || sound1.getChannel() != sm.getChannel())
                     {
                     continue;
                     }

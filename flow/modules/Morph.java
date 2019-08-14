@@ -95,11 +95,11 @@ public class Morph extends Unit
         }
 
     public void setMorphFrequency(boolean val) { morphFrequency = val; }
-    public boolean getMorphFrequency() { return morphFrequency; }
+    public boolean getMorphFrequency() { lastMorph = -1; return morphFrequency; }
     public void setMorphAmplitude(boolean val) { morphAmplitude = val; }
     public boolean getMorphAmplitude() { return morphAmplitude; }
         
-    public void setIncludesFundamental(boolean val) { includesFundamental = val; }
+    public void setIncludesFundamental(boolean val) { lastMorph = -1; includesFundamental = val; }
     public boolean getIncludesFundamental() { return includesFundamental; }
         
     public void setMorph(int morph) { this.morph = morph; }
@@ -353,8 +353,12 @@ public class Morph extends Unit
             {
             morphTo = new int[getAmplitudes(0).length];
             }
-                
-        if (morph == MORPH_ALL_RANDOM)
+            
+        if (!morphFrequency)		// just doing amplitude, so we're not morphing just crossfading
+        	{
+            for(int x = 0; x < morphTo.length; x++) morphTo[x]= x;
+        	}        
+        else if (morph == MORPH_ALL_RANDOM)
             {
             Random rand = (random == null ? getSound().getRandom() : random);
             lastVariance = modulate(MOD_VARIANCE);
@@ -417,7 +421,6 @@ public class Morph extends Unit
     public static final int MORPH_RANDOM_64 = 14;
     public static final int MORPH_RANDOM_128 = 15;
     */
-        
                 
     public static final String[] MORPH_NAMES = new String[]
     { "Normal", "Random", "2-Pair", "4-Pair", "8-Pair", "Increasing" }; //  "Rand 2", "Rand 3", "Rand 4", "Rand 5", "Rand 6", "Rand 8", "Rand 16", "Rand 32", "Rand 64", "Rand 128" };

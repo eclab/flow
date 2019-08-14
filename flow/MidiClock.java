@@ -90,10 +90,11 @@ public class MidiClock
     public static final String[] CLOCK_NAMES = new String[]
     { "Triplet 1/64th", "Triplet 1/32th", "1/32th", "Triplet 1/16th", "1/16th", "Triplet Eighth", "Eighth",
       "Triplet Quarter", "Dotted Eighth", "Quarter", "Triplet Half", "Dotted Quarter", "Half", "Triplet Whole",
-      "Dotted Half", "Whole", "Dotted Whole", "Double Whole" };
+      "Dotted Half", "Whole", "Dotted Whole", "2 Whole", "3 Whole", "4 Whole", "6 Whole", "8 Whole", 
+      "12 Whole", "16 Whole", "24 Whole", "32 Whole" };
                         
     public static final int [] CLOCK_PULSES = new int[]
-    { 1, 2, 3, 4, 6, 8, 12, 16, 18, 24, 32, 36, 48, 64, 72, 96, 144, 192 };
+    { 1, 2, 3, 4, 6, 8, 12, 16, 18, 24, 32, 36, 48, 64, 72, 96, 144, 192, 96 * 3, 96 * 4, 96 * 6, 96 * 8, 96 * 12, 96 * 16, 96 * 24, 96 * 32 };
                 
     
     public static final int WAITING_FOR_START = 0;
@@ -104,14 +105,14 @@ public class MidiClock
     public static final int UNPAUSED = 5;
     int state;
 
-
-    double smoothedDiff;
+	// our estimated rate in TICKS PER PULSE
+    double rateEstimate;
     double currentPulseRealTick;
     double smoothedMidiTickTarget;
     
 
     static final double DIFF_ALPHA = 0.5;
-    static final double MIDI_TICK_ALPHA = 0.1;
+    static final double MIDI_TICK_ALPHA = 0.25;
         
     volatile int syncTick = 0;
     int tick = 0;
@@ -143,8 +144,7 @@ public class MidiClock
     // stops the clock
     synchronized void stopClock()
         {
-        if (clockState == CLOCK_STATE_RUNNING)
-            clockState = CLOCK_STATE_PAUSED;
+        clockState = CLOCK_STATE_PAUSED;
 
         state = PAUSED;
         }
@@ -152,8 +152,7 @@ public class MidiClock
     // continues the clock
     synchronized void continueClock()
         {
-        if (clockState == CLOCK_STATE_PAUSED)
-            clockState = CLOCK_STATE_RUNNING;
+        clockState = CLOCK_STATE_RUNNING;
                         
         // what to do here?
         state = UNPAUSED;
@@ -163,7 +162,7 @@ public class MidiClock
     synchronized void pulseClock()
         {
         int currentRealTick = input.getOutput().getTick();
-                
+            
         if (clockState == CLOCK_STATE_RUNNING)
             {
             pulses++;
@@ -179,13 +178,13 @@ public class MidiClock
         else if (state == WAITING_FOR_SECOND_PULSE)
             {
             // we got our second pulse.  So now we have a first delta
-            smoothedDiff = (currentRealTick - currentPulseRealTick);
+            rateEstimate = (currentRealTick - currentPulseRealTick);
             currentPulseRealTick = currentRealTick;
             state = GOING;
             }
         else if (state == GOING)
             {
-            smoothedDiff = (1 - DIFF_ALPHA) * smoothedDiff + DIFF_ALPHA * (currentRealTick - currentPulseRealTick);
+            rateEstimate = (1 - DIFF_ALPHA) * rateEstimate + DIFF_ALPHA * (currentRealTick - currentPulseRealTick);
             currentPulseRealTick = currentRealTick;
             }
         else if (state == UNPAUSED)
@@ -217,10 +216,9 @@ public class MidiClock
             {
             int currentRealTick = input.getOutput().getTick();
 
-            double tickDelta = (currentRealTick - currentPulseRealTick) / smoothedDiff;
-                        
-            // This is our final target estimate of where we should be (in Midi ticks)
-            double midiTickTarget = (getPulses() + tickDelta) * TICKS_PER_PULSE;
+            // This is our final target estimate of where we should be (in clock ticks)
+            double midiTickTarget = getPulses() * TICKS_PER_PULSE + (currentRealTick - currentPulseRealTick) / rateEstimate * TICKS_PER_PULSE;
+            
             if (midiTickTarget > smoothedMidiTickTarget) 
                 smoothedMidiTickTarget = (1 - MIDI_TICK_ALPHA) * smoothedMidiTickTarget + MIDI_TICK_ALPHA * midiTickTarget;
             else if (midiTickTarget < smoothedMidiTickTarget - BIG_CHANGE) // big drop in value

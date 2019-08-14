@@ -15,6 +15,7 @@ import java.awt.event.*;
 import java.util.*;
 import java.io.*;
 import java.util.zip.*;
+import javax.swing.event.*;
 
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
@@ -36,6 +37,7 @@ public class Rack extends JPanel
     Box box;
     Output output;
     String patchName = null;
+    File patchFile = null;
     String patchAuthor = null;
     String patchDate = null;
     String patchVersion = null;
@@ -49,7 +51,6 @@ public class Rack extends JPanel
     public Oscilloscope osc2;
     public Box displayBox;
     boolean showsDisplays = true;
-    boolean modified = false;
     
     // A list of all current module panels.  Note that this isn't all the
     // *Modulations* in use -- Constants and NILs don't get panels.  But they're
@@ -117,10 +118,8 @@ public class Rack extends JPanel
         add(subpatchBox, BorderLayout.SOUTH);
 
         setTransferHandler(new ModulePanelTransferHandler());
-        this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener())
-            {
-            public int getDefaultActions() { return TransferHandler.MOVE | TransferHandler.COPY; }
-            });
+        this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener()));
+
         setPatchName(getPatchName());
         setAddModulesAfter(Prefs.getLastAddModulesAfter());
 
@@ -179,6 +178,7 @@ public class Rack extends JPanel
         frame.pack();
         setShowsDisplays(showing);
         
+        setPatchName(getPatchName());
         frame.setVisible(true);
         
         return frame;
@@ -208,12 +208,24 @@ public class Rack extends JPanel
     public boolean getAddModulesAfter() { return addModulesAfter; }
     public void setAddModulesAfter(boolean val) { addModulesAfter = val; }
         
+    public File getPatchFile() { return patchFile; }
+    public void setPatchFile(File f) { patchFile = f; }
+    public String getPatchFilename() 
+    	{ 
+    	if (patchFile == null) return null; 
+    	else return AppMenu.removeExtension(patchFile.getName()); 
+    	}
+    
     public String getPatchName() { return patchName; }
     public void setPatchName(String val) 
         { 
         patchName = val; 
         String p = patchName;
         if (p == null) p = Sound.UNTITLED_PATCH_NAME;
+        String patchFilename = getPatchFilename();
+                if (patchFilename != null &&
+        	!p.equals(patchFilename))
+        		p = p + "     (" + patchFilename + AppMenu.PATCH_EXTENSION + ")";
         Object frame = SwingUtilities.getWindowAncestor(this);
         if (frame != null && frame instanceof JFrame)
             {
@@ -918,12 +930,48 @@ public class Rack extends JPanel
             if (m.equals(mix))
                 { mixersCombo.setSelectedItem(m); break; }
             }
+            
+        final JLabel scratch = new JLabel(" 8.88 ");
+        final JLabel gainLabel = new JLabel(" 8.88 ", SwingConstants.RIGHT)	
+        	{
+        	public Dimension getPreferredSize() { return scratch.getPreferredSize(); }
+        	public Dimension getMinimumSize() { return scratch.getMinimumSize(); }
+        	};
+        
+		final double MASTER_GAIN_MULTIPLIER = 50.0;
+		
+		gainLabel.setText(String.format("%.2f ", output.getMasterGain()));
+		JSlider gainSlider = new JSlider(0, (int)(Output.MAX_MASTER_GAIN * MASTER_GAIN_MULTIPLIER), (int)(1.0 * MASTER_GAIN_MULTIPLIER));
+		JButton gainResetButton = new JButton("Reset");
+		gainResetButton.addActionListener(new ActionListener()
+			{
+            public void actionPerformed(ActionEvent e)
+            	{
+            	gainSlider.setValue((int)(1.0 * MASTER_GAIN_MULTIPLIER));
+            	}
+			});
+			
+		final JSlider _gainSlider = gainSlider;
+		gainSlider.addChangeListener(new ChangeListener()
+			{
+			public void stateChanged(ChangeEvent e)
+				{
+				output.setMasterGain(_gainSlider.getValue() / MASTER_GAIN_MULTIPLIER);
+				gainLabel.setText(String.format("%.2f ", output.getMasterGain()));
+				}
+			});
+			
+        JPanel gainPanel = new JPanel();
+        gainPanel.setLayout(new BorderLayout());
+        gainPanel.add(gainLabel, BorderLayout.WEST);
+        gainPanel.add(gainSlider, BorderLayout.CENTER);
+        gainPanel.add(gainResetButton, BorderLayout.EAST);
         
         boolean result = showMultiOption(this, 
-            new String[] { "MIDI Device", "MIDI Channel", "MPE Channels", "Audio Device" }, 
-            new JComponent[] { devicesCombo, channelsCombo, mpeChannelsCombo, mixersCombo }, 
+            new String[] { "MIDI Device", "MIDI Channel", "MPE Channels", "Audio Device", "Master Gain" }, 
+            new JComponent[] { devicesCombo, channelsCombo, mpeChannelsCombo, mixersCombo, gainPanel }, 
             "MIDI and Audio Options", 
-            "Select the MIDI device and channel, and the Audio device.");
+            "Select the MIDI device and channel, audio device, and master gain.");
                         
         if (result)
             {
@@ -1090,16 +1138,17 @@ public class Rack extends JPanel
                 
 
 
+////// DRAG AND DROP JUNK
+
+
     /// Drag-and-drop data flavor
     static DataFlavor moduleflavor = null;
-    static DataFlavor subpatchflavor = null;
     
     static
         {
         try
             {
             moduleflavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=flow.gui.ModulePanel");
-            subpatchflavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=flow.gui.SubpatchPanel");
             }
         catch (ClassNotFoundException ex)
             {
@@ -1111,15 +1160,15 @@ public class Rack extends JPanel
 
 
 
-
-////// DRAG AND DROP JUNK
-
-
 class ModulePanelTransferHandler extends TransferHandler implements DragSourceMotionListener 
     {
     public Transferable createTransferable(JComponent c) 
         {
         if (c instanceof ModulePanel) 
+            {
+            return (Transferable) c;
+            }
+        else if (c instanceof SubpatchPanel) 
             {
             return (Transferable) c;
             }
@@ -1131,6 +1180,10 @@ class ModulePanelTransferHandler extends TransferHandler implements DragSourceMo
         if (c instanceof ModulePanel) 
             {
             return TransferHandler.COPY | TransferHandler.MOVE;
+            }
+        else if (c instanceof SubpatchPanel)                 // can't copy subpatch panels
+            {
+            return TransferHandler.MOVE;
             }
         else return TransferHandler.NONE;
         }
@@ -1151,8 +1204,8 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                 transferableObj = dtde.getTransferable().getTransferData(Rack.moduleflavor);
                 } 
             } 
-        catch (Exception ex) {  }
-        
+        catch (Exception ex) {  System.err.println("Can't drag and drop that"); }
+                
         if (transferableObj != null && transferableObj instanceof ModulePanel)
             {
             ModulePanel droppedPanel = (ModulePanel)transferableObj;
@@ -1329,50 +1382,7 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 
             rack.resetEmits();
             }
-        }
-    }
-
-
-
-class SubpatchPanelTransferHandler extends TransferHandler implements DragSourceMotionListener 
-    {
-    public Transferable createTransferable(JComponent c) 
-        {
-        if (c instanceof SubpatchPanel) 
-            {
-            return (Transferable) c;
-            }
-        else return null;
-        }
-
-    public int getSourceActions(JComponent c) 
-        {
-        if (c instanceof SubpatchPanel)                 // can't copy subpatch panels
-            {
-            return TransferHandler.MOVE;
-            }
-        else return TransferHandler.NONE;
-        }
-
-    public void dragMouseMoved(DragSourceDragEvent dsde) {}
-    } 
-
-class SubpatchPanelDropTargetListener extends DropTargetAdapter 
-    {
-    public void drop(DropTargetDropEvent dtde) 
-        {
-        Object transferableObj = null;
-        
-        try 
-            {
-            if (dtde.getTransferable().isDataFlavorSupported(Rack.subpatchflavor))
-                {
-                transferableObj = dtde.getTransferable().getTransferData(Rack.subpatchflavor);
-                } 
-            } 
-        catch (Exception ex) {  }
-        
-        if (transferableObj != null && transferableObj instanceof SubpatchPanel)
+ 		else if (transferableObj != null && transferableObj instanceof SubpatchPanel)
             {
             SubpatchPanel droppedPanel = (SubpatchPanel)transferableObj;
             Rack rack = droppedPanel.getRack();
@@ -1381,8 +1391,8 @@ class SubpatchPanelDropTargetListener extends DropTargetAdapter
             Component comp = dtde.getDropTargetContext().getComponent();
             
             int newpos = -2;
-            int oldpos = -1;
-            
+            int oldpos = -2;
+                        
             if (dtde.getDropAction() == DnDConstants.ACTION_MOVE)
                 {
                 if (comp instanceof SubpatchPanel)
@@ -1399,9 +1409,73 @@ class SubpatchPanelDropTargetListener extends DropTargetAdapter
                             }
                         }
                     }
-                else if (comp == rack)  // we dragged to the beginning
+                else if (comp == rack || comp instanceof ModulePanel)  // we dragged to the beginning
                     {
-                    newpos = -1;
+                    SwingUtilities.convertPointToScreen(p, comp);
+                    SwingUtilities.convertPointFromScreen(p, rack);	// p may be in ModulePanel's coordinate system, we want to compute this in rack's
+					final int BOTTOM_SLOP = 30;
+					final int SCROLLBAR_SLOP = 20;
+					final int TOP_SLOP = 4;
+					Rectangle paneBounds = rack.pane.getBounds();
+					if (p.y <= paneBounds.y + TOP_SLOP || p.y >= paneBounds.y + paneBounds.height - SCROLLBAR_SLOP)
+						{
+						//System.err.println("Drag failed");  // display region
+						return;
+						}
+					else if (paneBounds.height >= BOTTOM_SLOP * 2 && p.y >= paneBounds.y + paneBounds.height - BOTTOM_SLOP)
+						{       
+						//System.err.println("Drag failed");  // lower slop region
+						return;
+						}
+                    else if (AppMenu.showSimpleConfirm("Swap", "Swap the subpatch with the primary patch?", rack))
+    					{
+						rack.getOutput().lock();
+						try
+							{
+							for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
+								{
+								if (rack.subpatchBox.getComponent(i) == droppedPanel)
+									{
+									int index = i + 1;
+									
+									// get old group
+									Group g = rack.getOutput().getGroup(index);
+									
+									// copy primary group to old group
+									rack.getOutput().copyPrimaryGroup(index, false);
+									
+									// transfer name (it doesn't come along with the primary group)
+                                	rack.getOutput().getGroup(index).setPatchName(rack.getPatchName());
+									
+									// restore old group's data, since we don't want the new one
+									rack.getOutput().getGroup(index).setChannel(g.getChannel());
+									rack.getOutput().getGroup(index).setMinNote(g.getMinNote());
+									rack.getOutput().getGroup(index).setMaxNote(g.getMaxNote());
+									rack.getOutput().getGroup(index).setNumRequestedSounds(g.getNumRequestedSounds());
+									rack.getOutput().getGroup(index).setGain(g.getGain());
+																		
+									try
+										{
+										// load the old group as the primary group.  Don't displace the subpatches
+										AppMenu.doLoad(rack, g.getPatch(), false);
+										
+										rack.rebuild();
+										rack.rebuildSubpatches();
+										}
+        							catch(Exception ex) 
+        								{ 
+        								ex.printStackTrace(); 
+        								}
+									break;
+									}
+								}
+							}
+						finally 
+							{
+							rack.getOutput().unlock();
+							}
+    					}
+    				return;
                     }
                 else
                     {
@@ -1418,7 +1492,7 @@ class SubpatchPanelDropTargetListener extends DropTargetAdapter
                         }
                     }
 
-                if (oldpos == -1)
+                if (oldpos == -2)
                     {
                     System.err.println("WARNING(flow/modules/Rack.java) SubpatchPanelDropTargetListener: no such removed panel " + droppedPanel);
                     return;
@@ -1443,7 +1517,7 @@ class SubpatchPanelDropTargetListener extends DropTargetAdapter
                         }
                     }
                 }
+            }           
             }
+            
         }
-    }
-    

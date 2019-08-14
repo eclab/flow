@@ -21,6 +21,22 @@ public class Group
     int numRequestedSounds = 0;
     JSONObject patch = new JSONObject(EMPTY_JSON);
     double gain = DEFAULT_GAIN;
+    
+    public Group() { }
+    
+	public Group(Group copy)
+		{
+		channel = copy.channel;
+		minNote = copy.minNote;
+		maxNote = copy.maxNote;
+		numRequestedSounds = copy.numRequestedSounds;
+		gain = copy.gain;
+		if (copy.patch != null)
+			{
+			patch = new JSONObject(copy.patch, JSONObject.getNames(copy.patch));
+			}
+		else System.err.println("Group.Group() WARNING: no patch ");
+		}
         
     /** Returns the group's current channel.  This can be any of
     	Input.CHANNEL_NONE, or 0 ... 15.  If this group is the Primary group,
