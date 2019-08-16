@@ -104,7 +104,8 @@ public class FlangeFilter extends Unit
                 
         // The filter stretch (lobe size) is presently the BASE LOBE SIZE + lobe scale * modulation
         double filterStretch = (makeSensitive(modulate(MOD_STRETCH)) * 22049 + 1) * (1 + modulate(MOD_STRETCH_MOD) * (MAX_STRETCH - 1));
-
+		double invFilterStretch = 1.0 / filterStretch;
+		
         // The filter frequency is presently the BASE frequency + lobe size * number of lobes * modulation
         double filterFreq = (fixed ? 0 : pitch) + filterStretch * (modulate(MOD_OFFSET_MOD) - 0.5) * 4;
                                 
@@ -120,14 +121,35 @@ public class FlangeFilter extends Unit
             //
             // The baseline frequency is filterFreq.                f
             // The width of a lobe is filterStretch.                s
-            // Our input frequency is a
+            // Our input frequency is 								a
             //
             // position = ((((a - f) % s) + s) % s) / s
+			//
+			// We convert this as follows:
+			//
+            // position = ((((a - f) % s) + s) % s) / s
+			//
+			// position = ((((a - f) % s) + s) % s) * inv_s
+			//
+			// position = ((((a - f) * inv_s) % s) + s) % s
+			//
+			// position = ((((a - f) * inv_s) % 1) + 1) % 1
+			//
+			// position = (((a - f) * inv_s) % 1
+			// if (position < 1) position += 1
+			//
+			// position = (((a - f) * inv_s)
+			// position = position - (int) position			// much faster than % 1
+			// if (position < 0) position += 1
 
             double a = frequencies[i] * pitch;
-            double f = filterFreq;
-            double s = filterStretch;
-            double pos = (((a - f) % s + s) % s) / s;
+
+//            double pos = (((a - f) % s + s) % s) / s;						// ugh three divides, very costly.  We need to improve this
+            
+            double pos = (a - filterFreq) * invFilterStretch;
+            pos = pos - (int) pos;
+    		if (pos < 0.0) pos += 1.0;
+            
                         
             // Now we're between 0 and 1.  Consider reflections
             double p = (pos < 0.5 ? pos : 1.0 - pos) * 2;
@@ -138,7 +160,7 @@ public class FlangeFilter extends Unit
                 {
                 case STYLE_LINEAR:
                     {
-                    gain = (1.0 - p);
+                    gain = (1 - p);
                     }
                 break;
                 case STYLE_SPIKE_UP:
