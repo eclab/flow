@@ -43,6 +43,8 @@ public class Rack extends JPanel
     String patchVersion = null;
     String patchInfo = null;
     boolean addModulesAfter;
+
+    public static final String[] notes = new String[] { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" };
     
     public Box subpatchBox;
     public Display display1;
@@ -888,6 +890,17 @@ public class Rack extends JPanel
         
     public void chooseMIDIandAudio()
         {
+        double originalGain = 0;
+        	output.lock();
+        	try
+        		{
+				originalGain = output.getMasterGain();
+        		}
+        	finally
+        		{
+        		output.unlock();
+        		}
+        
         ArrayList<Midi.MidiDeviceWrapper> devices = output.getInput().getDevices();
         JComboBox devicesCombo = new JComboBox(devices.toArray());
         devicesCombo.setSelectedItem(output.getInput().getMidiDevice());
@@ -902,7 +915,6 @@ public class Rack extends JPanel
         final JComboBox mpeChannelsCombo = new JComboBox(mpeChannelNames);
         int numMPEChannels = Prefs.getLastNumMPEChannels();
         mpeChannelsCombo.setSelectedIndex(numMPEChannels - 1);
-
 
         String[] channelNames = new String[] { "MPE Lower Zone", "MPE Higher Zone", "Any Channel", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16" };
         final JComboBox channelsCombo = new JComboBox(channelNames);
@@ -933,7 +945,34 @@ public class Rack extends JPanel
             if (m.equals(mix))
                 { mixersCombo.setSelectedItem(m); break; }
             }
-            
+ 
+ /*
+        final JLabel scratch0 = new JLabel(" G#8 ");
+        final JLabel restrictLabel = new JLabel(" 8.88 ", SwingConstants.RIGHT)	
+        	{
+        	public Dimension getPreferredSize() { return scratch0.getPreferredSize(); }
+        	public Dimension getMinimumSize() { return scratch0.getMinimumSize(); }
+        	};
+        
+        int min = output.getGroup(Output.PRIMARY_GROUP).getMinNote();
+        int max = output.getGroup(Output.PRIMARY_GROUP).getMaxNote();
+		restrictLabel.setText((min==0 && max == 127) ? "Any" : notes[min % 12] + (min / 12));
+		final JSlider restrictSlider = new JSlider(0, 128, (min==0 && max == 127) ? 0 : min + 1);			
+		restrictSlider.addChangeListener(new ChangeListener()
+			{
+			public void stateChanged(ChangeEvent e)
+				{
+        		int note = restrictSlider.getValue();
+				restrictLabel.setText(note == 0 ? "Any" : notes[(note - 1) % 12] + ((note - 1) / 12));
+				}
+			});
+			
+        JPanel restrictPanel = new JPanel();
+        restrictPanel.setLayout(new BorderLayout());
+        restrictPanel.add(restrictLabel, BorderLayout.WEST);
+        restrictPanel.add(restrictSlider, BorderLayout.CENTER);        
+*/
+                   
         final JLabel scratch = new JLabel(" 8.88 ");
         final JLabel gainLabel = new JLabel(" 8.88 ", SwingConstants.RIGHT)	
         	{
@@ -971,24 +1010,54 @@ public class Rack extends JPanel
         gainPanel.add(gainResetButton, BorderLayout.EAST);
         
         boolean result = showMultiOption(this, 
-            new String[] { "MIDI Device", "MIDI Channel", "MPE Channels", "Audio Device", "Master Gain" }, 
-            new JComponent[] { devicesCombo, channelsCombo, mpeChannelsCombo, mixersCombo, gainPanel }, 
+            new String[] { "MIDI Device", "MIDI Channel", "MPE Channels", /* "MIDI Note", */ "Audio Device", "Master Gain" }, 
+            new JComponent[] { devicesCombo, channelsCombo, mpeChannelsCombo, /* restrictPanel, */ mixersCombo, gainPanel }, 
             "MIDI and Audio Options", 
-            "Select the MIDI device and channel, audio device, and master gain.");
+            "Select the MIDI and Audio Options for the Patch.");
                         
         if (result)
             {
-            // set up
-            output.setMixer(mixers[mixersCombo.getSelectedIndex()]);
-            output.getInput().setupMIDI(channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS,
-                mpeChannelsCombo.getSelectedIndex() + 1,
-                devices.get(devicesCombo.getSelectedIndex()));
+            output.lock();
+            try
+            	{
+				// set up
+				output.setMixer(mixers[mixersCombo.getSelectedIndex()]);
+				output.getInput().setupMIDI(channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS,
+					mpeChannelsCombo.getSelectedIndex() + 1,
+					devices.get(devicesCombo.getSelectedIndex()));
+				/*
+				if (restrictSlider.getValue() == 0)
+					{
+					output.getGroup(Output.PRIMARY_GROUP).setBothNotes(0, 127);
+					}
+				else
+					{
+					output.getGroup(Output.PRIMARY_GROUP).setBothNotes(restrictSlider.getValue() - 1);
+					}
+				*/
+				}
+			finally
+				{
+				output.unlock();
+				}
                 
             Prefs.setLastMidiDevice(devicesCombo.getSelectedItem().toString());
             Prefs.setLastChannel(channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS);
             Prefs.setLastNumMPEChannels(mpeChannelsCombo.getSelectedIndex() + 1);
             Prefs.setLastAudioDevice(mixersCombo.getSelectedItem().toString());
             }
+        else
+        	{
+        	output.lock();
+        	try
+        		{
+				output.setMasterGain(originalGain);			// restore it since we allow the gain to be changed in real time
+        		}
+        	finally
+        		{
+        		output.unlock();
+        		}
+        	}
         }
 
     /** Perform a JOptionPane confirm dialog with MUTLIPLE widgets that the user can select.  The widgets are provided
@@ -1430,18 +1499,6 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 						}
                     else 
                     	{
-                      int result = rack.showMultiOption(rack, 
-                    	new String[] { }, 
-                    	new JComponent[] { }, 
-                    	"Swap Patches", 
-                    	"Swap the subpatch with the primary patch?",
-                    	new String[] { "+ MIDI/Voice", "Swap", "Cancel" });
-
-          			if (result == -1 || result == 2)  // cancel
-          				{
-          				return;
-          				}
-            
 					rack.getOutput().lock();
 					try
 						{
@@ -1463,22 +1520,12 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 								
 								// transfer name (it doesn't come along with the primary group)
 								rack.getOutput().getGroup(index).setPatchName(rack.getPatchName());
-								
-								// restore old group's data, since we don't want the new one
-								rack.getOutput().getGroup(index).setMinNote(g.getMinNote());
-								rack.getOutput().getGroup(index).setMaxNote(g.getMaxNote());
-								rack.getOutput().getGroup(index).setGain(g.getGain());
-								if (result == 1) rack.getOutput().getGroup(index).setChannel(g.getChannel());
-								if (result == 1) rack.getOutput().getGroup(index).setNumRequestedSounds(g.getNumRequestedSounds());
 
-								// maybe shift over channel and voice?
-								if (result != 1) rack.getOutput().getGroup(index).setNumRequestedSounds(numSoundsPrimary);
-								if (result != 1) rack.getOutput().getGroup(index).setChannel(channelPrimary);
-								int oldChannel = g.getChannel();
-								if (oldChannel == Input.CHANNEL_NONE)
-									oldChannel = Input.CHANNEL_OMNI;
-								if (result != 1) rack.getOutput().getGroup(Output.PRIMARY_GROUP).setChannel(oldChannel);
+								// restore old group's data, since we don't want the new one
+								rack.getOutput().getGroup(index).setNumRequestedSounds(numSoundsPrimary);
+								rack.getOutput().getGroup(index).setChannel(channelPrimary);
 								
+								// load the primary group
 								try
 									{
 									// load the old group as the primary group.  Don't displace the subpatches
@@ -1491,6 +1538,14 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 									{ 
 									ex.printStackTrace(); 
 									}
+
+								// fix channel in new primary group
+								rack.getOutput().getGroup(Output.PRIMARY_GROUP).setBothNotes(g.getMinNote(), g.getMaxNote());
+								int channel = g.getChannel() == Input.CHANNEL_NONE ? Input.CHANNEL_OMNI : g.getChannel();
+								rack.getOutput().getGroup(Output.PRIMARY_GROUP).setChannel(channel);
+								Prefs.setLastChannel(channel);
+								// number of sounds will be automatic since we've already changed the requested sounds above
+
 								break;
 								}
 							}

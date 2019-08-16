@@ -503,6 +503,7 @@ public class AppMenu
 						}
 					}
 				}
+			rack.getOutput().getGroup(Output.PRIMARY_GROUP).setBothNotes(0, 127);		// reset
 			out.assignGroupsToSounds();
 			rack.rebuildSubpatches();
 			rack.checkOrder();
