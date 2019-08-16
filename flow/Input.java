@@ -2,7 +2,7 @@
 // Licensed under the Apache 2.0 License
 
 
-package flow; 
+package flow;
 
 import javax.sound.midi.MidiMessage;
 import javax.sound.midi.ShortMessage;
