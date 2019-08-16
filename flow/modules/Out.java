@@ -235,6 +235,7 @@ public class Out extends Unit implements Miscellaneous
     public static abstract class OutModulePanel extends ModulePanel
         {
         public abstract void updatePatchInfo();
+        public abstract void setReverb(float wet, float damp, float size);
         public OutModulePanel(Modulation mod) { super(mod); }
         };
 
@@ -344,6 +345,10 @@ public class Out extends Unit implements Miscellaneous
                                 
                 repaint();
                 }
+            
+            public void setReverb(float wet, float damp, float size)
+            	{
+            	}
                  
             public JComponent buildPanel()
                 {

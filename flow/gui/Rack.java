@@ -1499,7 +1499,8 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 						}
                     else 
                     	{
-					rack.getOutput().lock();
+					Output output = rack.getOutput();
+					output.lock();
 					try
 						{
 						for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
@@ -1508,22 +1509,26 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 								{
 								int index = i + 1;
 								
-								int numSoundsPrimary = rack.getOutput().getNumSounds(Output.PRIMARY_GROUP);
-								int channelPrimary = rack.getOutput().getGroup(Output.PRIMARY_GROUP).getChannel();
+								int numSoundsPrimary = output.getNumSounds(Output.PRIMARY_GROUP);
+								int channelPrimary = output.getGroup(Output.PRIMARY_GROUP).getChannel();
 								if (channelPrimary < 0) channelPrimary = Input.CHANNEL_NONE;
+								Out out = (Out)(output.getSound(0).getEmits());
+								double wet = out.modulate(Out.MOD_REVERB_WET);
+								double damp = out.modulate(Out.MOD_REVERB_DAMP);
+								double size = out.modulate(Out.MOD_REVERB_ROOM_SIZE);
 								
 								// get old group
-								Group g = rack.getOutput().getGroup(index);
+								Group g = output.getGroup(index);
 								
 								// copy primary group to old group
-								rack.getOutput().copyPrimaryGroup(index, false);
+								output.copyPrimaryGroup(index, false);
 								
 								// transfer name (it doesn't come along with the primary group)
-								rack.getOutput().getGroup(index).setPatchName(rack.getPatchName());
+								output.getGroup(index).setPatchName(rack.getPatchName());
 
 								// restore old group's data, since we don't want the new one
-								rack.getOutput().getGroup(index).setNumRequestedSounds(numSoundsPrimary);
-								rack.getOutput().getGroup(index).setChannel(channelPrimary);
+								output.getGroup(index).setNumRequestedSounds(numSoundsPrimary);
+								output.getGroup(index).setChannel(channelPrimary);
 								
 								// load the primary group
 								try
@@ -1540,11 +1545,19 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 									}
 
 								// fix channel in new primary group
-								rack.getOutput().getGroup(Output.PRIMARY_GROUP).setBothNotes(g.getMinNote(), g.getMaxNote());
+								output.getGroup(Output.PRIMARY_GROUP).setBothNotes(g.getMinNote(), g.getMaxNote());
 								int channel = g.getChannel() == Input.CHANNEL_NONE ? Input.CHANNEL_OMNI : g.getChannel();
-								rack.getOutput().getGroup(Output.PRIMARY_GROUP).setChannel(channel);
+								output.getGroup(Output.PRIMARY_GROUP).setChannel(channel);
 								Prefs.setLastChannel(channel);
+								
 								// number of sounds will be automatic since we've already changed the requested sounds above
+
+								// fix reverb in new primary group
+								// we do this even if it's not a Constant
+								out = (Out)(output.getSound(0).getEmits());
+								out.setModulation(new Constant(wet), Out.MOD_REVERB_WET);
+								out.setModulation(new Constant(damp), Out.MOD_REVERB_DAMP);
+								out.setModulation(new Constant(size), Out.MOD_REVERB_ROOM_SIZE);								
 
 								break;
 								}
@@ -1552,7 +1565,7 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 						}
 					finally 
 						{
-						rack.getOutput().unlock();
+						output.unlock();
 						}
     				return;			// done with swap
                     }
