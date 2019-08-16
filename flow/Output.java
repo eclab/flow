@@ -100,7 +100,7 @@ public class Output
     public static final float DEFAULT_MASTER_GAIN = 0.0f;
 
     // If a partial's volume is very low, we don't even bother computing its sample contribution, but just set it to zero.
-    static final double MINIMUM_VOLUME_SQUARED = (1.0 / 65536 / 256) * (1.0 / 65536 / 256);  // 0.0001 * 0.0001;
+    static final double MINIMUM_VOLUME = (1.0 / 65536 / 256);  // 0.0001
 
     // Output holds the input.  That makes total sense, right?  Right.  :-) 
     Input input;
@@ -379,17 +379,7 @@ public class Output
     /** Returns the total number of Sounds */
     public int getNumSounds()
         {
-        int n = 0;
-        lock();
-        try
-            {
-            n = numSounds;
-            }
-        finally
-            {
-            unlock();
-            }
-        return n;
+        return numSounds;
         }
     
         
@@ -508,31 +498,11 @@ public class Output
             Swap temp = swap;
             swap = with;
             with = temp;
-/*
-			swap.amplitudes3 = with.amplitudes3;
-			swap.amplitudes2 = with.amplitudes2;  
-			
-			for(int i = 0; i < swap.amplitudes2.length; i++)
-				System.arraycopy(swap.amplitudes2[i], 0, swap.amplitudes3[i], 0, swap.amplitudes2[i].length);
-
-			for(int i = 0; i < swap.amplitudes.length; i++)
-				System.arraycopy(swap.amplitudes[i], 0, swap.amplitudes[i], 0, swap.amplitudes[i].length);
-			
-			with.pos3 = with.pos2;
-			with.pos2 = with.pos;
-			with.curpos = with.pos;
-			with.pos = with.pos + SKIP;
-
-			swap.pos3 = with.pos3;
-			swap.pos2 = with.pos2;
-			swap.curpos = with.curpos;
-			swap.pos = with.pos;
-*/			
             emitsReady = false;
             }
         else
             {
-            Thread.currentThread().yield();
+            //Thread.currentThread().yield();		// we don't want the output thread to yield...
             }
         }
       
@@ -609,40 +579,16 @@ public class Output
                 int oi = orders[i];
                 if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
 					
-					                                                        
-//                if (ca[oi] != amplitude)			// this will never be exactly equal, so no need to check for it
-                    {
-                    // incoming amplitudes are pre-denormalized by the voice threads.
-                    // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
-                    // get denormalized.  So we undenormalize here.  It's theoretically possible that we
-                    // could still get denormalized when summing the samples below; but I have not been
-                    // able to cause that.
-                    double aa = undenormalize(ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
-                    double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
-                    amplitude = aa + bb;
-                    ca[oi] = amplitude;
-                    }
-
-
-/*
-		// LAGRANGE ATTEMPT
-		// there's a bug I think in my code but it really makes very little difference.
-		
-			boolean doit = false;
-			//doit = true;
-			
-			if (doit)
-				{
-		// let's try something else
-				double xl = _with.pos3;
-				double xm = _with.pos2;
-				double xh = _with.pos;
-				double x = _with.curpos;
-				amplitude = _with.amplitudes[s][i] * (x - xl) * (x - xm) / ((xh - xl) * (xh - xm)) +
-							_with.amplitudes3[s][i] * (x - xh) * (x - xm) / ((xl - xh) * (xl - xm)) +
-							_with.amplitudes2[s][i] * (x - xl) * (x - xh) / ((xm - xl) * (xm - xh));				
-				}
-*/
+				// incoming amplitudes are pre-denormalized by the voice threads.
+				// However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
+				// get denormalized.  So we undenormalize here.  It's theoretically possible that we
+				// could still get denormalized when summing the samples below; but I have not been
+				// able to cause that.
+				double aa = (ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
+				double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
+				amplitude = aa + bb;
+				if (amplitude < 1e-200) amplitude = 0;		// undenormalize prior to next go-around
+				ca[oi] = amplitude;
 
                 double frequency = freq[i];
                                                                 
@@ -653,7 +599,7 @@ public class Output
                     {
                     break;
                     }
-                if (amplitude <= MINIMUM_VOLUME_SQUARED)
+                if (amplitude <= MINIMUM_VOLUME)
                     {
                     continue;
                     }
@@ -662,7 +608,7 @@ public class Output
                 position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
                 pos[oi] = position;
                         
-                sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude * v;
+                sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude;
                 }
             }
         else
@@ -673,18 +619,16 @@ public class Output
                 int oi = orders[i];
                 if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
                                                         
-                if (ca[oi] != amplitude)
-                    {
-                    // incoming amplitudes are pre-denormalized by the voice threads.
-                    // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
-                    // get denormalized.  So we undenormalize here.  It's theoretically possible that we
-                    // could still get denormalized when summing the samples below; but I have not been
-                    // able to cause that.
-                    double aa = undenormalize(ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
-                    double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
-                    amplitude = aa + bb;
-                    ca[oi] = amplitude;
-                    }
+				// incoming amplitudes are pre-denormalized by the voice threads.
+				// However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
+				// get denormalized.  So we undenormalize here.  It's theoretically possible that we
+				// could still get denormalized when summing the samples below; but I have not been
+				// able to cause that.
+				double aa = (ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
+				double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
+				amplitude = aa + bb;
+				if (amplitude < 1e-200) amplitude = 0;		// undenormalize prior to next go-around
+				ca[oi] = amplitude;
                                 
                 double frequency = freq[i];
  
@@ -692,14 +636,14 @@ public class Output
                 position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
                 pos[oi] = position;
                         
-                if (frequency * pitch <= NYQUIST && amplitude * amplitude > MINIMUM_VOLUME_SQUARED)
+                if (frequency * pitch <= NYQUIST && amplitude > MINIMUM_VOLUME)
                     {
-                    sample += Utility.fastSin(position * PI2) * amplitude * v;
+                    sample += Utility.fastSin(position * PI2) * amplitude;
                     }
                 }
             }
 
-        return sample;
+        return sample * v;
         }
         
     volatile boolean clipped = false;
@@ -763,12 +707,6 @@ public class Output
                 /// The last amplitudes (used for interpolation between the past partials and new ones)
                 /// Note that these are indexed by ORDER, not by actual index position
                 final double[][] currentAmplitudes = new double[numVoices][Unit.NUM_PARTIALS];
-                /*
-                  final double[][] currentFrequencies = new double[numVoices][Unit.NUM_PARTIALS];
-                  for(int ii = 0; ii < currentFrequencies.length; ii++)
-                  for(int jj = 0; jj < currentFrequencies[ii].length; jj++)
-                  currentFrequencies[ii][jj] = -1;
-                */
   
                 lightweightOutputSemaphores = new boolean[numVoices];
                 outputLocks = new Object[numVoices];
@@ -800,7 +738,7 @@ public class Output
                                         double[] samplessnd = samples[j];
                                         for (int skipPos = 0; skipPos < SKIP; skipPos++)
                                             {
-                                            samplessnd[skipPos] = buildSample(j, currentAmplitudes/*, currentFrequencies*/) * DEFAULT_VOLUME_MULTIPLIER;
+                                            samplessnd[skipPos] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
                                             }
                                         }
                                     }
@@ -825,8 +763,10 @@ public class Output
                         glitched = true;
                         }
                         
-                    if (samples.length != getNumSounds())
-                        samples = new double[getNumSounds()][SKIP];
+                    if (samples.length != numSounds)
+                    	{
+                        samples = new double[numSounds][SKIP];
+                        }
 
                     checkAndSwap();
                     
@@ -841,7 +781,7 @@ public class Output
                         double[] samplessnd = samples[solo];
                         for (int skipPos = 0; skipPos < SKIP; skipPos++)
                             {
-                            samplessnd[skipPos] = buildSample(solo, currentAmplitudes/*, currentFrequencies*/) * DEFAULT_VOLUME_MULTIPLIER;
+                            samplessnd[skipPos] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
                             }
                         }
                     else
@@ -857,15 +797,6 @@ public class Output
                             }
                         }
                         
-/*
-                    with.curpos++;
-                    if (with.curpos >= with.pos)
-                    	{
-                    	//System.err.println("Long wait " + with.curpos + " " + with.pos);
-                    	with.curpos = with.pos;
-                    	}
-*/
-                    
                     if (with.reverbWet > 0.0f)
                         {        
                         freeverb.setWet(with.reverbWet);
@@ -873,7 +804,7 @@ public class Output
                         freeverb.setDamp(with.reverbDamp);
                         }
                         
-                    double gain = masterGain;
+                    double gain = masterGain;		// so we're not reading a volatile variable!
 
                     for (int skipPos = 0; skipPos < SKIP; skipPos++)
                         {
@@ -907,14 +838,14 @@ public class Output
                             d = (freeverbOutput[0][0] + freeverbOutput[1][0]) / 2; 
                             }
                                                     
-                        d *= masterGain;
+                        d *= gain;
                                                             
                         if (d > 32767)
                             {
                             d = 32767;
                             clipped = true;
                             }
-                        if (d < -32768)
+                        else if (d < -32768)
                             {
                             d = -32768;
                             clipped = true;
@@ -1104,15 +1035,10 @@ public class Output
             }
 
         // Spin-wait.  It's both faster and more efficient than a mutex in this case, but it eats up cycles
-        if (emitsReady)
-            {
-            Thread.currentThread().yield();
-
-            while(emitsReady)
-                {
-                Thread.currentThread().yield();
-                }
-            }
+		while(emitsReady)
+			{
+			Thread.currentThread().yield();
+			}
                 
         lock();
         try
