@@ -275,6 +275,8 @@ public class Out extends Unit implements Miscellaneous
         final boolean[] oldGlitched = new boolean[] { false };        
         final boolean[] oldPlayFirst = new boolean[] { false };        
         final int[] oldNumVoices = new int[] { -1 };            // -1 will force an update the first time
+        final boolean[] oldBlockedMIDI = new boolean[] { false };
+        final int[] oldChannel = new int[] { -100 };
         
         final JLabel example = new JLabel("  (Audio)");
         example.setFont(Style.SMALL_FONT());
@@ -430,17 +432,37 @@ public class Out extends Unit implements Miscellaneous
             public void actionPerformed ( ActionEvent e )
                 {
                 Output out = panel[0].getRack().getOutput();
-                boolean clipped = out.getAndResetClipped();
-                boolean glitched = out.getAndResetGlitched();
-                boolean playFirst = out.getOnlyPlayFirstSound();
-                int numVoices = out.getNumSounds(Output.PRIMARY_GROUP);
+                boolean clipped;
+                boolean glitched;
+                boolean playFirst;
+                int numVoices;
+                boolean blockedMIDI;
+                int channel;
+
+                    out.lock();
+                                    try
+                                    {
+                 clipped = out.getAndResetClipped();
+                 glitched = out.getAndResetGlitched();
+                 playFirst = out.getOnlyPlayFirstSound();
+                 numVoices = out.getNumSounds(Output.PRIMARY_GROUP);
+                 blockedMIDI = (out.getGroupOverridingPrimaryGroupInMIDI() != Output.PRIMARY_GROUP);
+                 channel = out.getGroup(Output.PRIMARY_GROUP).getChannel();
+                 		}
+            	    finally
+            	    	{
+            	    	out.unlock();
+            	    	}
                 
-                if (numVoices != oldNumVoices[0] || clipped != oldClipped[0] || glitched != oldGlitched[0] || playFirst != oldPlayFirst[0])
+                if (numVoices != oldNumVoices[0] || clipped != oldClipped[0] || glitched != oldGlitched[0] || playFirst != oldPlayFirst[0] || 
+                	blockedMIDI != oldBlockedMIDI[0] || channel != oldChannel[0])
                     {
                     oldClipped[0] = clipped;
                     oldGlitched[0] = glitched;
                     oldPlayFirst[0] = playFirst;
                     oldNumVoices[0] = numVoices;
+                    oldBlockedMIDI[0] = blockedMIDI;
+                    oldChannel[0] = channel;
 
                     String labeladdendum = null;
                     if (playFirst)
@@ -458,6 +480,11 @@ public class Out extends Unit implements Miscellaneous
                             labeladdendum = "   (" + numVoices + " Voices)";
                             }
                         } 
+                    
+	                    if (blockedMIDI)
+ 	 	                  	{
+ 	    	               	labeladdendum = labeladdendum + "  (No MIDI " + (out.getGroup(Output.PRIMARY_GROUP).getChannel() + 1) + ")";
+            	        	}
                     
                     panel[0].getTitlePanel().setBackground(glitched ? Color.RED : (clipped ? Color.YELLOW : Color.BLACK));
                     panel[0].getTitleLabel().setForeground(glitched ? Color.WHITE : (clipped ? Color.BLACK : Color.WHITE));

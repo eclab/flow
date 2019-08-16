@@ -1203,6 +1203,25 @@ public class Output
     /** Return the number of groups currently allocated */
     public int getNumGroups() { return numGroups; }
 
+	public int getGroupOverridingPrimaryGroupInMIDI()
+		{
+		lock();
+		try
+			{
+			for(int i = 1; i < numGroups; i++)
+				{
+				if (group[i].channel >= 0 &&
+					group[i].channel == group[0].channel)
+					return i;
+				}
+			return Output.PRIMARY_GROUP;
+			}
+		finally
+			{
+			unlock();
+			}
+		}
+
     /** Moves group index i to JUST ABOVE current index j */ 
     public void moveGroup(int i, int j)
         {

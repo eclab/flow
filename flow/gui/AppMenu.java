@@ -352,6 +352,7 @@ public class AppMenu
 
                 if (file != null)
                     {
+                    System.err.println(file);
                     fd.setFile(file.getName());
                     fd.setDirectory(file.getParentFile().getPath());
                     }
@@ -389,7 +390,7 @@ public class AppMenu
                     "Demote or replace the existing primary patch on load?",
                     new String[] { "Demote", "Replace", "Cancel" });
 
-                if (result == 2) return;
+                if (result == 2 || result == -1) return;			// when the ESC key is pressed we get a -1
 
                 FileDialog fd = new FileDialog((JFrame)(SwingUtilities.getRoot(rack)), "Load Primary Patch File...", FileDialog.LOAD);
                 fd.setFilenameFilter(new FilenameFilter()
@@ -666,10 +667,11 @@ public class AppMenu
                     "Demote or clear the existing primary patch?",
                     new String[] { "Demote", "Clear", "Cancel" });
 
+	            if (result == 2 || result == -1) return;			// when the ESC key is pressed we get a -1
+
                 rack.getOutput().lock();
                 try
                     {
-                    if (result == 2) return;
                     if (result == 0)
                         {
                         if (!rack.getOutput().copyPrimaryGroup(true))

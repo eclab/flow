@@ -861,7 +861,7 @@ public class Rack extends JPanel
             new JComponent[] { voicesCombo, bufferSizeCombo, partialsCombo, voicesPerThreadCombo, outputsPerThreadCombo }, 
             "Tuning Parameters", 
             "<html>Parameter changes don't take effect<br>until the synthesizer is restarted.",
-            new String[] { "Okay", "Cancel", "Reset" });
+            new String[] { "Okay", "Reset", "Cancel", });
         
         if (result == 0)  // OKAY
             {
@@ -871,7 +871,7 @@ public class Rack extends JPanel
             Prefs.setLastNumVoicesPerThread(voicesPerThread[voicesPerThreadCombo.getSelectedIndex()]);
             Prefs.setLastNumOutputsPerThread(outputsPerThread[outputsPerThreadCombo.getSelectedIndex()]);
             }
-        else if (result == 2) // RESET
+        else if (result == 1) // RESET
             {
             Prefs.setLastNumVoices(Output.DEFAULT_NUM_VOICES);
             Prefs.setLastBufferSize(Output.DEFAULT_BUFFER_SIZE);
@@ -879,6 +879,9 @@ public class Rack extends JPanel
             Prefs.setLastNumVoicesPerThread(Output.DEFAULT_NUM_VOICES_PER_THREAD);
             Prefs.setLastNumOutputsPerThread(Output.DEFAULT_NUM_OUTPUTS_PER_THREAD);
             }
+        else if (result == 2 || result == -1)		// CANCEL
+        	{
+        	} 
         }
 
 
@@ -1130,7 +1133,7 @@ public class Rack extends JPanel
             title, null,
             new String[] { "Okay", "Cancel" });
             
-        if (result == 1)  // cancel
+        if (result == 1 || result == -1)  // cancel
             return null;
         else
             return new String[] { n.getText(), a.getText(), d.getText(), v.getText(), i.getText() };
@@ -1419,69 +1422,86 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 					Rectangle paneBounds = rack.pane.getBounds();
 					if (p.y <= paneBounds.y + TOP_SLOP || p.y >= paneBounds.y + paneBounds.height - SCROLLBAR_SLOP)
 						{
-						//System.err.println("Drag failed");  // display region
 						return;
 						}
 					else if (paneBounds.height >= BOTTOM_SLOP * 2 && p.y >= paneBounds.y + paneBounds.height - BOTTOM_SLOP)
 						{       
-						//System.err.println("Drag failed");  // lower slop region
 						return;
 						}
-                    else if (AppMenu.showSimpleConfirm("Swap", "Swap the subpatch with the primary patch?", rack))
-    					{
-						rack.getOutput().lock();
-						try
+                    else 
+                    	{
+                      int result = rack.showMultiOption(rack, 
+                    	new String[] { }, 
+                    	new JComponent[] { }, 
+                    	"Swap Patches", 
+                    	"Swap the subpatch with the primary patch?",
+                    	new String[] { "+ MIDI/Voice", "Swap", "Cancel" });
+
+          			if (result == -1 || result == 2)  // cancel
+          				{
+          				return;
+          				}
+            
+					rack.getOutput().lock();
+					try
+						{
+						for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
 							{
-							for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
+							if (rack.subpatchBox.getComponent(i) == droppedPanel)
 								{
-								if (rack.subpatchBox.getComponent(i) == droppedPanel)
+								int index = i + 1;
+								
+								int numSoundsPrimary = rack.getOutput().getNumSounds(Output.PRIMARY_GROUP);
+								int channelPrimary = rack.getOutput().getGroup(Output.PRIMARY_GROUP).getChannel();
+								if (channelPrimary < 0) channelPrimary = Input.CHANNEL_NONE;
+								
+								// get old group
+								Group g = rack.getOutput().getGroup(index);
+								
+								// copy primary group to old group
+								rack.getOutput().copyPrimaryGroup(index, false);
+								
+								// transfer name (it doesn't come along with the primary group)
+								rack.getOutput().getGroup(index).setPatchName(rack.getPatchName());
+								
+								// restore old group's data, since we don't want the new one
+								rack.getOutput().getGroup(index).setMinNote(g.getMinNote());
+								rack.getOutput().getGroup(index).setMaxNote(g.getMaxNote());
+								rack.getOutput().getGroup(index).setGain(g.getGain());
+								if (result == 1) rack.getOutput().getGroup(index).setChannel(g.getChannel());
+								if (result == 1) rack.getOutput().getGroup(index).setNumRequestedSounds(g.getNumRequestedSounds());
+
+								// maybe shift over channel and voice?
+								if (result != 1) rack.getOutput().getGroup(index).setNumRequestedSounds(numSoundsPrimary);
+								if (result != 1) rack.getOutput().getGroup(index).setChannel(channelPrimary);
+								int oldChannel = g.getChannel();
+								if (oldChannel == Input.CHANNEL_NONE)
+									oldChannel = Input.CHANNEL_OMNI;
+								if (result != 1) rack.getOutput().getGroup(Output.PRIMARY_GROUP).setChannel(oldChannel);
+								
+								try
 									{
-									int index = i + 1;
+									// load the old group as the primary group.  Don't displace the subpatches
+									AppMenu.doLoad(rack, g.getPatch(), false);
 									
-									// get old group
-									Group g = rack.getOutput().getGroup(index);
-									
-									// copy primary group to old group
-									rack.getOutput().copyPrimaryGroup(index, false);
-									
-									// transfer name (it doesn't come along with the primary group)
-                                	rack.getOutput().getGroup(index).setPatchName(rack.getPatchName());
-									
-									// restore old group's data, since we don't want the new one
-									rack.getOutput().getGroup(index).setChannel(g.getChannel());
-									rack.getOutput().getGroup(index).setMinNote(g.getMinNote());
-									rack.getOutput().getGroup(index).setMaxNote(g.getMaxNote());
-									rack.getOutput().getGroup(index).setNumRequestedSounds(g.getNumRequestedSounds());
-									rack.getOutput().getGroup(index).setGain(g.getGain());
-																		
-									try
-										{
-										// load the old group as the primary group.  Don't displace the subpatches
-										AppMenu.doLoad(rack, g.getPatch(), false);
-										
-										rack.rebuild();
-										rack.rebuildSubpatches();
-										}
-        							catch(Exception ex) 
-        								{ 
-        								ex.printStackTrace(); 
-        								}
-									break;
+									rack.rebuild();
+									rack.rebuildSubpatches();
 									}
+								catch(Exception ex) 
+									{ 
+									ex.printStackTrace(); 
+									}
+								break;
 								}
 							}
-						finally 
-							{
-							rack.getOutput().unlock();
-							}
-    					}
-    				return;
+						}
+					finally 
+						{
+						rack.getOutput().unlock();
+						}
+    				return;			// done with swap
                     }
-                else
-                    {
-                    //System.err.println("Drag failed");  // wasn't a mod panel I guess
-                    return;
-                    }
+                }
 
                 for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
                     {
@@ -1518,6 +1538,5 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                     }
                 }
             }           
-            }
-            
         }
+    }
