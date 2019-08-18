@@ -230,6 +230,14 @@ public class Prefs
         return Midi.NO_DEVICE;
         }
 
+    public static void setLastMidiDevice2(String midiDevice) { setLastX("" + midiDevice, "MidiDevice2"); }
+    public static String getLastMidiDevice2() 
+        { 
+        String s = getLastX("MidiDevice2"); 
+        if (s != null) return s;
+        return Midi.NO_DEVICE;
+        }
+
     public static void setLastChannel(int channel) { setLastX("" + channel, "Channel"); }
     public static int getLastChannel() 
         { 

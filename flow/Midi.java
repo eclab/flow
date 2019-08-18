@@ -294,6 +294,7 @@ public class Midi
         }
                         
     InReceiver inReceiver = null;
+    InReceiver inReceiver2 = null;
         
     /** Sets the In Reciever to receive from the device in the given wrapper */
     public void setInReceiver(MidiDeviceWrapper wrapper)
@@ -309,6 +310,19 @@ public class Midi
             }
         }
         
+    /** Sets the In Reciever to receive from the device in the given wrapper */
+    public void setInReceiver2(MidiDeviceWrapper wrapper)
+        {
+        synchronized(lock)
+            {
+            if (inReceiver2 != null)
+                {
+                inReceiver2.close();
+                }
+            inReceiver2 = new InReceiver();
+            wrapper.setReceiver(inReceiver2);
+            }
+        }
         
                 
     /// UTILITIES FOR PARSING        

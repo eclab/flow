@@ -911,6 +911,15 @@ public class Rack extends JPanel
                 { devicesCombo.setSelectedItem(m); break; }
             }
 
+        JComboBox devices2Combo = new JComboBox(devices.toArray());
+        devices2Combo.setSelectedItem(output.getInput().getMidiDevice2());
+        String midiDevice2 = Prefs.getLastMidiDevice2();
+        for(Midi.MidiDeviceWrapper m : devices)
+            {
+            if (m.toString().equals(midiDevice2))
+                { devices2Combo.setSelectedItem(m); break; }
+            }
+
         String[] mpeChannelNames = new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15" };
         final JComboBox mpeChannelsCombo = new JComboBox(mpeChannelNames);
         int numMPEChannels = Prefs.getLastNumMPEChannels();
@@ -1010,10 +1019,10 @@ public class Rack extends JPanel
         gainPanel.add(gainResetButton, BorderLayout.EAST);
         
         boolean result = showMultiOption(this, 
-            new String[] { "MIDI Device", "MIDI Channel", "MPE Channels", /* "MIDI Note", */ "Audio Device", "Master Gain" }, 
-            new JComponent[] { devicesCombo, channelsCombo, mpeChannelsCombo, /* restrictPanel, */ mixersCombo, gainPanel }, 
+            new String[] { "MIDI Device", "Aux MIDI Device", "MIDI Channel", "MPE Channels", /* "MIDI Note", */ "Audio Device", "Master Gain" }, 
+            new JComponent[] { devicesCombo, devices2Combo, channelsCombo, mpeChannelsCombo, /* restrictPanel, */ mixersCombo, gainPanel }, 
             "MIDI and Audio Options", 
-            "Select the MIDI and Audio Options for the Patch.");
+            "Select the MIDI and Audio Options.\nMIDI Devices may not be the same.");
                         
         if (result)
             {
@@ -1022,9 +1031,12 @@ public class Rack extends JPanel
             	{
 				// set up
 				output.setMixer(mixers[mixersCombo.getSelectedIndex()]);
+				
 				output.getInput().setupMIDI(channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS,
 					mpeChannelsCombo.getSelectedIndex() + 1,
-					devices.get(devicesCombo.getSelectedIndex()));
+					devices.get(devicesCombo.getSelectedIndex()),
+					devicesCombo.getSelectedIndex() == devices2Combo.getSelectedIndex() ?
+						devices.get(0) : devices.get(devices2Combo.getSelectedIndex()));
 				/*
 				if (restrictSlider.getValue() == 0)
 					{
@@ -1042,6 +1054,10 @@ public class Rack extends JPanel
 				}
                 
             Prefs.setLastMidiDevice(devicesCombo.getSelectedItem().toString());
+            if (devicesCombo.getSelectedIndex() == devices2Combo.getSelectedIndex())
+            	Prefs.setLastMidiDevice2(devices.get(0).toString());
+            else            
+            	Prefs.setLastMidiDevice2(devices2Combo.getSelectedItem().toString());
             Prefs.setLastChannel(channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS);
             Prefs.setLastNumMPEChannels(mpeChannelsCombo.getSelectedIndex() + 1);
             Prefs.setLastAudioDevice(mixersCombo.getSelectedItem().toString());

@@ -51,7 +51,7 @@ public class AppMenu
     // Returns the MIDI and Audio Preferences menu
     static JMenuItem setupPatchMenu(final Rack rack)
         {
-        JMenuItem setup = new JMenuItem("MIDI and Audio Preferences");
+        JMenuItem setup = new JMenuItem("MIDI and Audio Options");
         setup.addActionListener(new ActionListener()
             {
             public void actionPerformed(ActionEvent e)

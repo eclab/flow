@@ -70,9 +70,18 @@ public class Input
             if (devs.get(i).toString().equals(midiDevice))
                 { wrap = devs.get(i); break; }
             }
+
+        Midi.MidiDeviceWrapper wrap2 = devs.get(0);
+        String midiDevice2 = Prefs.getLastMidiDevice2();
+        for(int i = 0; i < devs.size(); i++)
+            {
+            if (devs.get(i).toString().equals(midiDevice2) &&
+            	devs.get(i) != wrap)	// can't be the same as device #1
+                { wrap2 = devs.get(i); break; }
+            }
             
         // we assume we have only one group at startup time
-        setupMIDI(Prefs.getLastChannel(), Prefs.getLastNumMPEChannels(), wrap);
+        setupMIDI(Prefs.getLastChannel(), Prefs.getLastNumMPEChannels(), wrap, wrap2);
         }
     
     // Output calls this to add a Sound to the Input (it's added to the notesOff list)
@@ -136,15 +145,20 @@ public class Input
         }
     
     Midi.MidiDeviceWrapper currentWrapper;
+    Midi.MidiDeviceWrapper currentWrapper2;
     
     /**
      * Sets MIDI to the new device wrapper and channel.
      */
-    public void setupMIDI(int primaryChannel, int numMPEChannels, Midi.MidiDeviceWrapper midiDeviceWrapper)
+    public void setupMIDI(int primaryChannel, int numMPEChannels, Midi.MidiDeviceWrapper midiDeviceWrapper,
+    	Midi.MidiDeviceWrapper midiDeviceWrapper2)
         {
         // set up device
         midi.setInReceiver(midiDeviceWrapper);
         currentWrapper = midiDeviceWrapper;
+
+        midi.setInReceiver2(midiDeviceWrapper2);
+        currentWrapper2 = midiDeviceWrapper2;
 
 		primaryGroup().setChannel(primaryChannel);
 
@@ -175,6 +189,14 @@ public class Input
     public Midi.MidiDeviceWrapper getMidiDevice()
         {
         return currentWrapper;
+        }
+
+    /**
+     * Returns the current MidiDevice
+     */
+    public Midi.MidiDeviceWrapper getMidiDevice2()
+        {
+        return currentWrapper2;
         }
     
     
@@ -517,7 +539,7 @@ public class Input
                         {
                         c = CHANNEL_LOWER_ZONE;
                         }
-                    setupMIDI(c, num, currentWrapper);
+                    setupMIDI(c, num, currentWrapper, currentWrapper2);
                     
                     // We might want to update the menu too....
                     Prefs.setLastNumMPEChannels(num);
@@ -646,7 +668,7 @@ public class Input
                 }
             else
                 {                
-                // look through notesOff first
+               // look through notesOff first
                 for(int j = notesOff.size() - 1; j >= 0; j--)
                     {
                     Sound s = notesOff.get(j);
@@ -757,8 +779,9 @@ public class Input
                     break;
                     }
                 Sound sound1 = (Sound) iterator.next();
-                // Unlike, say, aftertouch, I *think* the right behavior here is simply to match the channel
-                if (sound1.getMIDINote() != i || sound1.getChannel() != sm.getChannel())
+                int c = sound1.getChannel();
+                // Unlike, say, aftertouch, I *think* the right behavior here is simply to match the channel or OMNI
+                if ((c != sm.getChannel() && c != CHANNEL_OMNI) || (sound1.getMIDINote() != i))
                     {
                     continue;
                     }
