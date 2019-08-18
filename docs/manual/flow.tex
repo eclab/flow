@@ -86,8 +86,7 @@ An additive synthesizer is a synthesizer which produces sounds by {\it adding up
 
 Consider Figure~\ref{sinewaves}, which shows three sine waves in green, orange, and blue.  These sine waves are differing in their {\it frequency} (how fast they go up and down), and in their {\it amplitude} (how far they go up and down).  If you add the three sine waves up, you get the wave shown in bold.  In fact, it's easily shown that in theory you can synthesize {\it any wave} by adding up the right combination of sine waves.
 
-Notice we didn't mention {\it phase}.  Phase is the horizontal shift in the sine wave, as shown in Figure \ref{phases}.  As it turns out, humans can't easily distinguish between sounds whose partials only differ in phase relative to one another: we just don't have the hardware built-in to do it.\footnote{We {\it can} detect when phase is changing: that's how most FM synthesizers work.  We can also detect when two superimposed waves differ in phase in some way: for example, two sine waves with the same phase just double their volume: but if one of them is out of phase by \(\pi\), they effectively cancel each other out.}   As a result,  many additive synthesizers, including {\name}, don't consider phase in order to simplify matters.\footnote{Indeed, if you have just started Flow and you output a Sawtooth wave, you might see this \smash{\raisebox{-0.5em}{\includegraphics[trim=1cm 1cm 1cm 8cm, clip=true, width=1in, height=0.15in]{Saw1}}}\quad But if you change certain parameters in real time, fairly quickly Flow's partials will get out of phase of one another.  And your sawtooth might look like this instead
-\smash{\raisebox{-0.5em}{\includegraphics[trim=1cm 1cm 1cm 8cm, clip=true,width=1in, height=0.15in]{Saw2}}}\quad This sure doesn't {\it look} like a Sawtooth wave, but if you play it, you'll find it {\it sounds} exactly the same!}  We will assume that all partials have a phase angle of \(0\degree\).
+Notice we didn't mention {\it phase}.  Phase is the horizontal shift in the sine wave, as shown in Figure \ref{phases}.  As it turns out, humans often can't easily distinguish between sounds whose partials only differ in phase relative to one another: we just don't have the hardware built-in to do it.\footnote{While this is certainly true for high- and mid-pitch sounds, it isn't entirely true for bass sounds: a low-frequency square wave (for example) sounds pretty different\,---\,buzzier\,---\,than one whose partials have randomly-assigned phases.}   As a result,  many additive synthesizers, including {\name}, don't consider phase in order to simplify matters.
 
 If we only consider frequency and amplitude, we can chart our three sine waves as shown in Figure~\ref{partials}: showing the amplitude of each partial by frequency.  Notice that the \(Y\) axis is still Amplitude, but the \(X\) axis has changed from {\it time} to {\it frequency}. For this reason, thinking of a sound in this fashion is known as casting the sound into the {\bf frequency domain}; whereas thinking of a sound as a wave in the traditional way (Figure~\ref{sinewaves}) is known as considering it in the {\bf time domain}.  While we have been trained to think of sound waves in the time domain: in fact our brains receive sound information in the frequency domain: hardware in our ears first breaks out the sounds into high and low frequencies before our brains even get them.
 
@@ -114,14 +113,14 @@ In {\name}, if you adjust partials so that they are all harmonics, with no gaps 
 
 (Useful) partials can have any frequency from 0 up to the {\bf Nyquist limit} of a digital sound wave.  The Nyquist limit is the highest frequency a digital representation is capable of producing: it is half the sampling rate.  So if the audio rate is 44100 Hz (as is the case for {\name}, and of course, for CDs), then the highest possible frequency is 22,050.
 
-\subsection{Fully Modular Additive Synthesis}  Additive synthesis is viewed as a sort of holy grail of synthesis: because you can generate all sounds in an additive fashion in theory, additive synthesis is in some sense an ``optimal'' way to doing synthesis: but it has a problem which prevents it from being easily used in reality.   And that problem is: the classical approach to additive synthesis involves a very, very large number of tedious parameters.  Sound waves have many hundreds or thousands of partials, each with a frequency and amplitude and maybe phase: and as sounds change and evolve over time, so do all those values.  And so a synthesizer in which you set all the partials independently will have a great many parameters to set.  Consider: the Kawai K5000 had 126 harmonics, each with a base amplitude and {\it its own envelope} which specified how it changed over time.  This meant that the Kawai K5000's patches had on the order of a thousand parameters.\footnote{I'm not denigrating the K5000.  The K5000 was one of the most incredible and awe-inspiring synthesizers in history.}
+\subsection{Fully Modular Additive Synthesis}  Additive synthesis is viewed as a sort of holy grail of synthesis: because you can generate all sounds in an additive fashion in theory, additive synthesis is in some sense an ``optimal'' way to doing synthesis: but it has a problem which prevents it from being easily used in reality.   And that problem is: the classical approach to additive synthesis involves a very, very large number of tedious parameters.  Sound waves have many hundreds or thousands of partials, each with a frequency and amplitude and maybe phase: and as sounds change and evolve over time, so do all those values.  And so a synthesizer in which you set all the partials independently will have a great many parameters to set.  Consider: the Kawai K5000 had 126 harmonics, each with a base amplitude and {\it its own envelope} which specified how it changed over time.  This meant that the Kawai K5000's patches had on the order of a thousand parameters.\footnote{I'm not denigrating the K5000!  The K5000 was one of the most incredible and awe-inspiring synthesizers in history.}
 
 An alternative approach, taken by software tools such as Harmor/Harmless, Razor, and Loom,\footnote{Harmor and Harmless are trademarks of Image-Line Software.  See https:/\!/www.image-line.com/plugins/Synths/Harmor/  and https:/\!/www.image-line.com/plugins/Synths/Harmless/\qquad Razor is a trademark of Native Instruments, Inc.  You can find Razor at https:/\!/www.native-instruments.com/en/products/komplete/synths/razor/\qquad And Loom is a trademark of inMusic Brands.  You can find Loom at http:/\!/www.airmusictech.com/product/loom-ii}
 is to create a series of modules which either generate sets of partials or modify existing partials, and then to arrange them in an assembly line, routing partials from one module to the next, until a sound is emitted at the end.  The idea is that instead of directly manipulating partials and envelopes, you're using operations (the modules) designed to sculpt away at the partials.  But because you can't wire up the modules in any fashion, these tools generally use a kind of {\bf semi-modular synthesis} approach.  
 
 {\name} is in contrast closer to a {\bf fully modular synthesis} approach: you can organize as many modules as you like, and wire them up however you like, just like a hardware modular synthesizer. Since they're not in a line, modules can be fed from, and feed into, {\it multiple} other modules.  There's no reason you can't have modules wired up in cycles or other patterns.  And just like in a hardware modular synthesizer, if you don't wire the modules up at all, you don't get any sound. 
 
-Note however that unlike a classical fully-modular synthesizer, a software synthesizer like {\name} can easily be (and is) {\bf polyphonic} and {\bf multitmbral}, and you can save and load patches.  And of course, unlike a traditional modular synthesizer, {\name} is additive.
+Note however that unlike a classical fully-modular synthesizer, a software synthesizer like {\name} can easily be (and is) {\bf polyphonic} and {\bf multitmbral}, and you can save and load patches.  And of course, unlike a traditional modular synthesizer, {\name} is {\bf additive}.
 
 {\name} has another powerful trick up its sleeve: after you have saved your collection of wired modules out as a {\bf patch}, you then have the option of loading that patch to operate as a {\bf self-contained module in another patch!}  When a patch is loaded in this way, it is called a {\bf macro}.  And yes, you can have macros which contain macros which contain macros.
 
@@ -133,10 +132,9 @@ At present {\name} has the following specifications.  They may change:
 \begin{center}
 \begin{tabular}{rl}
 Number of Partials&64, 128, or 256, user-selectable.  Phase is disregarded.\\
-Polyphony&1--16, user-selectable.\\
-Multitimbrality&Up to 16 unique sounds, each on its own MIDI channel.  Compatible with MPE.\\
-Partials Update Rate&Every 32 samples\\
-Audio Sampling Rate&44,100 Hz\\
+Polyphony&1--32, user-selectable.\\
+Multitimbrality&Up to (at present) 32 unique sounds.\\
+Sampling Rate&44,100 Hz\\
 Audio Bit Depth&16 bit\\
 Channels&Mono (that is, not stereo)\\
 MIDI Features&MPE, Clock, Channel and Polyphonic Aftertouch, Pitch Bend, NRPN, RPN, CC\\
@@ -167,7 +165,7 @@ How do we tamp down glitches?  By playing with a few parameters. If you select {
 
 \begin{itemize}
 \item {\bf Polyphony} (1--16, default: 8)\qquad This is the number of voices the synthesizer can play at once.  More voices incurs a higher load.
-\item {\bf Audio Buffer Size} (default: 1152, which is crummy, but the best Java on the Mac can do)\qquad This is the size of the audio buffer that {\name} keeps filled for your operating system to tap into to generate sounds.  You want a low buffer if you can (much less latency); but a bigger buffer makes it easier for Flow to keep up.  Some operating systems require a large buffer size: for example, OS X typically needs at least 1152 . On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{audioloopback} for more information.  I can't help you much regarding Windows.
+\item {\bf Audio Buffer Size} (default: 1152, which is crummy, but the best Java on the Mac can do)\qquad This is the size of the audio buffer that {\name} keeps filled for your operating system to tap into to generate sounds.  You want a low buffer if you can (much less latency); but a bigger buffer makes it easier for Flow to keep up.  Some operating systems require a large buffer size: for example, OS X typically needs at least 1152 . On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{connecting} for more information.  I can't help you much regarding Windows.
 
 \item {\bf Partials} (64--256, default: 128)\qquad This is the number of partials passed around from module to module.  More partials will produce a richer sound, particularly in bass notes, but incur a much higher load.
 
@@ -288,86 +286,34 @@ You might also find the oscilloscopes handy to understand what a modulation sign
 
 A warning about oscilloscopes: like displays, they show the data of the most recently pressed note.  This can be confusing if (for example) you're using an LFO.  You've just reset the LFO with a note-on, but instead of resetting from its current position, it magically jumps to something much higher and resets from there.  This is because the voice being allocated for your note has its LFO at that position at the moment, {\it not the voice you've just been watching}, and the oscilloscope suddenly jumped to it.
 
-\enlargethispage{1em}
+\subsection{Playing a Patch}
+\label{playingapatch}
 
-\subsection{Playing Sounds}
+\begin{wrapfigure}{r}{1.5in}
+\vspace{-1em}
+\includegraphics[width=1.5in]{Simple}
+\caption{Playing a Sawtooth}
+\vspace{-1em}
+\label{simple}
+\end{wrapfigure}
 
-If you directly connect a partials source to your Out module, it'll start playing.  In fact, {\bf all voices} might start playing: there's nothing to stop them!  It won't sound good.   Probably at this point you're just testing your patch and want to hear just a single voice.  To do this, select the menu option {\bf Monophonic} in the {\bf Play} menu.  The word "(Mono") will appear in the {\bf Out} module.\footnote{You might also choose {\bf Monophonic} if you'd like a monophonic synth.  Flow does {\it last note priority}, meaning that if, while playing monophonically, you hold down note A, then hold down note B, then hold down note C, then let go of C, then B will begin to sound, and if you let go of B, then A will begin to sound.}
+In order to hear a sound you need to first specify your {\bf Audio Device} from the window which pops up when you select {\bf MIDI and Audio Options} from the {\bf Options} menu.  I suggest setting it to your computer's speaker.
 
-Ultimately you'll probably set things up with a {\bf VCA} (see the last entry in Section~\ref{unitshapers}) which won't play the sound unless a key is pressed and an {\bf Envelope} (typically a {\bf DADSR Envelope}: see Section~\ref{modsources}) sends the appropriate modulation signal.  That way different voices are played when you play different keys.  At this point you'll want to uncheck {\bf Play 1 Voice Only} so you can play more than one voice.
+Now, if you directly connect a partials source ({\bf Sawtooth}, say) to the {\bf A (Audio)} input of your {\bf Out} module, it'll start playing.  In fact, {\bf all voices} might start playing: there's nothing to stop them!  It won't sound good.   At this point you're just testing your patch and may want to hear just a single voice.  To do this, select the menu option {\bf Monophonic} in the {\bf Play} menu.  The word "(Mono") will appear in the {\bf Out} module.
 
-So how do you play a using keyboard?  You attach it to {\name} by selecting {\bf MIDI and Audio Preferences} in the {\bf Options} menu, then choosing the appropriate MIDI channel (or ``All Channels'') and MIDI device.  Similarly you can choose the appropriate output audio device for your computer, if you have multiple ones.
+You might also choose {\bf Monophonic} if you'd like a monophonic synth.  Flow does {\it last note priority}, meaning that if, while playing monophonically, you hold down note A, then hold down note B, then hold down note C, then let go of C, then B will begin to sound, and if you let go of B, then A will begin to sound.
 
-If Flow is playing too loudly its sound may {\bf clip}. The title bar of the {\bf Out} module will briefly turn yellow and say ``Clip''.  You may also hear an audible buzz or click.  To prevent this in the future, you can turn down the sound's {\bf Gain} (in the {\bf Out module}).  This knob will only affect the primary patch: if you are playing in multitimbral mode (see Section~\ref{multitimbral}) you may find it more useful to turn down the primary patch and all subpatches by changing the {\bf Master Gain} knob in the aforementioned {\bf MIDI and Audio Preferences}. 
+Ultimately you'll probably set things up with a {\bf VCA} (see the last entry in Section~\ref{unitshapers}) modulated by an {\bf Envelope} (typically a {\bf DADSR Envelope}: see Section~\ref{modsources}) which won't play the sound unless a key is pressed.  That way different voices are played when you play different keys.  At that point you'll want to uncheck {\bf Monophonic} so you can play more than one voice.
 
+So how do you play a using keyboard?  You attach it to {\name} by selecting {\bf MIDI and Audio Preferences} from the {\bf Options} menu, then choosing the appropriate {\bf MIDI Device} and {\bf MIDI Channel}.  You'll notice an {\bf Auxillary MIDI Device} as an option: this lets you connect two MIDI devices to Flow.  It's not useful to use this unless you're in multitimbral mode (discussed in Section~\ref{multitimbral}).
+
+If Flow is playing too loudly its sound will {\bf clip}. The title bar of the {\bf Out} module will briefly turn yellow and say ``Clip''.  You may also hear an audible buzz or click.  To prevent this in the future, you can turn down the sound's {\bf Gain} (in the {\bf Out module}).  You can also change the {\bf Master Gain} in the {\bf MIDI and Audio Preferences}, but this is better reserved for multitimbral mode instead.
 
 \subsubsection{Using MPE}
 
 To set up a MIDI Polyphonic Expression (MPE) device, go to {\bf MIDI and Audio Preferences} in the {\bf Play} menu, and change the MIDI Channel to either the MPE Lower Zone or the MPE Upper Zone, as determined by your MPE Controller.  You can then specify the number of MPE channels in the Zone.  {\name} also responds to an MPE Configuration Message (or MCM) sent over MIDI from your controller.
 
 MPE devices are often designed to link certain behaviors to attack velocity, pitch bend, aftertouch, CC 74, and release velocity.  All of these are accessible via the {\bf MIDI In} module.  However, pitch bend and attack velocity also do specific things in Flow.  If you wanted Flow to respond in some {\it non-bend} way when you perform the bend behavior on a Roli Seaboard (say), you need a way to disable bend.  To do this, you can deselect {\bf Responds to Bend} in the {\bf Play} menu.  Similarly, you can disable {\bf Velocity Sensitive} in the {\bf Play} menu.  The Bend and Attack Velocity signals still will be sent to the MIDI In module, where you can tap into them to make your patch do what you like.
-
-\subsubsection{Routing MIDI from a Digital Audio Workstation}
-\label{routingmidi}
-
-\begin{wrapfigure}{r}{3in}
-\begin{center}\vspace{-1em}\includegraphics[width=3in]{loopbackmidi}\end{center}
-\vspace{-1em}
-\caption{A MIDI loopback connecting a Digital Audio Workstation to {\name}.  Compare to Figure~\ref{loopbackaudio}.}\label{loopbackmidi}
-\end{wrapfigure}
-
-In many situations you'll want to get {\name} to play sounds over MIDI  as directed by a digital audio workstation (DAW).   You'd think it'd be easy to connect directly to another piece of software on your computer.  But you'd be wrong!  The problem is that {\name}, because it's written in Java, can only connect to {\it MIDI devices}, and your software synthesizer or DAW has probably not registered itself as a device\,---\,it likewise probably is designed only to connect to MIDI devices.
-
-To get around this, you need to make a {\it MIDI loopback}.  This is where you create two {\it virtual devices} which are connected to one another.  {\name} and your DAW can both see these devices.  Consider Figure~\ref{loopbackmidi}.  If your DAW outputs to Virtual Device X (say) and {\name} is set up to {\it input} from Virtual Device X, then it will receive what the DAW outputs.
-
-\paragraph{Making a MIDI Loopback Device}  This varies depending on your operating system.
-
-\begin{itemize}
-\item {\bf On the Mac}\quad First, open the application \textsf{/Applications/Utilities/Audio MIDI Setup}.  Next, click on the ``IAC Driver'' icon to open the ``IAC Driver Properties'' window.  Add a new port, named whatever you like.  Check the box ``Device is Online''.  This new port will appear to your DAW and to {\name} as the loopback device.
-
-\item {\bf On Windows}\quad There is no way to do this in Windows directly: instead you'll need to run a program which provides this service.  Programs include {\sf loopMIDI},  {\sf loopBe1}, MIDIOx's {\sf MidiYoke}, and so on.  Googling for ``loopback MIDI Windows'' will get you there. 
-
-\item {\bf On Linux}\quad In most flavors of Linux, to get virtual devices running you'll first need to type the command \hbox{\tt sudo modprobe snd-virmidi} and then type in your password.  \quad If you're using something like Gentoo or any other distro that does not come with this kernel module, you'll need to custom compile your kernel to get it. 
-
-This procedure will create a bunch of of virtual devices with names like {\tt VirMIDI [hw:2,0,0]} or {\tt VirMIDI [hw:2,1,8]}.  Select a device whose third number is 0 (such as {\tt VirMIDI [hw:2,0,0]} or {\tt VirMIDI [hw:3,1,0]}, but not {\tt VirMIDI [hw:2,1,1]}).  Have the DAW send to this device and have {\name} listen from the same device.
-\end{itemize}
-
-\subsubsection{Routing Audio to a Digital Audio Workstation}
-\label{audioloopback}
-
-\begin{wrapfigure}{r}{3in}
-\begin{center}\vspace{-2em}\includegraphics[width=3in]{loopbackaudio}\end{center}
-\vspace{-1em}
-\caption{An Audio loopback connecting {\name} to a Digital Audio Workstation.  Compare to Figure~\ref{loopbackmidi}.}\label{loopbackaudio}
-\end{wrapfigure}
-
-Note that {\name} is a standalone application, not a VST or AU.  By default it sends its audio to the default audio device on your computer, which is probably your computer's speakers.  If you want to route the audio to your DAW, you'll need a loopback device for audio similar to the one for MIDI discussed in Section~\ref{routingmidi}.  This is because neither Java nor your DAW will create their own audio devices, so neither can connect to the other.  You need an intermediary.
-
-
-\paragraph{Making an Audio Loopback Device}  This varies depending on your operating system.
-\begin{itemize}
-\item {\bf On the Mac}\quad Unlike for MIDI, there's no built-in audio loopback facility on the Mac.  You'll need to install a program which does audio loopbacks.  There is an open-source driver called {\it SoundFlower}\footnote{https:/\!/github.com/mattingalls/Soundflower/releases/\qquad Note that installation of SoundFlower fails on High Sierra even if you have given permission per the instructions on the website.  But installing via the Terminal seems to work.  Do the following:
-
-\begin{enumerate}
-\item Unpack the {\tt Soundflower-2.0b2.dmg} disk image.
-\item In the terminal, type:
-\begin{tabbing}
-~\hspace{5em}{\tt cd /Volumes/Soundflower-2.0b2}\hspace{2in}\= {\it Then press RETURN}\\
-~\hspace{5em}{\tt sudo installer -pkg Soundflower.pkg -target /}\>{\it Then press RETURN}
-\end{tabbing}
-\item Enter your password and press RETURN.
-\item When you're told that this has failed, go to ``Security and Privacy'' in System Preferences, and permit the software to load.  You may need to click "Allow...", then select ``MATT INGALLS'' (he's the developer) in the list and approve it.  Then do steps 2 and 3 again.
-\item Wait a long time.  It takes quite a while to install for no good reason.
-\item At this point, SoundFlower 2ch and 64ch will appear as audio devices.  You want SoundFlower 2ch.  You can configure it further in Audio MIDI Setup if you like, or just use it straight.
-\end{enumerate}
-}
-which seems to work fine.  If you'd like support and a better user experience, I recommend the commercial product {\it Loopback} by Rogue Amoeba.\footnote{https:/\!/rogueamoeba.com/loopback/}  It works very well, and if you're poor you can try it in unfettered trial mode for about 20 minutes, quit it, and start it again for another 20, etc.   There are also various tools built around the {\it Jack} framework: but Jack seems to be break all Java Audio applications: you won't be able to run {\name} at all after installing Jack.  And furthermore, Jack's {\it uninstaller} is seriously broken: it doesn't remove the necessary files and you'll be permanently unable to run anything that needs Java Audio (including {\name}).  {\color{red}\bf Do not install Jack on OS X.}  You will regret it.\footnote{In fact, after I reported this, Jack's administrators seem to be leaning towards eliminating Jack on OS X entirely.  Oh well.  If you screwed up and installed Jack on OS X, the following URL contains a list of all the files you'll need to remove manually (as administrator): https:/\!/github.com/jackaudio/jack2/issues/379}
-
-\item {\bf On Windows}\quad I can't help you here.
-
-\item {\bf On Linux}\quad You'll want to use Jack 2 and Cadence. A good solution with minimal friction is to enable the ALSA and Pulseaudio bridges from within the Cadence GUI. Set the buffer size for your sound card in Cadence to something small, like 128 samples (ideally, the smallest you can get it without glitches): this allows you to minimize the application buffer size, reducing latency. After running Cadence and starting the jack daemon, run flow and set the sound output to the jack bridge in Pulseaudio via Pavucontrol (or an equivalent audio configurator). This will allow you to route audio from Pulseaudio into jack, which will most likely be able to interface with your DAW and other audio applications.
-
-\end{itemize}
 
 \subsection{Erasing, Loading, and Saving Patches}
 
@@ -388,7 +334,77 @@ A patch is most useful as a Macro if it's been wired up to send and receive modu
 
 Patches have four pieces of auxiliary text information stored in them: a {\it patch name}, a {\it patch author}, a {\it patch date}, a {\it patch version}, and some {\it patch info}.  You can put whatever you like in these four text boxes: just choose {\bf Patch Info...} from the {\bf Play} menu.
 
-A patch doesn't need to have an author, date, version, or info: but it ought to have a name.  This is because if you load a patch as a Macro, the Macro's module will be titled with the patch name so you can tell what it is.  If you save a patch that has no name (yet), {\name} will set the patch name to the filename (minus the extension).
+A patch doesn't need to have an author, date, version, or info: but it ought to have a name.  This is because if you load a patch as a Macro, the Macro's module will be titled with the patch name.  If you save a patch that has no name (yet), {\name} will set the patch name to the filename (minus the extension).
+
+\subsection{Connecting to a Digital Audio Workstation}
+\label{connecting}
+
+The primary challenge to connecting Flow to a DAW is that both Flow and your DAW are designed to connect to {\it MIDI Devices} and {\it Audio Devices}, yet neither of them {\it is} a MIDI or Audio Device!  Thus neither of them can connect to each other!  This is a stupid mistake in how MIDI and Audio routing is implemented in operating systems, but there you have it.
+
+To get Flow and a DAW to send MIDI and Audio data to each other, you need to create a {\it MIDI Loopback} device and an {\it Audio Loopback} device.  A Loopback device is a tunnel which presents itself as a device at each end: by connecting an application at one end and an application at the other end, each thinks it's talking to a device, but in fact they are talking to each other.
+
+The problem with loopback devices is that they are slow: they introduce a great deal of latency both in MIDI and audio.  This is the biggest problem with using Flow with a DAW.  Flow has certain features which help mitigate this.  
+
+\paragraph{Routing MIDI from a Digital Audio Workstation}
+
+\begin{wrapfigure}{r}{3in}
+\vspace{-2em}
+\begin{center}\includegraphics[width=3in]{loopbackmidi}\end{center}
+\vspace{-1em}
+\caption{A MIDI loopback connecting a Digital Audio Workstation to {\name}.  Compare to Figure~\ref{loopbackaudio}.}\label{loopbackmidi}
+\end{wrapfigure}
+
+To enable your DAW to send MIDI to Flow, you need to make a {\it MIDI loopback}.  This is where you create two {\it virtual devices} which are connected to one another.  {\name} and your DAW can both see these devices.  Consider Figure~\ref{loopbackmidi}.  If your DAW outputs to Virtual Device X (say) and {\name} is set up to {\it input} from Virtual Device X, then it will receive what the DAW outputs.
+
+Making a MIDI loopback device varies depending on your operating system:
+
+\begin{itemize}
+\item {\bf On the Mac}\quad First, open the application \textsf{/Applications/Utilities/Audio MIDI Setup}.  Next, click on the ``IAC Driver'' icon to open the ``IAC Driver Properties'' window.  Add a new port, named whatever you like (I named mine ``From Ableton'').  Check the box ``Device is Online''.  This new port will appear to your DAW and to {\name} as the loopback device.
+
+\item {\bf On Windows}\quad There is no way to do this in Windows directly: instead you'll need to run a program which provides this service.  Programs include {\sf loopMIDI},  {\sf loopBe1}, MIDIOx's {\sf MidiYoke}, and so on.  Googling for ``loopback MIDI Windows'' will get you there. 
+
+\item {\bf On Linux}\quad In most flavors of Linux, to get virtual devices running you'll first need to type the command \hbox{\tt sudo modprobe snd-virmidi} and then type in your password.  \quad If you're using something like Gentoo or any other distro that does not come with this kernel module, you'll need to custom compile your kernel to get it. 
+
+This procedure will create a bunch of of virtual devices with names like {\tt VirMIDI [hw:2,0,0]} or {\tt VirMIDI [hw:2,1,8]}.  Select a device whose third number is 0 (such as {\tt VirMIDI [hw:2,0,0]} or {\tt VirMIDI [hw:3,1,0]}, but not {\tt VirMIDI [hw:2,1,1]}).  Have the DAW send to this device and have {\name} listen from the same device.
+\end{itemize}
+
+\paragraph{Routing Audio from a Digital Audio Workstation}
+
+\begin{wrapfigure}{r}{3in}
+\begin{center}\vspace{-2em}\includegraphics[width=3in]{loopbackaudio}\end{center}
+\vspace{-1em}
+\caption{An Audio loopback connecting {\name} to a Digital Audio Workstation.  Compare to Figure~\ref{loopbackmidi}.}\label{loopbackaudio}
+\end{wrapfigure}
+
+To send audio from Flow to your DAW to be recorded, you'll need a loopback device for audio similar to the one for MIDI.   Once again how you'd make an Audio Loopback device depends on your operating system:
+
+\begin{itemize}
+\item {\bf On the Mac}\quad Unlike for MIDI, there's no built-in audio loopback facility on the Mac.  You'll need to install a program which does audio loopbacks.  There is an open-source driver called {\it SoundFlower}\footnote{https:/\!/github.com/mattingalls/Soundflower/releases/\qquad Note that the GUI installer fails on High Sierra even if you have given permission per the instructions on the website.  But installing via the Terminal seems to work.  Do the following:
+
+\begin{enumerate}
+\item Unpack the {\tt Soundflower-2.0b2.dmg} disk image.
+\item In the terminal, type:
+\begin{tabbing}
+~\hspace{5em}{\tt cd /Volumes/Soundflower-2.0b2}\hspace{2in}\= {\it Then press RETURN}\\
+~\hspace{5em}{\tt sudo installer -pkg Soundflower.pkg -target /}\>{\it Then press RETURN}
+\end{tabbing}
+\item Enter your password and press RETURN.
+\item When you're told that this has failed, go to ``Security and Privacy'' in System Preferences, and permit the software to load.  You may need to click "Allow...", then select ``MATT INGALLS'' (he's the developer) in the list and approve it.  Then do steps 2 and 3 again.
+\item Wait a long time.  It takes quite a while to install for no good reason.
+\item At this point, SoundFlower 2ch and 64ch will appear as audio devices.  You want SoundFlower 2ch.  You can configure it further in Audio MIDI Setup if you like, or just use it straight.
+\end{enumerate}
+}
+which seems to work fine though with high latency.  If you'd like support and a better user experience, I recommend the commercial product {\it Loopback} by Rogue Amoeba.\footnote{https:/\!/rogueamoeba.com/loopback/}  It works very well, and if you're poor you can try it in unfettered trial mode for about 20 minutes, quit it, and start it again for another 20, etc.   There are also various tools built around the {\it Jack} framework: but Jack seems to be break all Java Audio applications: you won't be able to run {\name} at all after installing Jack.  And furthermore, Jack's {\it uninstaller} is seriously broken: it doesn't remove the necessary files and you'll be permanently unable to run anything that needs Java Audio (including {\name}).  {\color{red}\bf Do not install Jack on OS X.}  You will regret it.\footnote{In fact, after I reported this, Jack's administrators seem to be leaning towards eliminating Jack on OS X entirely.  Oh well.  If you screwed up and installed Jack on OS X, the following URL contains a list of all the files you'll need to remove manually (as administrator): https:/\!/github.com/jackaudio/jack2/issues/379}
+
+\end{itemize}
+
+\begin{itemize}
+\item {\bf On Windows}\quad I can't help you here.  I'm sure there's many ways to do this, but I don't know them.
+
+\item {\bf On Linux}\quad You'll want to use Jack 2 and Cadence. A good solution with minimal friction is to enable the ALSA and Pulseaudio bridges from within the Cadence GUI. Set the buffer size for your sound card in Cadence to something small, like 128 samples (ideally, the smallest you can get it without glitches): this allows you to minimize the application buffer size, reducing latency. After running Cadence and starting the jack daemon, run flow and set the sound output to the jack bridge in Pulseaudio via Pavucontrol (or an equivalent audio configurator). This will allow you to route audio from Pulseaudio into jack, which will most likely be able to interface with your DAW and other audio applications.
+
+\end{itemize}
+
 
 \begin{figure}[t]
 \begin{center}\includegraphics[width=6.5in]{subpatches}\end{center}
@@ -397,17 +413,14 @@ A patch doesn't need to have an author, date, version, or info: but it ought to 
 \label{subpatches}
 \end{figure}
 
-
-\subsection{Multitimbral Patches}
+\subsubsection{Multitimbral Patches}
 \label{multitimbral}
 
 Flow can be set up to play more than one patch at a time. This is particularly useful because Flow is a very computationally costly: if you have attached Flow to a DAW and you want to play more than one Flow patch through the DAW, you'd probably rather not run multiple copies of the application, each tuned with a small number of voices.
 
-In most synthesizers, a multitimbral patch is different from a single patch.  You'd make a bunch of single patches, then make one multitimbral patch which combines them.  Flow's multitmbral patch model is different.  In Flow, you load a single patch, then you attach one or more additional single patches to it as {\bf subpatches}.  The original patch is known as the {\bf primary patch}.  You can save this combined patch out to a standard file and load it again.  An example of a primary patch and three subpatches is shown in Figure~\ref{subpatches}.
+In most synthesizers, a multitimbral patch is different from a ``single'' (one-sound) patch.  In synthesizers like this, you'd make a bunch of single patches, then make one multitimbral patch which references all of them.  Flow's multitmbral patch model is different.  In Flow, you load a single patch, which we'll call the {\it primary patch}, then you attach one or more additional single patches to it as {\it subpatches}.  You can save this combined bundle of patches out to a standard file and load it again.  An example of a primary patch and three subpatches is shown in Figure~\ref{subpatches}.
 
-Subpatches are added to the primary patch by choosing {\it Load Subpatch...} in the {\it File} menu.  You can remove a subpatch by clicking on its close box, just like removing a module.  You can also drag subpatches to reorder them relative to one another, just like modules.
-
-Only the primary patch can be edited: the subpatches will appear as thin rows beneath its modules.  For each subpatch you can make the following settings:
+Subpatches are added to the primary patch by choosing {\bf Load Subpatch...} in the {\bf File} menu.  Only the primary patch can be edited: the subpatches will appear as thin rows beneath its modules.  For each subpatch you can make the following settings:
 
 \begin{itemize}
 \item {\bf Voices Requested}\quad Here you stipulate how many voices you'd like to allocate to this subpatch.  Voices allocated to a subpatch are taken out of voices available to the main patch. 
@@ -428,24 +441,63 @@ Thus if you have chosen MPE Upper Zone with \(n\) channels, you want your subpat
 
 If you have instead chosen the MPE Upper Zone with \(n\) channels, then the MPE Global Channel is 16 and the MPE channels go down from there, that is, they're assigned to \(16 - n\ ...\ 15\). Once again, you want your subpatches to stay out of this region, so you'd assign to subpatches channels in the region \(1\ ...\ 16 - n - 1\).  For example, if you have 3 subpatches, you might once again set up MPE Upper Zone with \(n=12\) (so MPE needs channels \(4\ ...\ 16\)), and then use channels 1, 2, and 3 for the subpatches.
 
-Subpatches cannot use MPE, nor can the be assigned to ``Any Channel''.  Only the primary patch can.
+Subpatches cannot use MPE, nor can they be assigned to ``Any Channel''.  Only the primary patch can.
 
-\item {\bf Gain}\quad This sets the overall volume of the subpatch in the final mix.  This is exactly the same as the {\it Gain} knob on the {\bf Out} module of the primary patch, discussed later in Section~\ref{outmodule}.  And in fact, the Gain knob can be modulated: if your subpatch was originally modulating its Gain knob before you loaded it as a subpatch, it will {\it continue} to modulate the gain, overriding the setting you make here.  In general it's probably not  wise to modulate the Gain knob.
+\item {\bf MIDI Note}\quad You can restrict a sound to only respond to a given note: any other notes on the MIDI channel will be passed on to later sounds.
 
-If you want to change the overall gain of the primary patch and all the subpatches, you can do this by changing the {\it Master Gain} option in {\bf MIDI and Audio Preferences}. 
+\item {\bf Gain}\quad This sets the overall volume of the subpatch in the final mix.  This is exactly the same as the {\it Gain} knob on the {\bf Out} module of the primary patch, mentioned earlier in Section~\ref{playingapatch}.  And in fact, the Gain knob can be modulated: if your subpatch was originally modulating its Gain knob before you loaded it as a subpatch, it will {\it continue} to modulate the gain, overriding the setting you make here.  In general it's probably not  wise to modulate the Gain knob.
+
+If you want to change the overall gain of the primary patch and all the subpatches, you can do this by changing the {\it Master Gain} option in {\bf MIDI and Audio Preferences}.   Note that Master Gain is not saved with patches and is reset when you restart Flow.
+
+\item {\bf Rename}\quad You can rename the subpatch name.
 \end{itemize}
 
 Flow mixes the primary patch and subpatch voices as follows: each voice is amplified according to its the gain of its patch or subpatch, and then the voices are added together.  Finally all the voices are pushed through the reverb.  This means that {\bf reverb is global}: the settings you make in the primary patch will affect all voices, even ones in subpatches.  We may change that in the future.
 
-\paragraph{Loading and Clearing Just the Primary Patch}  Obviously you could load a new primary patch or clear it by choosing {\it Load Patch...} or {\it New Patch}: but this will clear out the subpatches as well.  There are times when you'd just like to replace the primary patch but keep the existing subpatches around.
+You can remove a subpatch by clicking on its close box, just like removing a module.  You can also drag subpatches to reorder them relative to one another, just like modules.
+
+\paragraph{Changing Patch Order}
+
+As mentioned before, the order of the subpatches affects which patches get allocated voices and priority over MIDI channels.  You change this order by dragging the titlebar of a subpatch and dropping it before or after another subpatch.
+
+If you drag the titlebar of a subpatch clear into the region of the {\it primary patch}, it will {\it swap} the subpatch with the primary patch.  Flow will try its best to swap the allocated number of voices and the MIDI channel of the primary and subpatches as well; and reverb (which is global) will be preserved from the previous primary patch.  MIDI has some caveats however.  First, only the Primary patch can perform MPE: so if you are swapping a primary patch that uses MPE, when it becomes a subpatch its MIDI channel will become ``No Channel''.  Similarly, only subpatches can have ``No Channel'' as a MIDI channel option,\footnote{This may change in the future.} so if one of them is swapped to a primary path, its MIDI channel will change to ``All Channels''.
+
+\paragraph{Loading and Clearing the Primary Patch}  Obviously you could load a new primary patch or clear it by choosing {\it Load Patch...} or {\it New Patch}: but this will clear out the subpatches as well.  There are times when you'd just like to replace the primary patch but keep the existing subpatches around.
 
 If you choose {\it New Primary Patch}, you will clear the primary patch but not the subpatches.  You'll be asked if you wanted to optionally {\it demote} the primary patch, that is, to make it a subpatch rather than eliminate it. 
 
 Similarly, if you choose {\it Load Primary Patch...}, you will load a new primary patch, replacing the original, but will keep the subpatches.  You will likewise be asked if you would like to optionally {\it demote} the primary patch just as before.
 
-\paragraph{Strategy}  I am an old-school synthesizer guy: I tend to use my DAW to automate all my hardware synthesizers, then mix them in analog and record the final result.  I will use Flow's multitmbral patches to follow a similar strategy as follows.  I lay down each track on a different MIDI channel, targeting a different subpatch, and listen to all of them together.  I need more polyphony than my computer can provide, I will (temporarily) reduce the number of partials.  Then I will either play the final result directly into the DAW to record it (if I didn't have to reduce the number of partials), or increase the partials again and record each patch separately and mix the final result in the DAW.
+\subsubsection{Digital Audio Workstation Integration Strategies}
 
-\bump
+Here's a common scenario.  You have recorded MIDI for several tracks in your DAW, and you're currently recording MIDI for a new track while playing the old ones.  This new track is connected to Flow's Primary Patch, while the several old tracks are connected to subpatches.  When you have finished recording the new track, you load a new patch into Flow's Primary Patch, demoting the current Primary Patch to a subpatch, and you begin anew.
+
+To do this, you'd assign each subpatch a unique MIDI channel.  The Primary patch also gets its own MIDI channel.  Your keyboard is connected to the DAW's recording track, and the DAW is rerouting it to the primary patch's MIDI.  Flow's sound output is connected to the DAW in anticipation of eventually recording the audio: for now the DAW is just routing it to the speakers.
+
+\paragraph{Latency} There is a big problem with this scenaro: very high latency.  Your MIDI keyboard is routed to the DAW, which is then {\it rerouting} it to Flow, which is then sending audio to the DAW, which is then {\it rerouting} the audio to your speakers.
+
+We can reduce the MIDI latency by eliminating the rerouting: the DAW doesn't reroute the keyboard to Flow, but only records it into the track.  Instead, we set up the keyboard as a {\it second MIDI device} in Flow: it's going directly to Flow's Primary patch.  The DAW is also sending MIDI to Flow (for the subpatches).  To do this, you can set the keyboard as the {\bf Aux MIDI Device} in the {\bf MIDI and Audio Options} window.  Make sure that the DAW isn't routing the keyboard to Flow as well or you'll get two copies of the same MIDI data.
+
+The best way to reduce the Audio latency is to not send audio to the DAW until you absolutely have to (to record an audio track).  Instead, just have Flow play directly to your speakers.
+
+\paragraph{Computational Cost} Flow uses a lot of CPU.   {\it A lot of CPU.}   Your objective is to eek out as many voices as possible to make your song before it begins to glitch.  I can usually get 20--24 voices on my laptop.  How is this done?
+
+\begin{itemize}
+\item Turn off Flow's display.  That saves a lot.
+\item For each subpatch, reduce the voices requested to the minimum number needed before you hear the artifacts of voice stealing. 
+\item If necessary, temporarily reduce the number of partials being used while recording and editing the MIDI in tracks.  Then bring the partials up to (say) 256 for the final audio recording.  This is an extreme measure but it works, especially in combination with...
+\item You can significantly increase the audio buffer size in the final recording, which will reduce glitching by quite a lot even with 256 partials and a maxed-out voice count: the downside is heavily increased latency, but that wouldn't matter for the final audio recording and can be shifted in post.
+\item Keep in mind that some patches are much more costly per-voice than others.
+\end{itemize}
+
+\paragraph{Minimizing Tracks} I am cheap and don't own a full-fledge copy of Abelton: I just have Ableton Live Lite.  The problem with this is that I am restricted to 8 tracks total, including the audio track (I record multiple MIDI tracks, then play them together with subpatches and record a final audio track).  This means that I can have at most 7 MIDI channels going into Flow.  How then can I play (say) 12 different sounds?
+
+It's often the case that many of my sounds are percussion.  Percussion sounds are typically played with a single note each\,---\,indeed it doesn't matter what the note is because I use the {\bf Fix} module (Section~\ref{specialmodules}) to force them to play at a certain pitch anyway.  For this reason, I often assign each percussion sound to a certain note: the bass kick to C4, the high hat to C5, etc., and have them all recorded like a drumset on a single track.
+
+Flow can handle this without any difficulty: each percussion subpatch has the exact same MIDI channel, but is assigned a different   note via the subpatch's {\bf MIDI Note} restriction.  The kick gets assigned to C6 etc.\footnote{Note that Ableton's octaves go from -2 to 8 in old Yamaha tradition, while Flow's go from 0 to 10.  I just add 2 to convert to Flow.}  This lets me play multiple Flow percussion sounds from a single track!
+
+\paragraph{Gain} At the end of the day I can get my whole song to play without glitching, but it still clips here and there.  Rather than go through and adjust the gain of each subpatch separately, I just pull down the master gain (see the {\bf MIDI and Audio Options} window).     Note that Master Gain is not saved with patches and is reset when you restart Flow.
+
 \section{The Modules}
 
 The Modules are divided into five categories:
@@ -455,7 +507,7 @@ The Modules are divided into five categories:
 \item {\bf Modulation Shapers}\quad Are meant to modify modulation information.  Example: a module which takes an incoming signal and does a Sample and Hold on it.
 \item {\bf Partials Sources}\quad Are meant to be sources of, well, partials.  Example: a sawtooth wave.
 \item {\bf Partials Shapers}\quad Are meant to modify partials, producing new ones.  Example: a low pass filter.
-\item {\bf Special}\quad Various system modules, such as In, Out, Choice, and Macro.  Just because these are at the end doesn't mean they're not important (they're probably the {\it most} important, so don't skip them!).
+\item {\bf Special}\quad Various system modules, such as In, Out, Choice, Fix, Note, and Macro.  Just because these are at the end doesn't mean they're not important (they're probably the {\it most} important!).
 \end{itemize}
 
 \subsection{Modulation Sources}
@@ -778,8 +830,9 @@ Partial Filter can be set to be {\it Relative}.  When relative, the partials are
 \paragraph{VCA} This is just what it says on the tin: an amplifier (VCA is the classic term).  A VCA is very commonly used in conjunction with an envelope.  It takes an input and multiplies all of its amplitudes by {\it mod} (which goes 0--1), then by {\it scale} (which goes 0--8).  The {\it mod} modulation is designed for you to attach LFOs or envelopes etc.  The {\it scale} modulation is not linear and so is just meant for you to dial in a maximum scale value.   The VCA also sports a {\it bass boost} meant to, well, boost lower partials.  It's very simplistic: at maximum boost, partials of frequency 0 are boosted \(2\times\), and partials at Nyquist are boosted \(0\times\).  Partials in-between are boosted in linear proportion to their position between these two extremes.  
 
 \subsection{Special Modules}
+\label{specialmodules}
 
-There are currently four special modules: {\bf In}, {\bf Out}, {\bf Choice}, {\bf Note}, and {\bf Macro}.  The {\bf Out} module is critical in every patch, and is discussed below in Section~\ref{outmodule}.  {\bf In} and {\bf Macro} enable {\it macros}\.---\,and {\bf Out} helps out here as well\,---\,as discussed below in Sectino~\ref{creatingmacros}.
+There are currently five special modules: {\bf In}, {\bf Out}, {\bf Choice}, {\bf Fix}, {\bf Note}, and {\bf Macro}.  The {\bf Out} module is critical in every patch, and is discussed below in Section~\ref{outmodule}.  {\bf In} and {\bf Macro} enable {\it macros}\.---\,and {\bf Out} helps out here as well\,---\,as discussed below in Sectino~\ref{creatingmacros}.
 
 \paragraph{Choice}  The Choice module is an odd duck: it doesn't produce any sounds or modulation at all.  Instead, it enables you to change a module's checkboxes and comboboxes using a modulation signal.  To do this, note that Choice has a modulation input and a sound input port both called {\bf Target}.   Plug one of your target module's modulation or sound outputs into the appropriate Target port: this tells Choice what target module it should be modifying.  Don't attach to both of them, or Choice will just use the sound input port.
 
@@ -787,16 +840,20 @@ After this is done, you will find you can select an option (a combobox or a chec
 
 Note that when you change the value, it's not immediately reflected (or reflected at all!) in the target module's GUI.  This is because updating the GUI in real time could be very costly.  But it's been change!  You can convince yourself of this by dragging the module and moving it.  Similarly, if you click on the option combo box or check box, the result is not directly reflected in the Option dial.
 
-\paragraph{Note} This module doesn't process sound at all. Instead, it lets you leave a note or comment.  You can change the width of the Note panel with two arrow-like buttons at the bottom.   You can have as many Note modules as you like; they'll each save their comments independently as part of your patch.
+\paragraph{Note} This module also doesn't process sound at all. Instead, it lets you leave a note or comment.  You can change the width of the Note panel with two arrow-like buttons at the bottom.   You can have as many Note modules as you like; they'll each save their comments independently as part of your patch.
+
+\paragraph{Fix} This module likewise doesn't process any sound.  Instead, it lets you fix the note (pitch) being played, and/or the velocity being played, to specific values.  After Fix is called, it changes the pitch and volume, and all later modules will use the new ones: thus you want Fix early in your modules, ideally the very first one.  I use Fix in percussion patches to force the patches to always make the same pitched sound regardless of the note being played.
 
 \subsubsection{The \textit{Out} Module in Basic Use}  
 \label{outmodule}
 
-Every useful patch has to have an Out module, since it provides the facility for outputting your final partials to the audio system.  Out does three important basic things:
+Every useful patch has to have an Out module, since it provides the facility for outputting your final partials to the audio system.  Out does several important basic things:
 
 \paragraph{Audio Generation}  Out is responsible for converting your partials into sound.  To do this, connect your final partials to the port on Out normally labelled {\bf A}: it's the topmost port in the module.  You can adjust the volume of this port by changing the {\it Gain} knob.
 
 \paragraph{Reverb} Flow sports a simple implementation of the Freeverb algorithm.\footnote{A well regarded reverb algorithm in the public domain by ``Jezar at Dreampoint''.}  This algorithm has three parameters.  {\it Wet} is the dry/wet knob for the algorithm (0 is fully dry).  {\it Damp} is the damping: basically a low-pass filter applied to the reflected signals.  {\it Size} is the room size, which translates roughly into the reverb decay.  Note only a single sound (voice \#0) controls the modulation of Wet, Damp, and Size.  This means that if you attach an Envelope etc. to any of these modules, it may not respond in exactly the way you think.  It's probably best to keep them as knobs rather than attaching a modulation source.
+
+\paragraph{Dephase} By default Flow keeps all of its partials consistent with their original phases, so when you output a Sawtooth it'll look like this:  \smash{\raisebox{-0.5em}{\includegraphics[trim=1cm 1cm 1cm 8cm, clip=true, width=1in, height=0.15in]{Saw1}}}\quad However this may sound too buzzy in low pitch sounds, so selecting this button will cause Flow to add a specific fixed set of random values to the phases of its partials.  This might change the Sawtooth wave to look like this \smash{\raisebox{-0.5em}{\includegraphics[trim=1cm 1cm 1cm 8cm, clip=true,width=1in, height=0.15in]{Saw2}}}\quad This sure doesn't {\it look} like a Sawtooth wave, but if you play it in the high- and mid- pitch notes, you'll find it {\it sounds} exactly the same!  For low-frequency notes the randomly-phased Sawtooth will sound less buzzy; you may or may not prefer this.  It {\it is} the case that randomly-phased sounds give Flow the opportunity to do some tricks which reduce computational cost by a bit.
 
 \paragraph{Partials Visualization}  When you connect to the {\bf A} port, the resulting partials are also displayed on the left partials display in your rack.  The {\bf B} port is also useful for displaying partials (it shows them on the right partials display).  
 
