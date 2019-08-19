@@ -43,6 +43,7 @@ public class Rack extends JPanel
     String patchVersion = null;
     String patchInfo = null;
     boolean addModulesAfter;
+    boolean swapPrimaryWithMIDIVoice;
 
     public static final String[] notes = new String[] { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" };
     
@@ -124,6 +125,7 @@ public class Rack extends JPanel
 
         setPatchName(getPatchName());
         setAddModulesAfter(Prefs.getLastAddModulesAfter());
+        setSwapPrimaryWithMIDIVoice(Prefs.getSwapPrimaryWithMIDIVoice());
 
         if (Style.isMac())
             Mac.setup(this);
@@ -209,6 +211,9 @@ public class Rack extends JPanel
         
     public boolean getAddModulesAfter() { return addModulesAfter; }
     public void setAddModulesAfter(boolean val) { addModulesAfter = val; }
+
+    public boolean getSwapPrimaryWithMIDIVoice() { return swapPrimaryWithMIDIVoice; }
+    public void setSwapPrimaryWithMIDIVoice(boolean val) { swapPrimaryWithMIDIVoice = val; }
         
     public File getPatchFile() { return patchFile; }
     public void setPatchFile(File f) { patchFile = f; }
@@ -1526,8 +1531,8 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 								int index = i + 1;
 								
 								int numSoundsPrimary = output.getNumSounds(Output.PRIMARY_GROUP);
-								int channelPrimary = output.getGroup(Output.PRIMARY_GROUP).getChannel();
-								if (channelPrimary < 0) channelPrimary = Input.CHANNEL_NONE;
+								int channelPrimaryOld = output.getGroup(Output.PRIMARY_GROUP).getChannel();
+								int channelPrimary = (channelPrimaryOld < 0) ? Input.CHANNEL_NONE : channelPrimaryOld;
 								Out out = (Out)(output.getSound(0).getEmits());
 								double wet = out.modulate(Out.MOD_REVERB_WET);
 								double damp = out.modulate(Out.MOD_REVERB_DAMP);
@@ -1542,9 +1547,18 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 								// transfer name (it doesn't come along with the primary group)
 								output.getGroup(index).setPatchName(rack.getPatchName());
 
-								// restore old group's data, since we don't want the new one
-								output.getGroup(index).setNumRequestedSounds(numSoundsPrimary);
-								output.getGroup(index).setChannel(channelPrimary);
+								if (rack.getSwapPrimaryWithMIDIVoice())
+									{
+									// fix sounds and channel
+									output.getGroup(index).setNumRequestedSounds(numSoundsPrimary);
+									output.getGroup(index).setChannel(channelPrimary);
+									}
+								else
+									{
+									// revert sounds and channel
+									output.getGroup(index).setNumRequestedSounds(g.getNumRequestedSounds());
+									output.getGroup(index).setChannel(g.getChannel());
+									}
 								
 								// load the primary group
 								try
@@ -1560,13 +1574,20 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 									ex.printStackTrace(); 
 									}
 
-								// fix channel in new primary group
-								output.getGroup(Output.PRIMARY_GROUP).setBothNotes(g.getMinNote(), g.getMaxNote());
-								int channel = g.getChannel() == Input.CHANNEL_NONE ? Input.CHANNEL_OMNI : g.getChannel();
-								output.getGroup(Output.PRIMARY_GROUP).setChannel(channel);
-								Prefs.setLastChannel(channel);
-								
-								// number of sounds will be automatic since we've already changed the requested sounds above
+								if (rack.getSwapPrimaryWithMIDIVoice())
+									{
+									// fix channel in new primary group
+									output.getGroup(Output.PRIMARY_GROUP).setBothNotes(g.getMinNote(), g.getMaxNote());
+									int channel = g.getChannel() == Input.CHANNEL_NONE ? Input.CHANNEL_OMNI : g.getChannel();
+									output.getGroup(Output.PRIMARY_GROUP).setChannel(channel);
+									Prefs.setLastChannel(channel);
+									// number of sounds will be automatic since we've already changed the requested sounds above
+									}
+								else
+									{
+									output.getGroup(Output.PRIMARY_GROUP).setChannel(channelPrimary);
+									// number of sounds will be automatic since we've already changed the requested sounds above
+									}								
 
 								// fix reverb in new primary group
 								// we do this even if it's not a Constant

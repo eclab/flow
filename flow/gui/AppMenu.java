@@ -1012,6 +1012,23 @@ public class AppMenu
         return addModulesAfter;
         }
 
+    // Produces the Add New Modules At End menu
+    static JMenuItem swapPrimaryMenu(Rack rack)
+        {
+        final JCheckBoxMenuItem swapPrimary = new JCheckBoxMenuItem("Include MIDI/Voice in Swap");
+        swapPrimary.setSelected(Prefs.getSwapPrimaryWithMIDIVoice());
+        rack.setSwapPrimaryWithMIDIVoice(swapPrimary.isSelected());
+        swapPrimary.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+                rack.setSwapPrimaryWithMIDIVoice(swapPrimary.isSelected());
+                Prefs.setSwapPrimaryWithMIDIVoice(swapPrimary.isSelected());
+                }
+            });
+        return swapPrimary;
+        }
+
 
     // Produces the Velocity Sensitive menu
     static JMenuItem velMenu(Rack rack)
@@ -1168,6 +1185,8 @@ public class AppMenu
         menu.add(minDisplayedHarmonic(rack));
         menu.addSeparator();
         menu.add(addModulesAfterMenu(rack));
+		menu.add(swapPrimaryMenu(rack));
+		menu.addSeparator();
         menu.add(setupPatchMenu(rack));
         menu.add(setupTuningMenu(rack));
         return menu;

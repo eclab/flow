@@ -379,6 +379,14 @@ public class Prefs
         return Boolean.parseBoolean(s);         // default is FALSE
         }
 
+    public static void setSwapPrimaryWithMIDIVoice(boolean val) { setLastX("" + val, "SwapPrimaryWithMIDIVoice"); }
+    public static boolean getSwapPrimaryWithMIDIVoice() 
+        { 
+        String s = getLastX("SwapPrimaryWithMIDIVoice"); 
+        if (s == null) return true;
+        if (s.equalsIgnoreCase("false")) return false;
+        return true;							// default is FALSE
+        }
 
     public static void setLastAudioDevice(String audioDevice) { setLastX("" + audioDevice, "AudioDevice"); }
     public static String getLastAudioDevice() 
