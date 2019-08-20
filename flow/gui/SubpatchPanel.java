@@ -79,7 +79,8 @@ public class SubpatchPanel extends JPanel implements Transferable
             gain.setValue((int)(out.getGroup(group).getGain() * GAIN_RESOLUTION * Out.MAX_GAIN));
 
             sounds.setValue(out.getGroup(group).getNumRequestedSounds());
-            System.err.println("->" + (out.getGroup(group).getNumRequestedSounds()));
+            soundsLabel.setText(sounds.getValue() == 0 ? "Off" : "" + sounds.getValue());
+                                
             midi.setValue(out.getGroup(group).getChannel() + 1);
             int min = out.getGroup(group).getMinNote();
             int max = out.getGroup(group).getMaxNote();

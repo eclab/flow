@@ -1012,6 +1012,7 @@ public class AppMenu
         return addModulesAfter;
         }
 
+/*
     // Produces the Add New Modules At End menu
     static JMenuItem swapPrimaryMenu(Rack rack)
         {
@@ -1028,7 +1029,7 @@ public class AppMenu
             });
         return swapPrimary;
         }
-
+*/
 
     // Produces the Velocity Sensitive menu
     static JMenuItem velMenu(Rack rack)
@@ -1185,8 +1186,8 @@ public class AppMenu
         menu.add(minDisplayedHarmonic(rack));
         menu.addSeparator();
         menu.add(addModulesAfterMenu(rack));
-		menu.add(swapPrimaryMenu(rack));
-		menu.addSeparator();
+		//menu.add(swapPrimaryMenu(rack));
+//		menu.addSeparator();
         menu.add(setupPatchMenu(rack));
         menu.add(setupTuningMenu(rack));
         return menu;

@@ -43,7 +43,7 @@ public class Rack extends JPanel
     String patchVersion = null;
     String patchInfo = null;
     boolean addModulesAfter;
-    boolean swapPrimaryWithMIDIVoice;
+//    boolean swapPrimaryWithMIDIVoice;
 
     public static final String[] notes = new String[] { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" };
     
@@ -125,7 +125,7 @@ public class Rack extends JPanel
 
         setPatchName(getPatchName());
         setAddModulesAfter(Prefs.getLastAddModulesAfter());
-        setSwapPrimaryWithMIDIVoice(Prefs.getSwapPrimaryWithMIDIVoice());
+//        setSwapPrimaryWithMIDIVoice(Prefs.getSwapPrimaryWithMIDIVoice());
 
         if (Style.isMac())
             Mac.setup(this);
@@ -212,8 +212,10 @@ public class Rack extends JPanel
     public boolean getAddModulesAfter() { return addModulesAfter; }
     public void setAddModulesAfter(boolean val) { addModulesAfter = val; }
 
+/*
     public boolean getSwapPrimaryWithMIDIVoice() { return swapPrimaryWithMIDIVoice; }
     public void setSwapPrimaryWithMIDIVoice(boolean val) { swapPrimaryWithMIDIVoice = val; }
+*/
         
     public File getPatchFile() { return patchFile; }
     public void setPatchFile(File f) { patchFile = f; }
@@ -1276,7 +1278,7 @@ class ModulePanelTransferHandler extends TransferHandler implements DragSourceMo
             }
         else if (c instanceof SubpatchPanel)                 // can't copy subpatch panels
             {
-            return TransferHandler.MOVE;
+            return TransferHandler.COPY | TransferHandler.MOVE;
             }
         else return TransferHandler.NONE;
         }
@@ -1486,8 +1488,10 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
             int newpos = -2;
             int oldpos = -2;
                         
-            if (dtde.getDropAction() == DnDConstants.ACTION_MOVE)
+            if (dtde.getDropAction() == DnDConstants.ACTION_MOVE || dtde.getDropAction() == DnDConstants.ACTION_COPY)
                 {
+                boolean swap = (dtde.getDropAction() == DnDConstants.ACTION_COPY);
+
                 if (comp instanceof SubpatchPanel)
                     {
                     if (comp == droppedPanel) return;  // no change
@@ -1531,6 +1535,8 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 								int index = i + 1;
 								
 								int numSoundsPrimary = output.getNumSounds(Output.PRIMARY_GROUP);
+								int minNotePrimary = output.getGroup(Output.PRIMARY_GROUP).getMinNote();
+								int maxNotePrimary = output.getGroup(Output.PRIMARY_GROUP).getMaxNote();
 								int channelPrimaryOld = output.getGroup(Output.PRIMARY_GROUP).getChannel();
 								int channelPrimary = (channelPrimaryOld < 0) ? Input.CHANNEL_NONE : channelPrimaryOld;
 								Out out = (Out)(output.getSound(0).getEmits());
@@ -1547,16 +1553,18 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 								// transfer name (it doesn't come along with the primary group)
 								output.getGroup(index).setPatchName(rack.getPatchName());
 
-								if (rack.getSwapPrimaryWithMIDIVoice())
+								if (!swap)
 									{
 									// fix sounds and channel
 									output.getGroup(index).setNumRequestedSounds(numSoundsPrimary);
+									output.getGroup(index).setBothNotes(minNotePrimary, maxNotePrimary);
 									output.getGroup(index).setChannel(channelPrimary);
 									}
 								else
 									{
 									// revert sounds and channel
 									output.getGroup(index).setNumRequestedSounds(g.getNumRequestedSounds());
+									output.getGroup(index).setBothNotes(g.getMinNote(), g.getMaxNote());
 									output.getGroup(index).setChannel(g.getChannel());
 									}
 								
@@ -1574,7 +1582,7 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 									ex.printStackTrace(); 
 									}
 
-								if (rack.getSwapPrimaryWithMIDIVoice())
+								if (!swap)
 									{
 									// fix channel in new primary group
 									output.getGroup(Output.PRIMARY_GROUP).setBothNotes(g.getMinNote(), g.getMaxNote());
@@ -1585,6 +1593,7 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 									}
 								else
 									{
+									output.getGroup(Output.PRIMARY_GROUP).setBothNotes(minNotePrimary, maxNotePrimary);
 									output.getGroup(Output.PRIMARY_GROUP).setChannel(channelPrimary);
 									// number of sounds will be automatic since we've already changed the requested sounds above
 									}								
