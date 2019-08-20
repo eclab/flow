@@ -456,11 +456,17 @@ Flow mixes the primary patch and subpatch voices as follows: each voice is ampli
 
 You can remove a subpatch by clicking on its close box, just like removing a module.  You can also drag subpatches to reorder them relative to one another, just like modules.
 
-\paragraph{Changing Patch Order}
+\paragraph{Changing Subpatch Order}
 
 As mentioned before, the order of the subpatches affects which patches get allocated voices and priority over MIDI channels.  You change this order by dragging the titlebar of a subpatch and dropping it before or after another subpatch.
 
-If you drag the titlebar of a subpatch clear into the region of the {\it primary patch}, it will {\it swap} the subpatch with the primary patch.  Flow will try its best to swap the allocated number of voices and the MIDI channel of the primary and subpatches as well; and reverb (which is global) will be preserved from the previous primary patch.  MIDI has some caveats however.  First, only the Primary patch can perform MPE: so if you are swapping a primary patch that uses MPE, when it becomes a subpatch its MIDI channel will become ``No Channel''.  Similarly, only subpatches can have ``No Channel'' as a MIDI channel option,\footnote{This may change in the future.} so if one of them is swapped to a primary path, its MIDI channel will change to ``All Channels''.
+\paragraph{Swapping a Subpatch with the Primary Patch}
+
+If you drag the titlebar of a subpatch clear into the region of the {\it primary patch}, it will {\bf swap} the subpatch with the primary patch.  Flow will preserve reverb from the previous patch.  This is useful for making a subpatch the the Primary Patch temporarily in order to tweak it.
+
+Swapping the MIDI channel come with some caveats.  First, only the Primary patch can perform MPE: so if you are swapping a primary patch that uses MPE, when it becomes a subpatch its MIDI channel will become ``No Channel''.  Similarly, only subpatches can have ``No Channel'' as a MIDI channel option,\footnote{This may change in the future.} so if one of them is swapped to a primary path, its MIDI channel will change to ``All Channels''.
+
+You can also swap a subpatch with  swap while holding down the Control key (on the Mac, you can also hold the Option key).\footnote{Yes, I know this is the behavior for ``copying'' while drag and drop, and in fact you'll get a copy icon.  But there's no ``alternative drag'' option in Java, so I had to make do.}  This will swap the two patches but the MIDI channel, MIDI Note, and Number of Requested Sounds won't change.  Why would you want to do this?  If you are auditioning a bunch of different sounds, you may have them lined up as subpatches and are dragging them into the primary patch to hear them play a given part (which has its own MIDI channel).
 
 \paragraph{Loading and Clearing the Primary Patch}  Obviously you could load a new primary patch or clear it by choosing {\it Load Patch...} or {\it New Patch}: but this will clear out the subpatches as well.  There are times when you'd just like to replace the primary patch but keep the existing subpatches around.
 
@@ -470,11 +476,11 @@ Similarly, if you choose {\it Load Primary Patch...}, you will load a new primar
 
 \subsubsection{Digital Audio Workstation Integration Strategies}
 
-Here's a common scenario.  You have recorded MIDI for several tracks in your DAW, and you're currently recording MIDI for a new track while playing the old ones.  This new track is connected to Flow's Primary Patch, while the several old tracks are connected to subpatches.  When you have finished recording the new track, you load a new patch into Flow's Primary Patch, demoting the current Primary Patch to a subpatch, and you begin anew.
+Here's a common scenario.  You have so far recorded MIDI for several Flow tracks in your DAW, and you're currently recording MIDI for a new track while playing the old ones.  This new track is connected to Flow's Primary Patch, while the several old tracks are connected to subpatches.  When you have finished recording the new track, you load a new patch into Flow's Primary Patch, demoting the current Primary Patch to a subpatch, and you begin anew.
 
-To do this, you'd assign each subpatch a unique MIDI channel.  The Primary patch also gets its own MIDI channel.  Your keyboard is connected to the DAW's recording track, and the DAW is rerouting it to the primary patch's MIDI.  Flow's sound output is connected to the DAW in anticipation of eventually recording the audio: for now the DAW is just routing it to the speakers.
+To get this scenario working, you assign each Flow subpatch a unique MIDI channel.  The Primary patch also gets its own MIDI channel.  Your keyboard is connected to the DAW's recording track, and the DAW is rerouting its MIDI data to the primary patch in Flow.  Flow's sound output is connected to the DAW in anticipation of eventually recording the audio: for now the DAW is just routing it to the speakers.
 
-\paragraph{Latency} There is a big problem with this scenaro: very high latency.  Your MIDI keyboard is routed to the DAW, which is then {\it rerouting} it to Flow, which is then sending audio to the DAW, which is then {\it rerouting} the audio to your speakers.
+\paragraph{Latency} There is a big problem with this scenaro: high latency.  Your MIDI keyboard is routed to the DAW, which is then {\it rerouting} it to Flow, which is then sending audio to the DAW, which is then {\it rerouting} the audio to your speakers.
 
 We can reduce the MIDI latency by eliminating the rerouting: the DAW doesn't reroute the keyboard to Flow, but only records it into the track.  Instead, we set up the keyboard as a {\it second MIDI device} in Flow: it's going directly to Flow's Primary patch.  The DAW is also sending MIDI to Flow (for the subpatches).  To do this, you can set the keyboard as the {\bf Aux MIDI Device} in the {\bf MIDI and Audio Options} window.  Make sure that the DAW isn't routing the keyboard to Flow as well or you'll get two copies of the same MIDI data.
 
@@ -487,16 +493,19 @@ The best way to reduce the Audio latency is to not send audio to the DAW until y
 \item For each subpatch, reduce the voices requested to the minimum number needed before you hear the artifacts of voice stealing. 
 \item If necessary, temporarily reduce the number of partials being used while recording and editing the MIDI in tracks.  Then bring the partials up to (say) 256 for the final audio recording.  This is an extreme measure but it works, especially in combination with...
 \item You can significantly increase the audio buffer size in the final recording, which will reduce glitching by quite a lot even with 256 partials and a maxed-out voice count: the downside is heavily increased latency, but that wouldn't matter for the final audio recording and can be shifted in post.
-\item Keep in mind that some patches are much more costly per-voice than others.
+\item Keep in mind that some patches are much more costly per-voice than others.  Keep their voice counts minimized.
+\item Shut off other applications: especially web browsers and other CPU-hungry stuff.
 \end{itemize}
 
-\paragraph{Minimizing Tracks} I am cheap and don't own a full-featured copy of Abelton: I just have Ableton Live Lite.  The problem with this is that I am restricted to 8 tracks total, including the audio track (I record multiple MIDI tracks, then play them together with subpatches and record a final audio track).  This means that I can have at most 7 MIDI channels going into Flow.  How then can I play (say) 12 different sounds?
+\paragraph{Compressing Tracks} I am cheap and don't own a full-featured copy of Abelton: I just have Ableton Live Lite.  The problem with this is that I am restricted to 8 tracks total, including the audio track (I record multiple MIDI tracks, then play them together with subpatches and record a final audio track).  This means that I can have at most 7 MIDI channels going into Flow.  How then can I play (say) 12 different sounds?
 
 It's often the case that many of my sounds are percussion.  Percussion sounds are typically played with a single note each\,---\,indeed it doesn't matter what the note is because I use the {\bf Fix} module (Section~\ref{specialmodules}) to force them to play at a certain pitch anyway.  For this reason, I often assign each percussion sound to a certain note: the bass kick to C4, the high hat to C5, etc., and have them all recorded like a drumset on a single track.
 
 Flow can handle this without any difficulty: each percussion subpatch has the exact same MIDI channel, but is assigned a different   note via the subpatch's {\bf MIDI Note} restriction.  The kick gets assigned to C6 etc.\footnote{Note that Ableton's octaves go from -2 to 8 in old Yamaha tradition, while Flow's go from 0 to 10.  I just add 2 to convert to Flow.}  This lets me play multiple Flow percussion sounds from a single track!
 
-\paragraph{Gain} At the end of the day I can get my whole song to play without glitching, but it still clips here and there.  Rather than go through and adjust the gain of each subpatch separately, I just pull down the master gain (see the {\bf MIDI and Audio Options} window).     Note that Master Gain is not saved with patches and is reset when you restart Flow.
+\paragraph{Master Gain} At the end of the day I can get my whole song to play without glitching, but it still clips here and there.  Rather than go through and adjust the gain of each subpatch separately, I just pull down the master gain (see the {\bf MIDI and Audio Options} window).     Note that Master Gain is not saved with patches and is reset when you restart Flow.
+
+\bump
 
 \section{The Modules}
 
@@ -920,12 +929,13 @@ Combine (non-``Half'') works well for many things but not if you're mixing toget
 \vspace{-1em}
 \caption{Core Classes.}
 \vspace{-1em}
-\label{hcpanel}
 \end{wrapfigure}
 
 The architecture behind {\name} is not particularly complex.  The top-level class, of which there is only a single instance, is {\bf Output}. This class is responsible for managing most of the threads in the system and for maintaining the facility which builds and emits samples to Java's audio system.  Output also contains a single {\bf Input} object which manages incoming MIDI data and sends it to the right places.  Input does this by working with {\bf MIDI}, an untidy class borrowed from Edisyn which provides a wrapper facility around Java's midi subsystem.
 
 Critically, Output also contains some \(N\) {\bf Sound} objects, one per voice.  Sound objects are {\it registered} with Output.  Output, and not the Sound objects themselves, handles the spawning of voice threads associated with the Sound objects.  Each Sound object contains some number of {\it modules} which are attached to one another and pass partials or modulation signals to one another.  One module is designated as the module which {\it emits} a final set of partials to the Sound on request: Sounds then hand off their partials to the Output which uses them to produce samples to give to the audio system. 
+
+Each Sound object belongs to a {\bf Group}, and there are up to \(G\) Groups stored in Output.   Each Group is really a patch (the Primary patch or a subpatch), and all Sounds associated with a Group have the same organization of module because the produce the same kind of sound.  Groups have names, MIDI channels, etc.  Each Group also has a user-requested number of voices (Sounds); the number of Sounds allocated to a Group will be no more than this number.  The Primary patch is Group 0, and it always contains at least one Sound (number 0).  Other Groups can have as few as zero Sounds.  You will rarely access a Sound's Group when developing a module.
 
 The top-level abstract superclass for modules is {\bf Modulation}, which designates a module capable of receiving modulation signals from some \(M\) sources, and likewise some \(P\) different modulation signals which other modules may subscribe to.  A Modulation which the user will think of as primarily producing modulations, rather than filtering modulations, may be designated a {\bf ModSource}, which gives it a specific color in the GUI. Examples of ModSources might include LFOs or envelopes; though they do receive modulation (such as LFO's rate), their primary function is to provide modulation.  A Sample and Hold module, which receives an incoming signal and produces a stepped version of the same, would not be a ModSource.
  
@@ -974,17 +984,19 @@ And indeed this is how the Swing event thread (if you have a GUI) interacts with
 \begin{itemize}
 \item {\tt SAMPLING\_RATE}\qquad This value, normally 44100, could of course be reduced (perhaps halved) to improve performance, but at a dramatic cost in sound quality.  I would not do that.
 
-\item {\tt bufferSize}\qquad The size of the sound buffer being fed by the sound output thread.  Java's audio system grabs data from this buffer in fairly random gulps: on the Mac they're 128 bytes at a time and can happen in spurts.  The sound output thread feeds the buffer two bytes (one 16-bit sample) at a time.  If the audio system cannot grab bytes from the buffer without reducing it to zero, then you will hear a {\bf glitch} (an audible pop or zap).  We don't want those.  We fix this by keeping the buffer pretty big.  The disadvantage of a large buffer is that if we have filled it, we're creating latency, and we don't want that either.  At an absolute minimum the buffer must be at least 1024 (the apparent minimum on the Mac to even work properly); but in reality we need it larger than that to prevent glitches.  1536 seems adequate but potentially can make a large latency (about 29 milliseconds worst-case).
+\item {\tt bufferSize}\qquad Specified by the user, by default, {\tt DEFAULT\_BUFFER\_SIZE} \(=1152\). The size of the sound buffer being fed by the sound output thread.  Java's audio system grabs data from this buffer in fairly random gulps: on the Mac they're 128 bytes at a time and can happen in spurts.  The sound output thread feeds the buffer two bytes (one 16-bit sample) at a time.  If the audio system cannot grab bytes from the buffer without reducing it to zero, then you will hear a {\bf glitch} (an audible pop or zap).  We don't want those.  We fix this by keeping the buffer pretty big.  The disadvantage of a large buffer is that if we have filled it, we're creating latency, and we don't want that either.  At an absolute minimum the buffer must be at least 1024 (the apparent minimum on the Mac to even work properly); but in reality we need it larger than that to prevent glitches.  1152 seems adequate but potentially can make a large latency (about 38 milliseconds worst-case).
 
-\item {\tt DEFAULT\_SKIP}\qquad We don't necessarily produce a new set of partials for every single sample; if your computer isn't fast enough, this isn't reasonable.  Instead we generate \(N\) samples for each partials set.  This is the value of {\tt DEFAULT\_SKIP}.  The default value is 32.  Upon receiving a new sample set, the sound output thread linearly interpolates between the previous sample set and the next one over 32 samples.  This also induces a different kind of lag: if you generate a sound, you'll have to wait up to 32 samples before it begins to be produced, and up to 64 samples before it is fully present.  Ideally {\tt skip} would be 1, which would produce the best quality sound, as well as produce true FM synthesis effects.  But there you have it.
+\item {\tt SKIP}\qquad We don't necessarily produce a new set of partials for every single sample; if your computer isn't fast enough, this isn't reasonable.  Instead we generate \(N\) samples for each partials set.  This is the value of {\tt SKIP}.  The default value is 32.  Upon receiving a new sample set, the sound output thread linearly interpolates between the previous sample set and the next one over 32 samples.  This also induces a different kind of lag: if you generate a sound, you'll have to wait up to 32 samples before it begins to be produced, and up to 64 samples before it is fully present.  Ideally {\tt skip} would be 1, which would produce the best quality sound, as well as produce true FM synthesis effects.  But there you have it.
 
-\item {\tt DEFAULT\_INTERPOLATION\_ALPHA}\qquad Because partials don't arrive every sample (see {\tt DEFAULT\_SKIP} above), we'd like to smoothly interpolate between them.  This is done by repeatedly multiplying in a small amount of the new partials amplitudes until they're dominant.  The amount multiplied in is {\tt DEFAULT\_INTERPOLATION\_ALPHA}, by default set to 0.05.  If you set this to a larger value, you'll start hearing pops or hisses when you make abrupt changes in volume in your partials (try a Drawbars patch to test).  But smaller values mean that new changes will take a longer time to take over\,---\,essentially a kind of attack rate.  At 0.05, partials are about 95\% takeover after about 100 samples (roughly three {\tt DEFAULT\_SKIP} intervals), or approximately 2ms, which seems reasonable.  At any rate, if you change {\tt DEFAULT\_SKIP}, this may have an impact on what setting you want to use for {\tt DEFAULT\_INTERPOLATION\_ALPHA} too.
+\item {\tt PARTIALS\_INTERPOLATION\_ALPHA}\qquad Because partials don't arrive every sample (see {\tt DEFAULT\_SKIP} above), we'd like to smoothly interpolate between them.  This is done by repeatedly multiplying in a small amount of the new partials amplitudes until they're dominant.  The amount multiplied in is {\tt PARTIALS\_INTERPOLATION\_ALPHA}, by default set to 0.05.  If you set this to a larger value, you'll start hearing pops or hisses when you make abrupt changes in volume in your partials (try a Drawbars patch to test).  But smaller values mean that new changes will take a longer time to take over\,---\,essentially a kind of attack rate.  At 0.05, partials are about 95\% takeover after about 100 samples (roughly three {\tt DEFAULT\_SKIP} intervals), or approximately 2ms, which seems reasonable.  At any rate, if you change {\tt DEFAULT\_SKIP}, this may have an impact on what setting you want to use for {\tt PARTIALS\_INTERPOLATION\_ALPHA} too.
 
-\item {\tt numVoices}\qquad is the maximum number of voices that the system will generate.  It is by default set to 8.  More voices of course means more computing power required.
+\item {\tt numVoices}\qquad is the maximum number of voices that the system will generate.  Specified by the user, can be no more that {\tt MAX\_VOICES}. It is by default set to {\tt DEFAULT\_NUM\_VOICES} \(=8\).  More voices of course means more computing power required.
 
-\item {\tt voicesPerThread}\qquad If you have a high thread context switching overhead, you can assign more than one voice to a single thread.  For example, if {\tt voicesPerThread} was equal to 2, then you'd have 4 threads handling your 8 voices.  If you don't have 8 cores, you might wish to do this.  However keep in mind that the total number of modules your voice can have is bounded by a single core: if you have two voices on a thread, they will share that core and your total number will be halved.  By default this value is 1.
+\item {\tt numVoicesPerThread}\qquad Specified by the user, by default {\tt DEFAULT\_NUM\_VOICES\_PER\_THREAD} \(=8\).  If you have a high thread context switching overhead, you can assign more than one voice to a single thread.  For example, if {\tt numVoicesPerThread} was equal to 2, then you'd have 4 threads handling your 8 voices.  If you don't have 8 cores, you might wish to do this.  However keep in mind that the total number of modules your voice can have is bounded by a single core: if you have two voices on a thread, they will share that core and your total number will be halved.
 
-\item {\tt NUM\_OUTPUTS\_PER\_THREAD}\qquad Affects the number of output threads generated to convert the partial results into the sound.  Fewer threads, and you've got more work being done by a single processor (which may not be able to take the load); but more threads means more total work given the thread context switching.  By default this is 2, which seems to work well on my laptop.
+\item {\tt numOutputsPerThread}\qquad Specified by the user, by default {\tt DEFAULT\_NUM\_OUTPUTS\_PER\_THREAD} \(=2\).  Affects the number of output threads generated to convert the partial results into the sound.  Fewer threads, and you've got more work being done by a single processor (which may not be able to take the load); but more threads means more total work given the thread context switching.
+
+\item {\tt MINIMUM\_VOLUME}\qquad If a sound is below this value, Flow doesn't bother adding it into the sum, which saves a little bit of CPU.
 
 \end{itemize}
 
@@ -1420,7 +1432,7 @@ Third: you might also change your module, which causes problems when trying to b
 \paragraph{The Current Patch Format}  The format is in GZipped JSON and is as follows:
 
 \begin{itemize}
-\item {\tt \{  "flow":{\it flow-version}, "name":{\it patch-name}, "by":{\it patch-author}, "on":{\it patch-date}, \rule[0in]{0in}{0in}~\hspace{\fill}\hbox{ "info":{\it patch-info}, "v":{\it patch-version},}  "modules":{\it modules} \} }
+\item {\tt \{  "flow":{\it flow-version}, "name":{\it patch-name}, "by":{\it patch-author}, "on":{\it patch-date}, \rule[0in]{0in}{0in}~\hspace{\fill}\hbox{ "info":{\it patch-info}, "v":{\it patch-version},}  "modules":{\it modules}, "sub":{\it optional-subpatches} \} }
 \item {\it flow-version:}\quad an integer \(\geq 0\) indicating the version of Flow which created this file.  Presently 0. 
 \item {\it patch-name:}\quad The name of the patch, as stipulated by the patch creator.  A string. 
 \item {\it patch-author:}\quad The patch creator.  A string.  
@@ -1448,6 +1460,15 @@ Third: you might also change your module, which causes problems when trying to b
 \item {\it unit-input-name:}\quad A unit input name (a string).  Normally this is the same as returned by {\tt getInputName(...)}.
 \item {\it unit-input-value:}\quad{\tt \{ "at":{\it unit-output-name}, "id":{\it id} \}}\qquad The id is for the attached module.
 \item {\it unit-output-name:}\quad A unit output name (a string).  Normally this is the same as returned by {\tt getOutputName(...)}.
+\item {\it optional-subpatches:}\quad {\tt [ {\it subpatch,*} ] }
+\item {\it subpatch:}\quad {\tt \{ "voices":{\it subpatch-voices}, "gain":{\it subpatch-gain}, "note": {\it optional-subpach-note}, \\
+\rule[0in]{0in}{0in}~\hspace{\fill}\hbox{"midi":{\it optional-subpatch-midi-channel},  "flow":{\it flow-version}, "name":{\it patch-name},} \\ 
+\rule[0in]{0in}{0in}~\hspace{\fill}\hbox{"by":{\it patch-author}, "on":{\it patch-date}, "info":{\it patch-info}, "v":{\it patch-version},}
+ "modules":{\it modules} \} }
+\item {\it subpatch-voices:}\quad The requested number of voices (Sounds) for this subpatch (an integer).
+\item {\it subpatch-gain:}\quad The requested gain for this subpatch (a double).
+\item {\it optional-subpatch-midi-channel:}\quad The subpatch's midi channel, 0--16.  0, or missing, means ``No channel''. 
+\item {\it optional-subpatch-midi-channel:}\quad The MIDI note for the subpath, 0--128.  0, or missing, means ``Any note''.  Otherwise the note is the value, minus 1.
 \end{itemize}
 
 \paragraph{Cloning}  One obscure feature of {\name} is that Modulations and Units can not just be {\it moved} in the Rack, but can in fact be {\it copied}.  This is done by holding the Control key (on the Mac, Option also works) while dragging the Module.  This in turn calls the Module's {\tt clone()} method.  You need to override this method to insure that it performs a deep clone.  In many situations you'd need not implement this method at all.  But if your Modulation or Unit is holding an array or perhaps some other object which must be copied, you'll need to implement it like this:
