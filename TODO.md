@@ -105,6 +105,8 @@ Modules
 * Triangle
 * User
 * VCA
+* Waves
+  - What other synths should we include?
 * Wavetable
 
 
