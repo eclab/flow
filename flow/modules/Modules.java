@@ -98,6 +98,7 @@ public class Modules
     flow.modules.Triangle.class,
     flow.modules.User.class,
     flow.modules.VCA.class,
+    flow.modules.Waves.class,
     flow.modules.WaveTable.class,
     };      
     }

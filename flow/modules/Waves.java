@@ -8,19 +8,19 @@ import flow.*;
 import java.util.*;
 
 /**
-   A Unit which generates a wide range of partials derived from pubic domain and factory
-   patches from the Kawai K5.  At present these partials are hard-coded, but in the future
-   they may be loaded specially.
+	This is basically the same class as KHARMONICS, except that the harmonics being
+	loaded are derived from single-cycle waves from the Kawai K3, Ensoniq SQ-80, and 
+	Prophet VS (or possibly Korg Wavestation's interpretation thereof).
 */
 
-public class KHarmonics extends Unit implements UnitSource
+public class Waves extends Unit implements UnitSource
     {
     private static final long serialVersionUID = 1;
 
-    public static final int MAX_HARMONICS = 128;  // regardless of number of partials
-    public static final double MAX_AMPLITUDE = 100.0;  // highest legal amplitude
+    public static final int MAX_HARMONICS = 256;  // regardless of number of partials
+    public static final double MAX_AMPLITUDE = 999.0;  // highest legal amplitude
 
-    public static final int NUM_HARMONICS = 484;
+    public static final int NUM_HARMONICS = 223;
     static final double[][] HARMONICS = new double[NUM_HARMONICS][MAX_HARMONICS];
     static final String[] NAMES = new String[NUM_HARMONICS];
 
@@ -73,7 +73,7 @@ public class KHarmonics extends Unit implements UnitSource
         if (done) return;
         done = true;
         
-        Scanner scan = new Scanner(Harmonics.class.getResourceAsStream("waves/kharmonics.out"), "US-ASCII");
+        Scanner scan = new Scanner(Harmonics.class.getResourceAsStream("waves/waves.out"), "US-ASCII");
         for(int i = 0; i < NUM_HARMONICS; i++)
             {
             NAMES[i] = scan.nextLine();
@@ -124,7 +124,7 @@ public class KHarmonics extends Unit implements UnitSource
             }
         }
                 
-    public KHarmonics(Sound sound) 
+    public Waves(Sound sound) 
         {
         super(sound);
         doStatic();

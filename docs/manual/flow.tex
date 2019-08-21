@@ -656,7 +656,6 @@ In addition to sequencing modulation signals, Seq can also be used in combinatio
 
 \subsection{Partials Sources}
 
-\vbox{
 \paragraph{All}  Outputs all partials, standardized, at full amplitude.  Useful for later shaping.
 
 % --- Bell is not completed yet -- 
@@ -667,7 +666,8 @@ In addition to sequencing modulation signals, Seq can also be used in combinatio
 Draw also allows you to load {\it single-cycle waveforms}, that is, sound files which start and end at zero and represent a single cycle of a sound wave.  You can do this by choosing {\it Load Wave...} from the {\it Menu} button.  These must be WAV files, mono, and cannot be very long (presently at most 2048 samples).  After loading, Flow converts them (naturally) into harmonics.
 
 A good source of single-cycle waves is the AdventureKid Single Cycle Waveforms collection, available at https:/\!/www.adventurekid.se/akrt/waveforms/\quad Flow can read all of these.
-}
+
+See also {\bf Waves}, which contains harmonics of single-cycle waves from certain well-known synthesizers.
 
 \paragraph{Drawbars}   Produces the sine wave equivalents of the drawbars of a classic tone wheel organ.  There are a number of preset options.
 
@@ -698,9 +698,13 @@ A good source of single-cycle waves is the AdventureKid Single Cycle Waveforms c
 
 \paragraph{Triangle}  A triangle wave.  Note that normally triangle waves include negative amplitude harmonics, that is ones with inverted phases.  As {\name} does not produce phases, these harmonics become all positive (you likely won't hear a difference).
 
-%\paragraph{Wave}  A wave from the set of Microwave II/XT waves.  You have the additional option of {\it Normalizing} the partials. Note that Waldorf asked us to not include this data; and although they likely don't hold IP over these, we have elected to do as they wished.  We are looking for public domain wavetables we might use instead. 
+\paragraph{Waves}  A collection of harmonics drawn from single-cycle waves in the Kawai K3, Ensoniq SQ-80, and Sequential Prophet VS.  These are as best as I can do for now\,---\,they may change if my sources improve.  The Kawai K3 harmonics are complete: obviously wave 31 is missing since that's actually the user's additive harmonics space.\footnote{The K3 harmonics are from http:/\!/www.deepsonic.ch/deep/audio\_samples/kawai\_k3\_-\_samples\_-\_33\_waveforms.mp3 by deep!sonic (http:/\!/www.deepsonic.ch)}
 
-%\paragraph{Wavetable}  A wavetable from the set of Microwave II/XT waves with a modulatable position.  Note that Waldorf asked us to not include this data; and although they likely don't hold IP over these, we have elected to do as they wished.  We are looking for public domain wavetables we might use instead.
+The SQ-80 is unusual in that it had different versions of the same wave depending on the octave of the note played on the keyboard (for octaves 1--14).  Thus if you see a wave called {\tt SQ grit 12-13}, this means the harmonics of the ``grit'' wave for octaves 12 and 13.  This collection is incomplete: the original source has a few errors.\footnote{The SQ-80 harmonics are drawn from the waves in http:/\!/www.buchty.net/ensoniq/files/the\_waves.zip by //christian.}
+
+The Prophet VS traditionally had waves 32--127, and these more or less line up with the harmonics provided by Flow: but you'll notice that Flow is missing a few.  The missing harmonics are partly because some of the waves are uninteresting (square waves, silence, etc.) and partly because my source is missing them.\footnote{The Prophet VS harmonics are drawn from https:/\!/www.dropbox.com/sh/ja0tc8wn6cnudzj/AACYqe2mjrWU2CeXIttm6MhOa as discussed in the forum thread http:/\!/www.muffwiggler.com/forum/viewtopic.php?t=33918\&sid=9e0b9554f0ac483b62a88c074c6136c3}
+
+See also {\bf Draw}, which allows you to load single-cycle waves: the manual section on Draw has good suggestions for sources of these waves.
 
 \paragraph{Wavetable}  Lets you load wavetables (as ``.WAV'' files) from https:/\!/waveeditonline.com/, then wander through them using the provided modulation.  You can turn off interpolation between waves.
 
