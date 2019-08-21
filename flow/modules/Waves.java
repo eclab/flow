@@ -20,7 +20,7 @@ public class Waves extends Unit implements UnitSource
     public static final int MAX_HARMONICS = 256;  // regardless of number of partials
     public static final double MAX_AMPLITUDE = 999.0;  // highest legal amplitude
 
-    public static final int NUM_HARMONICS = 223;
+    public static final int NUM_HARMONICS = 145;
     static final double[][] HARMONICS = new double[NUM_HARMONICS][MAX_HARMONICS];
     static final String[] NAMES = new String[NUM_HARMONICS];
 

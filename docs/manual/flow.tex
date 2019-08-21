@@ -673,7 +673,10 @@ See also {\bf Waves}, which contains harmonics of single-cycle waves from certai
 
 \paragraph{Harmonics}  Outputs the first 16 harmonics, whose amplitude you can define independently.  You optionally can load these harmonics from a source. See also {\bf Partials}.
 
-\paragraph{KHarmonics}  Produces a wide range of partials drawn from patches from the Kawai K5 synthesizer, including both factory patches (with Kawai's permission) and various patches in the public domain.  You have the additional option of {\it Normalizing} the partials.
+\paragraph{KHarmonics}  Produces a wide range of partials drawn from patches from the Kawai K5 synthesizer, including both factory patches (with Kawai's permission) and various patches in the public domain.  You have the additional option of {\it Normalizing} the partials.  Note that among the harmonics are ones purporting to be drawn from the Kawai K3.  These are just wrong.  However the {\bf Waves} module has the correct ones.
+
+See also {\bf Waves}, a similar collection drawn from various other synthesizers.
+
 
 %\begin{figure}[t]
 %\begin{center}\includegraphics[width=5.8in]{UnitSources2}\end{center}
@@ -700,11 +703,13 @@ See also {\bf Waves}, which contains harmonics of single-cycle waves from certai
 
 \paragraph{Waves}  A collection of harmonics drawn from single-cycle waves in the Kawai K3, Ensoniq SQ-80, and Sequential Prophet VS.  These are as best as I can do for now\,---\,they may change if my sources improve.  The Kawai K3 harmonics are complete: obviously wave 31 is missing since that's actually the user's additive harmonics space.\footnote{The K3 harmonics are from http:/\!/www.deepsonic.ch/deep/audio\_samples/kawai\_k3\_-\_samples\_-\_33\_waveforms.mp3 by deep!sonic (http:/\!/www.deepsonic.ch)}
 
-The SQ-80 is unusual in that it had different versions of the same wave depending on the octave of the note played on the keyboard (for octaves 1--14).  Thus if you see a wave called {\tt SQ grit 12-13}, this means the harmonics of the ``grit'' wave for octaves 12 and 13.  This collection is incomplete: the original source has a few errors.\footnote{The SQ-80 harmonics are drawn from the waves in http:/\!/www.buchty.net/ensoniq/files/the\_waves.zip by //christian.}
+The SQ-80 is unusual in that it had different oversampled versions of the same wave depending on the octave of the note played on the keyboard.  The harmonics here are taken from the lowest octaves (with the most harmonics).  This collection is incomplete: the original source had some errors.\footnote{The SQ-80 harmonics are drawn from the waves in http:/\!/www.buchty.net/ensoniq/files/the\_waves.zip by //christian.}
 
-The Prophet VS traditionally had waves 32--127, and these more or less line up with the harmonics provided by Flow: but you'll notice that Flow is missing a few.  The missing harmonics are partly because some of the waves are uninteresting (square waves, silence, etc.) and partly because my source is missing them.\footnote{The Prophet VS harmonics are drawn from https:/\!/www.dropbox.com/sh/ja0tc8wn6cnudzj/AACYqe2mjrWU2CeXIttm6MhOa as discussed in the forum thread http:/\!/www.muffwiggler.com/forum/viewtopic.php?t=33918\&sid=9e0b9554f0ac483b62a88c074c6136c3}
+The Prophet VS traditionally had waves 32--127, and these more or less line up with the harmonics provided by Flow: but you'll notice that Flow is missing a few because the original source is missing them.  Some, but not all, of the missing waves don't matter.\footnote{The Prophet VS harmonics are drawn from https:/\!/www.dropbox.com/sh/ja0tc8wn6cnudzj/AACYqe2mjrWU2CeXIttm6MhOa as discussed in the forum thread http:/\!/www.muffwiggler.com/forum/viewtopic.php?t=33918\&sid=9e0b9554f0ac483b62a88c074c6136c3}
 
 See also {\bf Draw}, which allows you to load single-cycle waves: the manual section on Draw has good suggestions for sources of these waves.
+
+See also {\bf KHarmonics}, a similar collection drawn from various Kawai K5 harmonics.
 
 \paragraph{Wavetable}  Lets you load wavetables (as ``.WAV'' files) from https:/\!/waveeditonline.com/, then wander through them using the provided modulation.  You can turn off interpolation between waves.
 
