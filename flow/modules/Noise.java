@@ -81,16 +81,16 @@ public class Noise extends Unit implements UnitSource
     public void generateRandomVals(double[] freq, int start, int n, Random random)
         {
         /*
-        for(int i = start; i < start + n; i++)
-        	{
-        	freq[i] = random.nextDouble();
-        	}
-        Arrays.sort(freq, start, start + n);
+          for(int i = start; i < start + n; i++)
+          {
+          freq[i] = random.nextDouble();
+          }
+          Arrays.sort(freq, start, start + n);
         */
         
-    // from Bentley, "Generating Sorted Lists of Random Numbers"
-    // You'd presume this is faster than an O(n lg n ) sort, but it's basically
-    // identical in speed due to the calls to log.
+        // from Bentley, "Generating Sorted Lists of Random Numbers"
+        // You'd presume this is faster than an O(n lg n ) sort, but it's basically
+        // identical in speed due to the calls to log.
         double sum = 0;
         for(int i = start; i < start + n; i++)
             {

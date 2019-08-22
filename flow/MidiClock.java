@@ -105,7 +105,7 @@ public class MidiClock
     public static final int UNPAUSED = 5;
     int state;
 
-	// our estimated rate in TICKS PER PULSE
+    // our estimated rate in TICKS PER PULSE
     double rateEstimate;
     double currentPulseRealTick;
     double smoothedMidiTickTarget;

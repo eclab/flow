@@ -76,7 +76,7 @@ public class Input
         for(int i = 0; i < devs.size(); i++)
             {
             if (devs.get(i).toString().equals(midiDevice2) &&
-            	devs.get(i) != wrap)	// can't be the same as device #1
+                devs.get(i) != wrap)    // can't be the same as device #1
                 { wrap2 = devs.get(i); break; }
             }
             
@@ -151,7 +151,7 @@ public class Input
      * Sets MIDI to the new device wrapper and channel.
      */
     public void setupMIDI(int primaryChannel, int numMPEChannels, Midi.MidiDeviceWrapper midiDeviceWrapper,
-    	Midi.MidiDeviceWrapper midiDeviceWrapper2)
+        Midi.MidiDeviceWrapper midiDeviceWrapper2)
         {
         // set up device
         midi.setInReceiver(midiDeviceWrapper);
@@ -160,7 +160,7 @@ public class Input
         midi.setInReceiver2(midiDeviceWrapper2);
         currentWrapper2 = midiDeviceWrapper2;
 
-		primaryGroup().setChannel(primaryChannel);
+        primaryGroup().setChannel(primaryChannel);
 
         // clear mpe channels
         this.numMPEChannels = numMPEChannels;
@@ -668,7 +668,7 @@ public class Input
                 }
             else
                 {                
-               // look through notesOff first
+                // look through notesOff first
                 for(int j = notesOff.size() - 1; j >= 0; j--)
                     {
                     Sound s = notesOff.get(j);

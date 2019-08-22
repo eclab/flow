@@ -218,11 +218,11 @@ public class SubpatchPanel extends JPanel implements Transferable
     protected JComponent buildPanel()
         {        
         JPanel pane = new JPanel();
-        	
+                
         pane.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
-		
+                
         JLabel sacrificialLabel = new JLabel("8.88");
         sacrificialLabel.setFont(Style.SMALL_FONT());
         final int titleWidth = (int)sacrificialLabel.getPreferredSize().getWidth();
@@ -246,7 +246,7 @@ public class SubpatchPanel extends JPanel implements Transferable
             public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         soundsLabel.setFont(Style.SMALL_FONT());
-        sounds = new JSlider(0, rack.getOutput().getNumSounds() - 1);		// we need to leave one sound for the primary
+        sounds = new JSlider(0, rack.getOutput().getNumSounds() - 1);           // we need to leave one sound for the primary
         sounds.setSnapToTicks(true);
         sounds.setBorder(null);
         sounds.putClientProperty( "JComponent.sizeVariant", "small" );
@@ -290,22 +290,22 @@ public class SubpatchPanel extends JPanel implements Transferable
         
         c.gridx = 0;
         c.gridy = 0;
-		c.weightx = 0.0;
+        c.weightx = 0.0;
         pane.add(soundsTitle, c);
     
         c.gridx = 1;
         pane.add(soundsLabel, c);
     
         c.gridx = 2;
-		c.weightx = 0.5;
+        c.weightx = 0.5;
         pane.add(sounds, c);
         
         c.gridx = 3;
-		c.weightx = 0.0;
+        c.weightx = 0.0;
         pane.add(allocatedTitle, c);
     
         c.gridx = 4;
-		c.weightx = 0.0;
+        c.weightx = 0.0;
         pane.add(allocatedLabel, c);
         
         
@@ -333,14 +333,14 @@ public class SubpatchPanel extends JPanel implements Transferable
                 // this one is real-time
                 rack.getOutput().lock();
                 try
-                	{
-	                rack.getOutput().getGroup(group).setGain(val / Out.MAX_GAIN);		// so we go from 0...1
-	                rack.getOutput().redistributeGains();
-	                }
-	            finally
-	            	{
-	            	rack.getOutput().unlock();
-	            	}
+                    {
+                    rack.getOutput().getGroup(group).setGain(val / Out.MAX_GAIN);           // so we go from 0...1
+                    rack.getOutput().redistributeGains();
+                    }
+                finally
+                    {
+                    rack.getOutput().unlock();
+                    }
 
                 buildSummary();
                 }
@@ -353,34 +353,34 @@ public class SubpatchPanel extends JPanel implements Transferable
         pane.add(gainLabel, c);
     
         c.gridx = 7;
-		c.weightx = 0.5;
+        c.weightx = 0.5;
         pane.add(gain, c);
         
         PushButton rename = new PushButton("Rename")
-        	{
-        	public void perform()
-        		{
+            {
+            public void perform()
+                {
                 rack.getOutput().lock();
                 try
-                	{
-                	String result = AppMenu.showSimpleInput("Rename", "Provide a name for this patch.", 
-                		rack.getOutput().getGroup(group).getPatchName(), rack);
-                	if (result != null)
-                		{
-						rack.getOutput().getGroup(group).setPatchName(result);
-						titleLabel.setText(" " + result);
-						// I don't think we need to distribute this to the sounds
-                		}
-	                }
-	            finally
-	            	{
-	            	rack.getOutput().unlock();
-	            	}
+                    {
+                    String result = AppMenu.showSimpleInput("Rename", "Provide a name for this patch.", 
+                        rack.getOutput().getGroup(group).getPatchName(), rack);
+                    if (result != null)
+                        {
+                        rack.getOutput().getGroup(group).setPatchName(result);
+                        titleLabel.setText(" " + result);
+                        // I don't think we need to distribute this to the sounds
+                        }
+                    }
+                finally
+                    {
+                    rack.getOutput().unlock();
+                    }
                 }
-        	};
+            };
 
         c.gridx = 8;
-		c.weightx = 0.0;
+        c.weightx = 0.0;
         pane.add(rename, c);
         
 
@@ -447,21 +447,21 @@ public class SubpatchPanel extends JPanel implements Transferable
         
         c.gridx = 0;
         c.gridy = 1;
- 		c.weightx = 0.0;
-       	pane.add(midiTitle, c);
+        c.weightx = 0.0;
+        pane.add(midiTitle, c);
         
         c.gridx = 1;
-		c.weightx = 0.0;
+        c.weightx = 0.0;
         pane.add(midiLabel, c);
         
         c.gridx = 2;
-		c.weightx = 0.5;
+        c.weightx = 0.5;
         pane.add(midi, c);
         
                 
         JLabel noteTitle = new JLabel("   MIDI Note: ");
         noteTitle.setFont(Style.SMALL_FONT());
-     	noteLabel = new JLabel("")
+        noteLabel = new JLabel("")
             {
             public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
             public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
@@ -521,7 +521,7 @@ public class SubpatchPanel extends JPanel implements Transferable
 
         c.gridx = 5;
         c.gridwidth = 3;
-		c.weightx = 0.5;
+        c.weightx = 0.5;
         pane.add(note, c);
         c.gridwidth = 1;
 
@@ -533,11 +533,11 @@ public class SubpatchPanel extends JPanel implements Transferable
         c.weightx = 1.0;
         pane.add(Stretch.makeHorizontalStretch(), c);
 
-		JPanel pp = new JPanel();
-		pp.setLayout(new BorderLayout());
-		pp.add(pane, BorderLayout.WEST);
-		pp.add(Stretch.makeHorizontalStretch(), BorderLayout.CENTER);
-		
+        JPanel pp = new JPanel();
+        pp.setLayout(new BorderLayout());
+        pp.add(pane, BorderLayout.WEST);
+        pp.add(Stretch.makeHorizontalStretch(), BorderLayout.CENTER);
+                
 
         summary = new JLabel();
         summary.setFont(Style.SMALL_FONT());
@@ -547,12 +547,12 @@ public class SubpatchPanel extends JPanel implements Transferable
         }
         
     public void buildSummary()
-    	{
-    	summary.setText("Voices: " + allocatedLabel.getText() + " / " + soundsLabel.getText() +
-    		"     Midi: " + midiLabel.getText() +
-    		"     Note: " + noteLabel.getText() +
-    		"     Gain: " + gainLabel.getText());
-    	}
+        {
+        summary.setText("Voices: " + allocatedLabel.getText() + " / " + soundsLabel.getText() +
+            "     Midi: " + midiLabel.getText() +
+            "     Note: " + noteLabel.getText() +
+            "     Gain: " + gainLabel.getText());
+        }
     
     public void updateSoundAllocation()
         {

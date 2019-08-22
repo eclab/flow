@@ -20,7 +20,7 @@ import java.util.zip.*;
 public class Flow
     {
     // Flow Version
-    public static int VERSION = 4;
+    public static int VERSION = 5;
     
     public static void main(String[] args)
         {
@@ -55,22 +55,22 @@ public class Flow
         output.startPrimaryVoiceThread();  
         
         if (args.length == 1)
-        	{
-        	SwingUtilities.invokeLater(new Runnable() 
-        		{
-        		public void run()
-        			{
-					try
-						{
-						File f = new File(args[0]);
-						AppMenu.doLoad(rack, new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))), true);
-						AppMenu.setLastFile(f);
-		            	rack.setPatchFile(f);
-						rack.setPatchName(rack.getPatchName());
-						}
-					catch(Exception ex) { System.err.println("Couldn't load file " + args[0]);  System.err.println(ex); }
-					}
-				});
-			}
+            {
+            SwingUtilities.invokeLater(new Runnable() 
+                {
+                public void run()
+                    {
+                    try
+                        {
+                        File f = new File(args[0]);
+                        AppMenu.doLoad(rack, new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))), true);
+                        AppMenu.setLastFile(f);
+                        rack.setPatchFile(f);
+                        rack.setPatchName(rack.getPatchName());
+                        }
+                    catch(Exception ex) { System.err.println("Couldn't load file " + args[0]);  System.err.println(ex); }
+                    }
+                });
+            }
         }
     }

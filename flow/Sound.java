@@ -361,7 +361,7 @@ public class Sound
             JSONObject patch = array.getJSONObject(i);
             try { groups[i + 1].setPatch(patch); }
             catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch " + (i + 1)); break; };
-			// try { groups[i + 1].setPatchName(Sound.loadName(patch)); }
+            // try { groups[i + 1].setPatchName(Sound.loadName(patch)); }
             // catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch name " + (i + 1)); break; };
             try { groups[i + 1].setGain(patch.getDouble("gain")); }
             catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid gain " + (i + 1)); break; };
@@ -372,8 +372,8 @@ public class Sound
             catch (NullPointerException e) { groups[i + 1].setChannel(Input.CHANNEL_NONE); }            // this might not exist if there's no current midi channel
             catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
             try {  groups[i + 1].setBothNotes(patch.getInt("note")); }
-            catch (org.json.JSONException e) { groups[i + 1].setBothNotes(0, 127); }	// this isn't in the documentation
-            catch (NullPointerException e) { groups[i + 1].setBothNotes(0, 127); }		// this might not exist if there's no current midi channel
+            catch (org.json.JSONException e) { groups[i + 1].setBothNotes(0, 127); }    // this isn't in the documentation
+            catch (NullPointerException e) { groups[i + 1].setBothNotes(0, 127); }              // this might not exist if there's no current midi channel
             catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
             }
         return i;

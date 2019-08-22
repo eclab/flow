@@ -13,7 +13,7 @@ install:
 	mv libraries/META-INF . ; mv libraries/uk .
 	cd libraries ; jar -xvf json.jar
 	mv libraries/org .
-	jar -cvfm install/flow.jar /tmp/manifest.add `find flow -name "*.class"` `find flow -name "*.init"` `find flow -name "*.html"` `find flow -name "*.png"` `find flow -name "*.jpg"` `find flow -name "kharmonics.out"` org/ uk/ META-INF/
+	jar -cvfm install/flow.jar /tmp/manifest.add `find flow -name "*.class"` `find flow -name "*.init"` `find flow -name "*.html"` `find flow -name "*.png"` `find flow -name "*.jpg"` `find flow -name "*.out"` `find flow -name "Manufacturers.txt"` org/ uk/ META-INF/
 	rm -rf uk META-INF org
 	javapackager -deploy -native dmg -srcfiles install/flow.jar -appclass flow.Flow -name Flow -outdir install -outfile Flow.dmg -v
 	mv install/bundles/Flow-0.0.dmg install/Flow.dmg

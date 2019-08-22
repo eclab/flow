@@ -347,8 +347,8 @@ public class Out extends Unit implements Miscellaneous
                 }
             
             public void setReverb(float wet, float damp, float size)
-            	{
-            	}
+                {
+                }
                  
             public JComponent buildPanel()
                 {
@@ -446,26 +446,26 @@ public class Out extends Unit implements Miscellaneous
                 int channel;
                 int restrict = -1;
 
-                    out.lock();
-                                    try
-                                    {
-                 clipped = out.getAndResetClipped();
-                 glitched = out.getAndResetGlitched();
-                 playFirst = out.getOnlyPlayFirstSound();
-                 numVoices = out.getNumSounds(Output.PRIMARY_GROUP);
-                 blockedMIDI = (out.getGroupOverridingPrimaryGroupInMIDI() != Output.PRIMARY_GROUP);
-                 channel = out.getGroup(Output.PRIMARY_GROUP).getChannel();
-                 int min = out.getGroup(Output.PRIMARY_GROUP).getMinNote();
-                 int max = out.getGroup(Output.PRIMARY_GROUP).getMaxNote();
-                 if (min == max) restrict = min;
-                 		}
-            	    finally
-            	    	{
-            	    	out.unlock();
-            	    	}
+                out.lock();
+                try
+                    {
+                    clipped = out.getAndResetClipped();
+                    glitched = out.getAndResetGlitched();
+                    playFirst = out.getOnlyPlayFirstSound();
+                    numVoices = out.getNumSounds(Output.PRIMARY_GROUP);
+                    blockedMIDI = (out.getGroupOverridingPrimaryGroupInMIDI() != Output.PRIMARY_GROUP);
+                    channel = out.getGroup(Output.PRIMARY_GROUP).getChannel();
+                    int min = out.getGroup(Output.PRIMARY_GROUP).getMinNote();
+                    int max = out.getGroup(Output.PRIMARY_GROUP).getMaxNote();
+                    if (min == max) restrict = min;
+                    }
+                finally
+                    {
+                    out.unlock();
+                    }
                 
                 if (numVoices != oldNumVoices[0] || clipped != oldClipped[0] || glitched != oldGlitched[0] || playFirst != oldPlayFirst[0] || 
-                	blockedMIDI != oldBlockedMIDI[0] || channel != oldChannel[0] || restrict != oldRestrict[0])
+                    blockedMIDI != oldBlockedMIDI[0] || channel != oldChannel[0] || restrict != oldRestrict[0])
                     {
                     oldClipped[0] = clipped;
                     oldGlitched[0] = glitched;
@@ -492,15 +492,15 @@ public class Out extends Unit implements Miscellaneous
                             }
                         } 
                     
-	                    if (restrict >= 0)
- 	 	                  	{
- 	    	               	labeladdendum = labeladdendum + "  " + Rack.notes[restrict % 12] + (restrict / 12);
- 	    	               	}
+                    if (restrict >= 0)
+                        {
+                        labeladdendum = labeladdendum + "  " + Rack.notes[restrict % 12] + (restrict / 12);
+                        }
                     
-	                    if (blockedMIDI)
- 	 	                  	{
- 	    	               	labeladdendum = labeladdendum + "  M" + (out.getGroup(Output.PRIMARY_GROUP).getChannel() + 1) + "?";
-            	        	}
+                    if (blockedMIDI)
+                        {
+                        labeladdendum = labeladdendum + "  M" + (out.getGroup(Output.PRIMARY_GROUP).getChannel() + 1) + "?";
+                        }
 
                     panel[0].getTitlePanel().setBackground(glitched ? Color.RED : (clipped ? Color.YELLOW : Color.BLACK));
                     panel[0].getTitleLabel().setForeground(glitched ? Color.WHITE : (clipped ? Color.BLACK : Color.WHITE));

@@ -249,7 +249,7 @@ public class Draw extends Unit implements UnitSource
                 { 
                 FileDialog fd = new FileDialog((Frame)(SwingUtilities.getRoot(root)), "Save Partials...", FileDialog.SAVE);
                 
-                fd.setFile(UNTITLED_PARTIALS_NAME + FILENAME_EXTENSION);			// "Untitled.partials"
+                fd.setFile(UNTITLED_PARTIALS_NAME + FILENAME_EXTENSION);                        // "Untitled.partials"
                 if (AppMenu.dirFile != null)
                     fd.setDirectory(AppMenu.dirFile.getParentFile().getPath());
                 

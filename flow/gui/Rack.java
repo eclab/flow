@@ -213,17 +213,17 @@ public class Rack extends JPanel
     public void setAddModulesAfter(boolean val) { addModulesAfter = val; }
 
 /*
-    public boolean getSwapPrimaryWithMIDIVoice() { return swapPrimaryWithMIDIVoice; }
-    public void setSwapPrimaryWithMIDIVoice(boolean val) { swapPrimaryWithMIDIVoice = val; }
+  public boolean getSwapPrimaryWithMIDIVoice() { return swapPrimaryWithMIDIVoice; }
+  public void setSwapPrimaryWithMIDIVoice(boolean val) { swapPrimaryWithMIDIVoice = val; }
 */
         
     public File getPatchFile() { return patchFile; }
     public void setPatchFile(File f) { patchFile = f; }
     public String getPatchFilename() 
-    	{ 
-    	if (patchFile == null) return null; 
-    	else return AppMenu.removeExtension(patchFile.getName()); 
-    	}
+        { 
+        if (patchFile == null) return null; 
+        else return AppMenu.removeExtension(patchFile.getName()); 
+        }
     
     public String getPatchName() { return patchName; }
     public void setPatchName(String val) 
@@ -232,9 +232,9 @@ public class Rack extends JPanel
         String p = patchName;
         if (p == null) p = Sound.UNTITLED_PATCH_NAME;
         String patchFilename = getPatchFilename();
-                if (patchFilename != null &&
-        	!p.equals(patchFilename))
-        		p = p + "     (" + patchFilename + AppMenu.PATCH_EXTENSION + ")";
+        if (patchFilename != null &&
+            !p.equals(patchFilename))
+            p = p + "     (" + patchFilename + AppMenu.PATCH_EXTENSION + ")";
         Object frame = SwingUtilities.getWindowAncestor(this);
         if (frame != null && frame instanceof JFrame)
             {
@@ -888,9 +888,9 @@ public class Rack extends JPanel
             Prefs.setLastNumVoicesPerThread(Output.DEFAULT_NUM_VOICES_PER_THREAD);
             Prefs.setLastNumOutputsPerThread(Output.DEFAULT_NUM_OUTPUTS_PER_THREAD);
             }
-        else if (result == 2 || result == -1)		// CANCEL
-        	{
-        	} 
+        else if (result == 2 || result == -1)           // CANCEL
+            {
+            } 
         }
 
 
@@ -898,15 +898,15 @@ public class Rack extends JPanel
     public void chooseMIDIandAudio()
         {
         double originalGain = 0;
-        	output.lock();
-        	try
-        		{
-				originalGain = output.getMasterGain();
-        		}
-        	finally
-        		{
-        		output.unlock();
-        		}
+        output.lock();
+        try
+            {
+            originalGain = output.getMasterGain();
+            }
+        finally
+            {
+            output.unlock();
+            }
         
         ArrayList<Midi.MidiDeviceWrapper> devices = output.getInput().getDevices();
         JComboBox devicesCombo = new JComboBox(devices.toArray());
@@ -962,63 +962,63 @@ public class Rack extends JPanel
                 { mixersCombo.setSelectedItem(m); break; }
             }
  
- /*
-        final JLabel scratch0 = new JLabel(" G#8 ");
-        final JLabel restrictLabel = new JLabel(" 8.88 ", SwingConstants.RIGHT)	
-        	{
-        	public Dimension getPreferredSize() { return scratch0.getPreferredSize(); }
-        	public Dimension getMinimumSize() { return scratch0.getMinimumSize(); }
-        	};
+        /*
+          final JLabel scratch0 = new JLabel(" G#8 ");
+          final JLabel restrictLabel = new JLabel(" 8.88 ", SwingConstants.RIGHT) 
+          {
+          public Dimension getPreferredSize() { return scratch0.getPreferredSize(); }
+          public Dimension getMinimumSize() { return scratch0.getMinimumSize(); }
+          };
         
-        int min = output.getGroup(Output.PRIMARY_GROUP).getMinNote();
-        int max = output.getGroup(Output.PRIMARY_GROUP).getMaxNote();
-		restrictLabel.setText((min==0 && max == 127) ? "Any" : notes[min % 12] + (min / 12));
-		final JSlider restrictSlider = new JSlider(0, 128, (min==0 && max == 127) ? 0 : min + 1);			
-		restrictSlider.addChangeListener(new ChangeListener()
-			{
-			public void stateChanged(ChangeEvent e)
-				{
-        		int note = restrictSlider.getValue();
-				restrictLabel.setText(note == 0 ? "Any" : notes[(note - 1) % 12] + ((note - 1) / 12));
-				}
-			});
-			
-        JPanel restrictPanel = new JPanel();
-        restrictPanel.setLayout(new BorderLayout());
-        restrictPanel.add(restrictLabel, BorderLayout.WEST);
-        restrictPanel.add(restrictSlider, BorderLayout.CENTER);        
-*/
+          int min = output.getGroup(Output.PRIMARY_GROUP).getMinNote();
+          int max = output.getGroup(Output.PRIMARY_GROUP).getMaxNote();
+          restrictLabel.setText((min==0 && max == 127) ? "Any" : notes[min % 12] + (min / 12));
+          final JSlider restrictSlider = new JSlider(0, 128, (min==0 && max == 127) ? 0 : min + 1);                       
+          restrictSlider.addChangeListener(new ChangeListener()
+          {
+          public void stateChanged(ChangeEvent e)
+          {
+          int note = restrictSlider.getValue();
+          restrictLabel.setText(note == 0 ? "Any" : notes[(note - 1) % 12] + ((note - 1) / 12));
+          }
+          });
+                        
+          JPanel restrictPanel = new JPanel();
+          restrictPanel.setLayout(new BorderLayout());
+          restrictPanel.add(restrictLabel, BorderLayout.WEST);
+          restrictPanel.add(restrictSlider, BorderLayout.CENTER);        
+        */
                    
         final JLabel scratch = new JLabel(" 8.88 ");
-        final JLabel gainLabel = new JLabel(" 8.88 ", SwingConstants.RIGHT)	
-        	{
-        	public Dimension getPreferredSize() { return scratch.getPreferredSize(); }
-        	public Dimension getMinimumSize() { return scratch.getMinimumSize(); }
-        	};
+        final JLabel gainLabel = new JLabel(" 8.88 ", SwingConstants.RIGHT)     
+            {
+            public Dimension getPreferredSize() { return scratch.getPreferredSize(); }
+            public Dimension getMinimumSize() { return scratch.getMinimumSize(); }
+            };
         
-		final double MASTER_GAIN_MULTIPLIER = 50.0;
-		
-		gainLabel.setText(String.format("%.2f ", output.getMasterGain()));
-		JSlider gainSlider = new JSlider(0, (int)(Output.MAX_MASTER_GAIN * MASTER_GAIN_MULTIPLIER), (int)(1.0 * MASTER_GAIN_MULTIPLIER));
-		JButton gainResetButton = new JButton("Reset");
-		gainResetButton.addActionListener(new ActionListener()
-			{
+        final double MASTER_GAIN_MULTIPLIER = 50.0;
+                
+        gainLabel.setText(String.format("%.2f ", output.getMasterGain()));
+        JSlider gainSlider = new JSlider(0, (int)(Output.MAX_MASTER_GAIN * MASTER_GAIN_MULTIPLIER), (int)(1.0 * MASTER_GAIN_MULTIPLIER));
+        JButton gainResetButton = new JButton("Reset");
+        gainResetButton.addActionListener(new ActionListener()
+            {
             public void actionPerformed(ActionEvent e)
-            	{
-            	gainSlider.setValue((int)(1.0 * MASTER_GAIN_MULTIPLIER));
-            	}
-			});
-			
-		final JSlider _gainSlider = gainSlider;
-		gainSlider.addChangeListener(new ChangeListener()
-			{
-			public void stateChanged(ChangeEvent e)
-				{
-				output.setMasterGain(_gainSlider.getValue() / MASTER_GAIN_MULTIPLIER);
-				gainLabel.setText(String.format("%.2f ", output.getMasterGain()));
-				}
-			});
-			
+                {
+                gainSlider.setValue((int)(1.0 * MASTER_GAIN_MULTIPLIER));
+                }
+            });
+                        
+        final JSlider _gainSlider = gainSlider;
+        gainSlider.addChangeListener(new ChangeListener()
+            {
+            public void stateChanged(ChangeEvent e)
+                {
+                output.setMasterGain(_gainSlider.getValue() / MASTER_GAIN_MULTIPLIER);
+                gainLabel.setText(String.format("%.2f ", output.getMasterGain()));
+                }
+            });
+                        
         JPanel gainPanel = new JPanel();
         gainPanel.setLayout(new BorderLayout());
         gainPanel.add(gainLabel, BorderLayout.WEST);
@@ -1035,52 +1035,52 @@ public class Rack extends JPanel
             {
             output.lock();
             try
-            	{
-				// set up
-				output.setMixer(mixers[mixersCombo.getSelectedIndex()]);
-				
-				output.getInput().setupMIDI(channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS,
-					mpeChannelsCombo.getSelectedIndex() + 1,
-					devices.get(devicesCombo.getSelectedIndex()),
-					devicesCombo.getSelectedIndex() == devices2Combo.getSelectedIndex() ?
-						devices.get(0) : devices.get(devices2Combo.getSelectedIndex()));
-				/*
-				if (restrictSlider.getValue() == 0)
-					{
-					output.getGroup(Output.PRIMARY_GROUP).setBothNotes(0, 127);
-					}
-				else
-					{
-					output.getGroup(Output.PRIMARY_GROUP).setBothNotes(restrictSlider.getValue() - 1);
-					}
-				*/
-				}
-			finally
-				{
-				output.unlock();
-				}
+                {
+                // set up
+                output.setMixer(mixers[mixersCombo.getSelectedIndex()]);
+                                
+                output.getInput().setupMIDI(channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS,
+                    mpeChannelsCombo.getSelectedIndex() + 1,
+                    devices.get(devicesCombo.getSelectedIndex()),
+                    devicesCombo.getSelectedIndex() == devices2Combo.getSelectedIndex() ?
+                    devices.get(0) : devices.get(devices2Combo.getSelectedIndex()));
+                /*
+                  if (restrictSlider.getValue() == 0)
+                  {
+                  output.getGroup(Output.PRIMARY_GROUP).setBothNotes(0, 127);
+                  }
+                  else
+                  {
+                  output.getGroup(Output.PRIMARY_GROUP).setBothNotes(restrictSlider.getValue() - 1);
+                  }
+                */
+                }
+            finally
+                {
+                output.unlock();
+                }
                 
             Prefs.setLastMidiDevice(devicesCombo.getSelectedItem().toString());
             if (devicesCombo.getSelectedIndex() == devices2Combo.getSelectedIndex())
-            	Prefs.setLastMidiDevice2(devices.get(0).toString());
+                Prefs.setLastMidiDevice2(devices.get(0).toString());
             else            
-            	Prefs.setLastMidiDevice2(devices2Combo.getSelectedItem().toString());
+                Prefs.setLastMidiDevice2(devices2Combo.getSelectedItem().toString());
             Prefs.setLastChannel(channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS);
             Prefs.setLastNumMPEChannels(mpeChannelsCombo.getSelectedIndex() + 1);
             Prefs.setLastAudioDevice(mixersCombo.getSelectedItem().toString());
             }
         else
-        	{
-        	output.lock();
-        	try
-        		{
-				output.setMasterGain(originalGain);			// restore it since we allow the gain to be changed in real time
-        		}
-        	finally
-        		{
-        		output.unlock();
-        		}
-        	}
+            {
+            output.lock();
+            try
+                {
+                output.setMasterGain(originalGain);                     // restore it since we allow the gain to be changed in real time
+                }
+            finally
+                {
+                output.unlock();
+                }
+            }
         }
 
     /** Perform a JOptionPane confirm dialog with MUTLIPLE widgets that the user can select.  The widgets are provided
@@ -1477,7 +1477,7 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
 
             rack.resetEmits();
             }
- 		else if (transferableObj != null && transferableObj instanceof SubpatchPanel)
+        else if (transferableObj != null && transferableObj instanceof SubpatchPanel)
             {
             SubpatchPanel droppedPanel = (SubpatchPanel)transferableObj;
             Rack rack = droppedPanel.getRack();
@@ -1509,113 +1509,113 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                 else if (comp == rack || comp instanceof ModulePanel)  // we dragged to the beginning
                     {
                     SwingUtilities.convertPointToScreen(p, comp);
-                    SwingUtilities.convertPointFromScreen(p, rack);	// p may be in ModulePanel's coordinate system, we want to compute this in rack's
-					final int BOTTOM_SLOP = 30;
-					final int SCROLLBAR_SLOP = 20;
-					final int TOP_SLOP = 4;
-					Rectangle paneBounds = rack.pane.getBounds();
-					if (p.y <= paneBounds.y + TOP_SLOP || p.y >= paneBounds.y + paneBounds.height - SCROLLBAR_SLOP)
-						{
-						return;
-						}
-					else if (paneBounds.height >= BOTTOM_SLOP * 2 && p.y >= paneBounds.y + paneBounds.height - BOTTOM_SLOP)
-						{       
-						return;
-						}
+                    SwingUtilities.convertPointFromScreen(p, rack);     // p may be in ModulePanel's coordinate system, we want to compute this in rack's
+                    final int BOTTOM_SLOP = 30;
+                    final int SCROLLBAR_SLOP = 20;
+                    final int TOP_SLOP = 4;
+                    Rectangle paneBounds = rack.pane.getBounds();
+                    if (p.y <= paneBounds.y + TOP_SLOP || p.y >= paneBounds.y + paneBounds.height - SCROLLBAR_SLOP)
+                        {
+                        return;
+                        }
+                    else if (paneBounds.height >= BOTTOM_SLOP * 2 && p.y >= paneBounds.y + paneBounds.height - BOTTOM_SLOP)
+                        {       
+                        return;
+                        }
                     else 
-                    	{
-					Output output = rack.getOutput();
-					output.lock();
-					try
-						{
-						for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
-							{
-							if (rack.subpatchBox.getComponent(i) == droppedPanel)
-								{
-								int index = i + 1;
-								
-								int numSoundsPrimary = output.getNumSounds(Output.PRIMARY_GROUP);
-								int minNotePrimary = output.getGroup(Output.PRIMARY_GROUP).getMinNote();
-								int maxNotePrimary = output.getGroup(Output.PRIMARY_GROUP).getMaxNote();
-								int channelPrimaryOld = output.getGroup(Output.PRIMARY_GROUP).getChannel();
-								int channelPrimary = (channelPrimaryOld < 0) ? Input.CHANNEL_NONE : channelPrimaryOld;
-								Out out = (Out)(output.getSound(0).getEmits());
-								double wet = out.modulate(Out.MOD_REVERB_WET);
-								double damp = out.modulate(Out.MOD_REVERB_DAMP);
-								double size = out.modulate(Out.MOD_REVERB_ROOM_SIZE);
-								
-								// get old group
-								Group g = output.getGroup(index);
-								
-								// copy primary group to old group
-								output.copyPrimaryGroup(index, false);
-								
-								// transfer name (it doesn't come along with the primary group)
-								output.getGroup(index).setPatchName(rack.getPatchName());
+                        {
+                        Output output = rack.getOutput();
+                        output.lock();
+                        try
+                            {
+                            for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
+                                {
+                                if (rack.subpatchBox.getComponent(i) == droppedPanel)
+                                    {
+                                    int index = i + 1;
+                                                                
+                                    int numSoundsPrimary = output.getNumSounds(Output.PRIMARY_GROUP);
+                                    int minNotePrimary = output.getGroup(Output.PRIMARY_GROUP).getMinNote();
+                                    int maxNotePrimary = output.getGroup(Output.PRIMARY_GROUP).getMaxNote();
+                                    int channelPrimaryOld = output.getGroup(Output.PRIMARY_GROUP).getChannel();
+                                    int channelPrimary = (channelPrimaryOld < 0) ? Input.CHANNEL_NONE : channelPrimaryOld;
+                                    Out out = (Out)(output.getSound(0).getEmits());
+                                    double wet = out.modulate(Out.MOD_REVERB_WET);
+                                    double damp = out.modulate(Out.MOD_REVERB_DAMP);
+                                    double size = out.modulate(Out.MOD_REVERB_ROOM_SIZE);
+                                                                
+                                    // get old group
+                                    Group g = output.getGroup(index);
+                                                                
+                                    // copy primary group to old group
+                                    output.copyPrimaryGroup(index, false);
+                                                                
+                                    // transfer name (it doesn't come along with the primary group)
+                                    output.getGroup(index).setPatchName(rack.getPatchName());
 
-								if (!swap)
-									{
-									// fix sounds and channel
-									output.getGroup(index).setNumRequestedSounds(numSoundsPrimary);
-									output.getGroup(index).setBothNotes(minNotePrimary, maxNotePrimary);
-									output.getGroup(index).setChannel(channelPrimary);
-									}
-								else
-									{
-									// revert sounds and channel
-									output.getGroup(index).setNumRequestedSounds(g.getNumRequestedSounds());
-									output.getGroup(index).setBothNotes(g.getMinNote(), g.getMaxNote());
-									output.getGroup(index).setChannel(g.getChannel());
-									}
-								
-								// load the primary group
-								try
-									{
-									// load the old group as the primary group.  Don't displace the subpatches
-									AppMenu.doLoad(rack, g.getPatch(), false);
-									
-									rack.rebuild();
-									rack.rebuildSubpatches();
-									}
-								catch(Exception ex) 
-									{ 
-									ex.printStackTrace(); 
-									}
+                                    if (!swap)
+                                        {
+                                        // fix sounds and channel
+                                        output.getGroup(index).setNumRequestedSounds(numSoundsPrimary);
+                                        output.getGroup(index).setBothNotes(minNotePrimary, maxNotePrimary);
+                                        output.getGroup(index).setChannel(channelPrimary);
+                                        }
+                                    else
+                                        {
+                                        // revert sounds and channel
+                                        output.getGroup(index).setNumRequestedSounds(g.getNumRequestedSounds());
+                                        output.getGroup(index).setBothNotes(g.getMinNote(), g.getMaxNote());
+                                        output.getGroup(index).setChannel(g.getChannel());
+                                        }
+                                                                
+                                    // load the primary group
+                                    try
+                                        {
+                                        // load the old group as the primary group.  Don't displace the subpatches
+                                        AppMenu.doLoad(rack, g.getPatch(), false);
+                                                                        
+                                        rack.rebuild();
+                                        rack.rebuildSubpatches();
+                                        }
+                                    catch(Exception ex) 
+                                        { 
+                                        ex.printStackTrace(); 
+                                        }
 
-								if (!swap)
-									{
-									// fix channel in new primary group
-									output.getGroup(Output.PRIMARY_GROUP).setBothNotes(g.getMinNote(), g.getMaxNote());
-									int channel = g.getChannel() == Input.CHANNEL_NONE ? Input.CHANNEL_OMNI : g.getChannel();
-									output.getGroup(Output.PRIMARY_GROUP).setChannel(channel);
-									Prefs.setLastChannel(channel);
-									// number of sounds will be automatic since we've already changed the requested sounds above
-									}
-								else
-									{
-									output.getGroup(Output.PRIMARY_GROUP).setBothNotes(minNotePrimary, maxNotePrimary);
-									output.getGroup(Output.PRIMARY_GROUP).setChannel(channelPrimary);
-									// number of sounds will be automatic since we've already changed the requested sounds above
-									}								
+                                    if (!swap)
+                                        {
+                                        // fix channel in new primary group
+                                        output.getGroup(Output.PRIMARY_GROUP).setBothNotes(g.getMinNote(), g.getMaxNote());
+                                        int channel = g.getChannel() == Input.CHANNEL_NONE ? Input.CHANNEL_OMNI : g.getChannel();
+                                        output.getGroup(Output.PRIMARY_GROUP).setChannel(channel);
+                                        Prefs.setLastChannel(channel);
+                                        // number of sounds will be automatic since we've already changed the requested sounds above
+                                        }
+                                    else
+                                        {
+                                        output.getGroup(Output.PRIMARY_GROUP).setBothNotes(minNotePrimary, maxNotePrimary);
+                                        output.getGroup(Output.PRIMARY_GROUP).setChannel(channelPrimary);
+                                        // number of sounds will be automatic since we've already changed the requested sounds above
+                                        }                                                               
 
-								// fix reverb in new primary group
-								// we do this even if it's not a Constant
-								out = (Out)(output.getSound(0).getEmits());
-								out.setModulation(new Constant(wet), Out.MOD_REVERB_WET);
-								out.setModulation(new Constant(damp), Out.MOD_REVERB_DAMP);
-								out.setModulation(new Constant(size), Out.MOD_REVERB_ROOM_SIZE);								
+                                    // fix reverb in new primary group
+                                    // we do this even if it's not a Constant
+                                    out = (Out)(output.getSound(0).getEmits());
+                                    out.setModulation(new Constant(wet), Out.MOD_REVERB_WET);
+                                    out.setModulation(new Constant(damp), Out.MOD_REVERB_DAMP);
+                                    out.setModulation(new Constant(size), Out.MOD_REVERB_ROOM_SIZE);                                                                
 
-								break;
-								}
-							}
-						}
-					finally 
-						{
-						output.unlock();
-						}
-    				return;			// done with swap
+                                    break;
+                                    }
+                                }
+                            }
+                        finally 
+                            {
+                            output.unlock();
+                            }
+                        return;                 // done with swap
+                        }
                     }
-                }
 
                 for(int i = 0; i < rack.subpatchBox.getComponentCount(); i++)
                     {

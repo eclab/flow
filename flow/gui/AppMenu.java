@@ -76,12 +76,12 @@ public class AppMenu
         return setup;
         }       
 
-	public static void setLastFile(File _file)
-		{
-		file = _file;
-		dirFile = _file.getParentFile();
-		}
-		
+    public static void setLastFile(File _file)
+        {
+        file = _file;
+        dirFile = _file.getParentFile();
+        }
+                
     // last file selected by open/save/save as
     static File file = null;
 
@@ -148,9 +148,9 @@ public class AppMenu
                   }
                 */
                      
-				File ff = rack.getPatchFile();
-            	
-            	if (ff != null)
+                File ff = rack.getPatchFile();
+                
+                if (ff != null)
                     {
                     JSONObject obj = new JSONObject();
                     
@@ -236,9 +236,9 @@ public class AppMenu
                      
         FileDialog fd = new FileDialog((Frame)(SwingUtilities.getRoot(rack)), "Save Patch to Sysex File...", FileDialog.SAVE);
                 
-		File ff = file;	// rare occurrence
-		if (rack.getPatchFile() != null)
-			ff = rack.getPatchFile();
+        File ff = file; // rare occurrence
+        if (rack.getPatchFile() != null)
+            ff = rack.getPatchFile();
 
         if (ff != null)
             {
@@ -335,11 +335,11 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-    			if (rack.subpatchBox.getComponentCount() > 0)
-    				{
-    				if (!showSimpleConfirm("Load Patch?", "This patch has subpatches.\nAre you sure you want to load a new patch?", rack))
-    					return;
-    				}
+                if (rack.subpatchBox.getComponentCount() > 0)
+                    {
+                    if (!showSimpleConfirm("Load Patch?", "This patch has subpatches.\nAre you sure you want to load a new patch?", rack))
+                        return;
+                    }
 
                 FileDialog fd = new FileDialog((JFrame)(SwingUtilities.getRoot(rack)), "Load Patch File...", FileDialog.LOAD);
                 fd.setFilenameFilter(new FilenameFilter()
@@ -364,8 +364,8 @@ public class AppMenu
                 if (fd.getFile() != null)
                     {
                     doLoad(rack, fd, true);
-		            rack.setPatchFile(new File(fd.getDirectory(), fd.getFile()));
-					rack.setPatchName(rack.getPatchName());
+                    rack.setPatchFile(new File(fd.getDirectory(), fd.getFile()));
+                    rack.setPatchName(rack.getPatchName());
                     }
                 }
             });
@@ -390,7 +390,7 @@ public class AppMenu
                     "Demote or replace the existing primary patch on load?",
                     new String[] { "Demote", "Replace", "Cancel" });
 
-                if (result == 2 || result == -1) return;			// when the ESC key is pressed we get a -1
+                if (result == 2 || result == -1) return;                        // when the ESC key is pressed we get a -1
 
                 FileDialog fd = new FileDialog((JFrame)(SwingUtilities.getRoot(rack)), "Load Primary Patch File...", FileDialog.LOAD);
                 fd.setFilenameFilter(new FilenameFilter()
@@ -461,59 +461,59 @@ public class AppMenu
         {
         String[] patchName = new String[1];
         rack.getOutput().lock();
-		int flowVersion = 0;
-		try 
-			{ 
-			flowVersion = Sound.loadFlowVersion(obj);
-			}
-		catch (Exception ex) { ex.printStackTrace(); }
-		// version
-		try
-			{
-			Modulation[][] mods = new Modulation[rack.getOutput().getNumSounds()][];
-			for(int i = 0; i < mods.length; i++)
-				{
-				mods[i] = Sound.loadModules(obj, flowVersion);
-				}
-																							
-			// Remove old subpatches
-			if (clearSubpatches)
-				{
-				rack.getOutput().setNumGroups(1);
-				}
+        int flowVersion = 0;
+        try 
+            { 
+            flowVersion = Sound.loadFlowVersion(obj);
+            }
+        catch (Exception ex) { ex.printStackTrace(); }
+        // version
+        try
+            {
+            Modulation[][] mods = new Modulation[rack.getOutput().getNumSounds()][];
+            for(int i = 0; i < mods.length; i++)
+                {
+                mods[i] = Sound.loadModules(obj, flowVersion);
+                }
+                                                                                                                                                                                        
+            // Remove old subpatches
+            if (clearSubpatches)
+                {
+                rack.getOutput().setNumGroups(1);
+                }
 
-			// Create and update Modulations and create ModulePanels
-			load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
+            // Create and update Modulations and create ModulePanels
+            load(mods, rack, obj == null ? patchName[0] : Sound.loadName(obj));
 
-			// reload
-			Output out = rack.getOutput();
-			if (obj != null)
-				{
-				rack.setPatchVersion(Sound.loadPatchVersion(obj));
-				rack.setPatchInfo(Sound.loadPatchInfo(obj));
-				rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
-				rack.setPatchDate(Sound.loadPatchDate(obj));
-							
-				if (clearSubpatches)
-					{
-					int numNewGroups = Sound.loadGroups(out.getGroups(), obj);
-					if (numNewGroups > 0)
-						{
-						out.setNumGroupsUnsafe(numNewGroups + 1);
-						}
-					}
-				}
-			rack.getOutput().getGroup(Output.PRIMARY_GROUP).setBothNotes(0, 127);		// reset
-			out.assignGroupsToSounds();
-			rack.rebuildSubpatches();
-			rack.checkOrder();
-			}
-		finally 
-			{
-			rack.getOutput().unlock();
-			}
-		rack.scrollToRight();
-		((Out.OutModulePanel)(rack.findOut())).updatePatchInfo();
+            // reload
+            Output out = rack.getOutput();
+            if (obj != null)
+                {
+                rack.setPatchVersion(Sound.loadPatchVersion(obj));
+                rack.setPatchInfo(Sound.loadPatchInfo(obj));
+                rack.setPatchAuthor(Sound.loadPatchAuthor(obj));
+                rack.setPatchDate(Sound.loadPatchDate(obj));
+                                                        
+                if (clearSubpatches)
+                    {
+                    int numNewGroups = Sound.loadGroups(out.getGroups(), obj);
+                    if (numNewGroups > 0)
+                        {
+                        out.setNumGroupsUnsafe(numNewGroups + 1);
+                        }
+                    }
+                }
+            rack.getOutput().getGroup(Output.PRIMARY_GROUP).setBothNotes(0, 127);           // reset
+            out.assignGroupsToSounds();
+            rack.rebuildSubpatches();
+            rack.checkOrder();
+            }
+        finally 
+            {
+            rack.getOutput().unlock();
+            }
+        rack.scrollToRight();
+        ((Out.OutModulePanel)(rack.findOut())).updatePatchInfo();
         } 
 
 
@@ -643,7 +643,7 @@ public class AppMenu
             public void actionPerformed(ActionEvent e)
                 {
                 if (showSimpleConfirm("New Patch", "Clear the existing patch " + 
-                	(rack.subpatchBox.getComponentCount() > 0 ? "and subpatches?" : ""), rack))
+                        (rack.subpatchBox.getComponentCount() > 0 ? "and subpatches?" : ""), rack))
                     {
                     doNew(rack, true);
                     }
@@ -668,7 +668,7 @@ public class AppMenu
                     "Demote or clear the existing primary patch?",
                     new String[] { "Demote", "Clear", "Cancel" });
 
-	            if (result == 2 || result == -1) return;			// when the ESC key is pressed we get a -1
+                if (result == 2 || result == -1) return;                    // when the ESC key is pressed we get a -1
 
                 rack.getOutput().lock();
                 try
@@ -728,7 +728,7 @@ public class AppMenu
                 rack.rebuildSubpatches();
                 }
                 
-        	rack.getOutput().assignGroupsToSounds();
+            rack.getOutput().assignGroupsToSounds();
             }
         finally 
             {
@@ -1013,22 +1013,22 @@ public class AppMenu
         }
 
 /*
-    // Produces the Add New Modules At End menu
-    static JMenuItem swapPrimaryMenu(Rack rack)
-        {
-        final JCheckBoxMenuItem swapPrimary = new JCheckBoxMenuItem("Include MIDI/Voice in Swap");
-        swapPrimary.setSelected(Prefs.getSwapPrimaryWithMIDIVoice());
-        rack.setSwapPrimaryWithMIDIVoice(swapPrimary.isSelected());
-        swapPrimary.addActionListener(new ActionListener()
-            {
-            public void actionPerformed(ActionEvent e)
-                {
-                rack.setSwapPrimaryWithMIDIVoice(swapPrimary.isSelected());
-                Prefs.setSwapPrimaryWithMIDIVoice(swapPrimary.isSelected());
-                }
-            });
-        return swapPrimary;
-        }
+// Produces the Add New Modules At End menu
+static JMenuItem swapPrimaryMenu(Rack rack)
+{
+final JCheckBoxMenuItem swapPrimary = new JCheckBoxMenuItem("Include MIDI/Voice in Swap");
+swapPrimary.setSelected(Prefs.getSwapPrimaryWithMIDIVoice());
+rack.setSwapPrimaryWithMIDIVoice(swapPrimary.isSelected());
+swapPrimary.addActionListener(new ActionListener()
+{
+public void actionPerformed(ActionEvent e)
+{
+rack.setSwapPrimaryWithMIDIVoice(swapPrimary.isSelected());
+Prefs.setSwapPrimaryWithMIDIVoice(swapPrimary.isSelected());
+}
+});
+return swapPrimary;
+}
 */
 
     // Produces the Velocity Sensitive menu
@@ -1186,8 +1186,8 @@ public class AppMenu
         menu.add(minDisplayedHarmonic(rack));
         menu.addSeparator();
         menu.add(addModulesAfterMenu(rack));
-		//menu.add(swapPrimaryMenu(rack));
-//		menu.addSeparator();
+        //menu.add(swapPrimaryMenu(rack));
+//              menu.addSeparator();
         menu.add(setupPatchMenu(rack));
         menu.add(setupTuningMenu(rack));
         return menu;

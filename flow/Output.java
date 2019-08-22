@@ -197,7 +197,7 @@ public class Output
             sdl.open(audioFormat, bufferSize);
             sdl.start();
 
- 			this.mixer = mixer;
+            this.mixer = mixer;
             }
         catch (LineUnavailableException ex) { throw new RuntimeException(ex); }
         }
@@ -502,7 +502,7 @@ public class Output
             }
         else
             {
-            //Thread.currentThread().yield();		// we don't want the output thread to yield...
+            //Thread.currentThread().yield();           // we don't want the output thread to yield...
             }
         }
       
@@ -578,17 +578,17 @@ public class Output
                 double amplitude = amp[i];
                 int oi = orders[i];
                 if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
-					
-				// incoming amplitudes are pre-denormalized by the voice threads.
-				// However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
-				// get denormalized.  So we undenormalize here.  It's theoretically possible that we
-				// could still get denormalized when summing the samples below; but I have not been
-				// able to cause that.
-				double aa = (ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
-				double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
-				amplitude = aa + bb;
-				if (amplitude < 1e-200) amplitude = 0;		// undenormalize prior to next go-around
-				ca[oi] = amplitude;
+                                        
+                // incoming amplitudes are pre-denormalized by the voice threads.
+                // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
+                // get denormalized.  So we undenormalize here.  It's theoretically possible that we
+                // could still get denormalized when summing the samples below; but I have not been
+                // able to cause that.
+                double aa = (ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
+                double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
+                amplitude = aa + bb;
+                if (amplitude < 1e-200) amplitude = 0;          // undenormalize prior to next go-around
+                ca[oi] = amplitude;
 
                 double frequency = freq[i];
                                                                 
@@ -619,16 +619,16 @@ public class Output
                 int oi = orders[i];
                 if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
                                                         
-				// incoming amplitudes are pre-denormalized by the voice threads.
-				// However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
-				// get denormalized.  So we undenormalize here.  It's theoretically possible that we
-				// could still get denormalized when summing the samples below; but I have not been
-				// able to cause that.
-				double aa = (ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
-				double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
-				amplitude = aa + bb;
-				if (amplitude < 1e-200) amplitude = 0;		// undenormalize prior to next go-around
-				ca[oi] = amplitude;
+                // incoming amplitudes are pre-denormalized by the voice threads.
+                // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
+                // get denormalized.  So we undenormalize here.  It's theoretically possible that we
+                // could still get denormalized when summing the samples below; but I have not been
+                // able to cause that.
+                double aa = (ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
+                double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
+                amplitude = aa + bb;
+                if (amplitude < 1e-200) amplitude = 0;          // undenormalize prior to next go-around
+                ca[oi] = amplitude;
                                 
                 double frequency = freq[i];
  
@@ -764,7 +764,7 @@ public class Output
                         }
                         
                     if (samples.length != numSounds)
-                    	{
+                        {
                         samples = new double[numSounds][SKIP];
                         }
 
@@ -804,7 +804,7 @@ public class Output
                         freeverb.setDamp(with.reverbDamp);
                         }
                         
-                    double gain = masterGain;		// so we're not reading a volatile variable!
+                    double gain = masterGain;           // so we're not reading a volatile variable!
 
                     for (int skipPos = 0; skipPos < SKIP; skipPos++)
                         {
@@ -1035,10 +1035,10 @@ public class Output
             }
 
         // Spin-wait.  It's both faster and more efficient than a mutex in this case, but it eats up cycles
-		while(emitsReady)
-			{
-			Thread.currentThread().yield();
-			}
+        while(emitsReady)
+            {
+            Thread.currentThread().yield();
+            }
                 
         lock();
         try
@@ -1093,7 +1093,7 @@ public class Output
             {
             unlock();
             }
-    	
+        
         emitsReady = true;
         }  
 
@@ -1129,24 +1129,24 @@ public class Output
     /** Return the number of groups currently allocated */
     public int getNumGroups() { return numGroups; }
 
-	public int getGroupOverridingPrimaryGroupInMIDI()
-		{
-		lock();
-		try
-			{
-			for(int i = 1; i < numGroups; i++)
-				{
-				if (group[i].channel >= 0 &&
-					group[i].channel == group[0].channel)
-					return i;
-				}
-			return Output.PRIMARY_GROUP;
-			}
-		finally
-			{
-			unlock();
-			}
-		}
+    public int getGroupOverridingPrimaryGroupInMIDI()
+        {
+        lock();
+        try
+            {
+            for(int i = 1; i < numGroups; i++)
+                {
+                if (group[i].channel >= 0 &&
+                    group[i].channel == group[0].channel)
+                    return i;
+                }
+            return Output.PRIMARY_GROUP;
+            }
+        finally
+            {
+            unlock();
+            }
+        }
 
     /** Moves group index i to JUST ABOVE current index j */ 
     public void moveGroup(int i, int j)
@@ -1385,97 +1385,97 @@ public class Output
 
     public void swapWithPrimaryGroup(int g)
         {
-		lock();
-		try
-			{
-			// save patch info
-			sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
-			Group primary = group[0];
-			group[0] = group[g];
-			group[g] = primary;
-			assignGroupsToSounds();
-			}
-		finally 
-			{
-			unlock();
-			}
+        lock();
+        try
+            {
+            // save patch info
+            sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
+            Group primary = group[0];
+            group[0] = group[g];
+            group[g] = primary;
+            assignGroupsToSounds();
+            }
+        finally 
+            {
+            unlock();
+            }
         }
 
 
     public boolean copyPrimaryGroup(int to, boolean resetMIDI)
         {
-		lock();
-		try
-			{
-			// save patch info
-			sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
-			group[to] = new Group(group[0]);
-			if (resetMIDI)
-				{
-				group[to].setChannel(Input.CHANNEL_NONE);
-				}
-							
-				// rebuild
-				assignGroupsToSounds();
-			}
-		finally 
-			{
-			unlock();
-			}
-		return true;
+        lock();
+        try
+            {
+            // save patch info
+            sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
+            group[to] = new Group(group[0]);
+            if (resetMIDI)
+                {
+                group[to].setChannel(Input.CHANNEL_NONE);
+                }
+                                                        
+            // rebuild
+            assignGroupsToSounds();
+            }
+        finally 
+            {
+            unlock();
+            }
+        return true;
         }
 
     public boolean copyPrimaryGroup(boolean resetMIDI)
         {
-		lock();
-		try
-			{
-			// save patch info
-			sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
-			if (addGroup(new Group(group[0])))
-				{
-				if (resetMIDI)
-					group[numGroups - 1].setChannel(Input.CHANNEL_NONE);
-							
-				// rebuild
-				assignGroupsToSounds();
-				}
-			else
-				{
-				return false;
-				}
-			}
-		finally 
-			{
-			unlock();
-			}
-		return true;
+        lock();
+        try
+            {
+            // save patch info
+            sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
+            if (addGroup(new Group(group[0])))
+                {
+                if (resetMIDI)
+                    group[numGroups - 1].setChannel(Input.CHANNEL_NONE);
+                                                        
+                // rebuild
+                assignGroupsToSounds();
+                }
+            else
+                {
+                return false;
+                }
+            }
+        finally 
+            {
+            unlock();
+            }
+        return true;
         }
         
-public boolean addGroup(Group g)
-	{
-	if (numGroups >= MAX_GROUPS - 1)
-		{
-		System.err.println("Output.addGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");
-		return false;
-		}
-	else
-		{
-		lock();
-		try
-			{
-			// increment group
-			setNumGroups(getNumGroups() + 1);
-			group[getNumGroups() - 1] = g;
-			}
-		finally
-			{
-			unlock();
-			} 
-		return true;
-		}
-	}
-	        
+    public boolean addGroup(Group g)
+        {
+        if (numGroups >= MAX_GROUPS - 1)
+            {
+            System.err.println("Output.addGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");
+            return false;
+            }
+        else
+            {
+            lock();
+            try
+                {
+                // increment group
+                setNumGroups(getNumGroups() + 1);
+                group[getNumGroups() - 1] = g;
+                }
+            finally
+                {
+                unlock();
+                } 
+            return true;
+            }
+        }
+                
     public int addGroup(JSONObject obj)
         {
         // copy the patch so it can be modified by others
@@ -1504,13 +1504,13 @@ public boolean addGroup(Group g)
                     g.setGain(Group.DEFAULT_GAIN);
                     Modulation[] mods = Sound.loadModules(obj, Sound.loadFlowVersion(obj));
                     for(int i = 0; i < mods.length; i++)
-                    	{
-                    	if (mods[i] instanceof Out)  // got it
-                    		{
-                    		g.setGain(((Out)mods[i]).modulate(Out.MOD_GAIN));
-                    		break;
-                    		}
-                    	}                    
+                        {
+                        if (mods[i] instanceof Out)  // got it
+                            {
+                            g.setGain(((Out)mods[i]).modulate(Out.MOD_GAIN));
+                            break;
+                            }
+                        }                    
                     g.setNumRequestedSounds(2);
                     g.setPatch(obj); 
                     g.setChannel(Input.CHANNEL_NONE);
@@ -1528,18 +1528,18 @@ public boolean addGroup(Group g)
     
     static volatile double masterGain = 1.0;
     
-	public double getMasterGain() 
-		{ 
-		return masterGain;
-		}      
+    public double getMasterGain() 
+        { 
+        return masterGain;
+        }      
                 
-	public void setMasterGain(double val) 
-		{ 
-		masterGain = val;
+    public void setMasterGain(double val) 
+        { 
+        masterGain = val;
         Prefs.setLastMasterGain(val);
-		}      
+        }      
 
-	public static final double MAX_MASTER_GAIN = 4.0;
+    public static final double MAX_MASTER_GAIN = 4.0;
 
     final static double[] MIXING = new double[]
     {

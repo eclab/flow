@@ -129,7 +129,7 @@ public class Seq extends Modulation
         super(sound);
         defineOptions(new String[] { "Change", "Free", "Stop on Release", "Sample", "Guided", "Display" }, 
             new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32" }, 
-        { "Free" }, { "Stop on Release" }, { "Sample" }, { "Guided" }, { "Display" } });
+                { "Free" }, { "Stop on Release" }, { "Sample" }, { "Guided" }, { "Display" } });
         defineModulations(new Constant[] 
             { Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
               Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
@@ -242,36 +242,36 @@ public class Seq extends Modulation
                     // should never happen
                     }
                 break;
-            case CURVE_X_2_X_8:
-                {
-                alpha = alpha * alpha;
-                double beta = alpha;		// x^2
-                alpha = alpha * alpha;
-                alpha = alpha * alpha;		// x^8
-                alpha = (alpha + beta) * 0.5;
-                }
-            break;
-            case CURVE_X_4_X_16:
-                {
-                alpha = alpha * alpha;
-                alpha = alpha * alpha;
-				double beta = alpha;		// x^4
-                alpha = alpha * alpha;
-                alpha = alpha * alpha;		// x^16
-                alpha = (alpha + beta) * 0.5;
-                }
-            break;
-            case CURVE_X_8_X_32:
-                {
-                alpha = alpha * alpha;
-                alpha = alpha * alpha;
-                alpha = alpha * alpha;
-				double beta = alpha;		// x^8
-                alpha = alpha * alpha;
-                alpha = alpha * alpha;		// x^32
-                alpha = (alpha + beta) * 0.5;
-                }
-            break;
+                case CURVE_X_2_X_8:
+                    {
+                    alpha = alpha * alpha;
+                    double beta = alpha;            // x^2
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;          // x^8
+                    alpha = (alpha + beta) * 0.5;
+                    }
+                break;
+                case CURVE_X_4_X_16:
+                    {
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    double beta = alpha;            // x^4
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;          // x^16
+                    alpha = (alpha + beta) * 0.5;
+                    }
+                break;
+                case CURVE_X_8_X_32:
+                    {
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    double beta = alpha;            // x^8
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;          // x^32
+                    alpha = (alpha + beta) * 0.5;
+                    }
+                break;
                 default:
                     {
                     // should never happen

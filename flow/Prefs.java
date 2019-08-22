@@ -385,7 +385,7 @@ public class Prefs
         String s = getLastX("SwapPrimaryWithMIDIVoice"); 
         if (s == null) return true;
         if (s.equalsIgnoreCase("false")) return false;
-        return true;							// default is FALSE
+        return true;                                                    // default is FALSE
         }
 
     public static void setLastAudioDevice(String audioDevice) { setLastX("" + audioDevice, "AudioDevice"); }
@@ -401,13 +401,13 @@ public class Prefs
         try
             {
             if (s != null)
-            	{
-            	double d = Double.parseDouble(s);
-            	if (d < 0 || d > Output.MAX_MASTER_GAIN || d != d)
-            		return Output.DEFAULT_MASTER_GAIN;
-            	else
-            		return d; 
-            	}
+                {
+                double d = Double.parseDouble(s);
+                if (d < 0 || d > Output.MAX_MASTER_GAIN || d != d)
+                    return Output.DEFAULT_MASTER_GAIN;
+                else
+                    return d; 
+                }
             }
         catch (NumberFormatException e) { }
         return Output.DEFAULT_MASTER_GAIN;                       

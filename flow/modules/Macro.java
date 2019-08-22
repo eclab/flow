@@ -125,9 +125,9 @@ public class Macro extends Unit implements Cloneable
     public void setTriggerValues(boolean isTriggered, int triggerCount, int num)
         {
         if (out != null && out.getNumModulationOutputs() > num)
-        	{
-	        out.setTriggerValues(isTriggered, triggerCount, num);
-	        }
+            {
+            out.setTriggerValues(isTriggered, triggerCount, num);
+            }
         }
 
     public void reset()

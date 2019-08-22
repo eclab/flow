@@ -164,8 +164,8 @@ public class AHR extends Modulation implements ModSource
             new String[] { "Start Level", "Attack Time", "Attack Level", "Hold Time",  "Release Time", "On Tr", "Off Tr" });
         defineOptions(new String[] { "Attack Curve", "Release Curve", "One Shot",  "MIDI Sync", "Ramp" }, 
             new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32" }, 
-       						 { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32" },
-                			{ "One Shot" }, { "Gate Reset" }, { "MIDI Sync" } } );
+                { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32" },
+                { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" } } );
         this.oneshot = false;
         setModulationOutput(0, 0);  
         }
@@ -350,9 +350,9 @@ public class AHR extends Modulation implements ModSource
             case CURVE_X_2_X_8:
                 {
                 alpha = (1-alpha) * (1-alpha);
-				double beta = alpha;		// x^2
+                double beta = alpha;            // x^2
                 alpha = alpha * alpha;
-                alpha = alpha * alpha;		// x^8
+                alpha = alpha * alpha;          // x^8
                 alpha = 1 - (alpha + beta) * 0.5;
                 }
             break;
@@ -360,9 +360,9 @@ public class AHR extends Modulation implements ModSource
                 {
                 alpha = (1-alpha) * (1-alpha);
                 alpha = alpha * alpha;
-				double beta = alpha;		// x^4
+                double beta = alpha;            // x^4
                 alpha = alpha * alpha;
-                alpha = alpha * alpha;		// x^16
+                alpha = alpha * alpha;          // x^16
                 alpha = 1 - (alpha + beta) * 0.5;
                 }
             break;
@@ -371,9 +371,9 @@ public class AHR extends Modulation implements ModSource
                 alpha = (1-alpha) * (1-alpha);
                 alpha = alpha * alpha;
                 alpha = alpha * alpha;
-				double beta = alpha;		// x^8
+                double beta = alpha;            // x^8
                 alpha = alpha * alpha;
-                alpha = alpha * alpha;		// x^32
+                alpha = alpha * alpha;          // x^32
                 alpha = 1 - (alpha + beta) * 0.5;
                 }
             break;

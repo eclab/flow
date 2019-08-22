@@ -354,10 +354,10 @@ public class Morph extends Unit
             morphTo = new int[getAmplitudes(0).length];
             }
             
-        if (!morphFrequency)		// just doing amplitude, so we're not morphing just crossfading
-        	{
+        if (!morphFrequency)            // just doing amplitude, so we're not morphing just crossfading
+            {
             for(int x = 0; x < morphTo.length; x++) morphTo[x]= x;
-        	}        
+            }        
         else if (morph == MORPH_ALL_RANDOM)
             {
             Random rand = (random == null ? getSound().getRandom() : random);

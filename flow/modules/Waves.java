@@ -8,9 +8,9 @@ import flow.*;
 import java.util.*;
 
 /**
-	This is basically the same class as KHARMONICS, except that the harmonics being
-	loaded are derived from single-cycle waves from the Kawai K3, Ensoniq SQ-80, and 
-	Prophet VS (or possibly Korg Wavestation's interpretation thereof).
+   This is basically the same class as KHARMONICS, except that the harmonics being
+   loaded are derived from single-cycle waves from the Kawai K3, Ensoniq SQ-80, and 
+   Prophet VS (or possibly Korg Wavestation's interpretation thereof).
 */
 
 public class Waves extends Unit implements UnitSource
