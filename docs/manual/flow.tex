@@ -427,8 +427,6 @@ Subpatches are added to the primary patch by choosing {\bf Load Subpatch...} in 
 
 \item {\bf Voices Allocated}\quad Obviously not every subpatch can have a maximal number of voices.  Here you can see how many voices were {\it actually} allocated.  The allocation strategy is simple: for each subpatch from top to bottom, Flow attempts to give that subpatch every voice it asked for.  Flow must reserve at least one voice for the main patch, so there are at most 15 voices available to distribute (or whatever the polyphony was that you specified in your tuning parameters).  If Flow runs out of voices, a subpatch may get fewer voices than it asked for, and later subpatches may get no voices at all.  
 
-You can see the number of remaining voices for the primary patch by looking at its {\bf Out} module.  If the title just says {\it Out}, then it has full voices.  Otherwise it'll say something like {\it Out (13 Voices)}.
-
 One confusing situation arises when you have selected {\it Monophonic} from the {\it Play} menu.  Here Flow only uses a single voice, and that voice must go to the primary patch, so the subpatches will all have zero voices.  To make this situation clear, the subpatches will show {\bf [M]} (for ``monophonic'') for the number of voices allocated, and  ``(Mono)'' will appear in the {\bf Out} module of the primary patch.
 
 \item {\bf MIDI Channel}\quad This specifies which MIDI channel is used by the subpatch (or, if no MIDI channel, ``Off'').  If multiple subpatches request the same MIDI Channel, the earlier (higher) one will prevail.    Subpatches also get MIDI channel priority over the primary patch, so if a subpatch and the primary patch are using the same MIDI channel, the subpatch gets it.
@@ -456,6 +454,15 @@ Flow mixes the primary patch and subpatch voices as follows: each voice is ampli
 
 You can remove a subpatch by clicking on its close box, just like removing a module.  You can also drag subpatches to reorder them relative to one another, just like modules.
 
+\paragraph{Primary Patch Parameter Display}  Subpatches take priority over the primary patch both in allocated voices and MIDI channels, so how you set them seriously affects the primary patch's resources.  You can see what those resources are by looking at the title bar of the {\bf Out} module:
+
+\begin{itemize}
+\item {\bf Voices}\quad  If the title just says {\it Out}, then it has full voices. Otherwise it'll say something like {\it Out (13 Voices)}.
+\item {\bf Monophonic}\quad  If you are playing in monophonic mode, the Primary patch gets the one and only voice.  In this case, the title will say {\it Out (Mono)}.
+\item {\bf MIDI Channel}\quad  If you have any subpatches, the title will display the MIDI channel of the primary patch.  For example, if the channel is 13, the title will say something like {\it M13}.  If another subpatch has {\it also} chosen channel 13, then the title will say {\it M13?}.  Whether the subpatch has fully overridden the primary patch depends on whether the subpatch is restricted to a single MIDI Note (and it's different from the primary patch of course).
+\item {\bf MIDI Note}\quad  Speaking of the MIDI note: normally you can't set the MIDI note in a primary patch\,---\,however if you set it in a subpatch, then swap the subpatch to the primary patch, then it will have a MIDI note (mostly under the assumption that you're doing this temporarily and will swap it back).  In this case, the note will be displayed, something like {\it Ab2}.
+\end{itemize}
+
 \paragraph{Changing Subpatch Order}
 
 As mentioned before, the order of the subpatches affects which patches get allocated voices and priority over MIDI channels.  You change this order by dragging the titlebar of a subpatch and dropping it before or after another subpatch.
@@ -465,6 +472,8 @@ As mentioned before, the order of the subpatches affects which patches get alloc
 If you drag the titlebar of a subpatch clear into the region of the {\it primary patch}, it will {\bf swap} the subpatch with the primary patch.  Flow will preserve reverb from the previous patch.  This is useful for making a subpatch the the Primary Patch temporarily in order to tweak it.
 
 Swapping the MIDI channel come with some caveats.  First, only the Primary patch can perform MPE: so if you are swapping a primary patch that uses MPE, when it becomes a subpatch its MIDI channel will become ``No Channel''.  Similarly, only subpatches can have ``No Channel'' as a MIDI channel option,\footnote{This may change in the future.} so if one of them is swapped to a primary path, its MIDI channel will change to ``All Channels''.
+
+Another thing you need to watch out for is swapping the Primary patch whose Gain is under the control of a modulation such as an LFO.  When it becomes a subpatch, the subpatch's Gain slider will be set to 0 (and it won't work anyway).  In short: don't control Gain from a modulation.
 
 You can also swap a subpatch with  swap while holding down the Control key (on the Mac, you can also hold the Option key).\footnote{Yes, I know this is the behavior for ``copying'' while drag and drop, and in fact you'll get a copy icon.  But there's no ``alternative drag'' option in Java, so I had to make do.}  This will swap the two patches but the MIDI channel, MIDI Note, and Number of Requested Sounds won't change.  Why would you want to do this?  If you are auditioning a bunch of different sounds, you may have them lined up as subpatches and are dragging them into the primary patch to hear them play a given part (which has its own MIDI channel).
 

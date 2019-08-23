@@ -77,6 +77,8 @@ public class SubpatchPanel extends JPanel implements Transferable
             Output out = rack.getOutput();
             titleLabel.setText(" " + out.getGroup(group).getPatchName());
             gain.setValue((int)(out.getGroup(group).getGain() * GAIN_RESOLUTION * Out.MAX_GAIN));
+            double val = gain.getValue() / (double) GAIN_RESOLUTION;
+            gainLabel.setText(String.format("%1.2f", val));
 
             sounds.setValue(out.getGroup(group).getNumRequestedSounds());
             soundsLabel.setText(sounds.getValue() == 0 ? "Off" : "" + sounds.getValue());
@@ -317,7 +319,7 @@ public class SubpatchPanel extends JPanel implements Transferable
             public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         gainLabel.setFont(Style.SMALL_FONT());
-        double g = rack.getOutput().getGroup(group).getGain();
+        //double g = rack.getOutput().getGroup(group).getGain();
         
         gain = new JSlider(0, (int)(Out.MAX_GAIN * GAIN_RESOLUTION), 0);
         gain.setSnapToTicks(true);

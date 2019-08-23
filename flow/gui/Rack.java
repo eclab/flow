@@ -999,7 +999,7 @@ public class Rack extends JPanel
         final double MASTER_GAIN_MULTIPLIER = 50.0;
                 
         gainLabel.setText(String.format("%.2f ", output.getMasterGain()));
-        JSlider gainSlider = new JSlider(0, (int)(Output.MAX_MASTER_GAIN * MASTER_GAIN_MULTIPLIER), (int)(1.0 * MASTER_GAIN_MULTIPLIER));
+        JSlider gainSlider = new JSlider(0, (int)(Output.MAX_MASTER_GAIN * MASTER_GAIN_MULTIPLIER), (int)(output.getMasterGain() * MASTER_GAIN_MULTIPLIER));
         JButton gainResetButton = new JButton("Reset");
         gainResetButton.addActionListener(new ActionListener()
             {
@@ -1543,6 +1543,11 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                                     double wet = out.modulate(Out.MOD_REVERB_WET);
                                     double damp = out.modulate(Out.MOD_REVERB_DAMP);
                                     double size = out.modulate(Out.MOD_REVERB_ROOM_SIZE);
+                                    output.getGroup(Output.PRIMARY_GROUP).setGain(out.modulate(Out.MOD_GAIN));  // load gain into group
+                                    if (!(out.getModulation(Out.MOD_GAIN) instanceof Constant))
+                                        {
+                                        System.err.println("Couldn't move gain from primary, because user is modulating it (ugh)");
+                                        }
                                                                 
                                     // get old group
                                     Group g = output.getGroup(index);
@@ -1573,7 +1578,17 @@ class ModulePanelDropTargetListener extends DropTargetAdapter
                                         {
                                         // load the old group as the primary group.  Don't displace the subpatches
                                         AppMenu.doLoad(rack, g.getPatch(), false);
-                                                                        
+                                        
+                                        Out out2 = (Out)(output.getSound(0).getEmits());
+                                        if (out2.getModulation(Out.MOD_GAIN) instanceof Constant)
+                                            {
+                                            out2.setModulation(new Constant(g.getGain()), Out.MOD_GAIN);
+                                            }
+                                        else
+                                            {
+                                            System.err.println("Couldn't move gain from subpatch, because user is modulating it (ugh)");
+                                            }
+                                        
                                         rack.rebuild();
                                         rack.rebuildSubpatches();
                                         }

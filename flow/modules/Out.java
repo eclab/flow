@@ -279,6 +279,7 @@ public class Out extends Unit implements Miscellaneous
         final boolean[] oldBlockedMIDI = new boolean[] { false };
         final int[] oldChannel = new int[] { -100 };
         final int[] oldRestrict = new int[] { -100 };
+        final int[] oldNumGroups = new int[] { -100 };
         
         final JLabel example = new JLabel("  (Audio)");
         example.setFont(Style.SMALL_FONT());
@@ -445,6 +446,7 @@ public class Out extends Unit implements Miscellaneous
                 boolean blockedMIDI;
                 int channel;
                 int restrict = -1;
+                int numGroups = 1;
 
                 out.lock();
                 try
@@ -455,6 +457,7 @@ public class Out extends Unit implements Miscellaneous
                     numVoices = out.getNumSounds(Output.PRIMARY_GROUP);
                     blockedMIDI = (out.getGroupOverridingPrimaryGroupInMIDI() != Output.PRIMARY_GROUP);
                     channel = out.getGroup(Output.PRIMARY_GROUP).getChannel();
+                    numGroups = out.getNumGroups();
                     int min = out.getGroup(Output.PRIMARY_GROUP).getMinNote();
                     int max = out.getGroup(Output.PRIMARY_GROUP).getMaxNote();
                     if (min == max) restrict = min;
@@ -464,8 +467,14 @@ public class Out extends Unit implements Miscellaneous
                     out.unlock();
                     }
                 
-                if (numVoices != oldNumVoices[0] || clipped != oldClipped[0] || glitched != oldGlitched[0] || playFirst != oldPlayFirst[0] || 
-                    blockedMIDI != oldBlockedMIDI[0] || channel != oldChannel[0] || restrict != oldRestrict[0])
+                if (numVoices != oldNumVoices[0] || 
+                    clipped != oldClipped[0] || 
+                    glitched != oldGlitched[0] || 
+                    playFirst != oldPlayFirst[0] || 
+                    blockedMIDI != oldBlockedMIDI[0] || 
+                    channel != oldChannel[0] || 
+                    restrict != oldRestrict[0] ||
+                    numGroups != oldNumGroups[0])               // anything to avoid changing the text
                     {
                     oldClipped[0] = clipped;
                     oldGlitched[0] = glitched;
@@ -474,6 +483,7 @@ public class Out extends Unit implements Miscellaneous
                     oldBlockedMIDI[0] = blockedMIDI;
                     oldChannel[0] = channel;
                     oldRestrict[0] = restrict;
+                    oldNumGroups[0] = numGroups;
 
                     String labeladdendum = null;
                     if (playFirst)
@@ -500,6 +510,10 @@ public class Out extends Unit implements Miscellaneous
                     if (blockedMIDI)
                         {
                         labeladdendum = labeladdendum + "  M" + (out.getGroup(Output.PRIMARY_GROUP).getChannel() + 1) + "?";
+                        }
+                    else if (numGroups > 1)  // we've got subgroups
+                        {
+                        labeladdendum = labeladdendum + "  M" + (out.getGroup(Output.PRIMARY_GROUP).getChannel() + 1);
                         }
 
                     panel[0].getTitlePanel().setBackground(glitched ? Color.RED : (clipped ? Color.YELLOW : Color.BLACK));
