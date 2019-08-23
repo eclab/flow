@@ -342,6 +342,11 @@ public class Macro extends Unit implements Cloneable
         loadModules(Sound.loadModules(data, flowVersion), Sound.loadName(data));
         }
 
+	String info;
+	String version;
+	String author;
+	String date;
+	
     public JSONObject getData() 
         { 
         JSONObject obj = new JSONObject();
@@ -365,18 +370,87 @@ public class Macro extends Unit implements Cloneable
     public static Macro loadMacro(Sound sound, JSONObject obj) throws Exception
         {
         obj.remove("sub");  // strip out subgroups
-        return new Macro(sound, 
+        Macro macro = new Macro(sound, 
             Sound.loadModules(obj, Sound.loadFlowVersion(obj)), 
             Sound.loadName(obj));
+        macro.info = obj.getString("info");
+        macro.version = obj.getString("v");
+        macro.author = obj.getString("by");
+        macro.date = obj.getString("on");
+        return macro;
         }
         
+    public static final int LABEL_MAX_LENGTH = 24;
+
     public ModulePanel getPanel()
         {
+        final JLabel _author = new JLabel(" ", SwingConstants.LEFT);
+        final JLabel _date = new JLabel(" ", SwingConstants.LEFT);
+        final JLabel _version = new JLabel(" ", SwingConstants.LEFT);
+        final JTextArea _info = new JTextArea(5, LABEL_MAX_LENGTH / 2);
+                
+        _author.setFont(Style.SMALL_FONT());
+        _date.setFont(Style.SMALL_FONT());
+        _version.setFont(Style.SMALL_FONT());
+        _info.setFont(Style.SMALL_FONT());
+        _info.setLineWrap(true);
+        _info.setWrapStyleWord(true);
+        _info.setBorder(null);
+        _info.setBackground(_author.getBackground());
+        _info.setRows(20);
+        _info.setText(" ");
+        _info.setHighlighter(null);
+        _info.setEditable(false);
+        _info.setCaretPosition(0);  // scrolls to top
+                
+        final JScrollPane pane = new JScrollPane(_info);
+        pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        pane.setBorder(null);
+        pane.getViewport().setBackground(_author.getBackground());
+        pane.getVerticalScrollBar().setBackground(_author.getBackground());
+        pane.getVerticalScrollBar().setOpaque(false);
+        
         return new ModulePanel(Macro.this)
             {
             public JComponent buildPanel()
                 {
                 Box box = new Box(BoxLayout.Y_AXIS);
+
+				_author.setText(author);
+				_date.setText(date);
+				_version.setText(version);
+				_info.setText(info);
+				
+                Box right = new Box(BoxLayout.Y_AXIS);
+
+                JLabel label = new JLabel("<html><b>Version</b></html>");
+                label.setFont(Style.SMALL_FONT());              
+                right.add(label);
+                right.add(_version);
+                right.add(Strut.makeVerticalStrut(3));
+
+                label = new JLabel("<html><b>Author</b></html>");
+                label.setFont(Style.SMALL_FONT());              
+                right.add(label);
+                right.add(_author);
+                right.add(Strut.makeVerticalStrut(3));
+
+                label = new JLabel("<html><b>Date</b></html>");
+                label.setFont(Style.SMALL_FONT());              
+                right.add(label);
+                right.add(_date);
+                right.add(Strut.makeVerticalStrut(3));
+
+                label = new JLabel("<html><b>Info</b></html>");
+                label.setFont(Style.SMALL_FONT());              
+                right.add(label);
+                
+                JPanel disclosureP = new JPanel();
+                disclosureP.setLayout(new BorderLayout());
+                disclosureP.add(right, BorderLayout.NORTH);
+                disclosureP.add(pane, BorderLayout.CENTER);
+
+
                 Unit unit = (Unit) getModulation();
                 boolean hasIns = false;
                 boolean hasOuts = false;
@@ -418,6 +492,11 @@ public class Macro extends Unit implements Cloneable
                 
                 if (hasIns && hasOuts)
                     box.add(new ConstraintsChooser(unit, this));
+
+                JLabel disclosureLabel = new JLabel("Info  ");
+                disclosureLabel.setFont(Style.SMALL_FONT());
+                DisclosurePanel disclosure = new DisclosurePanel(disclosureLabel, disclosureP, null);
+                box.add(disclosure);
 
                 return box;
                 }

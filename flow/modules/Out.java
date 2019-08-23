@@ -229,13 +229,12 @@ public class Out extends Unit implements Miscellaneous
         }
 
         
-    public static final int LABEL_MAX_LENGTH = 16;
+    public static final int LABEL_MAX_LENGTH = 24;
 
 
     public static abstract class OutModulePanel extends ModulePanel
         {
         public abstract void updatePatchInfo();
-        public abstract void setReverb(float wet, float damp, float size);
         public OutModulePanel(Modulation mod) { super(mod); }
         };
 
@@ -347,10 +346,6 @@ public class Out extends Unit implements Miscellaneous
                 repaint();
                 }
             
-            public void setReverb(float wet, float damp, float size)
-                {
-                }
-                 
             public JComponent buildPanel()
                 {
                 JComponent left = super.buildPanel();
@@ -545,7 +540,7 @@ public class Out extends Unit implements Miscellaneous
         if (input < NUM_UNIT_OUTPUTS) return UNIT_NAMES[input];
         else return super.getKeyForInput(input);
         }
-        
+
     public void setData(JSONObject data, int moduleVersion, int patchVersion) 
         {
         if (data == null)
