@@ -163,6 +163,13 @@ public class In extends Unit implements Miscellaneous
 
 
     //// SERIALIZATION STUFF
+    public String getKeyForModulation(int input)
+        {
+        // notice we're reusing a lot of stuff from getKeyForModulationOutput below
+        if (input < NUM_MOD_INPUTS) return MOD_NAMES[input];
+        else return super.getKeyForModulation(input);
+        }
+   
     public String getKeyForModulationOutput(int output)
         {
         if (output < NUM_MOD_INPUTS) return MOD_NAMES[output];
