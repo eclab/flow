@@ -192,7 +192,7 @@ public class AppMenu
                     }
                 else
                     {
-                    doSaveAs(rack);
+                    doSaveAs(rack, false);
                     }
                 }
             });
@@ -209,38 +209,40 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-                doSaveAs(rack);
+                doSaveAs(rack, false);
                 }
             });
         return save;
         }
     
         
-    static void doSaveAs(Rack rack)
+    // Produces the Export Primary Patch menu
+    static JMenuItem exportPrimaryPatchMenu(Rack rack)
         {
-        /*
-          if (rack.getPatchName() == null || rack.getPatchName().trim().equals(""))
-          {
-          if (!rack.doPatchDialog("Patch Information Prior to Saving"))
-          return;         // failed
-          }
-        */
-
-/*
-  Modulation[] mods = new Modulation[rack.allModulePanels.size()];
-  for(int i = 0; i < mods.length; i++)
-  {
-  mods[i] = rack.allModulePanels.get(i).getModulation();
-  }
-*/
-                     
-        FileDialog fd = new FileDialog((Frame)(SwingUtilities.getRoot(rack)), "Save Patch to Sysex File...", FileDialog.SAVE);
+        JMenuItem export = new JMenuItem("Export Primary Patch...");
+        export.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
+        export.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+                doSaveAs(rack, true);
+                }
+            });
+        return export;
+        }
+    
+            static void doSaveAs(Rack rack, boolean primaryOnly)
+        {
+        FileDialog fd = new FileDialog((Frame)(SwingUtilities.getRoot(rack)), 
+        	(primaryOnly ?
+        		"Export Primary Patch to File..." :
+        		"Save Patch to File..."), FileDialog.SAVE);
                 
         File ff = file; // rare occurrence
         if (rack.getPatchFile() != null)
             ff = rack.getPatchFile();
 
-        if (ff != null)
+        if (ff != null && !primaryOnly)
             {
             fd.setFile(ff.getName());
             // dirFile should always exist if file exists
@@ -269,7 +271,8 @@ public class AppMenu
             JSONObject obj = new JSONObject();
 
             Output out = rack.getOutput();
-            Sound.saveGroups(out.getGroups(), out.getNumGroups(), obj);
+            if (!primaryOnly)
+            	Sound.saveGroups(out.getGroups(), out.getNumGroups(), obj);
             Sound.savePatchInfo(rack.getPatchInfo(), obj);
             Sound.savePatchDate(rack.getPatchDate(), obj);
             Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
@@ -305,10 +308,14 @@ public class AppMenu
                 {
                 rack.getOutput().unlock();
                 }
-            file = f;
-            dirFile = f;
-            rack.setPatchFile(f);
-            rack.setPatchName(rack.getPatchName());
+            
+            if (!primaryOnly)
+            	{
+            	file = f;
+	            dirFile = f;
+	            rack.setPatchFile(f);
+	            rack.setPatchName(rack.getPatchName());
+	            }
             }
         }
 
@@ -376,7 +383,7 @@ public class AppMenu
     static JMenuItem loadPrimaryPatchMenu(Rack rack)
         {
         JMenuItem load = new JMenuItem("Load Primary Patch...");
-        load.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK | InputEvent.ALT_MASK));
+        load.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
         load.addActionListener(new ActionListener()
             {
             public void actionPerformed(ActionEvent e)
@@ -642,8 +649,8 @@ public class AppMenu
             {
             public void actionPerformed(ActionEvent e)
                 {
-                if (showSimpleConfirm("New Patch", "Clear the existing patch " + 
-                        (rack.subpatchBox.getComponentCount() > 0 ? "and subpatches?" : ""), rack))
+                if (showSimpleConfirm("New Patch", "Clear the existing patch" + 
+                        (rack.subpatchBox.getComponentCount() > 0 ? " and subpatches?" : "?"), rack))
                     {
                     doNew(rack, true);
                     }
@@ -656,7 +663,7 @@ public class AppMenu
     static JMenuItem newPrimaryPatchMenu(Rack rack)
         {
         JMenuItem newpatch = new JMenuItem("New Primary Patch");
-        newpatch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.SHIFT_MASK));
+        newpatch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() | InputEvent.ALT_MASK));
         newpatch.addActionListener(new ActionListener()
             {
             public void actionPerformed(ActionEvent e)
@@ -1199,13 +1206,14 @@ return swapPrimary;
         JMenu menu = new JMenu("File");
 
         menu.add(newPatchMenu(rack));
+        menu.add(loadPatchMenu(rack));
         menu.add(savePatchMenu(rack));
         menu.add(saveAsPatchMenu(rack));
-        menu.add(loadPatchMenu(rack));
         menu.addSeparator();
         menu.add(newPrimaryPatchMenu(rack));
         menu.add(loadPrimaryPatchMenu(rack));
         menu.add(loadSubpatchMenu(rack));
+        menu.add(exportPrimaryPatchMenu(rack));
 
         if (!Style.isMac())
             {

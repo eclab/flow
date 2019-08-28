@@ -324,9 +324,16 @@ public class Macro extends Unit implements Cloneable
         // set the inputs
         if (ins.size() > 0)
             {
+            // compute the default settings for each one
+            Constant[] c = new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO };
+            for(int i = 0; i < 4; i++)
+            	if (ins.get(0).getModulation(i) instanceof Constant)
+            		{
+            		c[i] = new Constant(ins.get(0).modulate(i));
+            		}
+            
             String[] s = ins.get(0).getModulationOutputNames();
-            defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO}, 
-                ins.get(0).getModulationOutputNames());
+            defineModulations(c, ins.get(0).getModulationOutputNames());
             defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, 
                 ins.get(0).getOutputNames());
             }
@@ -373,10 +380,10 @@ public class Macro extends Unit implements Cloneable
         Macro macro = new Macro(sound, 
             Sound.loadModules(obj, Sound.loadFlowVersion(obj)), 
             Sound.loadName(obj));
-        macro.info = obj.getString("info");
-        macro.version = obj.getString("v");
-        macro.author = obj.getString("by");
-        macro.date = obj.getString("on");
+        macro.info = obj.optString("info", "");
+        macro.version = obj.optString("v", "");
+        macro.author = obj.optString("by", "");
+        macro.date = obj.optString("on", "");
         return macro;
         }
         

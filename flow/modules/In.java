@@ -24,11 +24,12 @@ public class In extends Unit implements Miscellaneous
     public static final int NUM_UNIT_INPUTS = 4;
     public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
     public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4" };
-        
+       
     public In(Sound sound)
         {
         super(sound);
         // we want the original names around so we can refer to them later
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO }, (String[])(MOD_NAMES.clone()));
         defineModulationOutputs((String[])(MOD_NAMES.clone()));
         defineOutputs((String[])(UNIT_NAMES.clone()));
         defineInputs(new Unit[0], new String[0]);
@@ -43,9 +44,13 @@ public class In extends Unit implements Miscellaneous
         for(int i = 0; i < NUM_MOD_INPUTS; i++)
             {
             if (macro != null)
+            	{
                 setModulationOutput(i, macro.modulate(i));
+                }
             else 
-                setModulationOutput(i, 0.0);  // probably don't need to do this, but...
+            	{
+                setModulationOutput(i, modulate(i));	// set outputs to the defaults the user set
+                }
             }
 
         for(int i = 0; i < NUM_UNIT_INPUTS; i++)
@@ -101,6 +106,12 @@ public class In extends Unit implements Miscellaneous
                 
             public void updateTitleChange(InputOutput inout, int number, String newTitle)
                 {
+                // update the assocated Input
+                for(int i = 0; i < 4; i++)
+                	{
+                	getModIn(i).setTitleText(getModOut(i).getTitleText());
+                	}
+                
                 // Here we're going to redistribute the title to all the Ins in the patch
                 Rack rack = getRack();
                 if (!inout.isInput())
@@ -140,6 +151,12 @@ public class In extends Unit implements Miscellaneous
         UnitOutput[] b = panel[0].getUnitOutputs();
         for(int i = 0; i < b.length; i++)
             b[i].setTitleCanChange(true);
+
+		// update the assocated Input
+		for(int i = 0; i < 4; i++)
+			{
+			panel[0].getModIn(i).setTitleText(panel[0].getModOut(i).getTitleText());
+			}
 
         return panel[0];
         }

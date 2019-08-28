@@ -272,6 +272,7 @@ public class Sound
     /** Stores the patch name to the given object. */
     public static void saveName(String name, JSONObject obj) throws JSONException
         {
+        if (name == null) name = "";
         obj.put("name", name);
         }
         
@@ -286,6 +287,7 @@ public class Sound
     /** Stores the patch version to the given object. */
     public static void savePatchVersion(String name, JSONObject obj) throws JSONException
         {
+        if (name == null) name = "";
         obj.put("v", name);
         }
                 
@@ -298,6 +300,7 @@ public class Sound
     /** Stores the patch version to the given object. */
     public static void savePatchDate(String name, JSONObject obj) throws JSONException
         {
+        if (name == null) name = "";
         obj.put("on", name);
         }
                 
@@ -310,6 +313,7 @@ public class Sound
     /** Stores the patch version to the given object. */
     public static void savePatchAuthor(String name, JSONObject obj) throws JSONException
         {
+        if (name == null) name = "";
         obj.put("by", name);
         }
                 
@@ -322,6 +326,7 @@ public class Sound
     /** Stores the patch version to the given object. */
     public static void savePatchInfo(String name, JSONObject obj) throws JSONException
         {
+        if (name == null) name = "";
         obj.put("info", name);
         }
                 
