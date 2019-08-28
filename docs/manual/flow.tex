@@ -274,8 +274,10 @@ By default, partial frequencies are displayed linearly.  You can change this to 
 
 Displays can also be set to {\it Waterfall Mode}, where the partials become dots (brighter dots are higher amplitude) and scroll by in time.  To try this out, choose {\bf Waterfall Display} in the {\bf Options} menu.  Finally, you can hide (or display) the displays with the menu option {\it Show Displays}: hiding the displays uses less computer power.
 
-\begin{wrapfigure}{r}{1in}
-\includegraphics[height=1in]{oscilloscope}
+\begin{wrapfigure}{r}{0.85in}
+\vspace{-1em}
+\includegraphics[height=.85in]{oscilloscope}
+\vspace{-1.5em}
 \caption{An\newline Oscilloscope}
 \vspace{-1em}
 \label{oscilloscope}
@@ -284,26 +286,34 @@ Displays can also be set to {\it Waterfall Mode}, where the partials become dots
 \paragraph{Oscilloscopes}
 You might also find the oscilloscopes handy to understand what a modulation signal looks like.  The left oscilloscope shows the modulation signal of anything connected to the {\it 1 (Scope)} jack in {\bf Out}.  Notice for example, that in Figure~\ref{simplepatch}, the LFO is wired up to modulate the {\it 1 (Scope)} jack: this will cause it to be displayed in the left oscilloscope display.  Similarly, the right oscilloscope shows the modulation signal of anything connected to the {\it 2 (Aux)} jack.  Oscilloscopes have axes (the horizontal axis passes through the 0.5 position).  These axes change colors from blue to green (or from green to blue) any time the modulation triggers.  Oscilloscopes don't currently display any text when you hover over them.  Maybe they should!
 
+\begin{wrapfigure}{r}{1.75in}
+\vspace{-1em}
+\includegraphics[width=1.75in]{simple}
+\caption{Playing a Saw wave}
+\vspace{-2em}
+\label{simple}
+\end{wrapfigure}
+
 A warning about oscilloscopes: like displays, they show the data of the most recently pressed note.  This can be confusing if (for example) you're using an LFO.  You've just reset the LFO with a note-on, but instead of resetting from its current position, it magically jumps to something much higher and resets from there.  This is because the voice being allocated for your note has its LFO at that position at the moment, {\it not the voice you've just been watching}, and the oscilloscope suddenly jumped to it.
 
 \subsection{Playing a Patch}
 \label{playingapatch}
 
-\begin{wrapfigure}{r}{1.5in}
-\vspace{-1em}
-\includegraphics[width=1.5in]{simple}
-\caption{Playing a Sawtooth}
-\vspace{-1em}
-\label{simple}
-\end{wrapfigure}
-
 In order to hear a sound you need to first specify your {\bf Audio Device} from the window which pops up when you select {\bf MIDI and Audio Options} from the {\bf Options} menu.  I suggest setting it to your computer's speaker.
 
-Now, if you directly connect a partials source ({\bf Sawtooth}, say) to the {\bf A (Audio)} input of your {\bf Out} module, it'll start playing.  In fact, {\bf all voices} might start playing: there's nothing to stop them!  It won't sound good.   At this point you're just testing your patch and may want to hear just a single voice.  To do this, select the menu option {\bf Monophonic} in the {\bf Play} menu.  The word "(Mono") will appear in the {\bf Out} module.
+Now, if you directly connect a partials source ({\bf Sawtooth}, say) to the {\bf A (Audio)} input of your {\bf Out} module, it'll start playing.  See Figure~\ref{simple} at right.  In fact, {\bf all voices} might start playing: there's nothing to stop them!  It won't sound good.   At this point you're just testing your patch and may want to hear just a single voice.  To do this, select the menu option {\bf Monophonic} in the {\bf Play} menu.  The word "(Mono") will appear in the {\bf Out} module.
 
 You might also choose {\bf Monophonic} if you'd like a monophonic synth.  Flow does {\it last note priority}, meaning that if, while playing monophonically, you hold down note A, then hold down note B, then hold down note C, then let go of C, then B will begin to sound, and if you let go of B, then A will begin to sound.
 
-Ultimately you'll probably set things up with a {\bf VCA} (see the last entry in Section~\ref{unitshapers}) modulated by an {\bf Envelope} (typically a {\bf DADSR Envelope}: see Section~\ref{modsources}) which won't play the sound unless a key is pressed.  That way different voices are played when you play different keys.  At that point you'll want to uncheck {\bf Monophonic} so you can play more than one voice.
+\begin{wrapfigure}{r}{3in}
+\vspace{-1em}
+\includegraphics[width=3in]{adsr}
+\caption{Playing a Saw wave modulated by an ADSR envelope and a VCA}
+\vspace{-2em}
+\label{adsr}
+\end{wrapfigure}
+
+Ultimately you'll probably set things up with a {\bf VCA} (see the last entry in Section~\ref{unitshapers}) modulated by an {\bf Envelope} (typically a {\bf DADSR Envelope}: see Section~\ref{modsources}) which won't play the sound unless a key is pressed. See Figure~\ref{adsr} at right That way different voices are played when you play different keys.  At that point you'll want to uncheck {\bf Monophonic} so you can play more than one voice.
 
 So how do you play a using keyboard?  You attach it to {\name} by selecting {\bf MIDI and Audio Preferences} from the {\bf Options} menu, then choosing the appropriate {\bf MIDI Device} and {\bf MIDI Channel}.  You'll notice an {\bf Auxillary MIDI Device} as an option: this lets you connect two MIDI devices to Flow.  It's not useful to use this unless you're in multitimbral mode (discussed in Section~\ref{multitimbral}).
 
