@@ -477,11 +477,9 @@ Another thing you need to watch out for is swapping the Primary patch whose Gain
 
 You can also swap a subpatch with  swap while holding down the Control key (on the Mac, you can also hold the Option key).\footnote{Yes, I know this is the behavior for ``copying'' while drag and drop, and in fact you'll get a copy icon.  But there's no ``alternative drag'' option in Java, so I had to make do.}  This will swap the two patches but the MIDI channel, MIDI Note, and Number of Requested Sounds won't change.  Why would you want to do this?  If you are auditioning a bunch of different sounds, you may have them lined up as subpatches and are dragging them into the primary patch to hear them play a given part (which has its own MIDI channel).
 
-\paragraph{Loading and Clearing the Primary Patch}  Obviously you could load a new primary patch or clear it by choosing {\it Load Patch...} or {\it New Patch}: but this will clear out the subpatches as well.  There are times when you'd just like to replace the primary patch but keep the existing subpatches around.
+\paragraph{Loading, Clearing, and Saving the Primary Patch}  Obviously you could clear the primary patch or load a new one by choosing {\it Load Patch...} or {\it New Patch} respectively, but this would clear out the subpatches as well.  If you just want to clear just the primary patch alone, choose {\it New Primary Patch}.  You'll be asked if you wanted to optionally {\it demote} the primary patch, that is, to turn it into a subpatch rather than eliminate it. 
 
-If you choose {\it New Primary Patch}, you will clear the primary patch but not the subpatches.  You'll be asked if you wanted to optionally {\it demote} the primary patch, that is, to make it a subpatch rather than eliminate it. 
-
-Similarly, if you choose {\it Load Primary Patch...}, you will load a new primary patch, replacing the original, but will keep the subpatches.  You will likewise be asked if you would like to optionally {\it demote} the primary patch just as before.
+Similarly, if you choose {\it Load Primary Patch...}, you will load a new primary patch, replacing the original, but keep the subpatches.  You will likewise be asked if you would like to optionally {\it demote} the primary patch just as before.  If you'd like to save the primary patch to a file (but not its subpatches), you can choose {\it Export Primary Patch...}  This sometimes happens when you've modified a subpatch in a multitimbral setting and would like to keep it: swap it to the primary patch, export it, then swap back.
 
 \subsubsection{Digital Audio Workstation Integration Strategies}
 
@@ -895,15 +893,17 @@ There's no reason you can't insert multiple Out modules into your patch: but onl
 \subsubsection{Creating a Macro with the \textit{In}, \textit{Out,} and \textit{Macro} Modules}
 \label{creatingmacros}
 
-Once you have saved your patch, you can reload it as a {\bf Macro} in a higher-level patch of your design: it will appear as a module like any other.  The partials fed into the ({\bf A}) port of your Out module, normally used to produce audio, will be available to feed into other modules. When used in a macro, Out's Reverb is disabled.
+Once you have saved your patch, you can reload it as a {\bf Macro} in a higher-level patch of your design: it will appear as a module like any other.  The partials fed into the ({\bf A}) port of your Out module, normally used to produce audio, will be available to feed into other modules. When used in a macro, Out's Reverb and Gain are disabled.  The underlying patch's information (author, etc.) are available by clicking on a disclosure triangle labelled {\it Info}.  Macro's outputs, like other partials shapers, can be constrained.
 
 But that's not all.  Your patch can in fact output {\it four} partials streams, by default called {\bf A}, {\bf B}, {\bf C}, and {\bf D}.  And you can also output {\it four} modulation signals, called {\bf 1}, {\bf 2}, {\bf 3}, and {\bf 4}.  Just connect to them in the Out module of your original patch, and when you load it as a Macro, they're all available as outputs in the Macro module to feed into other modules. 
 
-So far so good.  But how about feeding partials and modulation signals {\it into} your Macro?  This is accomplished with the {\bf In} module.  The In module has four partials outputs and four modulation outputs, conveniently called {\bf A}, {\bf B}, {\bf C}, {\bf D}, {\bf 1}, {\bf 2}, {\bf 3}, and {\bf 4}, just like Out's input ports.  If, before you save your patch, you wire up some modules to listen in on these ports, then when you load the patch as a Macro, you can attach modules to feed into the Macro at those ports and their partials and modulation signals will be handed the modules inside the Macro.  Unlike Out, you can have as many In modules as you like: all of them will happily provide these signals.
+\paragraph{Input to a Macro: the \textit{In} Module}  So far so good.  But how about feeding partials and modulation signals {\it into} your Macro?  This is accomplished with the {\bf In} module.  The In module has four partials outputs and four modulation outputs, conveniently called {\bf A}, {\bf B}, {\bf C}, {\bf D}, {\bf 1}, {\bf 2}, {\bf 3}, and {\bf 4}, just like Out's input ports.  If, before you save your patch, you wire up some modules to listen in on these ports, then when you load the patch as a Macro, you can attach modules to feed into the Macro at those ports and their partials and modulation signals will be handed the modules inside the Macro.  Unlike Out, you can have as many In modules as you like: all of them will happily provide (the same) signals.
 
-Macro, like other partials shapers, can be constrained.
+\paragraph{Modulation Defaults}
 
-\subsubsection{Naming Things}
+The In module also contains some modulation inputs (dials) with the same name as its modulation outputs.  The primary purpose of these inputs is to allow you to set default values for the Macro.   For example, if you set the first dial to 0.25, then the Macro will use 0.25 by default.  If while editing the patch you change these dials, then the In module will also temporarily send the same value out its equivalent modulation output.  This makes it a bit easier to figure out what values to set by default.  However this also means that you can also hook modulation signals to these inputs and the same signal will be output: but when you load the patch as a macro, these modulation signals will be ignored and the default will be set to 0.0.  In short: you should only set the dials manually, not via modulation signal: it'd be confusing otherwise.
+
+\paragraph{Naming Things}
 
 You can rename the input and output partials and modulation ports of your Macro.  This is accomplished by renaming their compatriots in your In and Out modules.  Note that, unlike in other modules, the ports in your In and Out modules have {\bf underlined labels}.  Just click on a label and you'll be asked to give it a new name.
 
