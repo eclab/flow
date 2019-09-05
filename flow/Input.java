@@ -739,6 +739,7 @@ public class Input
                 {
                 sound.setBend(globalBend[sound.getChannel()]);
                 }
+//            System.err.print("Gating? " + !noteCurrentlyOn);
             if (!noteCurrentlyOn)
                 {
                 sound.gate();
