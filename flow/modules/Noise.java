@@ -44,6 +44,38 @@ public class Noise extends Unit implements UnitSource
     public static final int MOD_AMP_VAR = 3;
     public static final int MOD_RAMP = 4;
     public static final int MOD_GAIN = 5;
+    public static final int MOD_SEED = 6;
+
+    public Random random = null;
+        
+    void initializeRandom()     
+        {
+        // first reseed
+        double mod = modulate(MOD_SEED);
+                
+        if (mod == 0)
+            {
+            random = null;
+            }
+        else
+            {
+            long seed = Double.doubleToLongBits(mod);
+            if (random == null) random = new Random(seed);
+            else random.setSeed(seed);
+            }
+        }
+        
+    public void reset()
+        {
+        super.reset();
+        initializeRandom(); 
+        }
+                
+    public void gate()
+        {
+        super.gate();
+        initializeRandom(); 
+        }
 
     boolean top = true;
     public boolean isTop() { return top; }
@@ -73,8 +105,8 @@ public class Noise extends Unit implements UnitSource
     public Noise(Sound sound)
         {
         super(sound);
-        defineModulations(new Constant[] { Constant.ONE, Constant.ZERO, Constant.HALF, Constant.ZERO, Constant.ONE, Constant.HALF }, 
-            new String[] { "High", "Low", "Partials", "Amp Var", "Ramp", "Gain" });
+        defineModulations(new Constant[] { Constant.ONE, Constant.ZERO, Constant.HALF, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ZERO }, 
+            new String[] { "High", "Low", "Partials", "Amp Var", "Ramp", "Gain", "Seed" });
         defineOptions(new String[] { "Top" }, new String[][] { { "Top" } } );
         }
     
@@ -128,12 +160,12 @@ public class Noise extends Unit implements UnitSource
         
         if (partials == 0) return;
 
-        Random random = getSound().getRandom();
+        Random rand = (random == null ? getSound().getRandom() : random);
         
         int start = (top ? Unit.NUM_PARTIALS - partials : 0);
         int end = (top ? Unit.NUM_PARTIALS : partials);
         
-        generateRandomVals(frequencies, start, partials, random);
+        generateRandomVals(frequencies, start, partials, rand);
         
         double max = 0;
         for(int j = start; j < end; j++)
@@ -152,7 +184,7 @@ public class Noise extends Unit implements UnitSource
             if (_var == 0.0)
                 amplitudes[j] = ramping;  
             else
-                amplitudes[j] = (1-_var) * ramping + _var * random.nextDouble();
+                amplitudes[j] = (1-_var) * ramping + _var * rand.nextDouble();
             total += amplitudes[j];
             if (amplitudes[j] > max) max = amplitudes[j];
             }
