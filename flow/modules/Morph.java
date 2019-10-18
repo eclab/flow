@@ -586,12 +586,16 @@ morphs[MORPH_RANDOM_128] = new int[] { 0, 67, 119, 97, 120, 107, 46, 20, 41, 63,
         {
         if (isConstant)
             {
-            if (modulation == 1)  // Variance
+            if (modulation == MOD_VARIANCE)  // Variance
                 {
                 double range = makeVerySensitive(value);
                 int f = (int)(range * NUM_PARTIALS + 1);
                 if (f == 1) return "1 Partial";
                 else return "" + f + " Partials";
+                }
+            else if (modulation == MOD_SEED)
+                {
+                return (value == 0.0 ? "Free" : String.format("%.4f" , value));
                 }
             else return super.getModulationValueDescription(modulation, value, isConstant);
             }
