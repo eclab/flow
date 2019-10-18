@@ -327,10 +327,10 @@ public class Macro extends Unit implements Cloneable
             // compute the default settings for each one
             Constant[] c = new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO };
             for(int i = 0; i < 4; i++)
-            	if (ins.get(0).getModulation(i) instanceof Constant)
-            		{
-            		c[i] = new Constant(ins.get(0).modulate(i));
-            		}
+                if (ins.get(0).getModulation(i) instanceof Constant)
+                    {
+                    c[i] = new Constant(ins.get(0).modulate(i));
+                    }
             
             String[] s = ins.get(0).getModulationOutputNames();
             defineModulations(c, ins.get(0).getModulationOutputNames());
@@ -349,11 +349,11 @@ public class Macro extends Unit implements Cloneable
         loadModules(Sound.loadModules(data, flowVersion), Sound.loadName(data));
         }
 
-	String info;
-	String version;
-	String author;
-	String date;
-	
+    String info;
+    String version;
+    String author;
+    String date;
+        
     public JSONObject getData() 
         { 
         JSONObject obj = new JSONObject();
@@ -423,11 +423,11 @@ public class Macro extends Unit implements Cloneable
                 {
                 Box box = new Box(BoxLayout.Y_AXIS);
 
-				_author.setText(author);
-				_date.setText(date);
-				_version.setText(version);
-				_info.setText(info);
-				
+                _author.setText(author);
+                _date.setText(date);
+                _version.setText(version);
+                _info.setText(info);
+                                
                 Box right = new Box(BoxLayout.Y_AXIS);
 
                 JLabel label = new JLabel("<html><b>Version</b></html>");

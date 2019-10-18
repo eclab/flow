@@ -44,12 +44,12 @@ public class In extends Unit implements Miscellaneous
         for(int i = 0; i < NUM_MOD_INPUTS; i++)
             {
             if (macro != null)
-            	{
+                {
                 setModulationOutput(i, macro.modulate(i));
                 }
             else 
-            	{
-                setModulationOutput(i, modulate(i));	// set outputs to the defaults the user set
+                {
+                setModulationOutput(i, modulate(i));    // set outputs to the defaults the user set
                 }
             }
 
@@ -108,9 +108,9 @@ public class In extends Unit implements Miscellaneous
                 {
                 // update the assocated Input
                 for(int i = 0; i < 4; i++)
-                	{
-                	getModIn(i).setTitleText(getModOut(i).getTitleText());
-                	}
+                    {
+                    getModIn(i).setTitleText(getModOut(i).getTitleText());
+                    }
                 
                 // Here we're going to redistribute the title to all the Ins in the patch
                 Rack rack = getRack();
@@ -152,11 +152,11 @@ public class In extends Unit implements Miscellaneous
         for(int i = 0; i < b.length; i++)
             b[i].setTitleCanChange(true);
 
-		// update the assocated Input
-		for(int i = 0; i < 4; i++)
-			{
-			panel[0].getModIn(i).setTitleText(panel[0].getModOut(i).getTitleText());
-			}
+        // update the assocated Input
+        for(int i = 0; i < 4; i++)
+            {
+            panel[0].getModIn(i).setTitleText(panel[0].getModOut(i).getTitleText());
+            }
 
         return panel[0];
         }
