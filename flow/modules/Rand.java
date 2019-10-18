@@ -70,4 +70,19 @@ public class Rand extends Unit implements UnitSource
                         
         normalizeAmplitudes();
         }
+
+
+    public String getModulationValueDescription(int modulation, double value, boolean isConstant)
+        {
+        if (isConstant)
+            {
+            if (modulation == MOD_SEED)
+                {
+                return (value == 0.0 ? "Free" : String.format("%.4f" , value));
+                }
+            else return super.getModulationValueDescription(modulation, value, isConstant);
+            }
+        else return "";
+        }
+
     }
