@@ -449,7 +449,7 @@ public class LFO extends Modulation implements ModSource
         {
         if (isConstant)
             {
-            if (modulation == 0)  // rate
+            if (modulation == MOD_RATE)  // rate
                 {
                 if (!linear)
                     value = makeSensitive(value);
@@ -458,9 +458,13 @@ public class LFO extends Modulation implements ModSource
                     return String.format("%.4f", d) + " Sec";
                 return String.format("%.5f", d) + " Sec";
                 }
-            else if (modulation == 3)  // shift
+            else if (modulation == MOD_SHIFT)  // shift
                 {
                 return String.format("%.4f" , value - 0.5);
+                }
+            else if (modulation == MOD_SEED)
+                {
+                return (value == 0.0 ? "Free" : String.format("%.4f" , value));
                 }
             else return super.getModulationValueDescription(modulation, value, isConstant);
             }
