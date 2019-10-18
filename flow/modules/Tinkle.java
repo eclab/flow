@@ -156,9 +156,13 @@ public class Tinkle extends Unit implements UnitSource
         {
         if (isConstant)
             {
-            if (modulation == 3)  // it's a time
+            if (modulation == MOD_NUMBER)
                 {
                 return "" + (int)(value * MAX_NUMBER);
+                }
+            else if (modulation == MOD_SEED)
+                {
+                return (value == 0.0 ? "Free" : String.format("%.4f" , value));
                 }
             else return super.getModulationValueDescription(modulation, value, isConstant);
             }
