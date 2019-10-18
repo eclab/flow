@@ -31,18 +31,23 @@ public class Jitter extends Unit
     public boolean started = false;
     public Random random = null;
         
+    boolean ampProportional = true;
+    public boolean getAmpProportional() { return ampProportional; }    
+    public void setAmpProportional(boolean val) { ampProportional = val; }
         
     boolean nonZero = true;
     public boolean getNonZero() { return nonZero; }
     public void setNonZero(boolean val) { nonZero = val; }
     
     public static final int OPTION_NONZERO = 0;
+    public static final int OPTION_AMP_PROPORTIONAL = 1;
 
     public int getOptionValue(int option) 
         { 
         switch(option)
             {
             case OPTION_NONZERO: return getNonZero() ? 1 : 0;
+            case OPTION_AMP_PROPORTIONAL: return getAmpProportional() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -52,6 +57,7 @@ public class Jitter extends Unit
         switch(option)
             {
             case OPTION_NONZERO: setNonZero(value != 0); return;
+            case OPTION_AMP_PROPORTIONAL: setAmpProportional(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -72,7 +78,7 @@ public class Jitter extends Unit
         {
         super(sound);
 
-        defineOptions( new String[] { "Non-Zero" }, new String[][] { { "Non-Zero" } });
+        defineOptions( new String[] { "Non-Zero", "Amp Ratio" }, new String[][] { { "Non-Zero" }, { "Amp Ratio"} });
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ONE }, 
             new String[] { "Freq Var", "Amp Var", "Trigger", "Seed" });
@@ -119,7 +125,9 @@ public class Jitter extends Unit
                                 
         double frequencyModulation = modulate(MOD_FREQ_VAR);
         frequencyModulation = frequencyModulation * frequencyModulation * frequencyModulation * frequencyModulation;
-
+                
+        boolean ratio = getAmpProportional();
+                
         if (!started || isTriggered(MOD_TRIGGER))
             {
             for(int i = 0; i < targets[FREQUENCY_VAR].length; i++)
@@ -136,8 +144,14 @@ public class Jitter extends Unit
                 {
                 double f = inputs0frequencies[i] + targets[FREQUENCY_VAR][i] * 20;
                 if (f >= 0) frequencies[i] = f;
-                double a = inputs0amplitudes[i] + targets[AMPLITUDE_VAR][i] / 4;
-                if (a >= 0) amplitudes[i] = a;
+                if (ratio)
+                    amplitudes[i] = inputs0amplitudes[i] * (1.0 + targets[AMPLITUDE_VAR][i]);
+                else
+                    {
+                    double a = 0;
+                    a = inputs0amplitudes[i] + targets[AMPLITUDE_VAR][i] / 4;
+                    if (a >= 0) amplitudes[i] = a;
+                    }
                 }
             else
                 {
@@ -151,6 +165,22 @@ public class Jitter extends Unit
         // always sort
         simpleSort(0, false);
         }       
+
+
+    public String getModulationValueDescription(int modulation, double value, boolean isConstant)
+        {
+        if (isConstant)
+            {
+            if (modulation == MOD_SEED)
+                {
+                return (value == 0.0 ? "Free" : String.format("%.4f" , value));
+                }
+            else return super.getModulationValueDescription(modulation, value, isConstant);
+            }
+        else return "";
+        }
+
+
     }
 
 
