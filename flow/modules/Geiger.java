@@ -53,7 +53,7 @@ public class Geiger extends Modulation
     public Geiger(Sound sound)
         {
         super(sound);
-        defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ZERO, Constant.ZERO }, new String[] { "Trials", "Prob", "Trigger", "Seed" });
+        defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ZERO, Constant.ONE }, new String[] { "Trials", "Prob", "Trigger", "Seed" });
         }
 
     public void reset()
@@ -103,6 +103,10 @@ public class Geiger extends Modulation
             if (modulation == MOD_RATE)
                 {
                 return "" + ((int)(modulate(MOD_RATE) * MAX_RATE) + 1);
+                }
+            else if (modulation == MOD_SEED)
+                {
+                return (value == 0.0 ? "Free" : String.format("%.4f" , value));
                 }
             else return super.getModulationValueDescription(modulation, value, isConstant);
             }
