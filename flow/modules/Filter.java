@@ -71,9 +71,19 @@ public class Filter extends Unit
     
     public double filter(double state, double frequency, double q, double cutoff, boolean pole4)
         {
+        if (pole4)
+        	{
+        	return numerator(state, frequency, q, cutoff) / denominator(frequency, q, cutoff);
+        	}
+        else
+        	{
+			return Math.sqrt(numerator(state, frequency, q, cutoff) / denominator(frequency, q, cutoff));
+        	}
+        /*
         double pole2 = Math.sqrt(numerator(state, frequency, q, cutoff) / denominator(frequency, q, cutoff));
         if (pole4) return pole2 * pole2;
         else return pole2;
+        */
         } 
         
     public double denominator(double frequency, double q, double cutoff)
