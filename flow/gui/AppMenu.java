@@ -231,12 +231,12 @@ public class AppMenu
         return export;
         }
     
-            static void doSaveAs(Rack rack, boolean primaryOnly)
+    static void doSaveAs(Rack rack, boolean primaryOnly)
         {
         FileDialog fd = new FileDialog((Frame)(SwingUtilities.getRoot(rack)), 
-        	(primaryOnly ?
-        		"Export Primary Patch to File..." :
-        		"Save Patch to File..."), FileDialog.SAVE);
+                (primaryOnly ?
+                "Export Primary Patch to File..." :
+                "Save Patch to File..."), FileDialog.SAVE);
                 
         File ff = file; // rare occurrence
         if (rack.getPatchFile() != null)
@@ -272,7 +272,7 @@ public class AppMenu
 
             Output out = rack.getOutput();
             if (!primaryOnly)
-            	Sound.saveGroups(out.getGroups(), out.getNumGroups(), obj);
+                Sound.saveGroups(out.getGroups(), out.getNumGroups(), obj);
             Sound.savePatchInfo(rack.getPatchInfo(), obj);
             Sound.savePatchDate(rack.getPatchDate(), obj);
             Sound.savePatchAuthor(rack.getPatchAuthor(), obj);
@@ -310,12 +310,12 @@ public class AppMenu
                 }
             
             if (!primaryOnly)
-            	{
-            	file = f;
-	            dirFile = f;
-	            rack.setPatchFile(f);
-	            rack.setPatchName(rack.getPatchName());
-	            }
+                {
+                file = f;
+                dirFile = f;
+                rack.setPatchFile(f);
+                rack.setPatchName(rack.getPatchName());
+                }
             }
         }
 

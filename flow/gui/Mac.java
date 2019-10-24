@@ -9,7 +9,7 @@ import java.lang.reflect.*;
 
 // Code for handling MacOS X specific About Menus.  Maybe also we'll handle Preferences later.
 //
-// Largely cribbed from https://stackoverflow.com/questions/7256230/in-order-to-macify-a-java-app-to-catch-the-about-event-do-i-have-to-implement
+// Inspired by https://stackoverflow.com/questions/7256230/in-order-to-macify-a-java-app-to-catch-the-about-event-do-i-have-to-implement
 //
 // I used the reflection version so it compiles cleanly on linux and windows as well.
 

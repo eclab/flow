@@ -216,13 +216,13 @@ public class ModulePanel extends JPanel implements Transferable
                 }
             }
 
-		modOut = new ModulationOutput[modulation.getNumModulationOutputs()];
+        modOut = new ModulationOutput[modulation.getNumModulationOutputs()];
         for(int i = 0; i < modulation.getNumModulationOutputs(); i++)
             {
             box.add(modOut[i] = new ModulationOutput(modulation, i, this));
             }
 
-		modIn = new ModulationInput[modulation.getNumModulations()];
+        modIn = new ModulationInput[modulation.getNumModulations()];
         for(int i = 0; i < modulation.getNumModulations(); i++)
             {
             box.add(modIn[i] = new ModulationInput(modulation, i, this));
