@@ -13,7 +13,7 @@ public class Utility
     {
     static double[] sqrtTable = new double[65536];
 
-    /** A fast (2x) approximation of Square Root.  Uses Math.sqrt for values >= 1,
+    /** A faster (~1.5x) approximation of Square Root.  Uses Math.sqrt for values >= 1,
         else uses a lookup table 64K in size. */
     // about twice as fast
     public static double fastSqrt(final double a)
@@ -106,7 +106,7 @@ public class Utility
     final static int SIN_TABLE_LENGTH_DIV_4 = SIN_TABLE_LENGTH / 4;
     final static double[] sinTable = new double[SIN_TABLE_LENGTH];
 
-    /** A fast approximation of Sine using a lookup table. */
+    /** A fast approximation of Sine using a lookup table.  40x the speed of Math.sin. */
     public static final double fastSin(double f) 
         {
         return sinTable[((int) (f * SIN_MULTIPLIER)) & (SIN_TABLE_LENGTH - 1)];
@@ -115,12 +115,13 @@ public class Utility
     /** A fast approximation of Cosine using a lookup table. */
     public static final double fastCos(double f) 
         {
-        return sinTable[((int) (f * SIN_MULTIPLIER + SIN_TABLE_LENGTH_DIV_4)) & (SIN_TABLE_LENGTH - 1)];      // seriously.  He's ANDing with a char.  Go figure.
+        return sinTable[((int) (f * SIN_MULTIPLIER + SIN_TABLE_LENGTH_DIV_4)) & (SIN_TABLE_LENGTH - 1)];
         }
 
 
     /**
      * A fast approximation of Sine using a lookup table and Catmull-Rom cubic spline interpolation.
+       16x the speed of Math.sin.
      */
     public static final double fastIntSin(double f) {
         double v = f * SIN_MULTIPLIER;
@@ -188,11 +189,23 @@ public class Utility
         double sum = 0;
         for(double i = 0; i < 10000; i+= 0.000005)
             {
-            sum += Utility.fastIntSin(i);
+            sum += Utility.fastSin(i);
             }
         System.err.println(sum);
         }
 
+/*
+    public static void main(String[] args)
+        {
+        double sum = 0;
+        for(double i = 0; i < 1; i+= 0.0000000002)
+            {
+            //sum += Utility.fastSqrt(i);
+            sum += Math.sqrt(i);
+            }
+        System.err.println(sum);
+        }
+*/
 
 
 /*

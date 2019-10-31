@@ -55,6 +55,7 @@ public class Modules
     flow.modules.Filter.class,
     flow.modules.Fix.class,
     flow.modules.FlangeFilter.class,
+    flow.modules.FormantFilter.class,
     flow.modules.Geiger.class,
     flow.modules.In.class,
     flow.modules.Harmonics.class,
