@@ -30,8 +30,8 @@ public class FormantFilter extends Unit
         	{
         	formantNames[i] = formants[i].name;
         	}
-        defineOptions(new String[] { "Vowel 1", "Vowel 2", "Vowel 3", "Vowel 4", "Vowel 5", "Vowel 6", "Vowel 7", "Vowel 8" }, 
-        						new String[][] { formantNames, formantNames, formantNames, formantNames, formantNames, formantNames, formantNames, formantNames});
+        defineOptions(new String[] { "Vowel 1", "Vowel 2", "Vowel 3", "Vowel 4", "Vowel 5", "Vowel 6", "Vowel 7", "Vowel 8", "Four Pole" }, 
+        						new String[][] { formantNames, formantNames, formantNames, formantNames, formantNames, formantNames, formantNames, formantNames, { "Four Pole" }});
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.HALF }, new String[] { "Interpolation", "Num Vowels", "Gain" });
         }
 
@@ -39,6 +39,9 @@ public class FormantFilter extends Unit
     public int getFormant(int f) { return formantIndex[f]; }
     public void setFormant(int f, int val) { formantIndex[f] = val; }
 
+	boolean fourPole = false;
+	public boolean getFourPole() { return fourPole; }
+	public void setFourPole(boolean val) { fourPole = val; }
         
     public static final int OPTION_FORMANT_1 = 0;
     public static final int OPTION_FORMANT_2 = 1;
@@ -48,6 +51,7 @@ public class FormantFilter extends Unit
     public static final int OPTION_FORMANT_6 = 5;
     public static final int OPTION_FORMANT_7 = 6;
     public static final int OPTION_FORMANT_8 = 7;
+    public static final int OPTION_FOUR_POLE = 8;
 
     public int getOptionValue(int option) 
         { 
@@ -61,6 +65,7 @@ public class FormantFilter extends Unit
             case OPTION_FORMANT_6: return getFormant(5);
             case OPTION_FORMANT_7: return getFormant(6);
             case OPTION_FORMANT_8: return getFormant(7);
+            case OPTION_FOUR_POLE: return (getFourPole() ? 1 : 0);
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -77,6 +82,7 @@ public class FormantFilter extends Unit
             case OPTION_FORMANT_6: setFormant(5, value); return;
             case OPTION_FORMANT_7: setFormant(6, value); return;
             case OPTION_FORMANT_8: setFormant(7, value); return;
+            case OPTION_FOUR_POLE: setFourPole(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -133,7 +139,9 @@ public class FormantFilter extends Unit
         double denominator = a * a + b * b;
         
         // to convert this to two pole, use sqrt(numerator/denomator)
-        return Math.sqrt(numerator / denominator);
+        double res = numerator / denominator;
+        if (!fourPole) res = Math.sqrt(res);
+        return res;
         }
     
     public void go()
