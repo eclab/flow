@@ -81,33 +81,40 @@ public class FormantFilter extends Unit
             }
         }
 
-    public double formantFilter(double frequency, int index1, int index2, double alpha)
+    double formantFilter(double frequency, int index1, int index2, double alpha)
     	{
     	Formant form1 = formants[index1];
     	Formant form2 = formants[index2];
+    	double[] f1 = form1.f;
+    	double[] f2 = form2.f;
+    	double[] b1 = form1.b;
+    	double[] b2 = form2.b;
+    	double[] a1 = form1.a;
+    	double[] a2 = form2.a;
+    	double alpha1 = 1.0 - alpha;
    		
     	return 
-    		singleFormantFilter(frequency, 	form1.f[0] * (1.0 - alpha) + form2.f[0] * alpha,
-    										form1.b[0] * (1.0 - alpha) + form2.b[0] * alpha,
-    										form1.a[0] * (1.0 - alpha) + form2.a[0] * alpha) +
-    		singleFormantFilter(frequency, 	form1.f[1] * (1.0 - alpha) + form2.f[1] * alpha,
-    										form1.b[1] * (1.0 - alpha) + form2.b[1] * alpha,
-    										form1.a[1] * (1.0 - alpha) + form2.a[1] * alpha) +
-    		singleFormantFilter(frequency, 	form1.f[2] * (1.0 - alpha) + form2.f[2] * alpha,
-    										form1.b[2] * (1.0 - alpha) + form2.b[2] * alpha,
-    										form1.a[2] * (1.0 - alpha) + form2.a[2] * alpha) +
-    		singleFormantFilter(frequency, 	form1.f[3] * (1.0 - alpha) + form2.f[3] * alpha,
-    										form1.b[3] * (1.0 - alpha) + form2.b[3] * alpha,
-    										form1.a[3] * (1.0 - alpha) + form2.a[3] * alpha) +
-    		singleFormantFilter(frequency, 	form1.f[4] * (1.0 - alpha) + form2.f[4] * alpha,
-    										form1.b[4] * (1.0 - alpha) + form2.b[4] * alpha,
-    										form1.a[4] * (1.0 - alpha) + form2.a[4] * alpha);    										  
+    		singleFormantFilter(frequency, 	f1[0] * alpha1 + f2[0] * alpha,
+    										b1[0] * alpha1 + b2[0] * alpha,
+    										a1[0] * alpha1 + a2[0] * alpha) +
+    		singleFormantFilter(frequency, 	f1[1] * alpha1 + f2[1] * alpha,
+    										b1[1] * alpha1 + b2[1] * alpha,
+    										a1[1] * alpha1 + a2[1] * alpha) +
+    		singleFormantFilter(frequency, 	f1[2] * alpha1 + f2[2] * alpha,
+    										b1[2] * alpha1 + b2[2] * alpha,
+    										a1[2] * alpha1 + a2[2] * alpha) +
+    		singleFormantFilter(frequency, 	f1[3] * alpha1 + f2[3] * alpha,
+    										b1[3] * alpha1 + b2[3] * alpha,
+    										a1[3] * alpha1 + a2[3] * alpha) +
+    		singleFormantFilter(frequency, 	f1[4] * alpha1 + f2[4] * alpha,
+    										b1[4] * alpha1 + b2[4] * alpha,
+    										a1[4] * alpha1 + a2[4] * alpha);    										  
     	}
     
     	// the resonant frequency is the same as the cutoff
     	// According to http://www.users.cloud9.net/~stark/elchap21.pdf
     	// 	Q = resonantFrequency / bandwidth
-    public double singleFormantFilter(double frequency, double f, double b, double a)
+    double singleFormantFilter(double frequency, double f, double b, double a)
     	{
     	return bandpassFilter(frequency, f/b, f) * a;
     	}
