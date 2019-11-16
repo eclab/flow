@@ -183,6 +183,10 @@ public class Macro extends Unit implements Cloneable
                         amplitudes[q] *= gain;
                 }
             }
+
+        if (out != null)
+        	if (constrain()) 
+        		bigSort(0, false);
         }
    
     public void setSound(Sound sound)
