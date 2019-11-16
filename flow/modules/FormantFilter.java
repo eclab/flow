@@ -108,13 +108,15 @@ public class FormantFilter extends Unit
     										a1[1] * alpha1 + a2[1] * alpha) +
     		singleFormantFilter(frequency, 	f1[2] * alpha1 + f2[2] * alpha,
     										b1[2] * alpha1 + b2[2] * alpha,
-    										a1[2] * alpha1 + a2[2] * alpha) +
+    										a1[2] * alpha1 + a2[2] * alpha) /*
+    										+
     		singleFormantFilter(frequency, 	f1[3] * alpha1 + f2[3] * alpha,
     										b1[3] * alpha1 + b2[3] * alpha,
     										a1[3] * alpha1 + a2[3] * alpha) +
     		singleFormantFilter(frequency, 	f1[4] * alpha1 + f2[4] * alpha,
     										b1[4] * alpha1 + b2[4] * alpha,
-    										a1[4] * alpha1 + a2[4] * alpha);    										  
+    										a1[4] * alpha1 + a2[4] * alpha)*/
+    										;    										  
     	}
     
     	// the resonant frequency is the same as the cutoff
