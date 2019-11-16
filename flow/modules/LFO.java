@@ -160,7 +160,7 @@ public class LFO extends Modulation implements ModSource
     public void gate() 
         { 
         super.gate();
-                
+        
         if (!free && isModulationConstant(MOD_GATE_TR))
             {
             resetLFO();

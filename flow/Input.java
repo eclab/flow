@@ -93,7 +93,20 @@ public class Input
             }
         }
     
-
+    public void reset()
+    	{
+    	synchronized(lock)
+    		{
+    		notesOnMono.clear();
+    		while(notesOn.size() != 0)
+    			{
+    			Sound s = notesOn.removeFirst();
+    			notesOff.addFirst(s);
+    			}
+    		}
+    	}
+    
+    
 
 
 
@@ -650,6 +663,7 @@ public class Input
             // we have no one who listens in on this channel
             if (g == Output.NO_GROUP)                       
                 {
+                System.err.println("no group");
                 return;
                 }
             
@@ -714,7 +728,7 @@ public class Input
         
         double d = Math.pow(2.0, (double) (i - 69) / 12.0) * 440.0;
         
-        output.lock();
+       output.lock();
         try
             {
             // set the channel, including OMNI
@@ -739,7 +753,6 @@ public class Input
                 {
                 sound.setBend(globalBend[sound.getChannel()]);
                 }
-//            System.err.print("Gating? " + !noteCurrentlyOn);
             if (!noteCurrentlyOn)
                 {
                 sound.gate();
@@ -751,14 +764,15 @@ public class Input
                 }
                 
             } 
+        catch (Exception e)
+        	{
+        	e.printStackTrace();
+        	}
         finally
             {
             output.unlock();
             }
         }
-    
-    
-    
     
     
     
