@@ -337,6 +337,9 @@ public class Rack extends JPanel
                 {
                 output.getSound(i).resetPartialPhases();
                 }
+                
+            // Reset stuck notes
+            output.getInput().reset();
             }
         finally 
             {
