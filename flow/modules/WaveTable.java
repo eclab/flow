@@ -43,7 +43,6 @@ public class WaveTable extends Unit implements UnitSource
 
     int currentPos = -1;
     boolean interpolate = true;
-    boolean sampled = false;
                 
     double[][] waveTable;
     
@@ -66,7 +65,7 @@ public class WaveTable extends Unit implements UnitSource
         {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Position" });
-        defineOptions(new String[] { "Interpolate", "Sampled" }, new String[][] { { "Interpolate" }, { "Sampled" } });
+        defineOptions(new String[] { "Interpolate" }, new String[][] { { "Interpolate" } });
         setClearOnReset(false);
         waveTable = new double[2][NUM_PARTIALS];
         waveTable[0][0] = 1;
@@ -81,18 +80,13 @@ public class WaveTable extends Unit implements UnitSource
     public boolean getInterpolate() { return interpolate; }
     public void setInterpolate(boolean val) { interpolate = val; }
         
-    public boolean getSampled() { return sampled; }
-    public void setSampled(boolean val) { sampled = val; }
-        
     public static final int OPTION_INTERPOLATE = 0;
-    public static final int OPTION_SAMPLED = 1;
 
     public int getOptionValue(int option) 
         { 
         switch(option)
             {
             case OPTION_INTERPOLATE: return getInterpolate() ? 1 : 0;
-            case OPTION_SAMPLED: return getSampled() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -102,7 +96,6 @@ public class WaveTable extends Unit implements UnitSource
         switch(option)
             {
             case OPTION_INTERPOLATE: setInterpolate(value != 0); return;
-            case OPTION_SAMPLED: setSampled(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -172,6 +165,8 @@ public class WaveTable extends Unit implements UnitSource
         
         pan[0] = new ModulePanel(WaveTable.this)
             {
+            boolean sampled = false;
+            
             public JComponent buildPanel()
                 {               
                 Box box = new Box(BoxLayout.Y_AXIS);
@@ -183,11 +178,18 @@ public class WaveTable extends Unit implements UnitSource
                     box.add(new ModulationInput(unit, i, this));
                     }
                 
+                for(int i = 0; i < unit.getNumOptions(); i++)
+                    {
+                    box.add(new OptionsChooser(unit, i));
+                    }
+
                 final PushButton button[] = new PushButton[1];
-                box.add(button[0] = new PushButton(name == null ? "Load..." : name)
+                box.add(button[0] = new PushButton(name == null ? "Wavetable" : name)
                     {
                     public void perform()
                         {
+                        sampled = false;
+
                         File f = pan[0].doLoad("Load a Wavetable from https://waveeditonline.com/", FILENAME_EXTENSIONS);
                         if (f != null)
                             {
@@ -196,10 +198,22 @@ public class WaveTable extends Unit implements UnitSource
                             }
                         }
                     });
-                for(int i = 0; i < unit.getNumOptions(); i++)
+
+                final PushButton button2[] = new PushButton[1];
+                box.add(button2[0] = new PushButton(name == null ? "Sample" : name)
                     {
-                    box.add(new OptionsChooser(unit, i));
-                    }
+                    public void perform()
+                        {
+                        sampled = true;
+                        
+                        File f = pan[0].doLoad("Convert a Sample into a Wavetable", FILENAME_EXTENSIONS);
+                        if (f != null)
+                            {
+                            name = AppMenu.removeExtension(f.getName());
+                            button2[0].getButton().setText(name);
+                            }
+                        }
+                    });
                 return box;
                 }
 
@@ -223,7 +237,6 @@ public class WaveTable extends Unit implements UnitSource
                             double[] a = new double[sampleSize];
                             double[] b = new double[sampleSize];
                             double[] buffer = new double[WAVETABLE_SIZE];
-                            int count = 0;
                             while(true)
                                 {
                                 // Read frames into buffer
@@ -234,7 +247,7 @@ public class WaveTable extends Unit implements UnitSource
                                 System.arraycopy(buffer, 0, b, sampleSize - WAVETABLE_SIZE, WAVETABLE_SIZE);
                                 System.arraycopy(b, 0, a, 0, sampleSize);
                                                       
-                                // is Hanning COLA?          
+                                // is Hanning COLA?     
                                 a = FFT.applyHanningWindow(a);
                                 double[] harmonics = FFT.getHarmonics(a);
                                 double[] finished = new double[harmonics.length / 2 / RESAMPLING];
@@ -242,40 +255,12 @@ public class WaveTable extends Unit implements UnitSource
                                     {
                                     finished[s - 1] = (harmonics[s * RESAMPLING - 1] >= MINIMUM_AMPLITUDE ? harmonics[s * RESAMPLING - 1]  : 0 );
                                     }
-
-
-                                                                        
-/*
-// averaging works like this...
-
-x
-x x x
-x x x x x
-x x x x x x x
-0 1 2 3 4 5 6 7 8 9 101112
-- x x x x x x x   x x x x
-x x x x x       x x x
-x x x           x x
-x               x
-                                                                        
-for (int s=1 ; s < harmonics.length / 2 / RESAMPLING + 1; s++)
-{
-for(int q = 1; q <= RESAMPLING; q++)
-{
-finished[s-1] = finished[s-1] + q * harmonics[s * RESAMPLING - (RESAMPLING - 1) + q];
-if (q != RESAMPLING) finished[s-1] = finished[s-1] + q * harmonics[s * RESAMPLING + (RESAMPLING - 1) - q];
-}
-finished[s-1] /= RESAMPLING * RESAMPLING;
-}
-*/                                                              
-
                                 buf.add(finished);
                                 }
                             }
                         else
                             {
                             double[] buffer = new double[WAVETABLE_SIZE];
-                            int count = 0;
                             while(true)
                                 {
                                 // Read frames into buffer
