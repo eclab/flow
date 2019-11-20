@@ -154,6 +154,8 @@ public class Macro extends Unit implements Cloneable
     public void go()
         {
         super.go();
+        
+        double note = sound.getNote();
 
         for(int i = 0; i < modules.length; i++)
             modules[i].go();
@@ -187,6 +189,9 @@ public class Macro extends Unit implements Cloneable
         if (out != null)
         	if (constrain()) 
         		bigSort(0, false);
+        
+        if (note != sound.getNote())		// restore the note.  May have been changed by Fix
+	        sound.setNote(note);
         }
    
     public void setSound(Sound sound)
