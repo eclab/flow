@@ -105,6 +105,10 @@ public class Output
     // Output holds the input.  That makes total sense, right?  Right.  :-) 
     Input input;
     
+    AudioInput audioInput;
+    
+    public AudioInput getAudioInput() { return audioInput; }
+    
     // The current Mixer
     Mixer.Info mixer;
     
@@ -121,7 +125,7 @@ public class Output
     // The current number of voices spawned so far.  This increases as sounds register themselves.
     // This is will be threadsafe even though we increment it with ++ because that's only done in one thread.
     volatile int numSounds = 0;   
-    
+        
     static
         {
         // Load preferences
@@ -169,6 +173,8 @@ public class Output
         input = new Input(this);
         for(int i = 0; i < standardOrders.length; i++)
             standardOrders[i] = (byte)i;
+            
+        audioInput = new AudioInput(this);
         }
 
     /** Returns the currently used Mixer */
@@ -1290,6 +1296,10 @@ public class Output
     public void assignGroupsToSounds()
         {
         lock();
+        
+        // This is an opportunity to cancel the audio input
+		getAudioInput().stop();
+		
         try
             {
             // by default we're the primary group

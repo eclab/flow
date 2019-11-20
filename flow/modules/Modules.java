@@ -38,6 +38,7 @@ public class Modules
     flow.modules.AHR.class,
     flow.modules.All.class,
     flow.modules.AmpMath.class,
+    flow.modules.AudioIn.class,
     flow.modules.Average.class,
     flow.modules.Buffer.class,
     flow.modules.Choice.class,

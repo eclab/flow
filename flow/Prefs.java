@@ -394,6 +394,12 @@ public class Prefs
         return getLastX("AudioDevice");         // null is default
         }
 
+    public static void setLastInputAudioDevice(String inputAudioDevice) { setLastX("" + inputAudioDevice, "InputAudioDevice"); }
+    public static String getLastInputAudioDevice() 
+        { 
+        return getLastX("InputAudioDevice");         // null is default
+        }
+
     public static void setLastMasterGain(double gain) { setLastX("" + gain, "MasterGain"); }
     public static double getLastMasterGain() 
         { 
