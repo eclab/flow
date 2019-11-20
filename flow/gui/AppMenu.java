@@ -717,6 +717,7 @@ public class AppMenu
             rack.closeAll();
             rack.checkOrder();
             rack.add(Out.class);
+            rack.setPatchFile(null);			// so we don't try to save again.  Must be done BEFORE setPatchName
             rack.setPatchName(null);
             rack.setPatchVersion(null);
             rack.setPatchInfo(null);
