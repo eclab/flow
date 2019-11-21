@@ -31,7 +31,7 @@ public class AudioInput
 		this.output = output;
 
         Mixer.Info[] mixers = getSupportedMixers();
-        String mix = Prefs.getLastAudioDevice();
+        String mix = Prefs.getLastInputAudioDevice();
         boolean found = false;
         for (int i = 0; i < mixers.length; i++)
             {
@@ -68,6 +68,7 @@ public class AudioInput
 								}
 							}
 						}
+					
 					// process will have is own internal lock
 					if (amplitudes != null)
 						process();
@@ -91,6 +92,15 @@ public class AudioInput
 	
 	void process()
 		{
+		TargetDataLine tdl_ = null;
+
+		synchronized(lock)
+			{
+			if (tdl == null || !running)
+				return;  // just in case
+			tdl_ = tdl;
+			}
+		
 		if (tdl.read(sampleBuffer, 0, sampleBuffer.length) == sampleBuffer.length)
 			{
 			// Read frames into buffer
@@ -101,6 +111,13 @@ public class AudioInput
 				buffer[j] = sample / 32768.0;
 				}
 		
+		/*
+			synchronized(lock)
+				{
+				robot.process(buffer, amplitudes);
+				}
+		*/
+		
 			System.arraycopy(b, WAVETABLE_SIZE, b, 0, sampleSize - WAVETABLE_SIZE);
 			System.arraycopy(buffer, 0, b, sampleSize - WAVETABLE_SIZE, WAVETABLE_SIZE);
 			//System.arraycopy(b, 0, a, 0, sampleSize);		// maybe a is unnecessarty as applyHanningWindow already clones
@@ -109,7 +126,6 @@ public class AudioInput
 			double[] a = FFT.applyHanningWindow(b);
 			// we need options here for not allocating buffers over and over again
 			double[] harmonics = FFT.getHarmonics(a);
-
 
 			synchronized(lock)
 				{
@@ -171,9 +187,6 @@ public class AudioInput
 				{
 				// clear buffers
 				b = new double[sampleSize];
-				//a = new double[sampleSize];
-				tdl.flush();  // clear any existing buffer gunk.  Dunno if this is necessary.
-				tdl.start();
 				running = true;
 				lock.notify();
 				}
@@ -198,9 +211,8 @@ public class AudioInput
 				{
 				if (tdl != null)
 					{
-					tdl.flush();		// clear any existing buffer gunk.  Dunno if this is necessary.
-					tdl.stop();
-					}
+					tdl.close();
+					}				
 				if (mixer == null)
 					{
 					Mixer.Info[] m = getSupportedMixers();
@@ -208,13 +220,19 @@ public class AudioInput
 						mixer = m[0];
 					}
 				if (mixer == null)
+					{
 					tdl = AudioSystem.getTargetDataLine( output.audioFormat );
+					}
 				else
+					{
 					tdl = AudioSystem.getTargetDataLine( output.audioFormat, mixer );
-				tdl.open(output.audioFormat, output.bufferSize);			// is this wise? Should we do something smaller?
+					}
+				try { tdl.open(output.audioFormat, output.bufferSize); }			// is this wise? Should we do something smaller?
+				catch (Exception ex) { ex.printStackTrace(); }
+				tdl.start();
 				this.mixer = mixer;
 				}
-			catch (LineUnavailableException ex) { throw new RuntimeException(ex); }
+			catch (LineUnavailableException ex) { ex.printStackTrace(); throw new RuntimeException(ex); }
 			}
 		}
 
