@@ -439,7 +439,7 @@ public class Input
     public byte getCC(int channel, int num)
         {
         if (channel == CHANNEL_NONE) return UNSPECIFIED;
-        if (channel == CHANNEL_OMNI) return cc[NUM_MIDI_CHANNELS][num];
+        if (channel == CHANNEL_OMNI) return cc[CC_OMNI][num];
         return cc[channel][num];
         }
     

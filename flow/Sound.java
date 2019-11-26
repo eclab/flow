@@ -65,7 +65,7 @@ public class Sound
     // The channel assigned to this Sound.  Normally this should be exactly the same as
     // Input.channel, but MPE will assign this specially.  We'll assign this during
     // voice allocation in Input.java 
-    volatile int channel = Input.CHANNEL_NONE;  // we need to assign it *something* initially...
+    volatile int channel = Input.CHANNEL_OMNI;  // we need to assign it *something* initially...
 
     public Sound(Output output)
         {

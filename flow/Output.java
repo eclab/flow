@@ -339,7 +339,7 @@ public class Output
         {
         soundLock.unlock();
         }
-        
+    
     // Sounds register themselves with the Output using this method.
     void register(Sound sound) 
         { 
@@ -349,6 +349,7 @@ public class Output
             sound.index = numSounds; 
             sounds[numSounds++] = sound; 
             sound.setGroup(Output.PRIMARY_GROUP);
+            sound.setChannel(Input.CHANNEL_OMNI);
             input.addSound(sound);
             }
         finally
@@ -1306,6 +1307,7 @@ public class Output
             for(int j = 0; j < numSounds; j++)
                 {
                 sounds[j].setGroup(Output.PRIMARY_GROUP);
+            	sounds[j].setChannel(Input.CHANNEL_OMNI);
                 }
             
             // override by sub-patches
@@ -1317,6 +1319,7 @@ public class Output
                     if (snd < numSounds)                            // we still have space
                         {
                         sounds[snd].setGroup(i);
+                        sounds[snd].setChannel(Input.CHANNEL_OMNI);
                         snd++;
                         }
                     }
