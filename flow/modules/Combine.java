@@ -127,8 +127,8 @@ public class Combine extends Unit
                 
                 // we'll assign the order from A
                 orders[i] = ordersA[iA];
-                int o = ordersA[iA];
-                if (o < 0) o += 256;
+                int o = ordersA[iA] & 0xFF;
+ //               if (o < 0) o += 256;
                 filledOrders[o] = true;         // this order is now used
                 iA++;
                 iB++;
@@ -140,8 +140,8 @@ public class Combine extends Unit
 
                 // we'll assign the order from A
                 orders[i] = ordersA[iA];
-                int o = ordersA[iA];
-                if (o < 0) o += 256;
+                int o = ordersA[iA] & 0xFF;
+ //               if (o < 0) o += 256;
                 filledOrders[o] = true;         // this order is now used
                 iA++;
                 }
@@ -151,8 +151,8 @@ public class Combine extends Unit
                 amplitudes[i] = amplitudesB[iB] * scaleB;
                 
                 // we won't assign the order from B just yet, but we'll store it in the hopes that we can assign it later
-                int o = ordersB[iB];
-                if (o < 0) o += 256;
+                int o = ordersB[iB] & 0xFF;
+//                if (o < 0) o += 256;
                 outstandingOrders[numOutstanding] = o;
                 outstandingOrderPositions[numOutstanding] = i;          // this basically says that partial i would *like* to have order o
                 numOutstanding++;

@@ -20,7 +20,7 @@ Related projects:
 
 Flow is a fully-modular multitimbral and polyphonic additive software synthesizer written in pure Java.  It runs on OS X, Linux, and Windows.  I have used it to play individual patches and to play many simultaneous patches for a full song controlled over MIDI via a DAW.
 
-Flow has almost 70 modules of different shapes and sizes, and currently supports up to 32 voices at up to 256 partials and 44.1KHz with a rate of one new partial update every 32 samples.  Flow is a very computationally expensive program and will keep your laptop quite warm and your fan busy.  You need to have some fairly good hardware to run Flow at full blast successfully (for reference, Flow was developed on a 2.8Ghz i7 2015 Macbook Pro Retina).  There are options for reducing Flow's footprint (such as reducing the number or voices or partials).
+Flow has almost 70 modules of different shapes and sizes, and currently supports up to 32 voices at up to 256 partials and 44.1KHz with a rate of one new partial update every 32 samples.  Flow is a very computationally expensive program and will keep your laptop quite warm and your fan busy.  You need to have some fairly good hardware to run Flow at full blast successfully (for reference, Flow was developed on a 2.8Ghz i7 2015 Macbook Pro Retina).  There are options for reducing Flow's footprint (such as reducing the number of voices or partials).
 
 ## Resources
 
@@ -31,6 +31,8 @@ Flow has almost 70 modules of different shapes and sizes, and currently supports
 * Interested in helping out on Flow?  Our [To Do list](TODO.md) lists current open issues and bugs.
 
 ### Demos
+* A [video demonstrating how to set up a simple patch in Flow](https://youtu.be/zkmEVWfly-0).
+
 * Three songs made using only Flow in multitimbral mode, with Ableton serving as just the sequencer.  They are called [8](https://cs.gmu.edu/~sean/projects/synth/log/#8), [9](https://cs.gmu.edu/~sean/projects/synth/log/#9), and [10](https://cs.gmu.edu/~sean/projects/synth/log/#10).  8 is the best one. All three come with the Flow patches and Ableton als files to recreate them.
 
 * ["Hello World" Demo](https://www.youtube.com/watch?v=w3aao8Sp0sQ).  This is a short tutorial on loading, setting up, and wiring modules for a basic patch.

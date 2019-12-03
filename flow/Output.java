@@ -583,8 +583,8 @@ public class Output
             for (int i = 0; i < pos.length; i++)
                 {
                 double amplitude = amp[i];
-                int oi = orders[i];
-                if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
+                int oi = orders[i] & 0xFF;           // if we're using 256 partials, they need to be all positive
+                //if (oi < 0) oi += 256; 
                                         
                 // incoming amplitudes are pre-denormalized by the voice threads.
                 // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
@@ -623,8 +623,8 @@ public class Output
             for (int i = 0; i < pos.length; i++)
                 {
                 double amplitude = amp[i];
-                int oi = orders[i];
-                if (oi < 0) oi += 256;          // if we're using 256 partials, they need to be all positive
+                int oi = orders[i] & 0xFF;           // if we're using 256 partials, they need to be all positive
+                //if (oi < 0) oi += 256; 
                                                         
                 // incoming amplitudes are pre-denormalized by the voice threads.
                 // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still

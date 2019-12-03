@@ -128,8 +128,8 @@ public class Fatten extends Unit
 
         for(int i = 0; i < halflen; i++)
             {
-            int o = orders[i];
-            if (o < 0) o += 256;
+            int o = orders[i] & 0xFF;
+//            if (o < 0) o += 256;
             isLower[o] = true;
             mapping[o] = -1;                                // also clean out mapping[], otherwise this can cause serious weird bugs
             }
@@ -137,8 +137,8 @@ public class Fatten extends Unit
         // STEP 3: Find the aleady-mapped lower partials
         for(int i = halflen; i < orders.length; i++)
             {
-            int o = orders[i];
-            if (o < 0) o += 256;
+            int o = orders[i] & 0xFF;
+//            if (o < 0) o += 256;
             int m = mapping[o];
             if (m != -1 &&          // the partial is mapped to someone
                 isLower[m])         // this someone is in the lower space
@@ -151,10 +151,11 @@ public class Fatten extends Unit
 
         // STEP 4: Map the free upper partials to remaining unmapped lower partials
         int l = 0;
+        //for(int i = orders.length - 1; i >= halflen ; i--)		// alternative: map in reverse order
         for(int i = halflen; i < orders.length; i++)
             {
-            int o = orders[i];
-            if (o < 0) o += 256;
+            int o = orders[i] & 0xFF;
+//            if (o < 0) o += 256;
             int m = mapping[o];
             if (m == -1 ||          // found a partial marked free in the first place
                 !isLower[m])    // found a partial mapped to a partial not in the lower space 
@@ -182,15 +183,15 @@ public class Fatten extends Unit
 
                 for(int i = 0; i < halflen; i++)
                 {
-                int o = orders[i];
-                if (o < 0) o += 256;
+                int o = orders[i] & 0xFF;
+//                if (o < 0) o += 256;
                 iL[o] = true;
                 }
 
                 for(int i = halflen; i < orders.length; i++)
                 {
-                int ord = orders[i];
-                if (ord < 0) ord += 256;
+                int ord = orders[i] & 0xFF;
+//                if (ord < 0) ord += 256;
                 int m = mapping[ord];
                 if (m == -1) continue;
                         
@@ -211,14 +212,14 @@ public class Fatten extends Unit
         // STEP 5: Map all upper partials, by order, to lower partials by position
         for(int i = 0; i < halflen; i++)
             {
-            int o = orders[i];
-            if (o < 0) o += 256;
+            int o = orders[i] & 0xFF;
+//            if (o < 0) o += 256;
             lowerMappingPos[o] = i;
             }
         for(int i = halflen; i < orders.length; i++)
             {
-            int o = orders[i];
-            if (o < 0) o += 256;
+            int o = orders[i] & 0xFF;
+//            if (o < 0) o += 256;
             mappingPos[o] = lowerMappingPos[mapping[o]];
             }
 
@@ -228,8 +229,8 @@ public class Fatten extends Unit
           boolean[] got = new boolean[orders.length];
           for(int i = 0; i < orders.length; i++)
           {
-          int ord = orders[i];
-          if (ord < 0) ord += 256;
+          int ord = orders[i] & 0xFF;
+//          if (ord < 0) ord += 256;
           if (got[ord])
           print("-->Already " + ord);
           got[ord] = true;
@@ -257,15 +258,15 @@ public class Fatten extends Unit
 
           for(int i = 0; i < halflen; i++)
           {
-          int o = orders[i];
-          if (o < 0) o += 256;
+          int o = orders[i] & 0xFF;
+//          if (o < 0) o += 256;
           iL[o] = true;
           }
 
           for(int i = halflen; i < orders.length; i++)
           {
-          int ord = orders[i];
-          if (ord < 0) ord += 256;
+          int ord = orders[i] & 0xFF;
+//          if (ord < 0) ord += 256;
           int m = mapping[ord];
           if (m == -1) continue;
                         
@@ -345,8 +346,8 @@ public class Fatten extends Unit
                 
         for(int i = halflen; i < orders.length; i++)
             {
-            int ord = orders[i];
-            if (ord < 0) ord += 256;
+            int ord = orders[i] & 0xFF;
+//            if (ord < 0) ord += 256;
             int pos = mappingPos[ord]; 
                 
             tempOrders[pos * 2 + 1] = orders[i];                // notice it's orders[i], not orders[pos*2].  This is correct.

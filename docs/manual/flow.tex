@@ -435,7 +435,7 @@ Subpatches are added to the primary patch by choosing {\bf Load Subpatch...} in 
 \begin{itemize}
 \item {\bf Voices Requested}\quad Here you stipulate how many voices you'd like to allocate to this subpatch.  Voices allocated to a subpatch are taken out of voices available to the main patch. 
 
-\item {\bf Voices Allocated}\quad Obviously not every subpatch can have a maximal number of voices.  Here you can see how many voices were {\it actually} allocated.  The allocation strategy is simple: for each subpatch from top to bottom, Flow attempts to give that subpatch every voice it asked for.  Flow must reserve at least one voice for the main patch, so there are at most 15 voices available to distribute (or whatever the polyphony was that you specified in your tuning parameters).  If Flow runs out of voices, a subpatch may get fewer voices than it asked for, and later subpatches may get no voices at all.  
+\item {\bf Voices Allocated}\quad Obviously not every subpatch can have a maximal number of voices.  Here you can see how many voices were {\it actually} allocated.  The allocation strategy is simple: for each subpatch from top to bottom, Flow attempts to give that subpatch every voice it asked for.  Flow must reserve at least one voice for the main patch.  If Flow runs out of voices, a subpatch may get fewer voices than it asked for, and later subpatches may get no voices at all.  
 
 One confusing situation arises when you have selected {\it Monophonic} from the {\it Play} menu.  Here Flow only uses a single voice, and that voice must go to the primary patch, so the subpatches will all have zero voices.  To make this situation clear, the subpatches will show {\bf [M]} (for ``monophonic'') for the number of voices allocated, and  ``(Mono)'' will appear in the {\bf Out} module of the primary patch.
 
@@ -443,15 +443,15 @@ One confusing situation arises when you have selected {\it Monophonic} from the 
 
 This has interesting implications when the primary patch is set to ``Any Channel'', ``MPE Lower Zone'', or ``MPE Upper Zone''.  Let's start with ``Any Channel''.  If your primary patch is set to this, then it responds to any channel {\it except} for the ones allocated to the subpatches.
 
-MPE is more complicated.  Recall that if you are using MPE, then you also specify the number of MPE channels.  If you have chosen MPE Lower Zone with \(n\) channels, then normally the patch would be allocated MIDI channel 1 for its {\it MPE Global Channel} and channels \(2\ ...\ n + 1\) for the requested MIDI channels.  However if a subpatch has allocated one of those channels, it will take it from the primary patch.  This will disrupt MPE.
+MPE is more complicated.  Recall that if you are using MPE, then you also specify the number of MPE channels.  If you have chosen MPE Lower Zone with \(n\) channels, then normally the primary patch would be allocated MIDI channel 1 for its {\it MPE Global Channel} and channels \(2\ ...\ n + 1\) for the requested MIDI channels.  However if a subpatch has allocated one of those channels, it will take it from the primary patch.  This will disrupt MPE.
 
-Thus if you have chosen MPE Upper Zone with \(n\) channels, you want your subpatches to request channels somewhere in the range \(n+2\ ...\ 16\).  For example, if you have 3 subpatches, you might set up MPE Upper Zone with \(n=12\) (so MPE needs channels \(1\ ...\ 13\)), and then use channels 14, 15, and 16 for the subpatches.
+Thus if you have chosen MPE Lower Zone with \(n\) channels, you want your subpatches to request channels somewhere in the range \(n+2\ ...\ 16\).  For example, if you have 3 subpatches, you might set up MPE Lower Zone with \(n=12\) (so MPE needs channels \(1\ ...\ 13\)), and then use channels 14, 15, and 16 for the subpatches.
 
 If you have instead chosen the MPE Upper Zone with \(n\) channels, then the MPE Global Channel is 16 and the MPE channels go down from there, that is, they're assigned to \(16 - n\ ...\ 15\). Once again, you want your subpatches to stay out of this region, so you'd assign to subpatches channels in the region \(1\ ...\ 16 - n - 1\).  For example, if you have 3 subpatches, you might once again set up MPE Upper Zone with \(n=12\) (so MPE needs channels \(4\ ...\ 16\)), and then use channels 1, 2, and 3 for the subpatches.
 
 Subpatches cannot use MPE, nor can they be assigned to ``Any Channel''.  Only the primary patch can.
 
-\item {\bf MIDI Note}\quad You can restrict a sound to only respond to a given note: any other notes on the MIDI channel will be passed on to later sounds.
+\item {\bf MIDI Note}\quad You can restrict a sound to only respond to a given note: any other notes on the MIDI channel will be passed on to later sounds.  This is useful for saving MIDI channels while building a drum kit: have all of your percussion sounds respond to the same MIDI channel but to different notes.  It's also helpful when your DAW has a restricted number of tracks, since the entire drum kit can be on the same track.
 
 \item {\bf Gain}\quad This sets the overall volume of the subpatch in the final mix.  This is exactly the same as the {\it Gain} knob on the {\bf Out} module of the primary patch, mentioned earlier in Section~\ref{playingapatch}.  And in fact, the Gain knob can be modulated: if your subpatch was originally modulating its Gain knob before you loaded it as a subpatch, it will {\it continue} to modulate the gain, overriding the setting you make here.  In general it's probably not  wise to modulate the Gain knob.
 
@@ -479,13 +479,13 @@ As mentioned before, the order of the subpatches affects which patches get alloc
 
 \paragraph{Swapping a Subpatch with the Primary Patch}
 
-If you drag the titlebar of a subpatch clear into the region of the {\it primary patch}, it will {\bf swap} the subpatch with the primary patch.  Flow will preserve reverb from the previous patch.  This is useful for making a subpatch the the Primary Patch temporarily in order to tweak it.
+If you drag the titlebar of a subpatch clear into the region of the {\it primary patch}, it will {\bf swap} the subpatch with the primary patch.  Flow will preserve the reverb settings from the previous patch.  This is useful for making a subpatch the the Primary Patch temporarily in order to tweak it.
 
-Swapping the MIDI channel come with some caveats.  First, only the Primary patch can perform MPE: so if you are swapping a primary patch that uses MPE, when it becomes a subpatch its MIDI channel will become ``No Channel''.  Similarly, only subpatches can have ``No Channel'' as a MIDI channel option,\footnote{This may change in the future.} so if one of them is swapped to a primary path, its MIDI channel will change to ``All Channels''.
+Swapping the subpatch comes with some MIDI channel complications.  First, only the Primary patch can perform MPE: so if you are swapping a primary patch that uses MPE, when it becomes a subpatch its MIDI channel will become ``No Channel''.  Similarly, only subpatches can have ``No Channel'' as a MIDI channel option,\footnote{This may change in the future.} so if one of them is swapped to a primary path, its MIDI channel will change to ``All Channels''.
 
 Another thing you need to watch out for is swapping the Primary patch whose Gain is under the control of a modulation such as an LFO.  When it becomes a subpatch, the subpatch's Gain slider will be set to 0 (and it won't work anyway).  In short: don't control Gain from a modulation.
 
-You can also swap a subpatch with  swap while holding down the Control key (on the Mac, you can also hold the Option key).\footnote{Yes, I know this is the behavior for ``copying'' while drag and drop, and in fact you'll get a copy icon.  But there's no ``alternative drag'' option in Java, so I had to make do.}  This will swap the two patches but the MIDI channel, MIDI Note, and Number of Requested Sounds won't change.  Why would you want to do this?  If you are auditioning a bunch of different sounds, you may have them lined up as subpatches and are dragging them into the primary patch to hear them play a given part (which has its own MIDI channel).
+You can do a different kind of subpatch swap if you do the swap while holding down the Control key (on the Mac, you can also hold the Option key).\footnote{Yes, I know this is the behavior for ``copying'' while drag and drop, and in fact you'll get a copy icon.  But there's no ``alternative drag'' option in Java, so I had to make do.}  This will swap the two patches as before, but the MIDI channel, MIDI Note, and Number of Requested Sounds won't be swapped: they'll stay as they were.  Why would you want to do this?  If you are auditioning a bunch of different sounds, you may have them lined up as subpatches and are dragging them into the primary patch to hear them play a given part (which has its own MIDI channel).
 
 \paragraph{Loading, Clearing, and Saving the Primary Patch}  Obviously you could clear the primary patch or load a new one by choosing {\it Load Patch...} or {\it New Patch} respectively, but this would clear out the subpatches as well.  If you just want to clear just the primary patch alone, choose {\it New Primary Patch}.  You'll be asked if you wanted to optionally {\it demote} the primary patch, that is, to turn it into a subpatch rather than eliminate it. 
 
@@ -506,9 +506,9 @@ The best way to reduce the Audio latency is to not send audio to the DAW until y
 \paragraph{Computational Cost} Flow uses a lot of CPU.   {\it A lot of CPU.}   Your objective is to eek out as many voices as possible to make your song before it begins to glitch.  I can usually get 20--24 voices on my laptop.  How is this done?
 
 \begin{itemize}
-\item Turn off Flow's display.  That saves a lot.
+\item Turn off Flow's partials and oscilloscope displays.  That saves a lot.
 \item For each subpatch, reduce the voices requested to the minimum number needed before you hear the artifacts of voice stealing. 
-\item If necessary, temporarily reduce the number of partials being used while recording and editing the MIDI in tracks.  Then bring the partials up to (say) 256 for the final audio recording.  This is an extreme measure but it works, especially in combination with...
+\item If necessary, temporarily reduce the number of partials being used while recording and editing the MIDI in tracks.  Then bring the partials back up to (say) 256 for the final audio recording.  This is an extreme measure but it works, especially in combination with...
 \item You can significantly increase the audio buffer size in the final recording, which will reduce glitching by quite a lot even with 256 partials and a maxed-out voice count: the downside is heavily increased latency, but that wouldn't matter for the final audio recording and can be shifted in post.
 \item Keep in mind that some patches are much more costly per-voice than others.  Keep their voice counts minimized.
 \item Shut off other applications: especially web browsers and other CPU-hungry stuff.
@@ -542,7 +542,7 @@ The Modules are divided into five categories:
 \begin{wrapfigure}{r}{3in}
 \vspace{-1em}
 \includegraphics[height=1.5in]{CurveUp}\includegraphics[height=1.5in]{CurveDown}
-\caption{Envelope modulation curves, shown both in rising and falling scenarios.  Solid lines are (right to left) {\it Linear}, \(x^2\), \(x^4\), \(x^8\), \(x^{16}\), and \(x^{32}\).  Dotted lines are (right to left) \((x^2 + x^8)/2\),  \((x^4 + x^{16})/2\), and  \((x^8 + x^{32})/2\).  Not shown is {\it Step}, which stays put until the very end, at which time it suddenly jumps to the ultimate value. }
+\caption{Envelope modulation curves, shown both in rising and falling scenarios.  Solid lines are (right to left) {\it Linear}, \(x^2\), \(x^4\), \(x^8\), \(x^{16}\), and \(x^{32}\).  Dashed lines are (right to left) \((x^2 + x^8)/2\),  \((x^4 + x^{16})/2\), and  \((x^8 + x^{32})/2\).  The dotted line is {\it Step}, which stays put until the very end, at which time it suddenly jumps to the ultimate value. }
 \label{curves}
 \end{wrapfigure}
 
@@ -675,6 +675,8 @@ In addition to sequencing modulation signals, Seq can also be used in combinatio
 
 \paragraph{All}  Outputs all partials, standardized, at full amplitude.  Useful for later shaping.
 
+\paragraph{Audio In}  This takes snippets of sound from the Input Device (which you specify from {\it MIDI and Audio options} under the {\it Options} menu), extracts their harmonics in real time, and organizes them as harmonics for the current note. Because the partials are relatively few and are organized as harmonics, this has the effect of making the input sound like a robot.  This is exactly the same process used to load samples into the Wavetable module.  The sampling is designed to remove some of the choppiness from reading an arbitrary sound, but it won't remove all of it.  You can eliminate most of the rest by running the partials through a Smooth module set to about 0.5.  Also beware of audio feedback during testing!  You might be able to tamp some of that down with a filter. See also {\bf Wavetable}.
+
 % --- Bell is not completed yet -- 
 %\paragraph{Bell}   An experimental bell module (not working yet) which lets you specify the pitch, peak amplitude, and attack/decay of 10 different bell partials, in addition to the total length.
 
@@ -732,9 +734,9 @@ See also {\bf Draw}, which allows you to load single-cycle waves: the manual sec
 
 See also {\bf KHarmonics}, a similar collection drawn from various Kawai K5 harmonics.
 
-\paragraph{Wavetable}  Lets you load wavetables (as ``.WAV'' files) from https:/\!/waveeditonline.com/, then wander through them using the provided modulation.  You can turn off interpolation between waves.
+\paragraph{Wavetable}  Lets you load wavetables (as ``.WAV'' files) from https:/\!/waveeditonline.com/, then wander through them using the provided modulation.  You can turn off interpolation between waves.  Wavetables are loaded using the {\it Wavetable} button.
 
-You can also load an arbitrary sound directly and Flow will chop it up into a wavetable for you.  Your sound file must be a 16-bit signed integer WAV file, mono only.  You should turn on the {\it sampled} option prior to loading the sound, which will cause Flow to grab larger overlapping chunks and to use a windowed FFT (the {\it sampled} option doesn't do anything but affect how the sound is loaded).  The sampled option is designed to remove some of the choppiness from reading an arbitrary sound, but it won't remove all of it.  You can eliminate most of the rest by running the partials through a Smooth module set to about 0.5.  Note: this is only for sampling arbitrary sounds:  you don't want to do any of this stuff (the sample option, Smooth) if you're reading a prepared wavetable from https:/\!/waveeditonline.com/.
+You can also load an arbitrary sound directly and Flow will chop it up into a wavetable for you by pressing the {\it Sample} button.  Your sound file must be a 16-bit signed integer WAV file, mono only.   The Sample button is different from the Wavetable button in that it isdesigned to remove some of the choppiness from reading an arbitrary sound: but it won't remove all of it.  You can eliminate most of the rest by running the partials through a Smooth module set to about 0.5.  Note: this is only for sampling arbitrary sounds:  you don't want to do any of this stuff (the sample option, Smooth) if you're reading a prepared wavetable from https:/\!/waveeditonline.com/.  The sampled option uses the same basic procedure as Audio In uses to sample its real-time input.  See also {\bf Audio In}.
 
 
 \subsection{Partials Shapers}
@@ -768,9 +770,9 @@ Okay, here we go.
 \item {\bf filter not}\quad  If \(B_i \geq M\) then returns 0, else \(A_i\)
 \item {\bf fill}\quad If \(A_i > M\) then returns \(A_i\), else \(B_i\)
 \item {\bf threshold}\quad If \(A_i > M\) then returns 1 else 0
-\item {\bf scaledown}\quad Does \(A_i \times M + B_i\)
-\item {\bf scaleup}\quad Does \(A_i \times (M + 1) + B_i\)
-\item {\bf scalefar}\footnote{Scales in a range 1...10 rather than 1...2 for {\it scaleup}}\quad Does \(A_i \times (M + 9) + B_i\)
+\item {\bf scaledown}\quad Does \(A_i \times M + B_i\)\qquad\quad\ (Scales in the range 0...1)
+\item {\bf scaleup}\quad Does \(A_i \times (M + 1) + B_i\)\qquad (Scales in the range 1...2)
+\item {\bf scalefar}\quad Does \(A_i \times (M + 9) + B_i\)\qquad (Scales in the range 1...10)
 \item {\bf clampdown}\quad Does \(\min(A_i,\ M) + B_i\)
 \item {\bf clampup}\quad Does \(\max(A_i,\ M) + B_i\)
 %\item {\bf remove}\quad If \(i\ \text{mod} (M \times 127) = 0\) then returns \(A_i\), else \(B_i\)
@@ -870,7 +872,7 @@ Partial Filter can be set to be {\it Relative}.  When relative, the partials are
 
 \paragraph{Sub} Adds up to four partials at octave spacing below the fundamental, eliminating the top four partials.  You can specify the amplitude of the partials relative to the fundamental.
 
-\paragraph{VCA} This is just what it says on the tin: an amplifier (VCA is the classic term).  A VCA is very commonly used in conjunction with an envelope.  It takes an input and multiplies all of its amplitudes by {\it mod} (which goes 0--1), then by {\it scale} (which goes 0--8).  The {\it mod} modulation is designed for you to attach LFOs or envelopes etc.  The {\it scale} modulation is not linear and so is just meant for you to dial in a maximum scale value.   The VCA also sports a {\it bass boost} meant to, well, boost lower partials.  It's very simplistic: at maximum boost, partials of frequency 0 are boosted \(2\times\), and partials at Nyquist are boosted \(0\times\).  Partials in-between are boosted in linear proportion to their position between these two extremes.  
+\paragraph{VCA} This is just what it says on the tin: an amplifier (VCA is the classic term).  A VCA is very commonly used in conjunction with an envelope.  It takes an input and multiplies all of its amplitudes by {\it mod} (which goes 0--1), then by {\it scale} (which goes 0--8).  The {\it mod} modulation is designed for you to attach LFOs or envelopes etc.  The {\it scale} modulation is not linear and so is just meant for you to dial in a maximum scale value.   %The VCA also sports a {\it bass boost} meant to, well, boost lower partials.  It's very simplistic: at maximum boost, partials of frequency 0 are boosted \(2\times\), and partials at Nyquist are boosted \(0\times\).  Partials in-between are boosted in linear proportion to their position between these two extremes.  
 
 \subsection{Special Modules}
 \label{specialmodules}
@@ -881,9 +883,9 @@ There are currently five special modules: {\bf In}, {\bf Out}, {\bf Choice}, {\b
 
 After this is done, you will find you can select an option (a combobox or a checkbox) via the {\it Option} dial.\footnote{At present, the constraints facility is not part of the available options.  This might change in the future.} Once this is done, you can change the value of the selected option via the {\it Value} dial.  This might be particularly interesting to do via an LFO.
 
-Note that when you change the value, it's not immediately reflected (or reflected at all!) in the target module's GUI.  This is because updating the GUI in real time could be very costly.  But it's been change!  You can convince yourself of this by dragging the module and moving it.  Similarly, if you click on the option combo box or check box, the result is not directly reflected in the Option dial.
+Note that when you change the value, it's not immediately reflected (or reflected at all!) in the target module's GUI.  This is because updating the GUI in real time like this would be very computationally costly.  But it's been changed!  You can convince yourself of this by dragging the module and moving it.  Similarly, if you click on the option combo box or check box, the result is not directly reflected in the Option dial.
 
-\paragraph{Note} This module also doesn't process sound at all. Instead, it lets you leave a note or comment.  You can change the width of the Note panel with two arrow-like buttons at the bottom.   You can have as many Note modules as you like; they'll each save their comments independently as part of your patch.
+\paragraph{Note} This module also doesn't process sound at all. Instead, it enables you to leave a note or comment.  You can change the width of the Note panel with two arrow-like buttons at the bottom.   You can have as many Note modules as you like; they'll each save their comments independently as part of your patch.  If your goal is to document your patch for later users, it'd be better to do that by editing {\bf Out}'s {\it Info} field (and you ought to fill out its other fields as well).  See also {\bf Out}.
 
 \paragraph{Fix} This module likewise doesn't process any sound.  Instead, it lets you fix the note (pitch) being played, and/or the velocity being played, to specific values.  After Fix is called, it changes the pitch and volume, and all later modules will use the new ones: thus you want Fix early in your modules, ideally the very first one.  I use Fix in percussion patches to force the patches to always make the same pitched sound regardless of the note being played.
 
@@ -896,7 +898,7 @@ Every useful patch has to have an Out module, since it provides the facility for
 
 \paragraph{Reverb} Flow sports a simple implementation of the Freeverb algorithm.\footnote{A well regarded reverb algorithm in the public domain by ``Jezar at Dreampoint''.}  This algorithm has three parameters.  {\it Wet} is the dry/wet knob for the algorithm (0 is fully dry).  {\it Damp} is the damping: basically a low-pass filter applied to the reflected signals.  {\it Size} is the room size, which translates roughly into the reverb decay.  Note only a single sound (voice \#0) controls the modulation of Wet, Damp, and Size.  This means that if you attach an Envelope etc. to any of these modules, it may not respond in exactly the way you think.  It's probably best to keep them as knobs rather than attaching a modulation source.
 
-\paragraph{Dephase} By default Flow keeps all of its partials consistent with their original phases, so when you output a Sawtooth it'll look like this:  \smash{\raisebox{-0.5em}{\includegraphics[trim=1cm 1cm 1cm 8cm, clip=true, width=1in, height=0.15in]{Saw1}}}\quad However this may sound too buzzy in low pitch sounds, so selecting this button will cause Flow to add a specific fixed set of random values to the phases of its partials.  This might change the Sawtooth wave to look like this \smash{\raisebox{-0.5em}{\includegraphics[trim=1cm 1cm 1cm 8cm, clip=true,width=1in, height=0.15in]{Saw2}}}\quad This sure doesn't {\it look} like a Sawtooth wave, but if you play it in the high- and mid- pitch notes, you'll find it {\it sounds} exactly the same!  For low-frequency notes the randomly-phased Sawtooth will sound less buzzy; you may or may not prefer this.  It {\it is} the case that randomly-phased sounds give Flow the opportunity to do some tricks which reduce computational cost by a bit.
+\paragraph{Dephase} By default Flow tries to keep all of its partials consistent with their original phases, so when you output a Sawtooth it'll look like this:  \smash{\raisebox{-0.5em}{\includegraphics[trim=1cm 1cm 1cm 8cm, clip=true, width=1in, height=0.15in]{Saw1}}}\quad However this may sound too buzzy in low pitch sounds, so selecting this button will cause Flow to add a specific fixed set of random values to the phases of its partials.  This might change the Sawtooth wave to look like this \smash{\raisebox{-0.5em}{\includegraphics[trim=1cm 1cm 1cm 8cm, clip=true,width=1in, height=0.15in]{Saw2}}}\quad This sure doesn't {\it look} like a Sawtooth wave, but if you play it in the high- and mid- pitch notes, you'll find it {\it sounds} exactly the same!  For low-frequency notes the randomly-phased Sawtooth will sound less buzzy; you may or may not prefer this.  It {\it is} the case that randomly-phased sounds give Flow the opportunity to do some tricks which reduce computational cost by a bit.
 
 \paragraph{Partials Visualization}  When you connect to the {\bf A} port, the resulting partials are also displayed on the left partials display in your rack.  The {\bf B} port is also useful for displaying partials (it shows them on the right partials display).  
 
@@ -907,6 +909,8 @@ The displays have certain special colors you should be aware of: the {\it Green}
 In addition to the modulation signal, the oscilloscope also draws a helpful set of axes.  The color of these axes can be either {\it Blue} or {\it Green}: every time the signal produces a {\bf trigger}, the oscilloscope will change the color of the axes.
 
 There's no reason you can't insert multiple Out modules into your patch: but only the last one will do anything.
+
+\paragraph{Documentation} If you press the {\it Edit} button, you can edit your patch's {\it Author Name}, {\it Creation Date}, {\it Version}, and {\it Info} (an area for general documentation).  If you load a patch as a Macro, you can view its Info string in the resulting module, so Info is useful to fill out with instructions for use.
 
 \subsubsection{Creating a Macro with the \textit{In}, \textit{Out,} and \textit{Macro} Modules}
 \label{creatingmacros}
@@ -927,7 +931,7 @@ You can rename the input and output partials and modulation ports of your Macro.
 
 Note that although you can have as many In modules as you like, and they will all work, only the ports of the first one will be used to rename ports in the Macro.  (Of course, as mentioned before, while you can have multiple Out modules, only the last one will function at all, and this includes naming ports).
 
-\subsection{Mixing Strategies}
+\subsection{Strategies for Mixing}
 \label{mixingstrategies}
 
 Ordinarily if you wanted to mix two sources into one stream, you'd imagine you could just lump all the partials together and be done with it.  But there are two catches.  First, {\name} has a fixed number of partials: so if you lump the partials from two sources together, half of them must be eliminated.  Second, partials are each associated with a sine wave oscillator in the output (that's the partial's {\it order}): when two sets of partials are mixed, you'll often have the situation where partials from each set are competing for that oscillator, and in the end only one can have it.  So it's a little more complex than you'd think.
@@ -967,9 +971,9 @@ Combine (non-``Half'') works well for many things but not if you're mixing toget
 \vspace{-1em}
 \end{wrapfigure}
 
-The architecture behind {\name} is not particularly complex.  The top-level class, of which there is only a single instance, is {\bf Output}. This class is responsible for managing most of the threads in the system and for maintaining the facility which builds and emits samples to Java's audio system.  Output also contains a single {\bf Input} object which manages incoming MIDI data and sends it to the right places.  Input does this by working with {\bf MIDI}, an untidy class borrowed from Edisyn which provides a wrapper facility around Java's midi subsystem.
+The architecture behind {\name} is not particularly complex.  The top-level class, of which there is only a single instance, is {\bf Output}. This class is responsible for managing most of the threads in the system and for maintaining the facility which builds and emits samples to Java's audio system.  Output also contains a single {\bf Input} object which manages incoming MIDI data and sends it to the right places.  Input does this by working with {\bf MIDI}, an untidy class borrowed from Edisyn which provides a wrapper facility around Java's midi subsystem.  Last, Output contains a single {\bf AudioInput} class which samples sound from a microphone or other input source.  AudioInput is at present only used by the {\it Audio In} module.
 
-Critically, Output also contains some \(N\) {\bf Sound} objects, one per voice.  Sound objects are {\it registered} with Output.  Output, and not the Sound objects themselves, handles the spawning of voice threads associated with the Sound objects.  Each Sound object contains some number of {\it modules} which are attached to one another and pass partials or modulation signals to one another.  One module is designated as the module which {\it emits} a final set of partials to the Sound on request: Sounds then hand off their partials to the Output which uses them to produce samples to give to the audio system. 
+Output also contains some \(N\) {\bf Sound} objects, one per voice.  Sound objects are {\it registered} with Output.  Output, and not the Sound objects themselves, handles the spawning of voice threads associated with the Sound objects.  Each Sound object contains some number of {\it modules} which are attached to one another and pass partials or modulation signals to one another.  One module is designated as the module which {\it emits} a final set of partials to the Sound on request: Sounds then hand off their partials to the Output which uses them to produce samples to give to the audio system. 
 
 Each Sound object belongs to a {\bf Group}, and there are up to \(G\) Groups stored in Output.   Each Group is really a patch (the Primary patch or a subpatch), and all Sounds associated with a Group have the same organization of module because the produce the same kind of sound.  Groups have names, MIDI channels, etc.  Each Group also has a user-requested number of voices (Sounds); the number of Sounds allocated to a Group will be no more than this number.  The Primary patch is Group 0, and it always contains at least one Sound (number 0).  Other Groups can have as few as zero Sounds.  You will rarely access a Sound's Group when developing a module.
 
@@ -996,7 +1000,9 @@ The final class in the core package is {\bf Utility}, which simply provides vari
 
 \paragraph{Threads} These classes spawn and are manipulated by several threads, as shown in Figure~\ref{threads}.  First and foremost is the {\bf voice sync thread}.  This thread can either be spawned to run on its own, or it can simply be the application's \texttt{main(...)} thread, calling \texttt{output.go()} in an infinite loop.  The voice sync thread is responsible for getting the latest MIDI data from the {\bf MIDI input receiver thread}, then syncing all of the {\bf individual voice threads} and having them produce a new set of partials, one per Sound.  If there is only one voice, the voice sync thread has the option of handling that voice itself rather than spawning with and negotiating with an individual voice thread.  Finally, it hands these partials to the {\bf sound output thread} which converts them into a sound wave and emits it.  The sound output thread does this by splitting the task per-voice into separate output threads to add up the respective partials.
 
-The sound output thread and MIDI input receiver threads run constantly in the background; but the voice sync thread and the individual voice threads can all be paused by locking on Output's {\bf sound lock}.  The recommended pattern is:\footnote{This isn't a synchronized statement because the lock is a ``fair'' (non-barging) recurrent lock internally.  The locks used in synchronized statements are (unfortunately) unfair, and we can't use that.}
+The sound output thread and MIDI input receiver threads run constantly in the background; but the voice sync thread and the individual voice threads can all be paused by locking on Output's {\bf sound lock}.  The recommended pattern is:\footnote{This doesn't use the {\tt synchronized} keyword because the lock must be a ``fair'' (non-barging) recurrent lock internally.  The locks used in {\tt synchronized} are (unfortunately) unfair, so we can't use them.}
+
+\bump
 
 \begin{verbatim}
 Output output = ... ;
@@ -1475,7 +1481,7 @@ Third: you might also change your module, which causes problems when trying to b
 \item {\it patch-date:}\quad The patch creation date.  A string.  
 \item {\it patch-info:}\quad Useful information about the patch, as stipulated by the patch creator.  A string.  
 \item {\it patch-version:}\quad The version of the patch, as stipulated by the patch creator.  A string. 
-\item {\it modules:}\quad {\tt [ {\it module,*} ] }
+\item {\it modules:}\quad {\tt {\it module,*} }
 \item {\it module:}\quad {\tt \{ "v":{\it module-version}, "class":{\it module-classname}, "id":{\it module-id}, "opt":{\it options}, \rule[0in]{0in}{0in}~\hspace{\fill} "unit":{\it unit-inputs}, "mod":{\it modulation-inputs}, {\it optional-constraints}, {\it optional-data} \}}
 \item {\it module-version:}\quad the version of this kind of module.  An integer \(\geq 0\).  Modules are presently largely at 0.
 \item {\it module-classname:}\quad the class name of this module.  A string.
@@ -1496,7 +1502,7 @@ Third: you might also change your module, which causes problems when trying to b
 \item {\it unit-input-name:}\quad A unit input name (a string).  Normally this is the same as returned by {\tt getInputName(...)}.
 \item {\it unit-input-value:}\quad{\tt \{ "at":{\it unit-output-name}, "id":{\it id} \}}\qquad The id is for the attached module.
 \item {\it unit-output-name:}\quad A unit output name (a string).  Normally this is the same as returned by {\tt getOutputName(...)}.
-\item {\it optional-subpatches:}\quad {\tt [ {\it subpatch,*} ] }
+\item {\it optional-subpatches:}\quad {\tt {\it subpatch,*} }
 \item {\it subpatch:}\quad {\tt \{ "voices":{\it subpatch-voices}, "gain":{\it subpatch-gain}, "note": {\it optional-subpach-note}, \\
 \rule[0in]{0in}{0in}~\hspace{\fill}\hbox{"midi":{\it optional-subpatch-midi-channel},  "flow":{\it flow-version}, "name":{\it patch-name},} \\ 
 \rule[0in]{0in}{0in}~\hspace{\fill}\hbox{"by":{\it patch-author}, "on":{\it patch-date}, "info":{\it patch-info}, "v":{\it patch-version},}
