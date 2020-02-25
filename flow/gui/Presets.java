@@ -21,6 +21,9 @@ public class Presets extends JPanel
     {
     JComboBox combo;
     ModulePanel modpanel;
+    JLabel label;
+
+    public static final String CHOOSE = "<html><i>Presets...</i></html>";
     
     public Presets(ModulePanel modpanel)
         {
@@ -90,19 +93,19 @@ public class Presets extends JPanel
                 boolean cellHasFocus)
                 {
                 if (index == -1)
-                    return new JLabel("Pre");
+                    return new JLabel(CHOOSE);
                 else
                     return r.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 }
             };
         combo.setRenderer(r2);
                 
-        JComboBox example = new JComboBox(new String[] { "Pre" });
+        JComboBox example = new JComboBox(new String[] { CHOOSE });
         combo.setPreferredSize(example.getPreferredSize());
         combo.setMinimumSize(example.getMinimumSize());
         combo.revalidate();
-        combo.setSelectedItem("Pre");
-
+        combo.setSelectedItem(CHOOSE);
+        
         add(combo, BorderLayout.CENTER);
         }
     }
