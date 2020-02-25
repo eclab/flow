@@ -184,7 +184,8 @@ public class WaveTable extends Unit implements UnitSource
                     }
 
                 final PushButton button[] = new PushButton[1];
-                box.add(button[0] = new PushButton(name == null ? "Wavetable" : name)
+                final PushButton button2[] = new PushButton[1];
+                box.add(button[0] = new PushButton(name == null ? "Wavetable..." : name)
                     {
                     public void perform()
                         {
@@ -195,12 +196,12 @@ public class WaveTable extends Unit implements UnitSource
                             {
                             name = AppMenu.removeExtension(f.getName());
                             button[0].getButton().setText(name);
+                            button2[0].getButton().setText("Sample...");
                             }
                         }
                     });
 
-                final PushButton button2[] = new PushButton[1];
-                box.add(button2[0] = new PushButton(name == null ? "Sample" : name)
+                box.add(button2[0] = new PushButton(name == null ? "Sample..." : name)
                     {
                     public void perform()
                         {
@@ -211,6 +212,7 @@ public class WaveTable extends Unit implements UnitSource
                             {
                             name = AppMenu.removeExtension(f.getName());
                             button2[0].getButton().setText(name);
+                            button[0].getButton().setText("Wavetable...");
                             }
                         }
                     });
