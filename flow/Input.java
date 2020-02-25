@@ -726,7 +726,7 @@ public class Input
             notesOn.addFirst(sound);
             }
         
-        double d = Math.pow(2.0, (double) (i - 69) / 12.0) * 440.0;
+        double d = Math.pow(2.0, (double) (i - 69.0) / 12.0) * 440.0;
         
        output.lock();
         try

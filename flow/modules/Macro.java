@@ -253,7 +253,7 @@ public class Macro extends Unit implements Cloneable
             modules[m].setMacro(this);
             }
         
-        // find the last Out
+        // find Out
         for(int m = modules.length - 1; m >= 0; m--)
             {
             if (modules[m] instanceof Out)

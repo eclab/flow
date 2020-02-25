@@ -359,7 +359,7 @@ public class AppMenu
 
                 if (file != null)
                     {
-                    System.err.println(file);
+                    //System.err.println(file);
                     fd.setFile(file.getName());
                     fd.setDirectory(file.getParentFile().getPath());
                     }
