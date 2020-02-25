@@ -582,6 +582,16 @@ public class Output
             {
             for (int i = 0; i < pos.length; i++)
                 {
+                double frequency = freq[i];
+                                                                
+                // Because we're mixing, we can just ignore the higher frequency stuff, which gives us a speed boost.
+                // However if the user wants to switch back to non-mixing, it might produce a pop because we have
+                // reset everything.
+                if (frequency * pitch > NYQUIST)
+                    {
+                    break;
+                    }
+
                 double amplitude = amp[i];
                 int oi = orders[i] & 0xFF;           // if we're using 256 partials, they need to be all positive
                 //if (oi < 0) oi += 256; 
@@ -597,15 +607,6 @@ public class Output
                 if (amplitude < 1e-200) amplitude = 0;          // undenormalize prior to next go-around
                 ca[oi] = amplitude;
 
-                double frequency = freq[i];
-                                                                
-                // Because we're mixing, we can just ignore the higher frequency stuff, which gives us a speed boost.
-                // However if the user wants to switch back to non-mixing, it might produce a pop because we have
-                // reset everything.
-                if (frequency * pitch > NYQUIST)
-                    {
-                    break;
-                    }
                 if (amplitude <= MINIMUM_VOLUME)
                     {
                     continue;
@@ -622,6 +623,8 @@ public class Output
             {
             for (int i = 0; i < pos.length; i++)
                 {
+                double frequency = freq[i];
+ 
                 double amplitude = amp[i];
                 int oi = orders[i] & 0xFF;           // if we're using 256 partials, they need to be all positive
                 //if (oi < 0) oi += 256; 
@@ -637,8 +640,6 @@ public class Output
                 if (amplitude < 1e-200) amplitude = 0;          // undenormalize prior to next go-around
                 ca[oi] = amplitude;
                                 
-                double frequency = freq[i];
- 
                 double position = pos[oi] + frequency * tr;
                 position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
                 pos[oi] = position;
