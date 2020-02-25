@@ -168,4 +168,6 @@ public class Tinkle extends Unit implements UnitSource
             }
         else return "";
         }
+    
+    public boolean isConstrainable() { return true; }
     }
