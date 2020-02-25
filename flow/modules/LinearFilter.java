@@ -104,7 +104,16 @@ public class LinearFilter extends Unit
     public void go()
         {
         super.go();
-                
+ 
+        int numNodes = (int)(modulate(MOD_NODES) * MAX_NODES);
+       
+        if (numNodes == 0)			// no nodes at all
+        	{
+        	pushFrequencies(0);
+        	pushAmplitudes(0);
+        	return;
+        	}
+        
         pushFrequencies(0);
         copyAmplitudes(0);
 
@@ -117,8 +126,6 @@ public class LinearFilter extends Unit
             pitch = MIDDLE_C_FREQUENCY;
             }
                 
-        
-        int numNodes = (int)(modulate(MOD_NODES) * MAX_NODES);
         int baseFreq = (int)((modulate(MOD_BASE) * 2 - 1.0) * MAX_BASE_FREQUENCY);
         
         for(int i = 0; i < numNodes; i++)
@@ -132,32 +139,28 @@ public class LinearFilter extends Unit
         int node = 0;
         for(int i = 0; i < amplitudes.length; i++)
             {
+            double freq = frequencies[i] * pitch;
             // First consider the situation where the frequency is lower than the minimum node
-            if (node == 0 && frequencies[i] * pitch <= nodeFreq[0])
+            if (freq <= nodeFreq[0])  // (node == 0 && freq <= nodeFreq[0])
                 {
                 amplitudes[i] *= nodeGain[0];
                 }
+            // Next consider the situation where the frequency is higher than the maximum node
+            else if (freq >= nodeFreq[numNodes-1])
+            	{
+            	amplitudes[i] *= nodeGain[numNodes-1];
+            	}
             else 
                 {
-                // Find the pair.  We do this by identifying the larger node which is >= the frequency in question
-                while (node + 1 < (numNodes - 1) && frequencies[i] * pitch >= nodeFreq[node + 1])
+                // Find the pair.  This corresponds to the first higher node which is > freq,
+                // while the existing node is <= freq
+                while (node < (numNodes - 2) && nodeFreq[node + 1] <= freq)
                     {
                     node++;
                     }
                 
-                // next consider the situation where the frequency is higher than the maximum node
-                if (node + 1 == (numNodes - 1) && frequencies[i] * pitch >= nodeFreq[node + 1])
-                    {
-                    double d = nodeGain[node + 1];
-                    for(int j = i; j < amplitudes.length; j++)
-                        {
-                        amplitudes[j] *= d;
-                        }
-                    break;  // all done
-                    }
-                
                 // don't want to divide by zero...
-                else if (nodeFreq[node] == nodeFreq[node + 1])
+                if (nodeFreq[node] == nodeFreq[node + 1])
                     {
                     amplitudes[i] *= nodeGain[node];
                     }
@@ -165,8 +168,8 @@ public class LinearFilter extends Unit
                 // finally interpolate between the node and the next node
                 else
                     {
-                    double pos = (frequencies[i] * pitch - nodeFreq[node]) / (nodeFreq[node + 1] - nodeFreq[node]);
-                    double gain = (1 - pos) * nodeGain[node] + pos * nodeGain[node + 1];
+                    double alpha = (freq - nodeFreq[node]) / (nodeFreq[node + 1] - nodeFreq[node]);
+                    double gain = (1 - alpha) * nodeGain[node] + alpha * nodeGain[node + 1];
                     amplitudes[i] *= gain;
                     }
                 }
@@ -188,7 +191,7 @@ public class LinearFilter extends Unit
                 {
                 return "" + (int)((modulate(MOD_BASE) * 2 - 1.0) * MAX_BASE_FREQUENCY);
                 }
-            else if (modulation < MAX_NODES + 1)
+            else if (modulation < MAX_NODES + 2)
                 {
                 return "" + (int)modToInsensitiveFrequency(value);
                 }
