@@ -23,6 +23,17 @@ import javax.swing.*;
 public class Drawbars extends Unit implements UnitSource, Presetable
     {
     private static final long serialVersionUID = 1;
+	int percussionType;
+	double percussion;
+	
+	public void setPercussionType(int type) { percussionType = type; }
+	public int getPercussionType() { return percussionType; }
+		
+	public static final double MAX_PERCUSSION = 4.0;
+	public static final double MIN_PERCUSSION = 0.0001;
+	
+    public static final int MOD_DECAY = 11;
+    public static final int MOD_VOLUME = 12;
 
     public static final int NUM_DRAWBARS = 11;
     public Drawbars(Sound sound) 
@@ -41,19 +52,44 @@ public class Drawbars extends Unit implements UnitSource, Presetable
             Constant.ZERO,
             Constant.ZERO,
             Constant.ZERO,
+            Constant.ZERO,
+            Constant.ZERO
             }, 
             new String[] { "1  (16')", "2  (5 1/3')", "3  (8')", "4  (4')", "5  (2 2/3')", "6  (2')", "7  (1 3/5')", 
-                           "8  (1 1/3')", "9  (1')",  "10", "11" }); // "10  (1 1/7', 8/9')", "11  (4/5', 2/3')" });
+                           "8  (1 1/3')", "9  (1')",  "10", "11", "Perc Decay", "Perc Volume" }); // "10  (1 1/7', 8/9')", "11  (4/5', 2/3')" });
+        defineOptions(new String[] { "Percussion" }, new String[][] { { "Off", "1st", "2nd" } });
         setClearOnReset(false);
         setupOrganFrequencies();
         }
         
+
+    public static final int OPTION_PERCUSSION_TYPE = 0;
+
+    public int getOptionValue(int option) 
+        { 
+        switch(option)
+            {
+            case OPTION_PERCUSSION_TYPE: return getPercussionType();
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+                
+    public void setOptionValue(int option, int value)
+        { 
+        switch(option)
+            {
+            case OPTION_PERCUSSION_TYPE: setPercussionType(value); return;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+        
+
     public void setupOrganFrequencies()
         {
         double[] frequencies = getFrequencies(0);
         frequencies[0] = 8.0 / (16.0);
-        frequencies[1] = 8.0 / (5.0 + 1.0/3.0); /// yes, they're flipped
-        frequencies[2] = 8.0 / (8.0);           /// yes, they're flipped
+        frequencies[1] = 8.0 / (8.0);           /// yes, they're flipped relative to the mods
+        frequencies[2] = 8.0 / (5.0 + 1.0/3.0); /// yes, they're flipped relative to the mods
         frequencies[3] = 8.0 / (4.0);
         frequencies[4] = 8.0 / (2.0 + 2.0/3.0);
         frequencies[5] = 8.0 / (2.0);
@@ -102,6 +138,21 @@ public class Drawbars extends Unit implements UnitSource, Presetable
 
     public void reset() { for(int i = 0; i < previousMods.length; i++) previousMods[i] = Double.NaN; } 
     
+    public void gate()
+    	{
+    	super.gate();
+        double[] amplitudes = getAmplitudes(0);
+
+		if (percussionType == 0)
+			{
+			percussion = 0;
+			}
+		else
+			{	
+			percussion = Utility.hybridpow(modulate(MOD_VOLUME), SQRT_2) * 3;
+			}
+    	}
+    
     public void go()
         {
         super.go();
@@ -116,30 +167,57 @@ public class Drawbars extends Unit implements UnitSource, Presetable
 //              See http://www.stefanv.com/electronics/hammond_drawbar_science.html
 
         double[] amplitudes = getAmplitudes(0);
-
+        
         for(int i = 0; i < previousMods.length; i++)
             {
             double mod = modulate(i);
-            if (mod != previousMods[i])
+            if (mod != previousMods[i] || (percussion > 0 && (i == 3 || i == 4)))
                 {
                 previousMods[i] = mod;
-                amplitudes[i] = Utility.hybridpow(mod, SQRT_2);
+                
+                // frequencies 1 and 2 are flipped relative to their mods,
+                // so we need to flip them here.
+                int drawbar = i;
+                if (i == 1) drawbar = 2;
+                else if (i == 2) drawbar = 1;
+                
+                amplitudes[drawbar] = Utility.hybridpow(mod, SQRT_2);
+                
+		        // add in additional amplitudes for 10 and 11
+            	if (i == 9) amplitudes[11] = Utility.hybridpow(mod , SQRT_2);
+            	else if (i == 10) amplitudes[12] = Utility.hybridpow(mod, SQRT_2);
                 }
             }
-        // add in additional amplitudes for 10 and 11
-        amplitudes[11] = Utility.hybridpow(previousMods[9] , SQRT_2);
-        amplitudes[12] = Utility.hybridpow(previousMods[10] , SQRT_2);
+        
+        // add percussion
+        percussion *= (1 - ((1.0 - modulate(MOD_DECAY)) * 0.1));
+        if (percussion < MIN_PERCUSSION) percussion = 0;
+        
+        if (percussionType == 1)
+        	amplitudes[3] += percussion;
+        else if (percussionType == 2)
+        	amplitudes[4] += percussion;
         }
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
         {
         if (isConstant)
+        	{
+        	if (modulation == MOD_DECAY) return String.format("%.4f", value);
+        	else if (modulation == MOD_VOLUME) return String.format("%.4f", value * 12.0);
             return String.format("%.4f", value * 8.0);
+            }
         else return "";
         }
 
     // Lots of Drawbar Settings here:
     // http://www.hammondtoday.com/category/drawbar-settings/
+    //
+    // Note that only a few such settings here or elsewhere also
+    // have percussion information :-(  so I have elected not to include
+    // percussion presets.
+    //
+    // See also https://www.scribd.com/doc/252754336/Hammond-B3-Presets
 
 /*
   static final double[][] PRESETS = new double[][] { 
