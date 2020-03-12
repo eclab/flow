@@ -88,6 +88,9 @@ public class DADSR extends Modulation implements ModSource
     public static final int CURVE_X_2_X_8 = 7;
     public static final int CURVE_X_4_X_16 = 8;
     public static final int CURVE_X_8_X_32 = 9;
+    public static final int CURVE_1_MINUS_X_2 = 10;
+    public static final int CURVE_1_MINUS_X_4 = 11;
+    public static final int CURVE_1_MINUS_X_8 = 12;
 
     public static final int MOD_DELAY_TIME = 0;
     public static final int MOD_DELAY_LEVEL = 1;
@@ -170,7 +173,7 @@ public class DADSR extends Modulation implements ModSource
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.ONE, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
             new String[] {  "Delay Time", "Delay Level", "Attack Time", "Attack Level", "Decay Time", "Sustain Level", "Release Time", "Release Level", "On Tr", "Off Tr" });
         defineOptions(new String[] { "Curve", "One Shot", "Gate Reset", "MIDI Sync", "Fast Release" }, 
-            new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32" }, 
+            new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32", "Inv x^2", "Inv x^4", "Inv x^8"  }, 
                 { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" }, { "No Release" } } );
         setModulationOutput(0, 0);  
         }
@@ -390,6 +393,24 @@ public class DADSR extends Modulation implements ModSource
                 alpha = alpha * alpha;
                 alpha = alpha * alpha;          // x^32
                 alpha = 1 - (alpha + beta) * 0.5;
+                }
+            break;
+            case CURVE_1_MINUS_X_2:
+                {
+                alpha = alpha * alpha;
+                }
+            break;
+            case CURVE_1_MINUS_X_4:
+                {
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                }
+            break;
+            case CURVE_1_MINUS_X_8:
+                {
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
                 }
             break;
             default:
