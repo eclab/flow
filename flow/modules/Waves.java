@@ -113,7 +113,7 @@ public class Waves extends Unit implements UnitSource
                 double[] h1 = HARMONICS[harmonics];
                 double[] h2 = HARMONICS[harmonics2];
                                 
-                for(int i = 0; i < HARMONICS[harmonics].length; i++)
+                for(int i = 0; i < amplitudes.length; i++)
                     {
                     amplitudes[i] = (1 - m) * h1[i] + m * h2[i];
                     }
