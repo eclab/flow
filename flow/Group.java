@@ -13,6 +13,7 @@ import org.json.*;
 public class Group
     {
     public static final double DEFAULT_GAIN = 1.0;
+    public static final double DEFAULT_PAN = 0.5;
     public static final String EMPTY_JSON = "{ \"flow\":" + Flow.VERSION + ", modules: [ ] }";
 
     int channel = Input.CHANNEL_NONE;
@@ -21,6 +22,7 @@ public class Group
     int numRequestedSounds = 0;
     JSONObject patch = new JSONObject(EMPTY_JSON);
     double gain = DEFAULT_GAIN;
+    double pan = DEFAULT_PAN;
     
     public Group() { }
     
@@ -159,5 +161,11 @@ public class Group
     
     /** Sets the group's current gain value (normally 0...1). */
     public void setGain(double g) { if (g < 0) g = 0; gain = g; }
+
+    /** Returns the group's current gain value (normally 0...1). */
+    public double getPan() { return pan; }
+    
+    /** Sets the group's current gain value (normally 0...1). */
+    public void setPan(double g) { if (g < 0) g = 0; pan = g; }
     }
         

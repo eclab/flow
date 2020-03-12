@@ -36,7 +36,7 @@ public class Out extends Unit implements Miscellaneous
     public static final int NUM_MOD_OUTPUTS = 4;
     public static final int NUM_UNIT_OUTPUTS = 4;
     public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
-    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4", "Gain", "Wet", "Damp", "Size" }; //  "C", "R" };
+    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4", "Gain", "Wet", "Damp", "Size", "Pan" }; //  "C", "R" };
 
     public static final int MOD_OSC_1 = 0;
     public static final int MOD_OSC_2 = 1;
@@ -44,6 +44,7 @@ public class Out extends Unit implements Miscellaneous
     public static final int MOD_REVERB_WET = NUM_MOD_OUTPUTS + 1;
     public static final int MOD_REVERB_DAMP = NUM_MOD_OUTPUTS + 2;
     public static final int MOD_REVERB_ROOM_SIZE = NUM_MOD_OUTPUTS + 3;
+    public static final int MOD_PAN = NUM_MOD_OUTPUTS + 4;
 
     public static final int UNIT_DISPLAY_1 = 0;
     public static final int UNIT_DISPLAY_2 = 1;
@@ -53,6 +54,9 @@ public class Out extends Unit implements Miscellaneous
 
     double gain;
     public double getGain() { return gain; }
+
+    double pan;
+    public double getPan() { return pan; }
  
     boolean dephase;
     public boolean getDephase() { return dephase; }
@@ -95,7 +99,7 @@ public class Out extends Unit implements Miscellaneous
         // we clone so we can keep the original names around
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[]) UNIT_NAMES.clone());
         defineOutputs( new String[] { "A", "B" } );
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER, Constant.ZERO, Constant.HALF, Constant.HALF /*, Constant.ZERO, Constant.ZERO*/ }, (String[]) MOD_NAMES.clone());
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.QUARTER, Constant.ZERO, Constant.HALF, Constant.HALF, Constant.HALF }, (String[]) MOD_NAMES.clone());
         defineOptions(new String[] { "Dephase" }, new String[][] { { "Dephase" } } );
         if (sound != null) sound.setEmits(this);
         }
@@ -133,6 +137,7 @@ public class Out extends Unit implements Miscellaneous
         super.go();
         
         gain = modulate(MOD_GAIN) * MAX_GAIN;
+        pan = modulate(MOD_PAN);
 
         // extract the gain and the output
         if (macro == null)  // going to the output
@@ -184,8 +189,13 @@ public class Out extends Unit implements Miscellaneous
                 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
         {
-        if (modulation == 4 && isConstant)
+        if (modulation == MOD_GAIN && isConstant)
             return String.format("%.4f", value * MAX_GAIN);
+        else if (modulation == MOD_PAN && isConstant)
+        	{
+        	double val = (value * 200);
+            return (val == 100 ? "--" : (val < 100 ? ("< " + (int)(100 - val)) : ("" + (int)(val - 100) + " >")));
+            }
         else return super.getModulationValueDescription(modulation, value, isConstant);
         }
 

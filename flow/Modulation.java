@@ -902,13 +902,14 @@ public abstract class Modulation implements Cloneable
                 {
                 setModulation(new Constant(v), i);
                 }
-            else            // It's an ID
+            else            // It's an ID?
                 {
                 JSONObject m = mods.optJSONObject(getKeyForModulation(i));
                 if (m == null)
                     {
-                    // probably a Macro
-                    setModulation(new Constant(0), i);
+                    // probably a Macro, possibly something new this patch didn't know about
+                    //setModulation(new Constant(0), i);
+					clearModulation(i);		// set it to its default constant value
                     }
                 else
                     {

@@ -698,8 +698,8 @@ public class Unit extends Modulation
     /** Sorts the partials of Unit Output port by frequency. Returns TRUE if any elements potentially changed positions. 
     
         <p>This method is normally called because you believe you have rearranged the partials so that their
-    	frequencies are out of order.  This also implies that you have already copied the frequencies, so this
-    	method doesn't copy them again.  However, orders are always copied.  Amplitudes are
+        frequencies are out of order.  This also implies that you have already copied the frequencies, so this
+        method doesn't copy them again.  However, orders are always copied.  Amplitudes are
         only copied if indicated: you should pass in TRUE if you have not already copied the amplitudes, else FALSE.  */
     public boolean bigSort(int j, boolean copyAmplitudes)
         {
@@ -733,8 +733,8 @@ public class Unit extends Modulation
         differing by one or two positions. 
         
         <p>This method is normally called because you believe you have rearranged the partials so that their
-    	frequencies are out of order.  This also implies that you have already copied the frequencies, so this
-    	method doesn't copy them again.  However, orders are always copied.  Amplitudes are
+        frequencies are out of order.  This also implies that you have already copied the frequencies, so this
+        method doesn't copy them again.  However, orders are always copied.  Amplitudes are
         only copied if indicated: you should pass in TRUE if you have not already copied the amplitudes, else FALSE.  */
     public boolean simpleSort(int j, boolean copyAmplitudes) 
         {

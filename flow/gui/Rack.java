@@ -868,9 +868,16 @@ public class Rack extends JPanel
         int outputPerThread = Prefs.getLastNumOutputsPerThread();
         outputsPerThreadCombo.setSelectedIndex(outputPerThread == 1 ? 0 : (outputPerThread == 2 ? 1 : (outputPerThread == 4 ? 2 : (outputPerThread == 8 ? 3 : 4))));
 
+		JCheckBox stereoCheckbox = new JCheckBox();
+		stereoCheckbox.setSelected(Prefs.getLastStereo());
+		JPanel b = new JPanel();
+		b.setLayout(new BorderLayout());
+		b.add(stereoCheckbox, BorderLayout.WEST);
+		b.add(Stretch.makeHorizontalStretch(), BorderLayout.CENTER);
+
         int result = showMultiOption(this, 
-            new String[] { "Polyphony", "Audio Buffer Size", "Partials", "Voices Per Thread", "Outputs Per Thread" }, 
-            new JComponent[] { voicesCombo, bufferSizeCombo, partialsCombo, voicesPerThreadCombo, outputsPerThreadCombo }, 
+            new String[] { "Polyphony", "Buffer Size Per Channel", "Partials", "Voices Per Thread", "Outputs Per Thread", "Stereo" }, 
+            new JComponent[] { voicesCombo, bufferSizeCombo, partialsCombo, voicesPerThreadCombo, outputsPerThreadCombo, b }, 
             "Tuning Parameters", 
             "<html>Parameter changes don't take effect<br>until the synthesizer is restarted.",
             new String[] { "Okay", "Reset", "Cancel", });
@@ -882,6 +889,7 @@ public class Rack extends JPanel
             Prefs.setLastNumPartials(partials[partialsCombo.getSelectedIndex()]);
             Prefs.setLastNumVoicesPerThread(voicesPerThread[voicesPerThreadCombo.getSelectedIndex()]);
             Prefs.setLastNumOutputsPerThread(outputsPerThread[outputsPerThreadCombo.getSelectedIndex()]);
+            Prefs.setLastStereo(stereoCheckbox.isSelected());
             }
         else if (result == 1) // RESET
             {
@@ -890,6 +898,7 @@ public class Rack extends JPanel
             Prefs.setLastNumPartials(Unit.DEFAULT_NUM_PARTIALS);
             Prefs.setLastNumVoicesPerThread(Output.DEFAULT_NUM_VOICES_PER_THREAD);
             Prefs.setLastNumOutputsPerThread(Output.DEFAULT_NUM_OUTPUTS_PER_THREAD);
+            Prefs.setLastStereo(Output.DEFAULT_STEREO);
             }
         else if (result == 2 || result == -1)           // CANCEL
             {

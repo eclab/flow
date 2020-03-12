@@ -81,6 +81,10 @@ public class Output
     public static final int MAX_VOICES = 32;
     static int numVoices = -1;
     
+    public static final boolean DEFAULT_STEREO = true;
+    static boolean stereo = DEFAULT_STEREO;
+    public static boolean isStereo() { return stereo; }
+    
     public static int getNumVoices() { return numVoices; }
 
     /** The default number of voices allocated to a single thread, by default 1.
@@ -120,7 +124,8 @@ public class Output
 
     // Audio buffer, which the audio output drains.
     // It's the Output Thread's job to keep this sucker filled as much as possible.
-    byte[] audioBuffer = new byte[SKIP * 2];
+    // If we wanted this to be stereo, we'd say new byte[SKIP * 2 * 2]; 
+    byte[] audioBuffer = new byte[SKIP * 2 * (isStereo() ? 2 : 1)];
     
     // The current number of voices spawned so far.  This increases as sounds register themselves.
     // This is will be threadsafe even though we increment it with ++ because that's only done in one thread.
@@ -134,6 +139,7 @@ public class Output
         numOutputsPerThread = Prefs.getLastNumOutputsPerThread();
         bufferSize = Prefs.getLastBufferSize();
         masterGain = Prefs.getLastMasterGain();
+        stereo = Prefs.getLastStereo();
         //skip = Prefs.getLastSkip();   
         }
     
@@ -151,7 +157,9 @@ public class Output
         randomSeed = System.currentTimeMillis();
         sounds = new Sound[numVoices];
         positions = new double[numVoices][Unit.NUM_PARTIALS];
-        audioFormat = new AudioFormat( SAMPLING_RATE, 16, 1, true, false );
+
+        // I'd like to do stereo but I can't get Java to do it without glitching
+        audioFormat = new AudioFormat( SAMPLING_RATE, 16, (isStereo() ? 2 : 1), true, false );
 
         Mixer.Info[] mixers = getSupportedMixers();
         String mix = Prefs.getLastAudioDevice();
@@ -200,7 +208,7 @@ public class Output
                 sdl = AudioSystem.getSourceDataLine( audioFormat );
             else
                 sdl = AudioSystem.getSourceDataLine( audioFormat, mixer );
-            sdl.open(audioFormat, bufferSize);
+            sdl.open(audioFormat, bufferSize * (isStereo() ? 2 : 1));
             sdl.start();
 
             this.mixer = mixer;
@@ -457,14 +465,9 @@ public class Output
     // Contains the latest partials for the Output Thread to emit.  
     static class Swap
         {
-//        double[][] amplitudes3;
-//        double[][] amplitudes2;
+        double[] pan;
         double[][] amplitudes;
         double[][] frequencies;
-//        int pos;
-//        int pos2;
-//        int pos3;
-//        int curpos;
         byte[][] orders;
         double[] pitches;
         double[] velocities;
@@ -475,8 +478,7 @@ public class Output
               
         public Swap()
             {
-//            amplitudes2 = new double[numVoices][Unit.NUM_PARTIALS];
-//            amplitudes3 = new double[numVoices][Unit.NUM_PARTIALS];
+            pan = new double[numVoices];
             amplitudes = new double[numVoices][Unit.NUM_PARTIALS];
             frequencies = new double[numVoices][Unit.NUM_PARTIALS];
             orders = new byte[numVoices][Unit.NUM_PARTIALS];
@@ -744,9 +746,9 @@ public class Output
                                     if (j < samples.length)         // voice hasn't been loaded yet, hang tight
                                         {
                                         double[] samplessnd = samples[j];
-                                        for (int skipPos = 0; skipPos < SKIP; skipPos++)
+                                        for (int samp = 0; samp < SKIP; samp++)
                                             {
-                                            samplessnd[skipPos] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+                                            samplessnd[samp] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
                                             }
                                         }
                                     }
@@ -759,14 +761,15 @@ public class Output
                     thread.setDaemon(true);
                     thread.start();
                     }
-
-                             
+            
+				boolean stereo = Output.isStereo();
+				
                 while(true)
                     {
                     int solo = -1;
                     
                     int available = sdl.available();
-                    if (available >= bufferSize - 128)
+                    if (available >= ((bufferSize - 128) * (stereo ? 2 : 1)))
                         {
                         glitched = true;
                         }
@@ -787,9 +790,9 @@ public class Output
                             solo = sound.getIndex();
                                                         
                         double[] samplessnd = samples[solo];
-                        for (int skipPos = 0; skipPos < SKIP; skipPos++)
+                        for (int samp = 0; samp < SKIP; samp++)
                             {
-                            samplessnd[skipPos] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+                            samplessnd[samp] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
                             }
                         }
                     else
@@ -813,20 +816,40 @@ public class Output
                         }
                         
                     double gain = masterGain;           // so we're not reading a volatile variable!
-
-                    for (int skipPos = 0; skipPos < SKIP; skipPos++)
+					
+                    for (int samp = 0; samp < SKIP; samp++)
                         {
-                        double d = 0;
+                        double left = 0;
+                        double right = 0;
                         if (solo != -1)
                             {
-                            d += samples[solo][skipPos];
+                            if (stereo)
+                            	{
+                            	left += samples[solo][samp] * (1.0 - with.pan[solo]);
+                        		right += samples[solo][samp] * with.pan[solo];
+                            	}
+                            else
+                            	{
+                            	left += samples[solo][samp];
+                            	}
                             }
                         else
                             {
-                            for(int snd = 0; snd < samples.length; snd++)
-                                {
-                                d += samples[snd][skipPos];
-                                }
+                            if (stereo)
+                            	{
+								for(int snd = 0; snd < samples.length; snd++)
+									{
+									left += samples[snd][samp] * (1.0 - with.pan[snd]);
+									right += samples[snd][samp] * with.pan[snd];
+									}
+								}
+							else
+								{
+								for(int snd = 0; snd < samples.length; snd++)
+									{
+									left += samples[snd][samp];
+									}
+								}
                             }
                             
                         // add reverb?
@@ -840,32 +863,70 @@ public class Output
                             //freeverb.compute(1, freeverbInput, freeverbOutput);
                             //d = freeverbOutput[0][0]; 
                                 
-                            freeverbInput[0][0] = (float)d;
-                            freeverbInput[1][0] = (float)d;
-                            freeverb.compute(1, freeverbInput, freeverbOutput);
-                            d = (freeverbOutput[0][0] + freeverbOutput[1][0]) / 2; 
+                            if (stereo)
+                            	{
+								freeverbInput[0][0] = (float)left;
+								freeverbInput[1][0] = (float)right;
+								freeverb.compute(1, freeverbInput, freeverbOutput);
+								left = freeverbOutput[0][0];
+								right = freeverbOutput[1][0];
+                            	}
+                            else
+                            	{
+								freeverbInput[0][0] = (float)left;
+								freeverbInput[1][0] = (float)left;
+								freeverb.compute(1, freeverbInput, freeverbOutput);
+								left = (freeverbOutput[0][0] + freeverbOutput[1][0]) * 0.5;
+                            	}
                             }
                                                     
-                        d *= gain;
+                        left *= gain;
                                                             
-                        if (d > 32767)
+                        if (left > 32767)
                             {
-                            d = 32767;
+                            left = 32767;
                             clipped = true;
                             }
-                        else if (d < -32768)
+                        else if (left < -32768)
                             {
-                            d = -32768;
+                            left = -32768;
                             clipped = true;
                             }
+
+						if (stereo)
+							{
+							right *= gain;
+							if (right > 32767)
+								{
+								right = 32767;
+								clipped = true;
+								}
+							else if (right < -32768)
+								  {
+									right = -32768;
+									clipped = true;
+								}
+							}
                         
-                        int val = (int)(d);
-                        audioBuffer[skipPos * 2 + 1] = (byte)((val >> 8) & 255);
-                        audioBuffer[skipPos * 2] = (byte)(val & 255);
+                        if (stereo)
+                        	{
+	                        int val = (int)(left);
+							audioBuffer[samp * 2 * 2 + 0] = (byte)(val & 255);
+							audioBuffer[samp * 2 * 2 + 1] = (byte)((val >> 8) & 255);
+							val = (int)(right);
+							audioBuffer[samp * 2 * 2 + 2] = (byte)(val & 255);
+							audioBuffer[samp * 2 * 2 + 3] = (byte)((val >> 8) & 255);
+                        	}
+                        else
+                        	{
+                        	int val = (int)(left);
+							audioBuffer[samp * 2 + 0] = (byte)(val & 255);
+							audioBuffer[samp * 2 + 1] = (byte)((val >> 8) & 255);
+                        	}
                         tick++;                                 /// See documentation elsewhere about threadsafe nature of tick
                         }
                     
-                    sdl.write(audioBuffer, 0, SKIP * 2);
+                    sdl.write(audioBuffer, 0, audioBuffer.length);
                     }
                 }
             });
@@ -1057,10 +1118,6 @@ public class Output
                 Unit emits = sounds[i].getEmits();
                 if (emits != null)
                     {
-//                    System.arraycopy(swap.amplitudes2[i], 0, swap.amplitudes3[i], 0, swap.amplitudes2[i].length); 
-//                    System.arraycopy(swap.amplitudes[i], 0, swap.amplitudes2[i], 0, swap.amplitudes[i].length); 
-
-
                     System.arraycopy(emits.amplitudes[0], 0, swap.amplitudes[i], 0, emits.amplitudes[0].length); 
                     undenormalize(swap.amplitudes[i]);
                     System.arraycopy(emits.frequencies[0], 0, swap.frequencies[i], 0, emits.frequencies[0].length);
@@ -1068,10 +1125,6 @@ public class Output
                     }
                 else
                     {
-//                    System.arraycopy(zeroAmplitudes[i], 0, swap.amplitudes3, 0, zeroAmplitudes.length); 
-//                    System.arraycopy(zeroAmplitudes, 0, swap.amplitudes2, 0, zeroAmplitudes.length); 
-                    
-                    
                     System.arraycopy(zeroAmplitudes, 0, swap.amplitudes[i], 0, zeroAmplitudes.length); 
                     System.arraycopy(zeroFrequencies, 0, swap.frequencies[i], 0, zeroFrequencies.length); 
                     System.arraycopy(standardOrders, 0, swap.orders[i], 0, standardOrders.length); 
@@ -1081,7 +1134,9 @@ public class Output
                 swap.velocities[i] = (velocitySensitive ? sounds[i].getVelocity() : Sound.DEFAULT_VELOCITY);
                 if (emits instanceof Out)
                     {
-                    swap.dephase[i] = ((Out)emits).getDephase();
+                    Out _out = (Out)emits;
+                    swap.dephase[i] = _out.getDephase();
+                    swap.pan[i] = _out.getPan();
                     }
                 else
                     {
@@ -1260,6 +1315,32 @@ public class Output
                     if (s.getGroup() == g)
                         {
                         ((Out)(s.getEmits())).setModulation(new Constant(val), Out.MOD_GAIN);
+                        }
+                    }
+                }
+            }
+        finally
+            {
+            unlock();
+            }
+        }
+        
+    /** Redistribute the pan for all groups except the primary group. */
+    public void redistributePans()
+        {
+        lock();
+        try
+            {
+            for(int g = 1; g < numGroups; g++)
+                {
+                double val = group[g].getPan();
+                // distribute to the gain of all the Out modules involved
+                for(int i = 0; i < numSounds; i++)
+                    {
+                    Sound s = getSound(i);
+                    if (s.getGroup() == g)
+                        {
+                        ((Out)(s.getEmits())).setModulation(new Constant(val), Out.MOD_PAN);
                         }
                     }
                 }

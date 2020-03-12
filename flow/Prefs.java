@@ -419,5 +419,13 @@ public class Prefs
         return Output.DEFAULT_MASTER_GAIN;                       
         }
 
+    public static void setLastStereo(boolean val) { setLastX("" + val, "Stereo"); }
+    public static boolean getLastStereo() 
+        { 
+        String s = getLastX("Stereo"); 
+        return parseBoolean(s, true);                   // default is TRUE
+        }
+
+
 
     }
