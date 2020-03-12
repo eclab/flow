@@ -136,7 +136,7 @@ Polyphony&1--32, user-selectable.\\
 Multitimbrality&Up to (at present) 32 unique sounds.\\
 Sampling Rate&44,100 Hz\\
 Audio Bit Depth&16 bit\\
-Channels&Mono (that is, not stereo)\\
+Channels&1 (Mono) or 2 (Stereo)\\
 MIDI Features&MPE, Clock, Channel and Polyphonic Aftertouch, Pitch Bend, NRPN, RPN, CC\\
 \end{tabular}
 \end{center}
@@ -165,13 +165,15 @@ How do we tamp down glitches?  By playing with a few parameters. If you select {
 
 \begin{itemize}
 \item {\bf Polyphony} (1--16, default: 8)\qquad This is the number of voices the synthesizer can play at once.  More voices incurs a higher load.
-\item {\bf Audio Buffer Size} (default: 1152, which is crummy, but the best Java on the Mac can do)\qquad This is the size of the audio buffer that {\name} keeps filled for your operating system to tap into to generate sounds.  You want a low buffer if you can (much less latency); but a bigger buffer makes it easier for Flow to keep up.  Some operating systems require a large buffer size: for example, OS X typically needs at least 1152 . On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{connecting} for more information.  I can't help you much regarding Windows.
+\item {\bf Buffer Size Per Channel} (default: 1152, which is crummy, but the best Java on the Mac can do)\qquad This is the size of the audio buffer (for each channel) that {\name} keeps filled for your operating system to tap into to generate sounds.  You want a low buffer if you can (much less latency); but a bigger buffer makes it easier for Flow to keep up.  Some operating systems require a large buffer size: for example, OS X typically needs at least 1152 . On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{connecting} for more information.  I can't help you much regarding Windows.
 
 \item {\bf Partials} (64--256, default: 128)\qquad This is the number of partials passed around from module to module.  More partials will produce a richer sound, particularly in bass notes, but incur a much higher load.
 
 \item {\bf Voices Per Thread} (1, 2, 4, 8, 16, default: 8)\qquad This is the number of voices which will be assigned to a single CPU thread in the partials-updating stage of synthesis.  More voices per thread means fewer threads.  You'd like as many voices assigned to a given thread as possible, because switching threads incurs significant computational overhead.  However if you have too many voices on a thread, then they cannot take advantage of the parallelism afforded by your laptop's nifty multi-core CPU and you won't have fast partials updates.  Also if you have very few voices per thread, then you'll have many more threads in the partials-updating stage and this may nudge out the critical output threads, resulting in more glitches.  You have to find a balance.  
 
 \item {\bf Outputs Per Thread} (1, 2, 4, 8, 16, default: 2)\qquad This is the number of voices which will be assigned to a single CPU thread in the sound-output stage of synthesis.  More voices per thread means fewer threads.  You'd like as many voices assigned to a given thread as possible, because switching threads incurs significant computational overhead.  However if you have too many voices on a thread, then they cannot take advantage of the parallelism afforded by your laptop's nifty multi-core CPU and you will glitch because Flow can't service the audio output fast enough.  You have to find a balance.  
+
+\item {\bf Stereo}  If this is unchecked, then Flow will output mono sound regardless of the setting of the pan knob or slider. This might incur a somewhat lower overhead, but it's likely to be minor.
 \end{itemize}
 
 \subsection{Adding, Moving, Copying, and Closing Modules}  Modules are added to the rack by choosing them from the {\bf Modules} menu.  You can move a module to another location by dragging its title bar.  You can also copy a module to another location by dragging its title bar while holding the Control key (on the Mac, you can also hold the Option key).  Finally, you can delete a module by clicking on its close box: the little white dot to the left of its title.
@@ -181,7 +183,7 @@ By default, modules are added to the beginning of the rack.  You might find this
 \subsection{Partial and Modulation Signals}  Modules can send and receive two kinds of signals.  First, a module can send or receive {\bf sets of partials} to/from other modules.  Since this is an additive synthesizer, a set of partials is essentially a sound being emitted from a module.  Additionally, a module can send or receive a {\bf modulation signal}.  This is a single number, ranging from 0 to 1, which can change over time.  Modulation signals are used to change parameters in modules in real time.  
 
 \begin{wrapfigure}{r}{2.6in}
-\vspace{-1em}
+\vspace{-1.5em}
 \includegraphics[width=2.6in]{simplepatch.png}
 \caption{A Simple, and Terrible, Patch}
 \vspace{-1em}
@@ -261,18 +263,20 @@ Figure~\ref{display} shows a typical partials display.  Note that the display ha
 
 If you hover over a display with your mouse pointer, the display will highlight the nearest partial in orange, and it'll display some text, in the form:\\
 \\
+{\small
 \begin{tabular}{@{\hspace{1in}}r}
 Partial {\it partial}  Amp: {\it amp}  Freq: {\it absolute-freq} ({\it relative-freq})\\
 Mouse  Amp: {\it amp}  Freq: {\it absolute-freq} ({\it relative-freq})\\
 \end{tabular}\\
+}
 
-What this is saying is that the nearest partial to the mouse pointer (the one in orange) is partial number {\it partial}, and it has a given amplitude and relative frequency (where the fundamental would have frequency 1.0).  Multiplied against the current note pitch gives the provided absolute frequency.  Moreover, the mouse pointer is currently pointing to a spot which would be a certain amplitude, relative frequency, and absolute frequency as well.
+This says that the nearest partial to the mouse pointer (the one in orange) is partial number {\it partial}, and it has a given amplitude and relative frequency (the fundamental would have frequency 1.0).  Multiplied against the current note pitch gives the provided absolute frequency.  Moreover, the mouse pointer is currently pointing to a spot with a certain amplitude, relative frequency, and absolute frequency as well.
 
 
 \paragraph{Optional Display Features}
 By default, partial frequencies are displayed linearly.  You can change this to a logarithmic plot by choosing {\bf Log-Axis Display} in the {\bf Options} menu.  There are two scaling options as well.  You can instruct Flow to provide enough room to display up to some \(N\) number of harmonics to the right of the fundamental by choosing the appropriate value under {\bf Max Displayed Harmonic} in the {\bf Options} menu.  The default is 150. If you're doing a logarithmic plot (this won't affect a linear display), you can also select how much room should be provided to the left of the fundamental by selecting {\bf Min Displayed Harmonic} from the {\bf Options} menu.  The default is 1/16.
 
-Displays can also be set to {\it Waterfall Mode}, where the partials become dots (brighter dots are higher amplitude) and scroll by in time.  To try this out, choose {\bf Waterfall Display} in the {\bf Options} menu.  Finally, you can hide (or display) the displays with the menu option {\it Show Displays}: hiding the displays uses less computer power.
+Displays can also be set to {\it Waterfall Mode}, where the partials become dots (brighter dots are higher amplitude) and scroll by in time.  To try this out, choose {\bf Waterfall Display} in the {\bf Options} menu.  Finally, you can hide (or show) the displays with the menu option {\it Show Displays}: hiding uses less computer power.
 
 \begin{wrapfigure}{r}{0.85in}
 \vspace{-1em}
@@ -301,7 +305,7 @@ A warning about oscilloscopes: like displays, they show the data of the most rec
 
 In order to hear a sound you need to first specify your {\bf Audio Device} from the window which pops up when you select {\bf MIDI and Audio Options} from the {\bf Options} menu.  I suggest setting it to your computer's speaker.
 
-Now, if you directly connect a partials source ({\bf Sawtooth}, say) to the {\bf A (Audio)} input of your {\bf Out} module, it'll start playing.  See Figure~\ref{simple} at right.  In fact, {\bf all voices} might start playing: there's nothing to stop them!  It won't sound good.   At this point you're just testing your patch and may want to hear just a single voice.  To do this, select the menu option {\bf Monophonic} in the {\bf Play} menu.  The word "(Mono") will appear in the {\bf Out} module.
+Now, if you directly connect a partials source ({\bf Sawtooth}, say) to the {\bf A (Audio)} input of your {\bf Out} module, it'll start playing.  See Figure~\ref{simple} at right.  In fact, {\bf all voices} might start playing: there's nothing to stop them!  It won't sound good.   At this point you're just testing your patch and may want to hear just a single voice.  To do this, select the menu option {\bf Monophonic} in the {\bf Play} menu.  The word "(Mono") will appear in the {\bf Out} module.\footnote{Note that {\it Mono} here means monophonic in the sense of a monophonic (single-voice) synthesizer: the output could still be in stereo.}
 
 You might also choose {\bf Monophonic} if you'd like a monophonic synth.  Flow does {\it last note priority}, meaning that if, while playing monophonically, you hold down note A, then hold down note B, then hold down note C, then let go of C, then B will begin to sound, and if you let go of B, then A will begin to sound.
 
@@ -404,7 +408,8 @@ To send audio from Flow to your DAW to be recorded, you'll need a loopback devic
 \item At this point, SoundFlower 2ch and 64ch will appear as audio devices.  You want SoundFlower 2ch.  You can configure it further in Audio MIDI Setup if you like, or just use it straight.
 \end{enumerate}
 }
-which seems to work fine though with high latency.  If you'd like support and a better user experience, I recommend the commercial product {\it Loopback} by Rogue Amoeba.\footnote{https:/\!/rogueamoeba.com/loopback/}  It works very well, and if you're poor you can try it in unfettered trial mode for about 20 minutes, quit it, and start it again for another 20, etc.   There are also various tools built around the {\it Jack} framework: but Jack seems to be break all Java Audio applications: you won't be able to run {\name} at all after installing Jack.  And furthermore, Jack's {\it uninstaller} is seriously broken: it doesn't remove the necessary files and you'll be permanently unable to run anything that needs Java Audio (including {\name}).  {\color{red}\bf Do not install Jack on OS X.}  You will regret it.\footnote{In fact, after I reported this, Jack's administrators seem to be leaning towards eliminating Jack on OS X entirely.  Oh well.  If you screwed up and installed Jack on OS X, the following URL contains a list of all the files you'll need to remove manually (as administrator): https:/\!/github.com/jackaudio/jack2/issues/379}
+which seems to work fine though with high latency.  If you'd like support and a better user experience, I recommend the commercial product {\it Loopback} by Rogue Amoeba.\footnote{https:/\!/rogueamoeba.com/loopback/}  It works very well, and if you're poor you can try it in unfettered trial mode for about 20 minutes, quit it, and start it again for another 20, etc.   
+{\bf Do not} use the {\it Jack} framework or any tools using it.  Jack breaks all Java Audio applications: you won't be able to run {\name} at all after installing Jack.  And furthermore, Jack's {\it uninstaller} won't remove its files properly and you'll be permanently unable to run anything that needs Java Audio (including {\name}).  {\color{red}\bf Do not install Jack on OS X.}  You will regret it.\footnote{In fact, after I reported this, Jack's administrators seem to be leaning towards eliminating Jack on OS X entirely.  Oh well.  If you screwed up and installed Jack on OS X, the following URL contains a list of all the files you'll need to remove manually (as administrator): https:/\!/github.com/jackaudio/jack2/issues/379}
 
 \end{itemize}
 
@@ -453,9 +458,11 @@ Subpatches cannot use MPE, nor can they be assigned to ``Any Channel''.  Only th
 
 \item {\bf MIDI Note}\quad You can restrict a sound to only respond to a given note: any other notes on the MIDI channel will be passed on to later sounds.  This is useful for saving MIDI channels while building a drum kit: have all of your percussion sounds respond to the same MIDI channel but to different notes.  It's also helpful when your DAW has a restricted number of tracks, since the entire drum kit can be on the same track.
 
-\item {\bf Gain}\quad This sets the overall volume of the subpatch in the final mix.  This is exactly the same as the {\it Gain} knob on the {\bf Out} module of the primary patch, mentioned earlier in Section~\ref{playingapatch}.  And in fact, the Gain knob can be modulated: if your subpatch was originally modulating its Gain knob before you loaded it as a subpatch, it will {\it continue} to modulate the gain, overriding the setting you make here.  In general it's probably not  wise to modulate the Gain knob.
+\item {\bf Gain}\quad This sets the overall volume of the subpatch in the final mix.  This is exactly the same as the {\it Gain} knob on the {\bf Out} module of the primary patch, mentioned earlier in Section~\ref{playingapatch}.  And in fact, the Gain knob can be modulated: if your subpatch was originally modulating its Gain knob before you loaded it as a subpatch, changing this slider will override it and fix it to a constant value.You can reset this by making the patch primary and then secondary again.
 
 If you want to change the overall gain of the primary patch and all the subpatches, you can do this by changing the {\it Master Gain} option in {\bf MIDI and Audio Preferences}.   Note that Master Gain is not saved with patches and is reset when you restart Flow.
+
+\item {\bf Pan}\quad This sets the overall pan of the subpatch in the final mix.  As is the case for Gain, this is exactly the same as the {\it Pan} knob on the {\bf Out} module of the primary patch, mentioned earlier in Section~\ref{playingapatch}.  The Pan knob can be modulated: if your subpatch was originally modulating its Pan knob before you loaded it as a subpatch, changing this slider will override it and fix it to a constant value. You can reset this by making the patch primary and then secondary again.
 
 \item {\bf Rename}\quad You can rename the subpatch name.
 \end{itemize}
@@ -511,6 +518,7 @@ The best way to reduce the Audio latency is to not send audio to the DAW until y
 \item If necessary, temporarily reduce the number of partials being used while recording and editing the MIDI in tracks.  Then bring the partials back up to (say) 256 for the final audio recording.  This is an extreme measure but it works, especially in combination with...
 \item You can significantly increase the audio buffer size in the final recording, which will reduce glitching by quite a lot even with 256 partials and a maxed-out voice count: the downside is heavily increased latency, but that wouldn't matter for the final audio recording and can be shifted in post.
 \item Keep in mind that some patches are much more costly per-voice than others.  Keep their voice counts minimized.
+\item Changing to Mono from Stereo might help a tiny bit.
 \item Shut off other applications: especially web browsers and other CPU-hungry stuff.
 \end{itemize}
 
@@ -539,14 +547,14 @@ The Modules are divided into five categories:
 \subsection{Modulation Sources}
 \label{modsources}
 
-\begin{wrapfigure}{r}{3in}
+\begin{wrapfigure}{r}{3.1in}
 \vspace{-1em}
-\includegraphics[height=1.5in]{CurveUp}\includegraphics[height=1.5in]{CurveDown}
-\caption{Envelope modulation curves, shown both in rising and falling scenarios.  Solid lines are (right to left) {\it Linear}, \(x^2\), \(x^4\), \(x^8\), \(x^{16}\), and \(x^{32}\).  Dashed lines are (right to left) \((x^2 + x^8)/2\),  \((x^4 + x^{16})/2\), and  \((x^8 + x^{32})/2\).  The dotted line is {\it Step}, which stays put until the very end, at which time it suddenly jumps to the ultimate value. }
+\includegraphics[height=1.5in]{CurveUp}~~~\includegraphics[height=1.5in]{CurveDown}
+\caption{Envelope modulation curves, shown both in rising and falling scenarios.  Solid lines are (right to left) {\it Linear}, \(x^2\), \(x^4\), \(x^8\), \(x^{16}\), and \(x^{32}\).  {\bf If you're looking for an exponential-sounding curve, \(\bm x^4\) works pretty well.}  Dashed lines are (right to left) \((x^2 + x^8)/2\),  \((x^4 + x^{16})/2\), and  \((x^8 + x^{32})/2\).  Dot-dash lines are (left to right) \(1-(1-x)^2, 1-(1-x)^4,\) and \(1-(1-x)^8\) (denoted {\it Inv \(x^2\), Inv \(x^4\),} and {\it Inv \(x^8\)} in Flow's menu).  The dotted line is {\it Step}, which stays put until the very end, then suddenly jumps to the ultimate value. }
 \label{curves}
 \end{wrapfigure}
 
-\paragraph{AHR}  A simple Attack-Hold-Release (or is you like Attack-Hold-Decay) envelope.  As you play a note, this envelope starts at the Start Level, ramps up to the Attack Level over the course of the Attack Time, then holds at that level for the Hold Time.  It then releases (decays) back to the Start Level over the Release Time.  If you let go of the key early, it immediately starts releasing for the given Release time (unless it's already releasing, in which case it just continues to do so).  AHR is much simpler than the DADSR envelope module, but it does have one feature that DADSR does not: you can specify the attack and release curves separately.  Curves are specified from linear to pseudo-exponential, plus ``Step'', which immediately steps to the next level.  Figure~\ref{curves} shows available curves.  The envelope can be one shot, meaning it continues until it is finished even if you have released.   The envelope triggers on completion of each of its stages.  You can request that the envelope sync to MIDI when the synthesizer is set to MIDI (otherwise it's based on time as usual).  If you double-click on any time dial, a pop-up menu will appear which lets you set various note speeds corresponding to playing at 120BPM.  If the MIDI clock is running, these note speeds will correspond to the MIDI clock's rate.
+\paragraph{AHR}  A simple Attack-Hold-Release (or is you like Attack-Hold-Decay) envelope.  As you play a note, this envelope starts at the Start Level, ramps up to the Attack Level over the course of the Attack Time, then holds at that level for the Hold Time.  It then releases (decays) back to the Start Level over the Release Time.  If you let go of the key early, it immediately starts releasing for the given Release time (unless it's already releasing, in which case it just continues to do so).  AHR is much simpler than the DADSR envelope module, but it does have one feature that DADSR does not: you can specify the attack and release curves independently.  There are many curves available, as shown in Figure~\ref{curves}.  The envelope can be one shot, meaning it continues until it is finished even if you have released.   The envelope triggers on completion of each of its stages.  You can request that the envelope sync to MIDI when the synthesizer is set to MIDI (otherwise it's based on time as usual).  If you double-click on any time dial, a pop-up menu will appear which lets you set various note speeds corresponding to playing at 120BPM.  If the MIDI clock is running, these note speeds will correspond to the MIDI clock's rate.
 
 AHR can be configured to instead act as a {\it ramp} function: when a Note-On happens, the envelope restarts at the Start Level, then ramps to the Attack Level over the course of the Attack Time, and  {\it holds there indefinitely.}  A Note-Off simply stops the ramping and it holds wherever it stopped.  If the envelope is one-shot, then a Note-Off has no effect at all. 
 
@@ -656,7 +664,7 @@ Like parameters, values also can be in the range 0...16383.  {\name} always expe
 
 The value of the current step is outputted as {\it Mod}.  When {\it Sample} is true, then {\it Mod} outputs the value of the current step as sampled immediately upon transitioning to that step; but if {\it Sample} is false, then the value of the current step may be changed in real-time, and {\it Mod} will output whatever its current value is.  {\it Mod} also outputs a trigger each time the step is incremented: you can use this to reset a sound to its start. 
 
-Seq doesn't just read trigger values from {\it Trigger}: it also reads modulation values.  This can be used in two ways.  First, you can use the modulation value to slide the sequencer from one step value to another.  Specifically, {\it Change} specifies how the sequencer interpolates from one step to the next: the default is {\it Step}.  Interpolation is based on the incoming modulation value: if you're using an LFO, try setting it to Sawtooth.  You can get the opposite interpolation waves by setting the LFO to an inverted Sawtooth.   Second, if {\it Guided} is true, then the {\it Trigger} not only specifies when a step occurs, but its modulation value also specifies {\it which} step is performed, rather than incrementing the step as normal.
+Seq doesn't just read trigger values from {\it Trigger}: it also reads modulation values.  This can be used in two ways.  First, you can use the modulation value to slide the sequencer from one step value to another.  Specifically, {\it Change} specifies how the sequencer interpolates from one step to the next: the default is {\it Step}, and other curves are shown in Figure~\ref{curves}.  Interpolation is based on the incoming modulation value: if you're using an LFO, try setting it to Sawtooth.  You can get the opposite interpolation waves by setting the LFO to an inverted Sawtooth.   Second, if {\it Guided} is true, then the {\it Trigger} not only specifies when a step occurs, but its modulation value also specifies {\it which} step is performed, rather than incrementing the step as normal.
 
 In addition to sequencing modulation signals, Seq can also be used in combination with {\bf Shift} to sequence note values.  To do this, attach {\it Mod} to Shift's {\it Shift} port, and set Shift's {\it Bound} to 1/3 and its {\it Type} to {\it Pitch}.  Feed the sound into Shift's {\it Input}, and the result in Shift's {\it Out}.  In this arrangement, each of Seq's modulation dials ranges from two octaves below to two octaves above.  To make things easier, if you double-click on a modulation dial, you'll get a pop-up menu with a keyboard, from two octaves below to two octaves above.  ``Middle C'' is 0.5 (the keyboard is keyed in C, but it'll be relative to whatever the current pitch is).  See also {\bf Shift}.
 
@@ -724,9 +732,9 @@ This module is designed to merge with other sources to add hiss to them: most co
 
 \paragraph{Triangle}  A triangle wave.  Note that normally triangle waves include negative amplitude harmonics, that is ones with inverted phases.  As {\name} does not produce phases, these harmonics become all positive (you likely won't hear a difference).
 
-\paragraph{Waves}  A collection of harmonics drawn from single-cycle waves in the Kawai K3, Ensoniq SQ-80, and Sequential Prophet VS.  These are as best as I can do for now\,---\,they may change if my sources improve.  The Kawai K3 harmonics are complete: obviously wave 31 is missing since that's actually the user's additive harmonics space.\footnote{The K3 harmonics are from http:/\!/www.deepsonic.ch/deep/audio\_samples/kawai\_k3\_-\_samples\_-\_33\_waveforms.mp3 by deep!sonic (http:/\!/www.deepsonic.ch)}
+\paragraph{Waves}  A collection of harmonics drawn from single-cycle waves in the Kawai K3, Ensoniq SQ-80, and Sequential Prophet VS.  These are as best as I can do for now\,---\,they may change if my sources improve.  The Kawai K3 harmonics are complete: obviously wave 31 is missing since that's actually the user's additive harmonics slot.\footnote{The K3 harmonics are from http:/\!/www.deepsonic.ch/deep/audio\_samples/kawai\_k3\_-\_samples\_-\_33\_waveforms.mp3 by deep!sonic (http:/\!/www.deepsonic.ch)}
 
-The SQ-80 is unusual in that it had different oversampled versions of the same wave depending on the octave of the note played on the keyboard.  The harmonics here are taken from the lowest octaves (with the most harmonics).  This collection is incomplete: my original source had some errors.\footnote{The SQ-80 harmonics are drawn from the waves in http:/\!/www.buchty.net/ensoniq/files/the\_waves.zip by //christian.}
+The SQ-80 is unusual in that it had different oversampled versions of the same wave depending on the octave of the note played on the keyboard: this was mostly an antialiasing measure.  The harmonics here are taken from the lowest octaves (with the most harmonics).  This collection is incomplete: my original source had some errors.\footnote{The SQ-80 harmonics are drawn from the waves in http:/\!/www.buchty.net/ensoniq/files/the\_waves.zip by //christian.}
 
 The Prophet VS traditionally had waves 32--127, and these more or less line up with the harmonics provided by Flow: but you'll notice that Flow is missing a few because my original source is missing them.\footnote{The Prophet VS harmonics are drawn from https:/\!/www.dropbox.com/sh/ja0tc8wn6cnudzj/AACYqe2mjrWU2CeXIttm6MhOa as discussed in the forum thread http:/\!/www.muffwiggler.com/forum/viewtopic.php?t=33918\&sid=9e0b9554f0ac483b62a88c074c6136c3}
 
@@ -831,7 +839,7 @@ Linear Filter can be {\it Relative}.  This means that the filter cutoff frequenc
 
 You have the option of turning on or off morphing of the frequency or amplitude.  You can also tell Morph to {\it not} morph the fundamental.  
 
-That's the simple case.  But there are several other bells and whistles in Morph.  First, you can have more than two inputs.  In this case, when Input A has finished morphing into Input B, Morph will then switch to morphing Input B into Input C, then C into D, and then D into A, looping back around again.  Morph decides to switch when the direction of the interpolation signal changes.  For example, suppose you had a triangle LFO attached to the Interpolation.  A the LFO goes up, A is morphed into B.  Then as the LFO goes down, B is morphed into C.  As the LFO goes up again, C is morphed into D, and as it goes down again, D is morphed to A.  Some inputs change over time\,---\,when Morph switches to that input, we'd like a way to inform the input source to reset itself to prepare to be included in the Morph.  To do this, Morph sets the trigger for that Input (labelled {\it Trig}), which you can use as a preparation signal.
+That's the simple case.  But there are several other bells and whistles in Morph.  First, you can have more than two inputs.  In this case, when Input A has finished morphing into Input B, Morph will then switch to morphing Input B into Input C, then C into D, and then D into A, looping back around again.  Morph decides to switch when the direction of the interpolation signal changes.  For example, suppose you had a triangle LFO attached to the Interpolation.  As the LFO goes up, A is morphed into B.  Then as the LFO goes down, B is morphed into C.  As the LFO goes up again, C is morphed into D, and as it goes down again, D is morphed to A.  Some inputs change over time\,---\,when Morph switches to that input, we'd like a way to inform the input source to reset itself to prepare to be included in the Morph.  To do this, Morph sets the trigger for that Input (labelled {\it Trig}), which you can use as a preparation signal.
 
 Second, normally every Partial \(i\) in the first Input is paired up with the same Partial \(i\) in the other input to morph to it.  But you can change what the pairing is with the {\it Type} popup.  These pairs include:
 
@@ -894,7 +902,7 @@ Note that when you change the value, it's not immediately reflected (or reflecte
 
 Every useful patch has to have an Out module, since it provides the facility for outputting your final partials to the audio system.  Out does several important basic things:
 
-\paragraph{Audio Generation}  Out is responsible for converting your partials into sound.  To do this, connect your final partials to the port on Out normally labelled {\bf A}: it's the topmost port in the module.  You can adjust the volume of this port by changing the {\it Gain} knob.
+\paragraph{Audio Generation}  Out is responsible for converting your partials into sound.  To do this, connect your final partials to the port on Out normally labelled {\bf A}: it's the topmost port in the module.  You can adjust the volume of this port by changing the {\it Gain} knob.  Similarly you can adjust the pan via the {\it Pan} knob.\footnote{Note that changing Pan manually will cause clicks due to the sudden change in relative volume of the two channels.  Attaching a square, sample and hold, or sawtooth LFO will cause pops for the same reason: while sine and triangle and random will sound fine.}
 
 \paragraph{Reverb} Flow sports a simple implementation of the Freeverb algorithm.\footnote{A well regarded reverb algorithm in the public domain by ``Jezar at Dreampoint''.}  This algorithm has three parameters.  {\it Wet} is the dry/wet knob for the algorithm (0 is fully dry).  {\it Damp} is the damping: basically a low-pass filter applied to the reflected signals.  {\it Size} is the room size, which translates roughly into the reverb decay.  Note only a single sound (voice \#0) controls the modulation of Wet, Damp, and Size.  This means that if you attach an Envelope etc. to any of these modules, it may not respond in exactly the way you think.  It's probably best to keep them as knobs rather than attaching a modulation source.
 
