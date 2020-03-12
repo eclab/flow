@@ -471,8 +471,8 @@ public class ModulePanel extends JPanel implements Transferable
         output.lock();
 
         // This is an opportunity to cancel the audio input
-		output.getAudioInput().stop();
-		
+        output.getAudioInput().stop();
+                
         try
             {
             // disconnect all

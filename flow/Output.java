@@ -762,8 +762,8 @@ public class Output
                     thread.start();
                     }
             
-				boolean stereo = Output.isStereo();
-				
+                boolean stereo = Output.isStereo();
+                                
                 while(true)
                     {
                     int solo = -1;
@@ -816,7 +816,7 @@ public class Output
                         }
                         
                     double gain = masterGain;           // so we're not reading a volatile variable!
-					
+                                        
                     for (int samp = 0; samp < SKIP; samp++)
                         {
                         double left = 0;
@@ -824,32 +824,32 @@ public class Output
                         if (solo != -1)
                             {
                             if (stereo)
-                            	{
-                            	left += samples[solo][samp] * (1.0 - with.pan[solo]);
-                        		right += samples[solo][samp] * with.pan[solo];
-                            	}
+                                {
+                                left += samples[solo][samp] * (1.0 - with.pan[solo]);
+                                right += samples[solo][samp] * with.pan[solo];
+                                }
                             else
-                            	{
-                            	left += samples[solo][samp];
-                            	}
+                                {
+                                left += samples[solo][samp];
+                                }
                             }
                         else
                             {
                             if (stereo)
-                            	{
-								for(int snd = 0; snd < samples.length; snd++)
-									{
-									left += samples[snd][samp] * (1.0 - with.pan[snd]);
-									right += samples[snd][samp] * with.pan[snd];
-									}
-								}
-							else
-								{
-								for(int snd = 0; snd < samples.length; snd++)
-									{
-									left += samples[snd][samp];
-									}
-								}
+                                {
+                                for(int snd = 0; snd < samples.length; snd++)
+                                    {
+                                    left += samples[snd][samp] * (1.0 - with.pan[snd]);
+                                    right += samples[snd][samp] * with.pan[snd];
+                                    }
+                                }
+                            else
+                                {
+                                for(int snd = 0; snd < samples.length; snd++)
+                                    {
+                                    left += samples[snd][samp];
+                                    }
+                                }
                             }
                             
                         // add reverb?
@@ -864,20 +864,20 @@ public class Output
                             //d = freeverbOutput[0][0]; 
                                 
                             if (stereo)
-                            	{
-								freeverbInput[0][0] = (float)left;
-								freeverbInput[1][0] = (float)right;
-								freeverb.compute(1, freeverbInput, freeverbOutput);
-								left = freeverbOutput[0][0];
-								right = freeverbOutput[1][0];
-                            	}
+                                {
+                                freeverbInput[0][0] = (float)left;
+                                freeverbInput[1][0] = (float)right;
+                                freeverb.compute(1, freeverbInput, freeverbOutput);
+                                left = freeverbOutput[0][0];
+                                right = freeverbOutput[1][0];
+                                }
                             else
-                            	{
-								freeverbInput[0][0] = (float)left;
-								freeverbInput[1][0] = (float)left;
-								freeverb.compute(1, freeverbInput, freeverbOutput);
-								left = (freeverbOutput[0][0] + freeverbOutput[1][0]) * 0.5;
-                            	}
+                                {
+                                freeverbInput[0][0] = (float)left;
+                                freeverbInput[1][0] = (float)left;
+                                freeverb.compute(1, freeverbInput, freeverbOutput);
+                                left = (freeverbOutput[0][0] + freeverbOutput[1][0]) * 0.5;
+                                }
                             }
                                                     
                         left *= gain;
@@ -893,36 +893,36 @@ public class Output
                             clipped = true;
                             }
 
-						if (stereo)
-							{
-							right *= gain;
-							if (right > 32767)
-								{
-								right = 32767;
-								clipped = true;
-								}
-							else if (right < -32768)
-								  {
-									right = -32768;
-									clipped = true;
-								}
-							}
+                        if (stereo)
+                            {
+                            right *= gain;
+                            if (right > 32767)
+                                {
+                                right = 32767;
+                                clipped = true;
+                                }
+                            else if (right < -32768)
+                                {
+                                right = -32768;
+                                clipped = true;
+                                }
+                            }
                         
                         if (stereo)
-                        	{
-	                        int val = (int)(left);
-							audioBuffer[samp * 2 * 2 + 0] = (byte)(val & 255);
-							audioBuffer[samp * 2 * 2 + 1] = (byte)((val >> 8) & 255);
-							val = (int)(right);
-							audioBuffer[samp * 2 * 2 + 2] = (byte)(val & 255);
-							audioBuffer[samp * 2 * 2 + 3] = (byte)((val >> 8) & 255);
-                        	}
+                            {
+                            int val = (int)(left);
+                            audioBuffer[samp * 2 * 2 + 0] = (byte)(val & 255);
+                            audioBuffer[samp * 2 * 2 + 1] = (byte)((val >> 8) & 255);
+                            val = (int)(right);
+                            audioBuffer[samp * 2 * 2 + 2] = (byte)(val & 255);
+                            audioBuffer[samp * 2 * 2 + 3] = (byte)((val >> 8) & 255);
+                            }
                         else
-                        	{
-                        	int val = (int)(left);
-							audioBuffer[samp * 2 + 0] = (byte)(val & 255);
-							audioBuffer[samp * 2 + 1] = (byte)((val >> 8) & 255);
-                        	}
+                            {
+                            int val = (int)(left);
+                            audioBuffer[samp * 2 + 0] = (byte)(val & 255);
+                            audioBuffer[samp * 2 + 1] = (byte)((val >> 8) & 255);
+                            }
                         tick++;                                 /// See documentation elsewhere about threadsafe nature of tick
                         }
                     
@@ -1381,15 +1381,15 @@ public class Output
         lock();
         
         // This is an opportunity to cancel the audio input
-		getAudioInput().stop();
-		
+        getAudioInput().stop();
+                
         try
             {
             // by default we're the primary group
             for(int j = 0; j < numSounds; j++)
                 {
                 sounds[j].setGroup(Output.PRIMARY_GROUP);
-            	sounds[j].setChannel(Input.CHANNEL_OMNI);
+                sounds[j].setChannel(Input.CHANNEL_OMNI);
                 }
             
             // override by sub-patches

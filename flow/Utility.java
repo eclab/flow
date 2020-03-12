@@ -121,8 +121,8 @@ public class Utility
 
     /**
      * A fast approximation of Sine using a lookup table and Catmull-Rom cubic spline interpolation.
-       16x the speed of Math.sin.
-     */
+     16x the speed of Math.sin.
+    */
     public static final double fastIntSin(double f) {
         double v = f * SIN_MULTIPLIER;
         int conv = (int) v;
@@ -195,16 +195,16 @@ public class Utility
         }
 
 /*
-    public static void main(String[] args)
-        {
-        double sum = 0;
-        for(double i = 0; i < 1; i+= 0.0000000002)
-            {
-            //sum += Utility.fastSqrt(i);
-            sum += Math.sqrt(i);
-            }
-        System.err.println(sum);
-        }
+  public static void main(String[] args)
+  {
+  double sum = 0;
+  for(double i = 0; i < 1; i+= 0.0000000002)
+  {
+  //sum += Utility.fastSqrt(i);
+  sum += Math.sqrt(i);
+  }
+  System.err.println(sum);
+  }
 */
 
 

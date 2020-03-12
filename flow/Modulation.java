@@ -909,7 +909,7 @@ public abstract class Modulation implements Cloneable
                     {
                     // probably a Macro, possibly something new this patch didn't know about
                     //setModulation(new Constant(0), i);
-					clearModulation(i);		// set it to its default constant value
+                    clearModulation(i);             // set it to its default constant value
                     }
                 else
                     {

@@ -128,7 +128,7 @@ public class Combine extends Unit
                 // we'll assign the order from A
                 orders[i] = ordersA[iA];
                 int o = ordersA[iA] & 0xFF;
- //               if (o < 0) o += 256;
+                //               if (o < 0) o += 256;
                 filledOrders[o] = true;         // this order is now used
                 iA++;
                 iB++;
@@ -141,7 +141,7 @@ public class Combine extends Unit
                 // we'll assign the order from A
                 orders[i] = ordersA[iA];
                 int o = ordersA[iA] & 0xFF;
- //               if (o < 0) o += 256;
+                //               if (o < 0) o += 256;
                 filledOrders[o] = true;         // this order is now used
                 iA++;
                 }

@@ -148,8 +148,8 @@ public class MIDIIn extends Modulation implements ModSource
         return "" + ((int)(value * 127));
         }
 
-	public static String[] OPTIONS = new String[] { "00 Bank Select", "01 Mod Wheel", "02 Breath Controller", "04 Foot Controller", "05 Portamento Time", "07 Volume", "10 Pan", "11 Expression Controller", "32 Bank Select LSB", "33 Mod Wheel LSB", "34 Breath Controller LSB", "36 Foot Controller LSB", "37 Portamento Time LSB", "39 Volume LSB", "42 Pan LSB", "43 Expression Controller LSB", "64 Sustain", "65 Portamento On/Off", "66 Sostenuto on/Off", "67 Soft Pedal On/Off", "68 Legato On/Off", "74 Y Axis", "84 Portamento Amount" };
-	public static int[] CCS = new int[] { 0, 1, 2, 4, 5, 7, 10, 11, 32, 33, 34, 36, 37, 39, 42, 43, 64, 65, 66, 67, 68, 74, 84 };
+    public static String[] OPTIONS = new String[] { "00 Bank Select", "01 Mod Wheel", "02 Breath Controller", "04 Foot Controller", "05 Portamento Time", "07 Volume", "10 Pan", "11 Expression Controller", "32 Bank Select LSB", "33 Mod Wheel LSB", "34 Breath Controller LSB", "36 Foot Controller LSB", "37 Portamento Time LSB", "39 Volume LSB", "42 Pan LSB", "43 Expression Controller LSB", "64 Sustain", "65 Portamento On/Off", "66 Sostenuto on/Off", "67 Soft Pedal On/Off", "68 Legato On/Off", "74 Y Axis", "84 Portamento Amount" };
+    public static int[] CCS = new int[] { 0, 1, 2, 4, 5, 7, 10, 11, 32, 33, 34, 36, 37, 39, 42, 43, 64, 65, 66, 67, 68, 74, 84 };
 
     public ModulePanel getPanel()
         {
@@ -170,10 +170,10 @@ public class MIDIIn extends Modulation implements ModSource
                     final int _i = i;
                     Box hbox = new Box(BoxLayout.X_AXIS);
                     hbox.add(new ModulationInput(mod, i, this)
-                    	{
-                            public String[] getOptions() { return OPTIONS; }
-                            public double convert(int elt) { return CCS[elt] / 127.0; }
-                    	});
+                        {
+                        public String[] getOptions() { return OPTIONS; }
+                        public double convert(int elt) { return CCS[elt] / 127.0; }
+                        });
                     hbox.add(new ModulationOutput(mod, i + MOD_CC, this));
                     box.add(hbox);
                     }

@@ -156,7 +156,7 @@ public class Morph extends Unit
         lastMorph = -1;
         lastRamp = -1;
         this.morph = MORPH_STANDARD;
-        reset();		// this fixes a bug 
+        reset();                // this fixes a bug 
         }
 
     public void reset()

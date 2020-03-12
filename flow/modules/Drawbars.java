@@ -23,15 +23,15 @@ import javax.swing.*;
 public class Drawbars extends Unit implements UnitSource, Presetable
     {
     private static final long serialVersionUID = 1;
-	int percussionType;
-	double percussion;
-	
-	public void setPercussionType(int type) { percussionType = type; }
-	public int getPercussionType() { return percussionType; }
-		
-	public static final double MAX_PERCUSSION = 4.0;
-	public static final double MIN_PERCUSSION = 0.0001;
-	
+    int percussionType;
+    double percussion;
+        
+    public void setPercussionType(int type) { percussionType = type; }
+    public int getPercussionType() { return percussionType; }
+                
+    public static final double MAX_PERCUSSION = 4.0;
+    public static final double MIN_PERCUSSION = 0.0001;
+        
     public static final int MOD_DECAY = 11;
     public static final int MOD_VOLUME = 12;
 
@@ -139,19 +139,19 @@ public class Drawbars extends Unit implements UnitSource, Presetable
     public void reset() { for(int i = 0; i < previousMods.length; i++) previousMods[i] = Double.NaN; } 
     
     public void gate()
-    	{
-    	super.gate();
+        {
+        super.gate();
         double[] amplitudes = getAmplitudes(0);
 
-		if (percussionType == 0)
-			{
-			percussion = 0;
-			}
-		else
-			{	
-			percussion = Utility.hybridpow(modulate(MOD_VOLUME), SQRT_2) * 3;
-			}
-    	}
+        if (percussionType == 0)
+            {
+            percussion = 0;
+            }
+        else
+            {       
+            percussion = Utility.hybridpow(modulate(MOD_VOLUME), SQRT_2) * 3;
+            }
+        }
     
     public void go()
         {
@@ -183,9 +183,9 @@ public class Drawbars extends Unit implements UnitSource, Presetable
                 
                 amplitudes[drawbar] = Utility.hybridpow(mod, SQRT_2);
                 
-		        // add in additional amplitudes for 10 and 11
-            	if (i == 9) amplitudes[11] = Utility.hybridpow(mod , SQRT_2);
-            	else if (i == 10) amplitudes[12] = Utility.hybridpow(mod, SQRT_2);
+                // add in additional amplitudes for 10 and 11
+                if (i == 9) amplitudes[11] = Utility.hybridpow(mod , SQRT_2);
+                else if (i == 10) amplitudes[12] = Utility.hybridpow(mod, SQRT_2);
                 }
             }
         
@@ -194,17 +194,17 @@ public class Drawbars extends Unit implements UnitSource, Presetable
         if (percussion < MIN_PERCUSSION) percussion = 0;
         
         if (percussionType == 1)
-        	amplitudes[3] += percussion;
+            amplitudes[3] += percussion;
         else if (percussionType == 2)
-        	amplitudes[4] += percussion;
+            amplitudes[4] += percussion;
         }
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
         {
         if (isConstant)
-        	{
-        	if (modulation == MOD_DECAY) return String.format("%.4f", value);
-        	else if (modulation == MOD_VOLUME) return String.format("%.4f", value * 12.0);
+            {
+            if (modulation == MOD_DECAY) return String.format("%.4f", value);
+            else if (modulation == MOD_VOLUME) return String.format("%.4f", value * 12.0);
             return String.format("%.4f", value * 8.0);
             }
         else return "";

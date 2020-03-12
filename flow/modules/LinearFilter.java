@@ -107,12 +107,12 @@ public class LinearFilter extends Unit
  
         int numNodes = (int)(modulate(MOD_NODES) * MAX_NODES);
        
-        if (numNodes == 0)			// no nodes at all
-        	{
-        	pushFrequencies(0);
-        	pushAmplitudes(0);
-        	return;
-        	}
+        if (numNodes == 0)                      // no nodes at all
+            {
+            pushFrequencies(0);
+            pushAmplitudes(0);
+            return;
+            }
         
         pushFrequencies(0);
         copyAmplitudes(0);
@@ -147,9 +147,9 @@ public class LinearFilter extends Unit
                 }
             // Next consider the situation where the frequency is higher than the maximum node
             else if (freq >= nodeFreq[numNodes-1])
-            	{
-            	amplitudes[i] *= nodeGain[numNodes-1];
-            	}
+                {
+                amplitudes[i] *= nodeGain[numNodes-1];
+                }
             else 
                 {
                 // Find the pair.  This corresponds to the first higher node which is > freq,

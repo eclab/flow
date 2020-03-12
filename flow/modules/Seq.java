@@ -275,24 +275,24 @@ public class Seq extends Modulation
                     alpha = (alpha + beta) * 0.5;
                     }
                 break;
-            case CURVE_1_MINUS_X_2:
-                {
-                alpha = alpha * alpha;
-                }
-            break;
-            case CURVE_1_MINUS_X_4:
-                {
-                alpha = alpha * alpha;
-                alpha = alpha * alpha;
-                }
-            break;
-            case CURVE_1_MINUS_X_8:
-                {
-                alpha = alpha * alpha;
-                alpha = alpha * alpha;
-                alpha = alpha * alpha;
-                }
-            break;
+                case CURVE_1_MINUS_X_2:
+                    {
+                    alpha = alpha * alpha;
+                    }
+                break;
+                case CURVE_1_MINUS_X_4:
+                    {
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    }
+                break;
+                case CURVE_1_MINUS_X_8:
+                    {
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    alpha = alpha * alpha;
+                    }
+                break;
                 default:
                     {
                     // should never happen

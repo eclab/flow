@@ -151,7 +151,7 @@ public class Fatten extends Unit
 
         // STEP 4: Map the free upper partials to remaining unmapped lower partials
         int l = 0;
-        //for(int i = orders.length - 1; i >= halflen ; i--)		// alternative: map in reverse order
+        //for(int i = orders.length - 1; i >= halflen ; i--)            // alternative: map in reverse order
         for(int i = halflen; i < orders.length; i++)
             {
             int o = orders[i] & 0xFF;
@@ -185,23 +185,23 @@ public class Fatten extends Unit
                 {
                 int o = orders[i] & 0xFF;
 //                if (o < 0) o += 256;
-                iL[o] = true;
-                }
+iL[o] = true;
+}
 
-                for(int i = halflen; i < orders.length; i++)
-                {
-                int ord = orders[i] & 0xFF;
+for(int i = halflen; i < orders.length; i++)
+{
+int ord = orders[i] & 0xFF;
 //                if (ord < 0) ord += 256;
-                int m = mapping[ord];
-                if (m == -1) continue;
+int m = mapping[ord];
+if (m == -1) continue;
                         
-                if (!iL[m])
-                print("+>Mapped to non-lower order " + m);
-                if (iM[m])
-                print("+>Mapped multiply to " + m);
-                iM[m] = true;
-                }
-                }
+if (!iL[m])
+print("+>Mapped to non-lower order " + m);
+if (iM[m])
+print("+>Mapped multiply to " + m);
+iM[m] = true;
+}
+}
         */
 
 
@@ -231,15 +231,15 @@ public class Fatten extends Unit
           {
           int ord = orders[i] & 0xFF;
 //          if (ord < 0) ord += 256;
-          if (got[ord])
-          print("-->Already " + ord);
-          got[ord] = true;
-          }
-          for(int i = 0; i < orders.length; i++)
-          {
-          if (!got[i])
-          print("-->Missing " + i);
-          }
+if (got[ord])
+print("-->Already " + ord);
+got[ord] = true;
+}
+for(int i = 0; i < orders.length; i++)
+{
+if (!got[i])
+print("-->Missing " + i);
+}
         */
 
 
@@ -260,23 +260,23 @@ public class Fatten extends Unit
           {
           int o = orders[i] & 0xFF;
 //          if (o < 0) o += 256;
-          iL[o] = true;
-          }
+iL[o] = true;
+}
 
-          for(int i = halflen; i < orders.length; i++)
-          {
-          int ord = orders[i] & 0xFF;
+for(int i = halflen; i < orders.length; i++)
+{
+int ord = orders[i] & 0xFF;
 //          if (ord < 0) ord += 256;
-          int m = mapping[ord];
-          if (m == -1) continue;
+int m = mapping[ord];
+if (m == -1) continue;
                         
-          if (!iL[m])
-          print("?>Mapped to non-lower order " + m);
-          if (iM[m])
-          print("?>Mapped multiply to " + m);
-          iM[m] = true;
-          }
-          }
+if (!iL[m])
+print("?>Mapped to non-lower order " + m);
+if (iM[m])
+print("?>Mapped multiply to " + m);
+iM[m] = true;
+}
+}
         */
 
         // We should be good to go at this point

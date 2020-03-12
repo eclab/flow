@@ -192,8 +192,8 @@ public class Out extends Unit implements Miscellaneous
         if (modulation == MOD_GAIN && isConstant)
             return String.format("%.4f", value * MAX_GAIN);
         else if (modulation == MOD_PAN && isConstant)
-        	{
-        	double val = (value * 200);
+            {
+            double val = (value * 200);
             return (val == 100 ? "--" : (val < 100 ? ("< " + (int)(100 - val)) : ("" + (int)(val - 100) + " >")));
             }
         else return super.getModulationValueDescription(modulation, value, isConstant);

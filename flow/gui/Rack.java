@@ -868,12 +868,12 @@ public class Rack extends JPanel
         int outputPerThread = Prefs.getLastNumOutputsPerThread();
         outputsPerThreadCombo.setSelectedIndex(outputPerThread == 1 ? 0 : (outputPerThread == 2 ? 1 : (outputPerThread == 4 ? 2 : (outputPerThread == 8 ? 3 : 4))));
 
-		JCheckBox stereoCheckbox = new JCheckBox();
-		stereoCheckbox.setSelected(Prefs.getLastStereo());
-		JPanel b = new JPanel();
-		b.setLayout(new BorderLayout());
-		b.add(stereoCheckbox, BorderLayout.WEST);
-		b.add(Stretch.makeHorizontalStretch(), BorderLayout.CENTER);
+        JCheckBox stereoCheckbox = new JCheckBox();
+        stereoCheckbox.setSelected(Prefs.getLastStereo());
+        JPanel b = new JPanel();
+        b.setLayout(new BorderLayout());
+        b.add(stereoCheckbox, BorderLayout.WEST);
+        b.add(Stretch.makeHorizontalStretch(), BorderLayout.CENTER);
 
         int result = showMultiOption(this, 
             new String[] { "Polyphony", "Buffer Size Per Channel", "Partials", "Voices Per Thread", "Outputs Per Thread", "Stereo" }, 

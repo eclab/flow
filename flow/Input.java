@@ -94,17 +94,17 @@ public class Input
         }
     
     public void reset()
-    	{
-    	synchronized(lock)
-    		{
-    		notesOnMono.clear();
-    		while(notesOn.size() != 0)
-    			{
-    			Sound s = notesOn.removeFirst();
-    			notesOff.addFirst(s);
-    			}
-    		}
-    	}
+        {
+        synchronized(lock)
+            {
+            notesOnMono.clear();
+            while(notesOn.size() != 0)
+                {
+                Sound s = notesOn.removeFirst();
+                notesOff.addFirst(s);
+                }
+            }
+        }
     
     
 
@@ -728,7 +728,7 @@ public class Input
         
         double d = Math.pow(2.0, (double) (i - 69.0) / 12.0) * 440.0;
         
-       output.lock();
+        output.lock();
         try
             {
             // set the channel, including OMNI
@@ -765,9 +765,9 @@ public class Input
                 
             } 
         catch (Exception e)
-        	{
-        	e.printStackTrace();
-        	}
+            {
+            e.printStackTrace();
+            }
         finally
             {
             output.unlock();
