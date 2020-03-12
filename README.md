@@ -33,7 +33,7 @@ Flow has almost 70 modules of different shapes and sizes, and currently supports
 ### Demos
 * A [video demonstrating how to set up a simple patch in Flow](https://youtu.be/zkmEVWfly-0).
 
-* Three songs made using only Flow in multitimbral mode, with Ableton serving as just the sequencer.  They are called [8](https://cs.gmu.edu/~sean/projects/synth/log/#8), [9](https://cs.gmu.edu/~sean/projects/synth/log/#9), and [10](https://cs.gmu.edu/~sean/projects/synth/log/#10).  8 is the best one. All three come with the Flow patches and Ableton als files to recreate them.
+* Three songs made using only Flow in multitimbral mode, with Ableton serving as just the sequencer.  They are called [8](https://cs.gmu.edu/~sean/projects/synth/log/#8), [9](https://cs.gmu.edu/~sean/projects/synth/log/#9), and [10](https://cs.gmu.edu/~sean/projects/synth/log/#10).  8 is the best one. All three come with the Flow patches and Ableton files to recreate them.
 
 [//]: <> ( Former hello-world demo: https://www.youtube.com/watch?v=w3aao8Sp0sQ )
 
