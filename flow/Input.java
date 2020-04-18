@@ -897,7 +897,7 @@ public class Input
     ////// MICROTUNING
     
     // If there is a parse error in the file, return FALSE
-    public boolean loadScala(File file) throws IOException
+    public boolean loadScala(File file, double rootFrequency, int rootNote) throws IOException
     	{
     	return true;
     	}

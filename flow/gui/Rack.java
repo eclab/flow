@@ -1305,14 +1305,15 @@ public class Rack extends JPanel
 				try 
 					{
 					file = new File(fd.getDirectory(), fd.getFile());
-					double frequencyOfMiddleC = 440.0;  // we'll change this
+					double rootFrequency = 440.0;  // we'll change this
+					int rootNote = 69;  // we'll change this
 					boolean cancelled = false;
 					if (!cancelled)
 						{
 						getOutput().lock();					
 						try
 							{
-							boolean result = getOutput().getInput().loadScala(file);
+							boolean result = getOutput().getInput().loadScala(file, rootFrequency, rootNote);
 							if (!result) 
 								{
 								AppMenu.showSimpleError("File Error", "The provided file could not be read.", this);
