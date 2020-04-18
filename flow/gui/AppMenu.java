@@ -96,7 +96,12 @@ public class AppMenu
             return filename;
         else return filename + ending;
         }
-
+        
+    public static File getLastFile()
+    	{
+    	return file;
+    	}
+	
 
 /*
   static JMenuItem namePatchMenu(Rack rack)
@@ -231,6 +236,7 @@ public class AppMenu
         return export;
         }
     
+
     static void doSaveAs(Rack rack, boolean primaryOnly)
         {
         FileDialog fd = new FileDialog((Frame)(SwingUtilities.getRoot(rack)), 
@@ -1138,7 +1144,39 @@ return swapPrimary;
         return sync;
         }
 
-    public static JMenuBar provideMenuBar(Rack rack)
+      // Produces the Microtuning menu
+    static JCheckBoxMenuItem microtuningMenu(Rack rack)
+        {
+        final JCheckBoxMenuItem microtuning = new JCheckBoxMenuItem("Microtuning");
+        microtuning.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+                rack.setMicrotuning(microtuning.isSelected());
+                }
+            });
+        return microtuning;
+        }
+
+      // Produces the Microtuning menu
+    static JMenuItem loadMicrotuningMenu(Rack rack, JCheckBoxMenuItem microtuningMenu)
+        {
+        JMenuItem setup = new JMenuItem("Load Microtuning File...");
+        setup.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+               	if (rack.loadMicrotuning())
+               		{
+               		microtuningMenu.setSelected(true);
+               		rack.setMicrotuning(true);
+               		}
+                }
+            });
+        return setup;
+        }
+        
+  public static JMenuBar provideMenuBar(Rack rack)
         {
         JMenuBar menubar = new JMenuBar();
         menubar.add(provideFileMenu(rack));
@@ -1178,7 +1216,10 @@ return swapPrimary;
         menu.add(velMenu(rack));
         menu.add(syncMenu(rack));
         menu.addSeparator();
-//        menu.add(namePatchMenu(rack));
+        
+        JCheckBoxMenuItem m = microtuningMenu(rack);
+        menu.add(m);
+        menu.add(loadMicrotuningMenu(rack, m));
         return menu;
         }
 
@@ -1194,8 +1235,6 @@ return swapPrimary;
         menu.add(minDisplayedHarmonic(rack));
         menu.addSeparator();
         menu.add(addModulesAfterMenu(rack));
-        //menu.add(swapPrimaryMenu(rack));
-//              menu.addSeparator();
         menu.add(setupPatchMenu(rack));
         menu.add(setupTuningMenu(rack));
         return menu;

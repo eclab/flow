@@ -77,7 +77,7 @@ public class MicroTuning extends TuningDefinition {
             }
         }
         cents.add(0, 0.0); // I expect a 0 at the beginning of my array.
-        Double[] outarr = cents.toArray(Double[]::new);
+        Double[] outarr = cents.toArray(new Double[0]);
         MicroTuning rs = new MicroTuning(outarr, "tuning");
         rs.popup();
         return rs;

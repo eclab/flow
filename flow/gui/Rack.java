@@ -22,6 +22,8 @@ import java.awt.datatransfer.*;
 
 import javax.sound.sampled.*;
 
+import java.io.*;
+
 import org.json.*;
 
 /**
@@ -1261,7 +1263,84 @@ public class Rack extends JPanel
         else
             return new String[] { n.getText(), a.getText(), d.getText(), v.getText(), i.getText() };
         }
-                
+
+
+
+
+////// MICROTUNING
+        
+    	public void setMicrotuning(boolean on)
+    		{
+			getOutput().lock();					
+			getOutput().getInput().setMicrotuning(on);
+			getOutput().unlock();										
+    		}
+    	
+    	public boolean loadMicrotuning()
+    		{
+			FileDialog fd = new FileDialog((Frame) (SwingUtilities.getRoot(this)), "Load Microtuning Scala File", FileDialog.LOAD);
+			fd.setFilenameFilter(new FilenameFilter() 
+				{
+				public boolean accept(File dir, String name) 
+					{
+					return AppMenu.ensureFileEndsWith(name, ".scl").equals(name) || AppMenu.ensureFileEndsWith(name, ".SCL").equals(name);
+					}
+				});
+
+			File file = AppMenu.getLastFile();
+
+			if (file != null) 
+				{
+				fd.setFile(file.getName());
+				fd.setDirectory(file.getParentFile().getPath());
+				} 
+
+			disableMenuBar();
+			fd.setVisible(true);
+			enableMenuBar();
+
+			FileInputStream is = null;
+			if (fd.getFile() != null)
+				{
+				try 
+					{
+					file = new File(fd.getDirectory(), fd.getFile());
+					double frequencyOfMiddleC = 440.0;  // we'll change this
+					boolean cancelled = false;
+					if (!cancelled)
+						{
+						getOutput().lock();					
+						try
+							{
+							boolean result = getOutput().getInput().loadScala(file);
+							if (!result) 
+								{
+								AppMenu.showSimpleError("File Error", "The provided file could not be read.", this);
+								return false;
+								}
+							}
+						finally 
+							{
+							getOutput().unlock();
+							}
+						}
+					else
+						{
+						return false;
+						}
+					} 
+				catch (IOException ex) 
+					{
+					AppMenu.showSimpleError("File Error", "An error occurred on reading the file.", this);
+					return false;
+					}
+				}
+			else
+				{
+				return false;
+				}
+			return true;
+    		}
 
 
 ////// DRAG AND DROP JUNK

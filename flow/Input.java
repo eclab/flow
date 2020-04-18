@@ -4,11 +4,9 @@
 
 package flow; 
 
-import javax.sound.midi.MidiMessage;
-import javax.sound.midi.ShortMessage;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
+import javax.sound.midi.*;
+import java.util.*;
+import java.io.*;
 
 /**
  * Input handles MIDI Input.  It is owned by Output, and it in turn owns Midi, the low-level wrapper for
@@ -895,8 +893,18 @@ public class Input
 			}
 	}
     
+  
+    ////// MICROTUNING
     
+    // If there is a parse error in the file, return FALSE
+    public boolean loadScala(File file) throws IOException
+    	{
+    	return true;
+    	}
 
+	public void setMicrotuning(boolean val)
+		{
+		}
 
 
 
