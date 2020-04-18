@@ -117,7 +117,7 @@ public class Smooth extends Unit
             }
         else
             {
-            double mod = makeVerySensitive(modulate(MOD_AMOUNT));
+            double mod = makeVerySensitive(1.0 - modulate(MOD_AMOUNT));
             for(int i = 0; i < frequencies.length; i++)
                 {
                 // This elaborate version of (1-mod) * s + mod * q

@@ -470,5 +470,4 @@ public class LFO extends Modulation implements ModSource
             }
         else return "";
         }
-        
     }

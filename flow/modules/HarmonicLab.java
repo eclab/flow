@@ -14,7 +14,7 @@ import java.awt.*;
     takes precedence over the third (with regard to constraints).
 */
 
-public class PartialLab extends Unit implements UnitSource
+public class HarmonicLab extends Unit implements UnitSource
     {
     private static final long serialVersionUID = 1;
 
@@ -39,7 +39,7 @@ public class PartialLab extends Unit implements UnitSource
         
     public Object clone()
         {
-        PartialLab obj = (PartialLab)(super.clone());
+        HarmonicLab obj = (HarmonicLab)(super.clone());
         obj.oldType = (int[])(obj.oldType.clone());
         obj.type = (int[])(obj.type.clone());
         obj.oldConstraint = (int[])(obj.oldConstraint.clone());
@@ -50,7 +50,7 @@ public class PartialLab extends Unit implements UnitSource
         }
 
 
-    public PartialLab(Sound sound) 
+    public HarmonicLab(Sound sound) 
         {
         super(sound);
         
@@ -215,7 +215,7 @@ public class PartialLab extends Unit implements UnitSource
                     break;
                     default:
                         {
-                        warn("modules/PartialLab.java", "default occurred when it shouldn't be possible");
+                        warn("modules/HarmonicLab.java", "default occurred when it shouldn't be possible");
                         break;
                         }
                     }
@@ -226,7 +226,7 @@ public class PartialLab extends Unit implements UnitSource
 
     public ModulePanel getPanel()
         {
-        return new ModulePanel(PartialLab.this)
+        return new ModulePanel(HarmonicLab.this)
             {
             public JComponent buildPanel()
                 {               

@@ -69,7 +69,7 @@ public class AmpMath extends Unit
     public static final double SCALEFAR_RANGE = 9;
         
     public static final String[] OPERATION_NAMES = new String[] { 
-        "+", "-", "*", "inv *", "compress", "average", "min", "max", "filter", "filternot", 
+        "+", "-", "x", "inv x", "compress", "average", "min", "max", "filter", "filternot", 
         "fill", "threshold", "scaledown", "scaleup", "scalefar", "clampdown", "clampup", 
         //"remove" 
         }; 

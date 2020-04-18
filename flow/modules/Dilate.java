@@ -53,7 +53,7 @@ public class Dilate extends Unit
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Boost" });
-        defineOptions(new String[] { "Direction" }, new String[][] { { "Left", "Right", "Both" } });
+        defineOptions(new String[] { "Direction" }, new String[][] { { "Lower", "Higher", "Both" } });
         }
         
     double[] zeros;        

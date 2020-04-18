@@ -21,7 +21,7 @@ public class Scale extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Scale" });
+        defineModulations(new Constant[] { Constant.HALF }, new String[] { "Scale" });
         }
 
     public static final double MAX_BOUND = 3.0;

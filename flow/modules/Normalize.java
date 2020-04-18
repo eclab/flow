@@ -22,7 +22,7 @@ public class Normalize extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineOptions(new String[] { "Normalize", "Standardize" }, new String[][] { {"Off", "Normalize", "Maximize"}, {"Standardize"} });
+        defineOptions(new String[] { "Scaling", "Standardize" }, new String[][] { {"None", "Normalize", "Maximize"}, {"Standardize"} });
         }
 
     public static final int N_OFF = 0;

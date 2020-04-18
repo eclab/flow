@@ -574,6 +574,29 @@ public class WavFile
         return readFrames(sampleBuffer, 0, numFramesToRead);
         }
 
+/** Change to this?
+    public int readFrames(double[] sampleBuffer, int offset, int numFramesToRead) throws IOException, WavFileException
+        {
+        if (ioState != IOState.READING) throw new IOException("Cannot read from WavFile instance");
+
+        for (int f=0 ; f<numFramesToRead ; f++)
+            {
+            if (frameCounter == numFrames) return f;
+
+            sampleBuffer[offset] = floatOffset + (double) readSample() / floatScale;
+            offset ++;
+            for (int c=0 ; c<numChannels ; c++)
+                {
+				readSample();
+                }
+
+            frameCounter ++;
+            }
+
+        return numFramesToRead;
+        }
+*/
+
     public int readFrames(double[] sampleBuffer, int offset, int numFramesToRead) throws IOException, WavFileException
         {
         if (ioState != IOState.READING) throw new IOException("Cannot read from WavFile instance");

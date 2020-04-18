@@ -462,48 +462,4 @@ public class AHR extends Modulation implements ModSource
                 }
             };
         }
-
-    public String[] getOptionHelp() 
-        { 
-        return new String[]
-            { 
-            "Function for rate of attack, ranging from a straight line (linear) to very extreme (x^32).  x^4 is close to exponential tradition.  Step is no change at all until the very end, then a sudden jump.",
-            "Function for rate of release, ranging from a straight line (linear) to very extreme (x^32).  x^4 is close to exponential tradition.  Step is no change at all until the very end, then a sudden jump.",
-            "Envelope ignores note-off, and continues on its own.",
-            "Envelope time is synced to MIDI clock.  Double-click on a time dial and MIDI note speeds will appear.",
-            "Envelope ignores hold and release time: it just goes from start level to attack level, then holds there.",
-            };
-        }
-
-    public String[] getModulationHelp() 
-        { 
-        return new String[]
-            { 
-            "Level for starting or ending the envelope.  If Ramping, then this is just the level for starting the envelope.",
-            "Time to reach the attack level",
-            "Attack level value.  If a release occurs early, this value may never be reached.",
-            "Time to hold at the attack level after reaching it",
-            "Time to release to back to the start level",
-            "Alternative trigger for (re)starting the envelope.  If nothing is connected here, the envelope is triggered by a NOTE ON.  If connected, then a NOTE ON does nothing.",
-            "Alternative trigger for releasing the envelope.  If nothing is connected here, the release is triggered by a NOTE OFF.  If connected, then a NOTE OFF does nothing.",
-            };
-        }
-
-    public String[] getModulationOutputHelp() 
-        { 
-        return new String[]
-            { 
-            "Current AHR value.",
-            };
-        }
-
-    public String[] getUnitInputHelp() 
-        {
-        return null; 
-        }
-
-    public String[] getUnitOutputHelp() 
-        { 
-        return null;
-        }
     }

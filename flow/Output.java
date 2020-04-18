@@ -276,8 +276,8 @@ public class Output
     void syncTick() { syncTick = tick; }
 
     /** Returns the Output's current tick.  Note that TICK is presently an INTEGER.  This means it will 
-        roll over to a negative value once
-        every 13 hours at 44100, or once every 26 hours at 22050.  It's not implemented as a long
+        roll over to a negative value once every 13.5 hours at 44100, once every 12.4 hours at 48000, 
+        or once every 27 hours at 22050.  It's not implemented as a long
         because there's no easy way to make tick a high-resolution rapid threadsafe counter without incurring
         a considerable efficiency cost, either as a volatile long (volatiles are good for occasional 
         writes by one one thread and lots of reads by another thread -- we have the opposite situation)
@@ -404,14 +404,21 @@ public class Output
      
     ///// THREADS   
 
-    ///// There are three kinds of threads in the system.
+    ///// There are five kinds of threads in the system.
     /////
-    ///// 1. The OUTPUT THREAD.  This is started in the constructor by calling the
+    ///// 0. The PRIMARY OUTPUT THREAD.  This is started in the constructor by calling the
     /////    startOutputThread() method.  This thread runs in the background and is
     /////    never killed.  It is responsible for occasionally grabbing the most
     /////    recent partials, stored in SWAP, and using them to produce samples
-    /////    via buildSample, then emit them to the the audio system.  The Output
-    /////    Thread also updates the current tick.
+    /////    via multithreaded calls to buildSample, then emit them to the the audio 
+    /////    system.  The Output Thread also updates the current tick.
+    /////
+    ///// 1. The SUBSIDIARY OUTPUT THREADS.  buildSample() is very costly.  These
+    /////    threads divvy up the work in multiple calls to buildSample() from the
+    /////    primary output thread.  There is one call to buildSample() per voice;
+    /////    these threads might each be responsible for (say) 2 calls to buildSample()
+    /////    each.  After they have returned the results from the various buildSample()
+    /////    calls, they wait for the primary output thread to call on them yet again.
     /////
     ///// 2. The PRIMARY VOICE THREAD.  This thread could be the main() thread,
     /////    or it can be spawned independently via startPrimaryVoiceThread().
@@ -425,6 +432,12 @@ public class Output
     /////    The primary voice thread distributes sounds to each of these threads
     /////    as necessary to build the latest partials.  If needed, the primary
     /////    voice creates these via createPerVoiceThreads().
+    /////
+    ///// 4. The SWING EVENT THREAD.  This method handles drawing on-screen and
+    /////    updates of parameters via widgets.  To do this, it obtains a gobal
+    /////    lock via Output.lock() and Output.unlock().  This global lock is
+    /////    a fair lock because otherwise the UI would get starved because it's
+    /////    generally much lower priority and/or stress than the other threads.
         
 
 
@@ -540,7 +553,7 @@ public class Output
     
     public static double undenormalize(double val)              // assumes only positive values
         {
-        if (val > 0 && val <= 1e-200)           // really it's 2250738585072012e-308, but I'm giving breathing room for multiplication
+        if (val > 0 && val <= WELL_ABOVE_SUBNORMALS)           // really it's 2250738585072012e-308, but I'm giving breathing room for multiplication
             val = 0;
         return val;
         }
@@ -550,23 +563,24 @@ public class Output
         {
         for(int i = 0; i < val.length; i++)
             {
-            if (val[i] > 0 && val[i] <= 1e-200)             // really it's 2250738585072012e-308, but I'm giving breathing room for multiplication
+            if (val[i] > 0 && val[i] <= WELL_ABOVE_SUBNORMALS)             // really it's 2250738585072012e-308, but I'm giving breathing room for multiplication
                 val[i] = 0;
             }
         }
         
 
-    public static void printDenormal(double val, String s)
+    public static double printDenormal(double val, String s)
         {
         if (val > 0 && val <= 2250738585072012e-308)
             System.err.println("Output.printDenormal() WARNING: " + s + " is DENORMAL " + val);
+        return val;
         }
     
 
     // Builds a single sample from the partials.  ALPHA is the current interpolation
     // factor (from 0...1) 
     double buildSample(int s, double[][] currentAmplitudes)
-        {
+        {        
         // build the sample
         double sample = 0;
         Swap _with = with;
@@ -574,13 +588,12 @@ public class Output
         double[] freq = _with.frequencies[s];
         byte[] orders = _with.orders[s];
         double[] pos = positions[s];
-        double[] ca = currentAmplitudes[s];
+        double[] currentAmp = currentAmplitudes[s];
         double v = _with.velocities[s];
         double pitch = _with.pitches[s];
         double tr = pitch * INV_SAMPLING_RATE;
-        boolean dephase = _with.dephase[s];
         
-        if (dephase)                    // this is a manual hoist
+        if (_with.dephase[s])                    // this is a manual hoist
             {
             for (int i = 0; i < pos.length; i++)
                 {
@@ -594,20 +607,17 @@ public class Output
                     break;
                     }
 
-                double amplitude = amp[i];
                 int oi = orders[i] & 0xFF;           // if we're using 256 partials, they need to be all positive
-                //if (oi < 0) oi += 256; 
                                         
                 // incoming amplitudes are pre-denormalized by the voice threads.
                 // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
-                // get denormalized.  So we undenormalize here.  It's theoretically possible that we
-                // could still get denormalized when summing the samples below; but I have not been
-                // able to cause that.
-                double aa = (ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
-                double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
-                amplitude = aa + bb;
-                if (amplitude < 1e-200) amplitude = 0;          // undenormalize prior to next go-around
-                ca[oi] = amplitude;
+                // get denormalized.  So we undenormalize here.  When summing the two (non-denormal))
+                // partials below, we can get a denormalled number -- try the IComeInPeace patch
+                // after commenting out     if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0; 
+                double amplitude = (currentAmp[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA) +
+                					(amp[i] * PARTIALS_INTERPOLATION_ALPHA);
+                if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0;          // undenormalize prior to next go-around
+                currentAmp[oi] = amplitude;
 
                 if (amplitude <= MINIMUM_VOLUME)
                     {
@@ -626,26 +636,26 @@ public class Output
             for (int i = 0; i < pos.length; i++)
                 {
                 double frequency = freq[i];
- 
-                double amplitude = amp[i];
                 int oi = orders[i] & 0xFF;           // if we're using 256 partials, they need to be all positive
-                //if (oi < 0) oi += 256; 
                                                         
                 // incoming amplitudes are pre-denormalized by the voice threads.
                 // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
-                // get denormalized.  So we undenormalize here.  It's theoretically possible that we
-                // could still get denormalized when summing the samples below; but I have not been
-                // able to cause that.
-                double aa = (ca[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA);
-                double bb = amplitude * PARTIALS_INTERPOLATION_ALPHA;
-                amplitude = aa + bb;
-                if (amplitude < 1e-200) amplitude = 0;          // undenormalize prior to next go-around
-                ca[oi] = amplitude;
+                // get denormalized.  So we undenormalize here.  When summing the two (non-denormal))
+                // partials below, we can get a denormalled number -- try the IComeInPeace patch
+                // after commenting out     if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0; 
+                double amplitude = (currentAmp[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA) +
+                					(amp[i] * PARTIALS_INTERPOLATION_ALPHA);
+                if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0;          // undenormalize prior to next go-around
+                currentAmp[oi] = amplitude;
                                 
+                // Unlike the dephase situation, we MUST update the position for all partials            
+                    
                 double position = pos[oi] + frequency * tr;
                 position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
                 pos[oi] = position;
                         
+                // only here can we avoid doing the fastSin.  But in truth this is just an array lookup at this point.
+                
                 if (frequency * pitch <= NYQUIST && amplitude > MINIMUM_VOLUME)
                     {
                     sample += Utility.fastSin(position * PI2) * amplitude;

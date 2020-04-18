@@ -1272,6 +1272,8 @@ public class Rack extends JPanel
     
     static
         {
+        // If we don't do this, on OS X the tooltips leak into the popups
+        ToolTipManager.sharedInstance().setLightWeightPopupEnabled(false);
         try
             {
             moduleflavor = new DataFlavor(DataFlavor.javaJVMLocalObjectMimeType + ";class=flow.gui.ModulePanel");

@@ -7,7 +7,9 @@ package flow;
 import flow.modules.*;
 import flow.gui.*;
 import java.util.*;
+import java.io.*;
 import org.json.*;
+import flow.utilities.*;
 import javax.swing.JToolTip;
 
 /**
@@ -952,4 +954,25 @@ public abstract class Modulation implements Cloneable
         if (val > 0 && val <= 2250738585072012e-308)
             System.err.println(s + " is DENORMAL " + val);
         }
+
+////// HELP
+
+	/** Override this to provide help text in HTML format. 
+		By default this method looks for an HTML file called Foo.html, where
+		Foo is the name of your Modulation subclass, stored in
+		a subdirectory called "html" located next to Foo.class.  It reads
+		this file and returns it as a String.   If there is no such file,
+		null is returned, indicating no help text is provided.
+		
+		<p>Some rules about the HTML.  First, you don't need to say <html>...</html>, those
+		tags will be added later.  Second, the title of the help, which will be added automatically
+		by Flow, will be in <h2>title</h2>.  So you shouldn't use <h2> or <h1>.
+		*/
+	public String getHelpText() 
+		{ 
+		InputStream str = this.getClass().getResourceAsStream("help/" + this.getClass().getSimpleName() + ".html");
+		if (str == null) return null;
+		else return StringUtilities.read(str);
+		}
+
     }

@@ -44,7 +44,7 @@ public class WaveTable extends Unit implements UnitSource
     int currentPos = -1;
     boolean interpolate = true;
                 
-    double[][] waveTable;
+    double[/*Wave*/][/*Partial*/] waveTable;
     
     // 1 and 2 are too bouncy, 8 sounds too... distant and wrong.
     public static final int RESAMPLING = 4;
@@ -67,13 +67,12 @@ public class WaveTable extends Unit implements UnitSource
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Position" });
         defineOptions(new String[] { "Interpolate" }, new String[][] { { "Interpolate" } });
         setClearOnReset(false);
-        waveTable = new double[2][NUM_PARTIALS];
+        // Set to a fundamental sine wave
+        waveTable = new double[1][NUM_PARTIALS];
         waveTable[0][0] = 1;
-        waveTable[1][0] = 1;
         for(int i = 1; i < NUM_PARTIALS; i++)
             {
             waveTable[0][i] = 0;
-            waveTable[1][i] = 0;
             }
         }
 
@@ -108,7 +107,7 @@ public class WaveTable extends Unit implements UnitSource
         if (mod != currentPos)  // gotta update
             {
             double[] amplitudes = getAmplitudes(0);
-            if (mod == 1.0)
+            if (mod == 1.0 || waveTable.length == 1)
                 {
                 System.arraycopy(waveTable[waveTable.length - 1], 0, amplitudes, 0, amplitudes.length);
                 }
@@ -374,4 +373,20 @@ public class WaveTable extends Unit implements UnitSource
             }
         } 
         
+    public String getModulationValueDescription(int modulation, double value, boolean isConstant)
+        {
+        if (isConstant)
+            {
+            if (modulation == MOD_POSITION)
+                {
+                double d = value * (waveTable.length - 1);
+                int wave = (int) d;
+                double alpha = (d - wave);
+                if (alpha >= 0.5) wave = wave + 1;
+                return "" + wave;
+                }
+            else return super.getModulationValueDescription(modulation, value, isConstant);
+            }
+        else return "";
+        }
     }

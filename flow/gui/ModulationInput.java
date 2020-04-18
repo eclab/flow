@@ -35,6 +35,8 @@ public class ModulationInput extends InputOutput implements Rebuildable
     // The distance the mouse travels to go 0...1
     static final int SCALE = 256;
 
+    JPopupMenu pop;
+
     // revises the data JLabel to reflect the current modulation value
     public void updateText()
         {
@@ -197,11 +199,36 @@ public class ModulationInput extends InputOutput implements Rebuildable
             }
         }
 
-    double[] conversions = new double[] { 0.0, 1.0 / 4.0, 1.0 / 3.0, 1.0 / 2.0, 2.0 / 3.0, 3.0 / 4.0, 1.0 };
+    public static final double[] DEFAULT_CONVERSIONS = new double[] { 0.0, 1.0 / 4.0, 1.0 / 3.0, 1.0 / 2.0, 2.0 / 3.0, 3.0 / 4.0, 1.0 };
+    public static final String[] DEFAULT_OPTIONS = new String[] { "0", "1/4", "1/3", "1/2", "2/3", "3/4", "1" };
+    double[] conversions = DEFAULT_CONVERSIONS;
+    String[] options = DEFAULT_OPTIONS;
     public double convert(int elt) { return conversions[elt]; }
-    String[] options = new String[] { "0", "1/4", "1/3", "1/2", "2/3", "3/4", "1" };
+    
+    /** Returns the options to be displayed in the ModulationInput's pop-up window.  These must correspond to,
+    	and thus have an array the same size as, the values from getConversions(), which are the actual values
+    	from 0 to 1 which correspond to each option.   You can override this method to return your own options,
+    	as long as you also override the method getConversions() to return a corresponding array.  Alternatively
+    	you can just call setOptionsAndConversions) or setOptionsWithDefaultConversions(). */
     public String[] getOptions() { return options; }
-    public void setOptionsAndConversions( String[] options, double[] conversions) { this.options = options; this.conversions = conversions; }
+    /** Returns the conversions (numbers ranging from 0.0 to 1.0) corresponding to the getOptions() strings
+    	displayed in the ModulationInput's pop-up window.  These must correspond to,
+    	and thus have an array the same size as, the values from getOptions().  
+    	You can override this method to return your own conversions,
+    	as long as you also override the method getOptions() to return a corresponding array.  Alternatively
+    	you can just call setOptionsAndConversions) or setOptionsWithDefaultConversions().  */
+    public double[] getConversions() { return conversions; }
+    /** Sets the *options* (the items presented in the ModulationInput's pop-up window and their 
+    	*conversions* (the numbers from 0.0 to 1.0 which are the values corresponding to them).  These arrays
+    	must be the same size.  Alternatively you can override the getOptions() and getConversions() methods if you wish. 
+    	This method also rebuilds the popup window.  */
+    public void setOptionsAndConversions( String[] options, double[] conversions) { this.options = options; this.conversions = conversions;  pop = getPopupMenu(); }
+    /** Sets the *options* (the labels presented in the ModulationInput's pop-up window) corresponding to 
+    	the default conversion values from DEFAULT_CONVERSIONS.  The default conversions are 0, 1/4, 1/3, 1/2, 2/3, 3/4, and 1.
+    	The options array must thus be DEFAULT_CONVERSIONS.length in size.
+    	Alternatively you can override the getOptions() and getConversions() methods if you wish.  
+    	This method also rebuilds the popup window. */
+    public void setOptionsWithDefaultConversions(String[] options) { setOptionsAndConversions(options, DEFAULT_CONVERSIONS); }
       
     public JPopupMenu getPopupMenu()
         {
@@ -237,7 +264,6 @@ public class ModulationInput extends InputOutput implements Rebuildable
         public static final int STATUS_DIAL_DYNAMIC = 1;
         int status = STATUS_STATIC;
         Color staticColor;
-        JPopupMenu pop;
 
         // The state when the mouse was pressed 
         double startState;
@@ -335,7 +361,7 @@ public class ModulationInput extends InputOutput implements Rebuildable
             this.staticColor = staticColor;
             this.modulationInput = modulationInput;
 
-            final JPopupMenu pop = getPopupMenu();
+            pop = getPopupMenu();
 
             addMouseWheelListener(new MouseWheelListener()
                 {

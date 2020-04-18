@@ -425,10 +425,12 @@ public class Out extends Unit implements Miscellaneous
                 super.setRack(rack);
                 updatePatchInfo();
                 }
-                                
             };
             
-            
+        panel[0].getModulationInputs()[MOD_PAN].setOptionsAndConversions(
+        	new String[] { "< 100", "< 50", "< 25", "--", "25 >", "50 >", "100 >" },
+        	new double[] { 0, 0.25, 0.5 * 0.75, 0.5, 1.0 - 0.5 * 0.75, 0.75, 1.0 } );
+        
         ModulationInput[] a = panel[0].getModulationInputs();
         for(int i = 0; i < NUM_MOD_OUTPUTS; i++)
             a[i].setTitleCanChange(true);
@@ -523,7 +525,7 @@ public class Out extends Unit implements Miscellaneous
 
                     panel[0].getTitlePanel().setBackground(glitched ? Color.RED : (clipped ? Color.YELLOW : Color.BLACK));
                     panel[0].getTitleLabel().setForeground(glitched ? Color.WHITE : (clipped ? Color.BLACK : Color.WHITE));
-                    String label = glitched ? "  Glitch" : (clipped ? "  Clip" : "  Out");
+                    String label = glitched ? " Glitch" : (clipped ? " Clip" : " Out");
                     if (labeladdendum != null)
                         label = label + labeladdendum;
                     panel[0].getTitleLabel().setText(label);

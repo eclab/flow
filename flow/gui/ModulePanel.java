@@ -13,6 +13,8 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.*;
 import java.io.*;
+import flow.utilities.*;
+import javax.swing.text.html.*;
 
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
@@ -30,6 +32,13 @@ public class ModulePanel extends JPanel implements Transferable
     
     JLabel titleLabel;
     JComponent titlePanel;
+    JScrollPane helpPanel;
+    // It seems that Java's JTextPane, in HTML mode, doesn't handle word wraps
+    // very well.  If you put in a word like "getTransferData", the minimum width
+    // expands to about twice that word.  Man!  So we need to be fairly wide to
+    // avoid horizontal scrolling.  Also, we have style sheet issues so we need to
+    // be big.
+    public static final int HELP_WIDTH = 300;
     
     ModulationInput[] modIn = new ModulationInput[0];
     ModulationOutput[] modOut = new ModulationOutput[0];
@@ -38,6 +47,8 @@ public class ModulePanel extends JPanel implements Transferable
     
     public boolean getFillPanel() { return false; }
         
+    boolean firstMouseDrag = false;
+    
     public ModulePanel(Modulation mod)
         {
         modulation = mod;
@@ -50,7 +61,25 @@ public class ModulePanel extends JPanel implements Transferable
             {
             public void mousePressed(MouseEvent e)
                 {
-                getTransferHandler().exportAsDrag(ModulePanel.this, e, TransferHandler.COPY);
+                firstMouseDrag = true;
+                }
+            public void mouseClicked(MouseEvent e)
+            	{
+            	if (e.getClickCount() == 2)
+            		{
+            		toggleHelpPanel();
+            		}
+            	}
+            });
+        title.addMouseMotionListener(new MouseMotionAdapter()
+            {
+            public void mouseDragged(MouseEvent e)
+                {
+                if (firstMouseDrag)
+	                {
+	                getTransferHandler().exportAsDrag(ModulePanel.this, e, TransferHandler.COPY);
+	                }
+	            firstMouseDrag = false;
                 }
             });
                 
@@ -74,7 +103,79 @@ public class ModulePanel extends JPanel implements Transferable
         this.setTransferHandler(new ModulePanelTransferHandler());
         this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener()));
         }
-        
+    
+    void buildHelpPanel()
+    	{
+    	JPanel pan2 = new JPanel();		// just a scratch panel to get background
+		String helpText = modulation.getHelpText();
+		if (helpText != null)
+			{
+			JTextPane help = new JTextPane()
+				{
+				  @Override
+				  public void updateUI() {
+					  super.updateUI();
+					  putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+				  }				
+				};
+			help.setContentType("text/html");
+			help.setText("<html><h2>About " + modulation.getNameForModulation() + "</h2>" + helpText + "</html>");
+      		help.setFont(Style.SMALL_FONT());
+			help.setBorder(null);
+			help.setBackground(pan2.getBackground());
+			help.setHighlighter(null);
+			help.setEditable(false);
+			help.setCaretPosition(0);  // scrolls to top
+			helpPanel = new JScrollPane(help)
+				{
+				public Dimension getPreferredSize()
+					{
+					// we want to be forced to fill the space but not go over
+					return new Dimension(HELP_WIDTH, 0);
+					}
+				};
+			helpPanel.setBorder(
+				BorderFactory.createCompoundBorder(
+					BorderFactory.createMatteBorder(5, 5, 5, 5, pan2.getBackground()),
+					BorderFactory.createCompoundBorder(
+						BorderFactory.createMatteBorder(0, 1, 0, 0, Color.BLACK),
+						BorderFactory.createMatteBorder(0, 5, 0, 0, pan2.getBackground()))));
+
+			//helpPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+			helpPanel.getViewport().setBackground(pan2.getBackground());
+			helpPanel.getVerticalScrollBar().setBackground(pan2.getBackground());
+			helpPanel.getVerticalScrollBar().setOpaque(false);
+    		try 
+    			{
+    			HTMLEditorKit kit = (HTMLEditorKit)(help.getEditorKit());
+    			StyleSheet sheet = kit.getStyleSheet();
+    			}
+    		catch (Exception e)
+    			{
+    			e.printStackTrace();
+    			}
+			}
+    	}
+    
+    boolean showingHelp = false;
+    public void toggleHelpPanel()
+    	{
+    	if (helpPanel == null)
+    		buildHelpPanel();
+    		
+    	if (showingHelp)
+    		{
+    		if (helpPanel != null)
+	    		remove(helpPanel);
+    		}
+    	else
+    		{
+    		if (helpPanel != null)
+    			add(helpPanel, BorderLayout.EAST);
+    		}
+    	revalidate();
+    	showingHelp = !showingHelp;
+    	}
 
     // close box
     static final ImageIcon I_CLOSE = iconFor("BellyButton.png");
@@ -636,5 +737,5 @@ public class ModulePanel extends JPanel implements Transferable
         {
         return (flavor.equals(Rack.moduleflavor));
         }
-        
+
     }
