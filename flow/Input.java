@@ -754,7 +754,12 @@ public class Input
 						sound.setChannel(sm.getChannel());
 					}
             
-				sound.setNote(d);
+				if (microTuning != null) {
+                    sound.setNote(microTuning.freqs[i]);
+				}
+				else {
+					sound.setNote(d);
+				}
 				sound.setMIDINote(i);
 				sound.incrementNoteCounter();
 				sound.setVelocity((double) sm.getData2() / 127.0);
