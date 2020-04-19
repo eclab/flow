@@ -1155,6 +1155,7 @@ return swapPrimary;
                 rack.setMicrotuning(microtuning.isSelected());
                 }
             });
+        microtuning.setEnabled(false);
         return microtuning;
         }
 
@@ -1169,6 +1170,7 @@ return swapPrimary;
                	if (rack.loadMicrotuning())
                		{
                		microtuningMenu.setSelected(true);
+               		microtuningMenu.setEnabled(true);
                		rack.setMicrotuning(true);
                		}
                 }
