@@ -152,19 +152,6 @@ public class MicroTuning
             return -1;
             }
 
-        double getLerpRatio(int midiNum1, int midiNum2, double alpha)
-            {
-            if (!configured)
-                {
-                return 0.0;
-                }
-            double f1 = freqs[midiNum1];
-            double f2 = freqs[midiNum2];
-            double r_above = Math.log(f2 / f1) / Math.log(2);
-            double corrected_r = r_above * alpha;
-            return Math.pow(2, corrected_r);
-            }
-
         void realize(int rootMIDINote, double rootFrequency)
             {
             for (int i = 0; i < 128; i++)
