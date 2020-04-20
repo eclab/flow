@@ -111,8 +111,8 @@ public class AHR extends Modulation implements ModSource
         
     public boolean getSync() { return sync; }
     public void setSync(boolean val) { sync = val; }
-    public void setOneShot(boolean val) { oneshot = val; }
     public boolean getOneShot() { return oneshot; }
+    public void setOneShot(boolean val) { oneshot = val; }
     public int getAttackCurve() { return attackCurve; }
     public void setAttackCurve(int val) { attackCurve = val; }
     public int getReleaseCurve() { return releaseCurve; }
@@ -251,6 +251,11 @@ public class AHR extends Modulation implements ModSource
 
         // What state are we in?
                         
+    	if (tick < start) // uh oh, probably switched to MIDI Sync
+    		{
+    		start = tick;
+    		}
+    
         // if we're in a sticky state, just return the level
         if (state == DONE)
             {
@@ -290,7 +295,7 @@ public class AHR extends Modulation implements ModSource
             firstLevel = level[state - 1];  
 
         double alpha = (tick - start) / interval;
-
+				
         int c = CURVE_LINEAR;
                 
         if (state == ATTACK)

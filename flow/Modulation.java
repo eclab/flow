@@ -595,9 +595,27 @@ public abstract class Modulation implements Cloneable
 
     /** Returns the names of all output modulation ports */
     public String[] getModulationOutputNames() { return modulationOutputNames; }
-        
+    
+    // This little bit of nastiness allows us to print a one-time error if we've received
+    // a request to set a modulation value outside of 0...1, which will bomb all sorts of stuff.
+    // We're doing it this way so that setModulationOutput(...) is still under 35 bytes and therefore
+    // is inlined.
+    static boolean printedModulationOutputError = false;
+    void printModulationOutputError(double val) 
+    	{ 
+    	if (!printedModulationOutputError)
+    		{
+    		printedModulationOutputError = true;
+    		new RuntimeException("Modulation Ouput Set to " + val + "\n This will be printed only once.").printStackTrace();
+    		}
+    	}
+    
     /** Sets the current output value of modulation port INDEX to VAL. */
-    public void setModulationOutput(int index, double val) { modulationOutputs[index] = val; }
+    public void setModulationOutput(int index, double val) 
+    	{
+    	if (val < 0 || val > 1) printModulationOutputError(val);
+    	else modulationOutputs[index] = val; 
+    	}
     
     /** Returns the current output value of modulation port INDEX to VAL. */
     public double getModulationOutput(int index) { return modulationOutputs[index]; }
