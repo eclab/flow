@@ -393,7 +393,9 @@ This procedure will create a bunch of of virtual devices with names like {\tt Vi
 To send audio from Flow to your DAW to be recorded, you'll need a loopback device for audio similar to the one for MIDI.   Once again how you'd make an Audio Loopback device depends on your operating system:
 
 \begin{itemize}
-\item {\bf On the Mac}\quad Unlike for MIDI, there's no built-in audio loopback facility on the Mac.  You'll need to install a program which does audio loopbacks.  There is an open-source driver called {\it SoundFlower}\footnote{https:/\!/github.com/mattingalls/Soundflower/releases/\qquad Note that the GUI installer fails on High Sierra even if you have given permission per the instructions on the website.  But installing via the Terminal seems to work.  Do the following:
+\item {\bf On the Mac}\quad Unlike for MIDI, there's no built-in audio loopback facility on the Mac.  You'll need to install a program which does audio loopbacks.  Here are some options:
+\begin{itemize}
+\item An older open-source driver called {\it SoundFlower}\footnote{https:/\!/github.com/mattingalls/Soundflower/releases/\qquad Note that the GUI installer fails on High Sierra even if you have given permission per the instructions on the website.  But installing via the Terminal seems to work.  Do the following:
 
 \begin{enumerate}
 \item Unpack the {\tt Soundflower-2.0b2.dmg} disk image.
@@ -408,9 +410,11 @@ To send audio from Flow to your DAW to be recorded, you'll need a loopback devic
 \item At this point, SoundFlower 2ch and 64ch will appear as audio devices.  You want SoundFlower 2ch.  You can configure it further in Audio MIDI Setup if you like, or just use it straight.
 \end{enumerate}
 }
-which seems to work fine though with high latency.  If you'd like support and a better user experience, I recommend the commercial product {\it Loopback} by Rogue Amoeba.\footnote{https:/\!/rogueamoeba.com/loopback/}  It works very well, and if you're poor you can try it in unfettered trial mode for about 20 minutes, quit it, and start it again for another 20, etc.   
-{\bf Do not} use the {\it Jack} framework or any tools using it.  Jack breaks all Java Audio applications: you won't be able to run {\name} at all after installing Jack.  And furthermore, Jack's {\it uninstaller} won't remove its files properly and you'll be permanently unable to run anything that needs Java Audio (including {\name}).  {\color{red}\bf Do not install Jack on OS X.}  You will regret it.\footnote{In fact, after I reported this, Jack's administrators seem to be leaning towards eliminating Jack on OS X entirely.  Oh well.  If you screwed up and installed Jack on OS X, the following URL contains a list of all the files you'll need to remove manually (as administrator): https:/\!/github.com/jackaudio/jack2/issues/379}
-
+which works well though with high latency.  
+\item A new open-source driver called {\it BlackHole}\footnote{https:/\!/github.com/ExistentialAudio/BlackHole} which promises low latency.  I have not tested it.
+\item The commercial product {\it Loopback} by Rogue Amoeba, which provides support and good user experience.\footnote{https:/\!/rogueamoeba.com/loopback/}  It works very well, and if you're poor you can try it in unfettered trial mode for about 20 minutes, quit it, and start it again for another 20, etc.   
+\item {\bf Do not} use the {\it Jack} framework or any tools using it.  Jack breaks all Java Audio applications: you won't be able to run {\name} at all after installing Jack.  And furthermore, Jack's {\it uninstaller} won't remove its files properly and you'll be permanently unable to run anything that needs Java Audio (including {\name}).  {\color{red}\bf Do not install Jack on OS X.}  You will regret it.\footnote{In fact, after I reported this, Jack's administrators seem to be leaning towards eliminating Jack on OS X entirely.  Oh well.  If you screwed up and installed Jack on OS X, the following URL contains a list of all the files you'll need to remove manually (as administrator): https:/\!/github.com/jackaudio/jack2/issues/379}
+\end{itemize}
 \end{itemize}
 
 \begin{itemize}
@@ -597,11 +601,27 @@ The {\it On Tr} option restarts the LFO whenever it receives a trigger (as if a 
 
 Keep in mind that gate, velocity, pitch bend, note, and clock information are already passed to all the modules internally; so this is really auxiliary stuff that might be useful for you to hook up.   See also the {\bf NRPN} module, next.
 
+\paragraph{MPE}  A source of Multidimensional Polyphonic Expression (MPE) information.  Modulation sources include:
+
+\begin{itemize}
+\item The most recent attack velocity value, drawn from NOTE ON. This modulation triggers on NOTE ON.
+\item The most recent release velocity value, drawn from NOTE OFF.  The velocity triggers on NOTE OFF.
+\item The pitch bend value.  This value is the actual MIDI bend signal, so extreme bend low is 0.0, extreme bend high is 1.0, and no bend is 0.5.
+\item The current pressure (aftertouch) value, mapped from 0...127 to 0.0...1.0, then modified by the offset and variance below, then bounded to between 0.0 and 1.0.  This responds to both channel and polyphonic pressure.
+\item Pressure offset: this value is added to the pressure.
+\item Pressure variance: this value is multiplied by the pressure (prior to offset).  Also, if the variance is negative, the final pressure value is inverted (subtracted from 1.0).
+\item The current ``Y controller'' (CC 74) value, mapped from 0...127 to 0.0...1.0, then modified by the offset and variance below, then bounded to between 0.0 and 1.0.
+\item Y controller offset: this value is added to the pressure.
+\item Y controller variance: this value is multiplied by the pressure (prior to offset).  Also, if the variance is negative, the final pressure value is inverted (subtracted from 1.0).
+\end{itemize}
+
+The purpose of the offsets and variances is that different controllers issue quite different values for pressure and Y.  Notably the Roli Seaboard has fairly poor offsets for pressure and Y.
+
 \paragraph{NRPN}  A source of MIDI NRPN information.  NRPN works similarly to CC in that it has parameters, each of which can be set to values.  The parameters range from 0...16383 and are set using two numbers: the {\it Most Significant Byte} (MSB) and the {\it Least Significant Byte} (LSB).  Each ranges 0...127.  The parameter number \(\text{P} = \text{MSB} \times 128 + \text{LSB}\).  When you set the MSB and LSB to specific values, to the right of the LSB you'll see the resulting parameter number.  Some synthesizers only use the MSB or the LSB.  
 
 Like parameters, values also can be in the range 0...16383.  {\name} always expects incoming NRPN data in ``Fine'' or ``14-bit'' mode: that is, the whole value range 0...16383 is mapped to modulation values \(0.0\ ...\ 1.0\).  If you need more than 6 NRPNs, just create another NRPN module.\footnote{A technical note.  NRPN data comes in chunks of four different types: MSB, LSB, Increment, and Decrement.  Flow's NRPN module doesn't update its value when it receives an MSB chunk.  It waits until an LSB, Increment, or Decrement shows up.}  See also {\bf MIDIIn}, previous.
 
-\paragraph{PartialMod}  This is an unusual and experimental modulation source.  It takes an input in the form of a set of partials, and a modulation (``Partial'') which indicates {\it which} partial.  Then it outputs as a modulation the value of that partial, bounded to between 0 and 1.  PartialMod can smoothly interpolate between partial values or not.
+%\paragraph{PartialMod}  This is an unusual and experimental modulation source.  It takes an input in the form of a set of partials, and a modulation (``Partial'') which indicates {\it which} partial.  Then it outputs as a modulation the value of that partial, bounded to between 0 and 1.  PartialMod can smoothly interpolate between partial values or not.
 
 %\begin{figure}[t]
 %\begin{center}\includegraphics[width=6in]{ModulationSourcesAndShapers}\end{center}
@@ -612,7 +632,7 @@ Like parameters, values also can be in the range 0...16383.  {\name} always expe
 
 \subsection{Modulation Shapers}
 
-\paragraph{Either/Or}  A switch which chooses among up to four outputs.  You choose the number of outputs with {\it Options}.  Thereafter, whichever output is currently being referenced by the value in {\it Input} will receive the value of {\it Yes}.  All other outputs will receive the value of {\it No}.  Either/Or is particularly useful with {\bf Mix}, where it can be used to zero out the amplitudes of all the mix inputs except for one, allowing you to choose from among several inputs.  See also {\bf Mix}.
+\paragraph{Either/Or}  A switch which chooses among up to four outputs.  You choose the number of outputs with {\it Options}.  Thereafter, whichever output is currently being referenced by the value in {\it Choice} will receive the value of {\it Yes}.  All other outputs will receive the value of {\it No}.  Either/Or is particularly useful with {\bf Mix}, where it can be used to zero out the amplitudes of all the mix inputs except for one, allowing you to choose from among several inputs.  See also {\bf Mix}.
 
 \paragraph{Geiger}  A source of randomness in timing.  When it receives an input {\it Trigger}, Geiger outputs a trigger (and switches from modulation of 0.0 to 1.0 or vice versa) only with a certain random probability.  If {\it Trials} is 1, then the probability is simple: it's just the probability specified by the {\it Prob} dial.  If {\it Trials} is \(>1\), then every time Geiger decides to output a trigger (with the given probability), it instead increments a counter.  When that counter is  \(\geq\){\it Trials}, only then does Geiger output a trigger, and the counter is reset to 0.  The effect of this is that as {\it Trials} is increased, the effective variance between fast and slow intervals is reduced: but you'll also need to increase the rate at which you provide incoming triggers to keep things at about the same speed.\footnote{In case you were interested, Geiger's random number events are using a {\it Negative Binomial Distribution}.  Following https:/\!/en.wikipedia.org/wiki/Negative\_binomial\_distribution\ \ Geiger's Trials dial specifies the {\it r} parameter, and the Prob dial specifies \(1-p\).  When Trials is 1, then this simply the {\it Geometric Distribution}, and following https:/\!/en.wikipedia.org/wiki/Geometric\_distribution the Prob dial specifies the value {\it p}.}  Geiger also has a {\it Seed} for its randomness.  If the Seed is {\it Free} (0), then Geiger uses a nondeterministic random source: otherwise the random sequence is always the same every time a note is played, and that sequence is specified by the Seed.
 
@@ -698,6 +718,8 @@ See also {\bf Waves}, which contains harmonics of single-cycle waves from certai
 
 \paragraph{Drawbars}   Produces the sine wave equivalents of the drawbars of a classic tone wheel organ.  There are a number of preset options.
 
+\paragraph{HarmonicLab}  Allows you to describe a sound as a combination of three mathematical functions operating on your harmonics.  For each of the three, you can define the function type, a function parameter, the gain of the function, and the harmonics the function manipulates.  When multiple functions manipulate the same harmonic, the earlier function takes precedence.  {\bf Important Note 1}\quad Unlike standard constraints menus, PartialLab's constraints menus include ``All'' at the end.  {\bf Important Note 2}\quad This is a costly module if you are modulating any of these values in real time, perhaps by an LFO (there are many calls to \(x^y\)): you can do it, but it'll keep your laptop warm.
+
 \paragraph{Harmonics}  Outputs the first 16 harmonics, whose amplitude you can define independently.  You optionally can load these harmonics from a source. See also {\bf Partials}.
 
 \paragraph{KHarmonics}  Produces a wide range of partials drawn from patches from the Kawai K5 synthesizer, including both factory patches (with Kawai's permission) and various patches in the public domain.  You have the additional option of {\it Normalizing} the partials.  Note that among the harmonics are ones purporting to be drawn from the Kawai K3.  These are just wrong.  However the {\bf Waves} module has the correct ones.
@@ -717,9 +739,7 @@ This module is designed to merge with other sources to add hiss to them: most co
 
 \paragraph{Partials}  Outputs 16 partials whose amplitude and frequency you can define independently.  You optionally can load these partials from a source.  See also {\bf Harmonics}.
 
-\paragraph{PartialLab}  Allows you to describe a sound as a combination of three mathematical functions operating on your harmonics.  For each of the three, you can define the function type, a function parameter, the gain of the function, and the harmonics the function manipulates.  When multiple functions manipulate the same harmonic, the earlier function takes precedence.  {\bf Important Note 1}\quad Unlike standard constraints menus, PartialLab's constraints menus include ``All'' at the end.  {\bf Important Note 2}\quad This is a costly module if you are modulating any of these values in real time, perhaps by an LFO (there are many calls to \(x^y\)): you can do it, but it'll keep your laptop warm.
-
-\paragraph{Rand}  Random partials.  Outputs all partials, standardized, with random amplitudes.  If the {\it Seed} is {\it Free} (0), then the amplitudes are different each gate; otherwise they are the same random values each gate, using a random number generator with the given seed.
+%\paragraph{Rand}  Random partials.  Outputs all partials, standardized, with random amplitudes.  If the {\it Seed} is {\it Free} (0), then the amplitudes are different each gate; otherwise they are the same random values each gate, using a random number generator with the given seed.
 
 \paragraph{Rectified}  The harmonics of a rectified sine wave, that is, \(|\sin(x)|\).
 
@@ -761,10 +781,9 @@ Okay, here we go.
 %\end{figure}
 
 
-\enlargethispage{1em}
-
+\vbox
+{
 \paragraph{Amp Math}  This shaper modifies the partials from two sources \(A\) and \(B\) by putting every pair of them \(\langle A_i, B_i\rangle\) through the same function, along with a modulation source \(M\).  The operations are:
-
 \begin{itemize}
 \item \(\boldsymbol{+}\)\quad Does \(A_i + B_i + M\)
 \item \(\boldsymbol -\)\quad Does \(\max(A_i - B_i - M,\ 0)\)
@@ -788,7 +807,8 @@ Okay, here we go.
 
 You have the option of normalizing the resulting partials.   Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Combine} and {\bf Fill} and {\bf Mix} and {\bf Morph}.
 
-\paragraph{Average}  Computes the average amplitude of all the partials, then nudges the amplitudes of all the partials towards the average.  The amount of nudging is an incoming modulation.  You can specify whether to include the zero-amplitude partials in the average.
+%\paragraph{Average}  Computes the average amplitude of all the partials, then nudges the amplitudes of all the partials towards the average.  The amount of nudging is an incoming modulation.  You can specify whether to include the zero-amplitude partials in the average.
+}
 
 \paragraph{Buffer}  This is a sort of Sample and Hold for partials.  Every time Buffer receives an incoming trigger, it takes a snapshot of its input and uses that snapshot for its output.  Buffer can be constrained, which means that it outputs its snapshot for certain partials, while outputting the current source partials for the remainder.
 
@@ -798,7 +818,7 @@ You have the option of normalizing the resulting partials.   Be sure to read ``M
 
 \paragraph{Delay}  Partials are added to an initial one-shot delay, then a repeated delay.  Each delay has a length (the ``delay'') and a cut (how much to cut down the delayed sound).  You can also specify the wet/dry ratio.
 
-\paragraph{Dilate} If a partial has a neighbor partial which is {\it larger} than it, then its amplitude is increased towards its neighbor: this change trickles down to its further (smaller) neighbors as well.  This has the effect of boosting neighboring partials until ultimately all partials are the same amplitude.  {\it Boost} is the amount to increase.  You can specify whether only left neighbors, right neighbors, or both are considered.  See also {\bf Skeletonize} (which is almost, but not quite, the opposite concept).
+\paragraph{Dilate} If a partial has a neighbor partial which is {\it larger} than it, then its amplitude is increased towards its neighbor: this change trickles down to its further (smaller) neighbors as well.  This has the effect of boosting neighboring partials until ultimately all partials are the same amplitude.  {\it Boost} is the amount to increase.  You can specify whether only lower neighbors, higher neighbors, or both are considered.  See also {\bf Skeletonize} (which is almost, but not quite, the opposite concept).
 
 \paragraph{Fatten}  The top half partials are discarded and reused to create detuned versions of the lower half partials.  The detuning amount is specified as well as the wet/dry ratio.
 
@@ -826,7 +846,7 @@ There are a number of options.  First, you can {\it stretch} the partials to a n
  
 \paragraph{Shift} This shifts all the partials in your input in a certain way.  {\it Shift} specifies by how much (this is easily modulated), and {\it Bound} scales the shifting.  There are three ways you can shift.  First you can shift the {\it Pitch}: this is essentially multiplying the partials by a certain amount.  Second, you can shift the {\it Frequency}: this {\it adds} a certain amount to the partials, which creates an inharmonic shift effect.  Third, you can shift the {\it Partials}: this shifts the whole partial amplitude array up or down.  A warning about partials shifting: this can make abrupt changes in amplitude, and you may hear static-like clicks or pops, especially in low pitches.  You can clean this up by running things through {\bf Smooth} set to about 0.9. See also {\bf Seq}.  Finally, {\it Vibrato} is the same as {\it Pitch}, but with a much smaller bound: at maximum, the bound is one whole step (major second) in each direction.  This makes it easier to dial in precise vibrato amounts.
 
-\paragraph{Linear Filter} This is a filter where you can specify up to 8 nodes (points of change) in terms of frequency and gain.  The filter then just draws lines attaching the nodes, and this becomes the filter frequency function.  Nodes are always sorted first by frequency.  {\it Num Nodes} is the number of nodes being used.
+\paragraph{Linear Filter} This is a filter where you can specify up to 8 nodes (points of change) in terms of frequency and gain.  The filter then just draws lines attaching the nodes, and this becomes the filter frequency function.  Nodes are always sorted first by frequency.  A {\it Base} frequency is added to the frequencies of all the nodes.  {\it Num Nodes} is the number of nodes being used.
 
 Linear Filter can be {\it Relative}.  This means that the filter cutoff frequency is set to be relative to Middle C.  If you're playing a higher note, the cutoff frequency will automatically be set higher to match; similarly if you're playing a lower note, the cutoff frequency will be automatically lower.  See also {\bf Partial Filter}.
 
@@ -868,7 +888,7 @@ Partial Filter can be set to be {\it Relative}.  When relative, the partials are
 
 \paragraph{Scale} This scales the frequency of all the partials but keeps the pitch the same: it ``stretches'' the partials out away from frequency 1.0, or compacts them towards it.  A {\it Scale} value of 0.5 is no scaling: larger values stretch the partials, and smaller values compact them.   See also  {\bf Pitch Shift} and  {\bf Partials Shift}.
 
-\paragraph{Skeletonize} If a partial has a neighbor partial which is {\it larger} than it, then its amplitude is cut by a percentage.  The percentage is a power of the distance of the partial to the peak partial on the left or right, whichever is further.  This has the effect of stripping partials out and only leaving the locally highest partials.  {\it Cut} is the base percentage.  See also {\bf Dilate}, which is almost, but not quite the opposite concept.
+\paragraph{Skeletonize} If a partial has a neighbor partial which is {\it larger} than it, then its amplitude is cut by a percentage.  The percentage is a power of the distance of the partial to the peak partial on the left or right, whichever is further.  This has the effect of stripping partials out and only leaving the locally highest partials.  {\it Cut} is the base percentage.  You can specify whether only lower neighbors, higher neighbors, or both are considered.  See also {\bf Dilate}, which is almost, but not quite the opposite concept.
 
 \paragraph{Smooth} This module smooths over the frequency and amplitude differences between successive sets of partials.  The degree of smoothing is specified by {\it Amount}.  Specifically, it maintains an internal set of Partials \(P\).  At every timestep, it takes the current incoming Partials \(Q\), and sets each amplitude \(A^P_i\) of \(P\) to \(A^P_i = (1-\alpha) A^P_i + \alpha A^Q_i\).  Likewise it sets each frequency \(F^P_i = (1-\alpha) F^P_i + \alpha F^Q_i\), where \(\alpha\) is the Amount.  Smooth has to deal with one unusual case: when the incoming partials of \(Q\) start wandering about in frequency and eventually cross one another.  This creates discontinuities in the smoothing.  Smooth handles this by trying to remember which partials were which; this strategy will work fine if Smooth is fed partials from the {\it first} partials output of any module.  No guarantees are made regarding other partials outputs.  Modules rarely have more than one output, anyway.
 
