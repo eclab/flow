@@ -9,7 +9,6 @@ public abstract class TuningDefinition
     {
         int bases[] = new int[128];
         int detunes[] = new int[128];
-        double freqs[] = new double[128];
         int rootMIDINote = 0;
         double rootFrequency = 1;
         boolean configured;

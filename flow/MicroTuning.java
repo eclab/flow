@@ -3,11 +3,13 @@ package flow;
 import java.io.*;
 import java.util.*;
 
-public class MicroTuning extends TuningDefinition
+public class MicroTuning
     {
         double[] offsets;
         double equivalencyRatio;
+        double freqs[] = new double[128];
         String name;
+        boolean configured = false;
 
         public MicroTuning(Double[] offsets, String name) {
 
@@ -20,7 +22,8 @@ public class MicroTuning extends TuningDefinition
         this.name = name;
         }
 
-	    // (setf lsp-java-format-settings-url "https://gist.githubusercontent.com/StEvUgnIn/2f89559b8aada966817fe95f48c54544/raw/dd11e6fb936dcc35d1590e6ee19fe439971ecd7d/eclipse-formatter.xml")
+        // (setf lsp-java-format-settings-url
+        // "https://gist.githubusercontent.com/StEvUgnIn/2f89559b8aada966817fe95f48c54544/raw/dd11e6fb936dcc35d1590e6ee19fe439971ecd7d/eclipse-formatter.xml")
         // (setf lsp-java-format-settings-profile "Whitesmiths")
         public static MicroTuning fromScalaFile(File scalaFile,
                 double rootFrequency, int rootNote) throws FileNotFoundException
@@ -166,14 +169,10 @@ public class MicroTuning extends TuningDefinition
             {
             for (int i = 0; i < 128; i++)
                 {
-                setNoteFrequency(i,
-                        getFrequency(i, rootMIDINote, rootFrequency));
-                }
-            }
 
-        public String getMenuName()
-            {
-            return name;
+                freqs[i] = getFrequency(i, rootMIDINote, rootFrequency);
+                }
+            configured = true;
             }
 
     }
