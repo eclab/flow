@@ -105,7 +105,7 @@ public class Rotate extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ONE, Constant.ZERO }, new String[] { "Rotate", "Upper", "Lower", "Thin" });
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ONE, Constant.ZERO, Constant.ZERO }, new String[] { "Rotate", "Upper", "Lower", "Thin" });
         defineOptions(new String[] { "Stretch", "Window", "Center", "Solo" }, new String[][] { { "None", "x^2", "x^4", "x^8", "x^16"}, { "None", "Tri", "x^2", "x^4", "x^8", "x^16", "x^32", "x^64", "x^128" }, { "Center" }, { "Solo" } } );
         }
     
