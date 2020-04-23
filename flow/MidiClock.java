@@ -25,7 +25,7 @@ public class MidiClock
     public MidiClock(Input input)
         {
         this.input = input;
-        System.err.println("STATE: " + state);
+        //System.err.println("STATE: " + state);
         }
         
     boolean syncing = false;
