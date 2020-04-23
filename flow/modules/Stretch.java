@@ -7,7 +7,9 @@ package flow.modules;
 import flow.*;
 
 /**
-   A Unit which stretches the frequency of partials away from a specific numbered partial.
+   A Unit which either stretches the frequency of partials away from a specific numbered partial,
+   or squishes it towards that partial.
+   
    The stretching function can be linear, squared, or cubed.  Additionally, if the
    function is not FREE, then the stretching is bounded so that the most extreme partials
    at each end stay fixed to their former positions; this has the effect of squeezing the
@@ -49,18 +51,23 @@ public class Stretch extends Unit
     int style = STYLE_X_LOCKED;
     public void setStyle(int val) { style = val; }
     public int getStyle() { return style; }
+    
+    boolean squish = false;
+    public void setSquish(boolean val) { squish = val; }
+    public boolean getSquish() { return squish; }
 
     public Stretch(Sound sound) 
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ZERO }, 
-            new String[] { "Amount", "Max Amount", "Partial" });
-        defineOptions(new String[] { "Style", "Largest" }, new String[][] { STYLES, { "Largest" } } );
+            new String[] { "Amount", "Max Stretch", "Partial" });
+        defineOptions(new String[] { "Style", "Largest", "Squish" }, new String[][] { STYLES, { "Largest" }, { "Squish" } } );
         }
         
     public static final int OPTION_STYLE = 0;
     public static final int OPTION_TARGET = 1;
+    public static final int OPTION_SQUISH = 2;
 
     public int getOptionValue(int option) 
         { 
@@ -68,6 +75,7 @@ public class Stretch extends Unit
             {
             case OPTION_STYLE: return getStyle();
             case OPTION_TARGET: return getTarget();
+            case OPTION_SQUISH: return getSquish() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -78,6 +86,7 @@ public class Stretch extends Unit
             {
             case OPTION_STYLE: setStyle(value); return;
             case OPTION_TARGET: setTarget(value); return;
+            case OPTION_SQUISH: setSquish(value == 1); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -127,6 +136,8 @@ public class Stretch extends Unit
         
         boolean locked = (style == STYLE_X_LOCKED || style == STYLE_X_TIMES_X_LOCKED || style == STYLE_X_TIMES_X_TIMES_X_LOCKED);
 
+		boolean squished = getSquish();
+		
         for(int i = 0; i < frequencies.length; i++)
             {
             double m = mod;
@@ -153,7 +164,14 @@ public class Stretch extends Unit
                 m = m * alpha;
                 }
 
-            frequencies[i] = (maxStretch * frequencies[i] - targetFreq) * m + frequencies[i] * (1.0 - m);
+            if (squished)
+            	{
+	            frequencies[i] = targetFreq * m + frequencies[i] * (1.0 - m);
+	            }
+	        else
+	        	{
+	            frequencies[i] = (maxStretch * frequencies[i] - targetFreq) * m + frequencies[i] * (1.0 - m);
+	            }
             }
 
         if (constrain()) simpleSort(0, true);
