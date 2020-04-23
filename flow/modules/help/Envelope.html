@@ -1,0 +1,38 @@
+A general-purpose envelope with many stages.  Envelope contains stages in three regions: the <b>Pre-Sustain</b> region, the <b>Sustain</b> region, and the <b>Release</b> (or Post-Sustain</b>) region.  When the envelope is triggered, it moves through its pre-sustain stages, then it optionally loops through its sustain stages until Note Off occurs, at which point it moves through its Release stages.
+
+<dl>
+<dt>Start
+<dd>The initial level to start at
+<dt>Pre <i>n</i> ... Level
+<dd>The time to progress through stage <i>n</i>, and the level reached at the end of the stage.  If the time is <b>off</b>, the stage is skipped.
+<dt>Sus <i>n</i> ... Level
+<dd>The time to progress through stage <i>n</i>, and the level reached at the end of the stage.  If the time is <b>off</b>, the stage is skipped.
+<dt>Rel <i>n</i> ... Level
+<dd>The time to progress through stage <i>n</i>, and the level reached at the end of the stage.  If the time is <b>off</b>, the stage is skipped.
+<dt>On Tr
+<dd>Triggers the Note-On trigger.  Otherwise, a NOTE ON event performs this trigger.
+<dt>Off Tr
+<dd>Triggers the Note-Off trigger.  Otherwise, a NOTE OFF event performs this trigger. 
+<dt>Curve
+<dd>The curve taken by all stages.  See the manual for a description of the available curves.
+<dt>Type
+<dd>
+<dl>
+<dt>Sustain
+<dd>The sustain region works through the sustain stages, then stays at the end of the final one.
+<dt>Sustain Loop
+<dd>The sustain region loops through its stages.
+<dt>One Shot
+<dd>The envelope works its way through all stages, with no looping, regardless of any Note Off event.
+<dt>Play Through
+<dd>The envelope works its way through all stages, with no looping, but on Note Off it skips forward to the release stages if it has not reached them yet.
+<dt>Loop w/Rel (Loop with Release)
+<dd>The envelope loops through all stages, and stops looping on Note Off
+<dt>Loop
+<dd>The envelope loops through all stages forever.  It resets to the first stage on Note On.
+</dl>
+<dt>Gate Reset
+<dd>When a Note On occurs, the envelope immediately resets to the Start level.  Otherwise the envelope starts from whatever level it is currently at (the default).
+<dt>MIDI Sync
+<dd>Delay, Attack, Decay, and Release times assume that we are playing at 120 BPM.  If MIDI sync is faster (or slower), these times will be correspondingly faster (or slower).
+</dl>

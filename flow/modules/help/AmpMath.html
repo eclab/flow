@@ -1,0 +1,51 @@
+Bulk amplitude manipulation of partials, by combining the amplitudes of two incoming partial sources.
+
+<dl>
+<dt>Input A
+<dd>The first partial source.
+<dt>Input B
+<dd>The second partial source.
+<dt>Scale
+<dd>A scalar value S.
+<dt>Operation
+<dd>The manipulation to perform:
+<dd>
+<dl>
+<dt>+
+<dd>A + B + S
+<dt>-
+<dd>max(A - B - B, 0)
+<dt>x
+<dd>A x B
+<dt>inv x 
+<dd>A x (1 - B)
+<dt>compress
+<dd>1 - (1 - A) x (1 - B)
+<dt>average
+<dd> S x A + (1 - S) x B
+<dt>min
+<dd>min(A x (1 - S), B)
+<dt>max
+<dd>max(A, (1 - S), B)
+<dt>filter
+<dd>If B &lt; S then 0 else A
+<dt>filternot
+<dd>If B >= S then 0 else A
+<dt>fill
+<dd>If A > S then A else B
+<dt>threshold
+<dd>If A > S then 1 else 0
+<dt>scaledown
+<dd>A x S + B, (Scales A in the range 0...1)
+<dt>scaleup
+<dd>A x (S + 1) + B (Scales A in the range 1...2)
+<dt>scalefar
+<dd>A x (S + 9) + B (Scales A in the range 1...10)
+<dt>clampdown
+<dd>min(A, S) + B
+<dt>clampup
+<dd>max(A, S) + B
+</dl>
+<dt>Normalize
+<dd>Normalizes the result after the operation.
+</dl>

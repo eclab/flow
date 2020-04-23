@@ -1,0 +1,24 @@
+A step sequencer.
+
+<p>Seq outputs a different modulation value every step.  Steps are advanced when it receives a trigger. Seq's output can be attached to Shift's shift input, and when Shift is set to Pitch, Seq can be used to change note values as well.
+
+<dl>
+<dt>1 ... 32
+<dd>The value to output when the trigger reaches the given step.   When connecting to Shift, you can select the right modulation output to correspond to a note by double-clicking on the step dial and selecting a note.
+<dt>Steps
+<dd>The number of steps.  Steps beyond this number are ignored.
+<dt>Trigger
+<dd>When a trigger is received here, Seq advances to the next step.  A good source of triggers would be an LFO.
+<dt>Change
+<dd>How the step shifts from one sequence to the next.  See the manual for a description of the various curves.  The modulation signal provided to the Trigger specifies where in this curve Seq should be at any time.  To do this right, attach an LFO to the Trigger and set the LFO to Saw Up.  If you're outputting notes, it'd be best also to turn off Free on the LFO.
+<dt>Free
+<dd>The sequencer ignores both Note On and Note Off.  Otherwise it resets on Note Off and obeys Stop on Release.
+<dt>Stop on Release
+<dd>The sequencer stops on Note Off.
+<dt>Sample
+<dd>The sequencer samples the current step value and immediately transitions to it (as opposed to constantly adjusting if the step value is modified in real-time).  The Trigger value is ignored, and so is Change.
+<dt>Guided
+<dd>The incoming value to Trigger doesn't specify the Change curve, but rather specifies which step to move to.
+<dt>Display
+<dd>A little red dot is displayed to show which step is being played.  This is computationally costly, so turn it off when it's not needed.
+</dl>

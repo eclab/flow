@@ -1,0 +1,104 @@
+Functions on two modulation signals, as well as functions on their triggers.
+
+<dl>
+<dt>Signal A and B
+<dd>The two input signals
+<dt>Operation
+<dd>This is the output function of A and B's signals.
+<dl>
+<dt>+
+<dd>min(A + B, 1)
+<dt>-
+<dd>max(A - B, 0).  By setting A = 0, you can use this to negate B.
+<dt>x
+<dd>A x B
+<dt>min
+<dd>min(A, B)
+<dt>max
+<dd>max(A, B)
+<dt>square
+<dd>min(A x A + B, 1)
+<dt>sqrt
+<dd>min(sqrt(A) + B, 1)
+<dt>cube
+<dd>min(A x A x A + B, 1)
+<dt>discretize
+<dd>Discretizes A, using B to set the amount of discretization (from 1 to 128 chunks).
+<dt>map hi
+<dd>A x (1 - B) + B
+<dt>average
+<dd>(A + B) / 2
+<dt>threshold
+<dd>If A >= B, 1 else 0
+<dt>switch
+<dd>If B was more recently triggered than A, then B else A
+
+</dl>
+<dt>Trigger On
+<dd>This indicates how the output should trigger wh
+en receiving triggers from A and/or B.
+<dl>
+<dt>A
+<dd>Triggers on A's trigger only
+<dt>A or B
+<dd>Triggers on A's trigger or B's trigger
+<dt>A and B
+<dd>Trigger only when A and B trigger simultaneously
+<dt>A and not B
+<dd>Trigger only when A is triggering but not B
+<dt>2 A ... 192 A
+<dd>A rate divider.  Triggers every <i>n</i> triggers of A.  This is particularly useful in conjunction with MIDI Clock information from the MIDI In module.
+<dt>dir
+<dd>Triggers when A's value changes direction.
+<dt>center
+<dd>Triggers when A's value crosses the center line (0.5).
+</dl>
+
+<h3>Dividing a Clock Pulse</h3>
+
+If you're dividing the trigger, the following table might be useful:
+
+<dl>
+<dt> 1
+<dd> Eighth Triplet (Triplet 64th Note)
+<dt> 2
+<dd> Quarter Triplet (Triplet 32nd Note)
+<dt> 3
+<dd> Thirty-Second Note
+<dt> 4
+<dd> Half Triplet (Triplet 16th Note)
+<dt> 6
+<dd> Sixteenth Note 
+<dt> 8
+<dd> Triplet
+<dt> 12
+<dd> Eighth Note
+<dt> 16
+<dd> Quarter Note Triplet 
+<dt> 18
+<dd> Dotted Eighth Note 
+<dt> 24
+<dd> Quarter Note
+<dt> 32
+<dd> Half Note Triplet
+<dt> 36
+<dd> Dotted Quarter Note
+<dt> 48
+<dd> Half Note
+<dt> 64
+<dd> Whole Note Triplet 
+<dt> 72
+<dd> Dotted Half Note
+<dt> 96 
+<dd> Whole Note
+<dt> 144
+<dd> Dotted Whole Note
+<dt> 192 
+<dd> Double Whole Note
+</dl>
+
+
+
+
+</dl>
+

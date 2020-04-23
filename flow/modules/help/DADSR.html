@@ -1,0 +1,34 @@
+A Decay-Attack-Delay-Sustain-Release envelope.
+
+<dl>
+<dt>Delay Time
+<dd>The amount of time taken to delay before starting the attack.
+<dt>Delay Level
+<dd>The level reached at the end of the Delay stage.
+<dt>Attack Time
+<dd>Time taken during the attack stage.
+<dt>Attack Level
+<dd>Level reached at the end of the attack stage.
+<dt>Decay Time
+<dd>Time taken duing the decay stage.
+<dt>Sustain Level
+<dd>Level to which the envelope decays.  The envelope then holds at the sustain level until a NOTE OFF occurs or a Note-Off trigger fires.
+<dt>Release Time
+<dd>Time take during the release stage.
+<dt>Release Level
+<dd>Level to which release decays.
+<dt>On Tr
+<dd>Triggers the Note-On trigger.  Otherwise, a NOTE ON event performs this trigger.
+<dt>Off Tr
+<dd>Triggers the Note-Off trigger.  Otherwise, a NOTE OFF event performs this trigger. 
+<dt>Curve
+<dd>The curve taken by the attack, decay, and release.  See the manual for a description of the available curves.
+<dt>One Shot
+<dd>If the Note Off trigger is received, it is ignored: the envelope will attack, then decay to sustain, then immediately release on its own.
+<dt>Gate Reset
+<dd>When a Note On occurs, the envelope immediately resets to the Release level.  Otherwise the envelope starts from whatever level it is currently at (the default).
+<dt>MIDI Sync
+<dd>Delay, Attack, Decay, and Release times assume that we are playing at 120 BPM.  If MIDI sync is faster (or slower), these times will be correspondingly faster (or slower).
+<dt>Fast Release
+<dd>If during the Decay stage a Note Off trigger occurs, the release stage is entered immediately.  Otherwise it is entered when the Decay stage has completed (the default).
+</dl>

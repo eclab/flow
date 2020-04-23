@@ -1,0 +1,25 @@
+Stretches the partials either <b>away from</b> or <b>toward</b> a specific target partial.
+
+
+<p>When there are more than two inputs, the Interpolation knob starts by interpolating between the first two: but when it reaches 1.0, it begins interpolating between the second and third.  When it reaches 0.0 it begins interpolating between the third and fourth, and so on.
+
+<p>Morph's interpolation is computed as follows.  We take the first partial from both active sources, and produce a partial which is a weighted average of the two both in terms of frequency and amplitude.  Then we do this for the second partial, and so on.
+
+<p>Morph doesn't just pair up the #1 partials and then the #2 partials, etc.  It can also map the partials to each other in complex ways.
+
+<dl>
+<dt>Input
+<dd>The input source to stretch.
+<dt>Amount
+<dd>The degree of stretching.
+<dt>Max Amount
+<dd>The maximum amount of stretching (away only).
+<dt>Partial
+<dd>The partial to stretch towards or away from.
+<dt>Style
+<dd>How stretching occurs.  Stretching can be linear (x), squared (x^2), or cubed (x^3), where x is the distance between a partial and the target partial.  In the "free" versions, partials may freely stretch to/away from the target partial.  In the "non-free" versions, partials are constrained so that they are "attached" to the partial bounds, like a spring.
+<dt>Largest
+<dd>The target is the largest possible partial, not one specified by the Partial dial.
+<dt>Squish
+<dd>Stretch towards the target partial rather than away.
+</dl>

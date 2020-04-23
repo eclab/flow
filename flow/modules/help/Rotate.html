@@ -1,0 +1,24 @@
+Shifts a set of partials up or down, wrapping partials beyond a certain boundary to the other side.  This creates a barber-pole effect.
+
+<dl>
+<dt>Input
+<dd>The input partials source.
+<dt>Rotate
+<dd>Degree of rotation from 0.0 to 1.0 (a full period).
+<dt>Upper
+<dd>The upper boundary: the highest frequency. If t
+he upper boundary is less than the lower boundary,
+the two are swapped.
+<dt>Lower
+<dd>The lower boundary: the lowest frequency.  If the upper boundary is less than the lower boundary, the two are swapped.
+<dt>Thin
+<dd>Thins out partials from the source.
+<dt>Stretch
+<dd>Stretches the frequencies of the partials prior to rotation.  
+<dt>Window
+<dd>Windows the amplitudes of the partials prior to rotation.
+<dt>Center
+<dd>Place the peak of the stretching in the center (and symmetric) as opposed to the lower boundary.
+<dt>Solo
+<dd>Mute all partials outside the boundaries.
+</dl>

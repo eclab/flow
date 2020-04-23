@@ -1,0 +1,18 @@
+Maps a signal to between a set of bounds.  
+
+<p>In normal configuration, the incoming signal is mapped so that 0.0 ... 1.0 maps to A ... B and is then output.  That is, for a given input x, the output y = A + (B - A) * x.
+
+<dl>
+<dt>Signal
+<dd>The original input.
+<dt>Bound A
+<dd>The first bound.
+<dt>Bound B
+<dd>The second bound.
+<dt>Inverse
+<dd>Instead of mapping 0.0 ... 1.0 -> A ... B, the converse is true: A ... B is mapped to 0.0 ... 1.0.You can use Inverse to un-map a value mapped by an earlier Map.
+<dt>Flip
+<dd>The input signal is flipped (subtracted from 1.0) prior to mapping.
+<dt>Center
+<dd>Instead of defining A and B directly, we define a <b>Center</b> and a <b>Variance</b> (and the dials change accordingly).  Thus A = min(0, Center - Variance) and B = max(Center + Variance) 
+</dl>

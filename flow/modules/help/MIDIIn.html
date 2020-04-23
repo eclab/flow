@@ -1,0 +1,20 @@
+Auxiliary MIDI input information.
+
+<dl>
+<dt>Gate
+<dd>0 when Note Off, 1 when Note On.  Trigger occurs on Note On.
+<dt>Note
+<dd>The pitch of the most recent MIDI Note.  0.0 ... 1.0 maps to MIDI note 0...127.  Trigger occurs on Note On.
+<dt>Velocity
+<dd>The most recent attack (Note On) velocity value.  0.0 ... 1.0 maps to MIDI velocity 0...127.  Trigger occurs on Note On
+<dt>Release
+<dd>The most recent release (Note Off) velocity value.  0.0 ... 1.0 maps to MIDI velocity 0...127.  Trigger occurs on Note Off
+<dt>Pressure
+<dd>The current pressure (aftertouch) value. This responds to both channel and poly pressure.  0.0 ... 1.0 maps to MIDI velocity 0...127. 
+<dt>Clock
+<dd>MIDI Clock.  This triggers every single MIDI clock pulse.  When the clock is running, the value is 1.0, else 0.0.   When a MIDI START message is received, the clock will also go to 0.0 prior to the first pulse (at which point the clock is considered running, so it goes to 1.0). You will probably need to divide the MIDI clock pulse to something more useful for your purposes: for example getting a trigger every beat (every 24 pulses). To do something like this, try using the Trigger 2A through Trigger 192A options in the Mod Math module.
+<dt>Bend
+<dd>Current pitch bend information.  0.0 ... 1.0 maps to extreme bend low (-8192) to extreme bend high (8191).  No bend is 0.5.
+<dt>CC <i>n</i> (eight of them)
+<dd>The dial sets the CC parameter.  The output is the current value at that parameter, with 0...127 mapped to 0.0 ... 1.0.  Trigger occurs when the CC value changes.  CC values 6, 38, 98, 99, 100, and 101 are invalid: they are used by Flow for NRPN.  If you need more than 8 CCs, just use a second MIDIIn module.
+</dl>

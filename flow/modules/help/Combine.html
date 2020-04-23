@@ -1,0 +1,16 @@
+Combines the partials of two input sources.
+
+<p>This throws all the partials together and removes the highest frequency half of them, leaving the remainder.
+
+<p>This module has a constraints facility (at its bottom): this facility constrains to the first input only.
+
+<dl>
+<dt>Input A and Input B
+<dd>The two inputs
+<dt>Scale A and Scale B
+<dd>Scales the amplitudes of the two inputs prior to combining them.
+<dt>Merge
+<dd>If two partials have identical frequencies, they are treated as a single partial whose amplitude is their sum.  This allows more unique partials to be included but can create pops if partials move about and merge into one another.
+<dt>Half
+<dd>Half of the partials of each source are guaranteed to be in the final result.  This is done by eliminating the highest frequency partials of each input <i>first</i>, then combining them.
+</dl>

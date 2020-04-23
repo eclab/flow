@@ -1,0 +1,23 @@
+A filter based on linear interpolation among another set of partials.
+
+<p>The idea is that each partial in the <b>Partials</b> port represents a peak or valley of a filter function: you can think of these partials as frequency value sliders in an equalizer, with their amplitudes being the gains.
+
+<dl>
+<dt>Input
+<dd>The partials to be filtered.
+<dt>Partials
+<dd>The partials to do the filtering.
+<dt>Frequencies
+<dd>How the partials are positioned in frequency.
+<dl>
+<dt>Relative
+<dd>The partials are at the frequency expected given the current pitch.
+<dt>Fixed
+<dd>The partials are spaced so that the fundamental represents 0Hz, the next harmonic would be 100Hz, the next would be 200Hz, and so on.  Partials less than the fundamental are ignored.
+<dt>Double
+<dd>The partials are spaced so that the fundamental
+ represents 0Hz, the next harmonic would be 200Hz,
+the next would be 400Hz, and so on.  Partials less
+than the fundamental are ignored.
+</dl>
+</dl>

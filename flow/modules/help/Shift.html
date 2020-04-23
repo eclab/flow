@@ -1,0 +1,22 @@
+Shifts the pitch, frequency, or partial position of a set of partials.
+
+<dl>
+<dt>Input
+<dd>The input partials to shift.
+<dt>Shift
+<dd>Shifts the pitch, frequency, or partial position.  Shift can be positive or negative.
+<dt>Bound
+<dd>The maximum range of the shift modulation.
+<dt>Type
+<dd>
+<dl>
+<dt>Pitch
+<dd>Shift by pitch.  This changes the frequency of the partials exponentially.  You can shift by up to several octaves.  This can be used in combination with the Seq module to change note pitches: see the Help panel of the Seq module.
+<dt>Frequency
+<dd>Shift by pitch.  This simply adds a constant value to the frequency of all the partials.
+<dt>Partials
+<dd>Shift by partials.  This moves each partial frequency up (or down) to the frequency value occupied by the neighboring partial
+<dt>Vibrato
+<dd>Shift by pitch, but by a much smaller amount (at most a half step in each direction).  This can be used with an LFO to provide a small amount of vibrato.
+</dl>
+</dl>

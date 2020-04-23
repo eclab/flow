@@ -1,0 +1,20 @@
+Adds random jitter noise to the frequencies and amplitudes of partials.
+
+<p>Jitter only adds noise when receiving a trigger and on NOTE ON.  Each time it receives a trigger it changes the noise provided.
+
+<dl>
+<dt>Input
+<dd>The partials input
+<dt>Freq Var
+<dd>The degree of jitter noise applied to the frequencies of the partials.
+<dt>Amp Var
+<dd>The degree of jitter noise applied to the amplitudes of the partials.
+<dt>Trigger
+<dd>Tiggers the module to change its jitter noise
+<dt>Seed
+<dd>The random number seed for the jitter.  This allows the jitter pattern to be exactly the same (deterministic) each time you press a note.  Alternatively you can set the seed to Free, which makes the pattern nondeterministic.  Free is particularly useful if you want new jitter every time you press a note.
+<dt>Non-Zero
+<dd>Jitter is only applied to non-zero amplitude partials.  This is useful when combining Jitter with Fill.
+<dt>Amp Ratio
+<dd>The amplitude jitter should be proportional to the current amplitude value, as opposed to just fixed random noise.
+</dl>

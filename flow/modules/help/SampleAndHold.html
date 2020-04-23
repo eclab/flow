@@ -1,0 +1,17 @@
+Takes an incoming modulation signal and a trigger, and samples the signal when triggered, outputting only that sample.  
+
+<dl>
+<dt>Signal
+<dd>The incoming signal to sample.
+<dt>Trigger
+<dd>When a trigger is received here, the sample is taken.
+<dt>Type
+<dd>
+<dl>
+<dt>S &amp; H
+<dd> Sample and Hold mode only.  On receiving a trigger, samples the signal and outputs that value until the next trigger, when it resamples etc.
+<dt>T &amp; H
+<dd>Track and Hold mode.  The trigger toggles between Sample and Hold Mode, or letting it pass through normally.  When a gate is received, we start in Sample and Hold Mode.
+<dt>T &amp; H 2
+<dd>Track and Hold mode #2.  The trigger toggles between Sample and Hold Mode, or letting it pass through normally.  When a gate is received, we start passing through normally.
+</dl>

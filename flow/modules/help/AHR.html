@@ -1,0 +1,29 @@
+An Attack-Hold-Release envelope.
+
+<dl>
+<dt>Start Level
+<dd>The level at which the envelope begins on trigger, and also the level at which the release ends.
+<dt>Attack Time
+<dd>Time taken during the attack period.
+<dt>Attack Level
+<dd>Level reached at the end of the attack period.
+<dt>Hold Time
+<dd>Time taken duing the hold period.  The level stays the same.
+<dt>Release Time
+<dd>Time take during the release period.
+<dt>On Tr
+<dd>Triggers the Note-On trigger.  Otherwise, a NOTE ON event performs this trigger.
+<dt>Off Tr
+<dd>Triggers the Note-Off trigger.  Otherwise, a NOTE OFF event performs this trigger. 
+<dt>Attack Curve
+<dd>The curve taken by the attack.  See the manual for a description of the available curves.
+<dt>Release Curve
+<dd>The curve taken by the attack.  See the manual for a de
+scription of the available curves.
+<dt>One Shot
+<dd>If the Note Off trigger is received, it is ignored: the release will only occur after the attack and hold times have expired.
+<dt>MIDI Sync
+<dd>Attack, Hold, and Release times assume that we are playing at 120 BPM.  If MIDI sync is faster (or slower), these times will be correspondingly faster (or slower).
+<dt>Ramp
+<dd>The envelope only attacks: it does not release.
+</dl>

@@ -1,0 +1,49 @@
+A Low Frequency Oscillator.  When the oscillator completes one period, it issues a trigger.
+
+<dl>
+<dt>Rate
+<dd>The speed of the oscillator (the length of its period).
+If you double-click on the rate, the menu that pops up will tell you the proper rate to set for different notes when under MIDI Sync.
+<dt>Phase
+<dd>The phase of the oscillator, from 0 (0.0) to 2 Pi (1.0)
+<dt>Scale
+<dd>The wave amplitude.
+<dt>Shift
+<dd>The wave's DC offset.  The LFO does not exceed 0.0 or 1.0, so it is clipped if the offset causes it to exceed those bounds.
+<dt>Variance
+<dd>The size of the random jumps made by the oscillator when the oscillator type is set to Random or to Rnd S&H.  
+<dt>Seed
+<dd>The random seed used for the random jumps when the oscillator type is set to Random or to Rnd S&H.  The seed guarantees that the random sequence is the same each time you press a new note.  If you want it to be different every time, set the seed to Free.
+<dt>On Tr
+<dd>Replaces the Note On trigger with one provided by this input.
+<dt>Type
+<dd>
+<dl>
+<dt>Sine
+<dd>Sine wave
+<dt>Triangle
+<dd>Triangle wave
+<dt>Square
+<dd>Square wave
+<dt>Saw Up
+<dd>Ramp wave
+<dt>Random
+<dd>A random wave.  When the wave concludes its period, a new random target value is selected.  Then during the next period the wave moves linearly to that new target value.  This target value is chosen from within the range defined by the Scale, centered at the Shift position.  The Variance defines the degree to which the target value will deviate from the current value.  A small variance makes a smooth random oscillator; a large variance causes more disruptive jumps.
+<dt>Rnd S&H
+<dd>A random wave.  This is the same as Random, except that when a new random target value is selected, the wave immediately adopts it, rather than moving to it smoothly.
+<dd>
+</dl>
+<dt>Free
+<dd>The LFO is not reset on a Note On event.
+<dt>Invert
+<dd>The LFO wave is flipped.
+<dt>Half Trigger
+<dd>The LFO issues a trigger both at the end of a period and half-way in the period.
+<dt>Linear Rate
+<dd>When an incoming modulation signal is attached to the Rate dial, it changes the Rate value linearly rather than (as is normal) exponentially.  This does not effect manual changes to the dial, which are always exponential.
+<dt>MIDI Sync
+<dd>The period rate assumes that we are playing at 120 BPM.  If MIDI sync is faster (or slower), this rate will be correspondingly faster (or slower).  The Rate dial's pop-up menu has useful note speeds when under MIDI Sync. 
+<dt>Init Trigger
+<dd>When a Note on event occurs, or the synthesizer is reset, a Trigger is issued at the start of the very first wave.
+</dl>
+

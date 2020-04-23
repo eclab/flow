@@ -1,0 +1,16 @@
+Outputs partials from wavetable.
+
+<p>Traditionaly a wavetable is a list of single-cycle waves, and you can modulate which wave is being outputted.  Flow doesn't have waves: instead Flow's wavetable is a list of sets f partials: the effect is the same.
+
+<p>The Wavetable module can load wavetables from .WAV files.  A good source of these files is <b>waveeditonline.com</b>  You can also load a raw sound sample as a .WAV file, and it will be treated as a wavetable, creating a vocoder effect.
+
+<dl>
+<dt>Position
+<dd>Where in the wavetable we should select the wave to output.
+<dt>Interpolate
+<dd>If the position specified is in between two waves, should we output a wave that is the interpolation (average) of the two, or should we just output the wave that is nearest?
+<dt>Wavetable...
+<dd>Loads the wavetable
+<dt>Sample...
+<dd>Loads a sample as if it were wavetable.  This does some additional smoothing on the sample to convert it appropriately.
+</dl>

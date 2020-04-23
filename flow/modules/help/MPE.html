@@ -1,0 +1,23 @@
+Multidimensional Polyphonic Expression (MPE) input information.
+
+<dl>
+<dt>Velocity
+<dd>The most recent attack (Note On) velocity value.  0.0 ... 1.0 maps to MIDI velocity 0...127.  Trigger occurs on Note On
+<dt>Release
+<dd>The most recent release (Note Off) velocity value.  0.0 ... 1.0 maps to MIDI velocity 0...127.  Trigger occurs on Note Off
+<dd>Current pitch bend information.  0.0 ... 1.0 ma
+ps to extreme bend low (-8192) to extreme bend high
+ (8191).  No bend is 0.5.
+<dt>Pressure
+<dd>The current pressure (aftertouch) value, mapped from 0...127 to 0.0...1.0, then modified by the offset and variance below, then bounded to between 0.0 and 1.0.  This responds to both channel and polyphonic pressure.
+<dt>(Pressure) Offset
+<dd>This value is added to the pressure.
+<dt>(Pressure) Variance
+<dd>This value is multiplied by the pressure (prior to offset).  Also, if the variance is negative, the final pressure value is inverted (subtracted from 1.0).
+<dt>Y (CC 74)
+<dd>The current "Y controller" (CC 74) value, mapped from 0...127 to 0.0...1.0, then modified by the offset and variance below, then bounded to between 0.0 and 1.0.
+<dt>(Y) Offset
+<dd>This value is added to the pressure.
+<dt>(Y) Variance
+<dd>This value is multiplied by the pressure (prior to offset).  Also, if the variance is negative, the final pressure value is inverted (subtracted from 1.0)
+</dl>

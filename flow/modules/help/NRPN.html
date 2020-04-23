@@ -1,0 +1,14 @@
+Modulation sources arriving by external NRPN signals.
+
+<p>Flow responds to NRPN, and you can use it for any purpose you like.   If you need more than eight incoming NRPN signals, just add an additional NRPN module.
+
+<p>Each NRPN parameter has three ports: an <b>MSB</b> dial, an <b>LSB</b> dial, and an output port (to the right of the MSB).  You specify the parameter number as a combination of the MSB and LSB, and the most recent value is output at the port.
+
+<dl>
+<dt>MSB
+<dd>Specifies the MSB of an NRPN parameter number.  The parameter number is equal to 128 * MSB + LSB.  This value is shown to the right of the LSB.
+<dt>LSB
+<dd>Specifies the LSB of an NRPN parameter number.  The parameter number is equal to 128 * MSB + LSB.  This value is shown to the right of the LSB.
+<dt>[Output] (to right of MSB)
+<dd>This provides the most recent value arriving on the given parameter.
+</dl>
