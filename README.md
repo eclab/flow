@@ -8,13 +8,16 @@ By Sean Luke (sean@cs.gmu.edu) \
 With Help from Bryan Hoyle \
 Copyright 2018 by George Mason University
 
-I (Sean) have been asked where my Patreon page is.  So, sure, here's my <a href="https://www.patreon.com/SeanLuke">Patreon page</a>.
-
 Related projects:  
 
 * [Edisyn](https://github.com/eclab/edisyn), a patch editor toolkit with sophisticated exploration tools.
 * [Gizmo](https://cs.gmu.edu/~sean/projects/gizmo/), an Arduino-based MIDI Swiss Army knife.
 * [*Computational Music Synthesis*](https://cs.gmu.edu/~sean/book/synthesis/), an open-content book on building software synthesizers.
+
+## Donations
+
+Donations are welcome via Paypal.
+
 
 ## About
 
