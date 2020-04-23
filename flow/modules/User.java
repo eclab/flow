@@ -30,11 +30,13 @@ public class User extends Modulation implements ModSource
     private static final long serialVersionUID = 1;
 
     public static final int NUM_MODULATIONS = 4;
+    
+    public static final String[] MODULATION_NAMES =   new String[] { "A", "B", "C", "D" };
         
     public User(Sound sound) 
         {
         super(sound);
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO},  new String[] { "A", "B", "C", "D" });
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO}, MODULATION_NAMES);
         defineModulationOutputs(new String[] { "", "", "", "" });
         }
         
@@ -76,7 +78,7 @@ public class User extends Modulation implements ModSource
                 for(int i = 0; i < NUM_MODULATIONS; i++)
                     {
                     final int _i = i;
-                    PushButton button = new PushButton("Tr " + i)
+                    PushButton button = new PushButton("Tr " + MODULATION_NAMES[i])
                         {
                         public void perform()
                             {
