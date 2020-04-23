@@ -9,8 +9,7 @@ import java.util.*;
 
 /**
    This is basically the same class as KHARMONICS, except that the harmonics being
-   loaded are derived from single-cycle waves from the Kawai K3, Ensoniq SQ-80, and 
-   Prophet VS (or possibly Korg Wavestation's interpretation thereof).
+   loaded are derived from single-cycle waves from various synthesizers.
 */
 
 public class Waves extends Unit implements UnitSource
@@ -20,9 +19,9 @@ public class Waves extends Unit implements UnitSource
     public static final int MAX_HARMONICS = 256;  // regardless of number of partials
     public static final double MAX_AMPLITUDE = 999.0;  // highest legal amplitude
 
-    public static final int NUM_HARMONICS = 145;
-    static final double[][] HARMONICS = new double[NUM_HARMONICS][MAX_HARMONICS];
-    static final String[] NAMES = new String[NUM_HARMONICS];
+    public static final int NUM_WAVES = 323; //306; // 145;
+    static final double[][] HARMONICS = new double[NUM_WAVES][MAX_HARMONICS];
+    static final String[] NAMES = new String[NUM_WAVES];
 
     boolean normalize;
     boolean oldNormalize;
@@ -73,14 +72,26 @@ public class Waves extends Unit implements UnitSource
         if (done) return;
         done = true;
         
-        Scanner scan = new Scanner(Harmonics.class.getResourceAsStream("waves/waves.out"), "US-ASCII");
-        for(int i = 0; i < NUM_HARMONICS; i++)
+        Scanner scan = new Scanner(Waves.class.getResourceAsStream("waves/waves.out"), "US-ASCII");
+        for(int i = 0; i < NUM_WAVES; i++)
             {
             NAMES[i] = scan.nextLine();
+            double max = 0;
             for(int j = 0; j < MAX_HARMONICS; j++)
                 {
-                HARMONICS[i][j] = (scan.nextInt() / MAX_AMPLITUDE);
+                HARMONICS[i][j] = scan.nextDouble();
+                if (max < HARMONICS[i][j]) 
+                	max = HARMONICS[i][j] ;
                 }
+            
+            // Normalize
+            if (max != 0.0)
+            	{
+				for(int j = 0; j < MAX_HARMONICS; j++)
+					{
+					HARMONICS[i][j] = HARMONICS[i][j] / max;
+					}
+				}
             scan.nextLine();
             }
         scan.close();

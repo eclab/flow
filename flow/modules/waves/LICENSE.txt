@@ -1,0 +1,6 @@
+The harmonics in this collection are licensed under 
+https://creativecommons.org/licenses/by/4.0/
+
+See the manual and the wavesources file for information
+about the location and sources of the sound files from
+which these harmonics were originally extracted.
