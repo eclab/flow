@@ -534,6 +534,10 @@ Flow can handle this without any difficulty: each percussion subpatch has the ex
 
 \paragraph{Master Gain} At the end of the day I can get my whole song to play without glitching, but it still clips here and there.  Rather than go through and adjust the gain of each subpatch separately, I just pull down the master gain (see the {\bf MIDI and Audio Options} window).     Note that Master Gain is not saved with patches and is reset when you restart Flow.
 
+\subsection{Module Help}
+
+Forgot what a given dial or button does?  Each module has a built-in help panel.  Just double-click on the module's title-bar to expand it.  You can double-click a second time to retract the panel.
+
 \bump
 
 \section{The Modules}
@@ -714,7 +718,7 @@ Draw also allows you to load {\it single-cycle waveforms}, that is, sound files 
 
 A good source of single-cycle waves is the AdventureKid Single Cycle Waveforms collection, available at https:/\!/www.adventurekid.se/akrt/waveforms/\quad Flow can read all of these.
 
-See also {\bf Waves}, which contains harmonics of single-cycle waves from certain well-known synthesizers.
+See also {\bf Waves}, which contains harmonics of single-cycle waves from certain well-known synthesizers.  See also {\bf KHarmonics}, a similar collection drawn from various Kawai K5 harmonics.
 
 \paragraph{Drawbars}   Produces the sine wave equivalents of the drawbars of a classic tone wheel organ.  There are a number of preset options.
 
@@ -724,7 +728,7 @@ See also {\bf Waves}, which contains harmonics of single-cycle waves from certai
 
 \paragraph{KHarmonics}  Produces a wide range of partials drawn from patches from the Kawai K5 synthesizer, including both factory patches (with Kawai's permission) and various patches in the public domain.  You have the additional option of {\it Normalizing} the partials.  Note that among the harmonics are ones purporting to be drawn from the Kawai K3.  These are just wrong.  However the {\bf Waves} module has the correct ones.
 
-See also {\bf Waves}, a similar collection drawn from various other synthesizers.
+See also {\bf Draw}, which allows you to load single-cycle waves: the manual section on Draw has good suggestions for sources of these waves.  See also {\bf Waves}, a similar collection drawn from various other synthesizers.
 
 
 %\begin{figure}[t]
@@ -752,15 +756,22 @@ This module is designed to merge with other sources to add hiss to them: most co
 
 \paragraph{Triangle}  A triangle wave.  Note that normally triangle waves include negative amplitude harmonics, that is ones with inverted phases.  As {\name} does not produce phases, these harmonics become all positive (you likely won't hear a difference).
 
-\paragraph{Waves}  A collection of harmonics drawn from single-cycle waves in the Kawai K3, Ensoniq SQ-80, and Sequential Prophet VS.  These are as best as I can do for now\,---\,they may change if my sources improve.  The Kawai K3 harmonics are complete: obviously wave 31 is missing since that's actually the user's additive harmonics slot.\footnote{The K3 harmonics are from http:/\!/www.deepsonic.ch/deep/audio\_samples/kawai\_k3\_-\_samples\_-\_33\_waveforms.mp3 by deep!sonic (http:/\!/www.deepsonic.ch)}
+\paragraph{Waves}  A collection of harmonics drawn from the single-cycle waves of several major synthesizers:
 
-The SQ-80 is unusual in that it had different oversampled versions of the same wave depending on the octave of the note played on the keyboard: this was mostly an antialiasing measure.  The harmonics here are taken from the lowest octaves (with the most harmonics).  This collection is incomplete: my original source had some errors.\footnote{The SQ-80 harmonics are drawn from the waves in http:/\!/www.buchty.net/ensoniq/files/the\_waves.zip by //christian.}
+\begin{itemize}
 
-The Prophet VS traditionally had waves 32--127, and these more or less line up with the harmonics provided by Flow: but you'll notice that Flow is missing a few because my original source is missing them.\footnote{The Prophet VS harmonics are drawn from https:/\!/www.dropbox.com/sh/ja0tc8wn6cnudzj/AACYqe2mjrWU2CeXIttm6MhOa as discussed in the forum thread http:/\!/www.muffwiggler.com/forum/viewtopic.php?t=33918\&sid=9e0b9554f0ac483b62a88c074c6136c3}
+\item{\bf Kawai K3}\quad This is the full complement of Kawai K3 waves: though obviously wave 31 is missing since that's actually the user's additive harmonics slot.\footnote{The K3 harmonics are from http:/\!/www.deepsonic.ch/deep/audio\_samples/kawai\_k3\_-\_samples\_-\_33\_waveforms.mp3 by deep!sonic (http:/\!/www.deepsonic.ch)}
+ 
+\item{\bf Ensoniq SQ-80}\quad   This collection is incomplete: my original source had some errors.\footnote{The SQ-80 harmonics are drawn from the waves in http:/\!/www.buchty.net/ensoniq/files/the\_waves.zip by //christian.}  The SQ-80 is unusual in that it had different oversampled versions of the same wave depending on the octave of the note played on the keyboard: this was mostly an antialiasing measure.  The harmonics here are taken from the lowest octaves (with the most harmonics).
 
-See also {\bf Draw}, which allows you to load single-cycle waves: the manual section on Draw has good suggestions for sources of these waves.
+\item{\bf Sequential Prophet VS}\quad The Prophet VS traditionally had waves 32--127, and these more or less line up with the harmonics provided by Flow: but you'll notice that Flow is missing a few because my original source is missing them.\footnote{The Prophet VS harmonics are drawn from https:/\!/www.dropbox.com/sh/ja0tc8wn6cnudzj/AACYqe2mjrWU2CeXIttm6MhOa as discussed in the forum thread http:/\!/www.muffwiggler.com/forum/viewtopic.php?t=33918\&sid=9e0b9554f0ac483b62a88c074c6136c3}  Note that some additional waves are labelled {\bf VS Extra}: these were a few additional waves in the original sources originally with numbers outside the VS range.  I asked John Bowen about them, and he thinks that they might be a few additional waves that were on the development hard drive at Sequential but which didn't find their way into the VS proper.  So I'm including them.
 
-See also {\bf KHarmonics}, a similar collection drawn from various Kawai K5 harmonics.
+\item{\bf Casio CZ Series}\quad These are many of the CZ's standard waves.  Casio's waves are formed by concatenating two simpler wave shapes and then applying a window function.  The wave names in the menu are of the form ``\mbox{\it CZ Number Wave1 Wave2 WindowFunction}''.  The basic wave shapes are Sawtooth (Saw), Square (Sqr), Pulse (Puls), Null (-{}-{}-), Sine-Pulse (Sinp), Saw-Pulse (Sawp), Multi-Sine (Msin), and Pulse 2 (Pul2).  The window shapes are None (-{}-{}-), Sawtooth (Saw), Triangle (Tri), Trapezoid (Trap), Pulse (Puls), and Double-Saw (2Saw).  You'll note that not all combinations are here: effective duplicates have been removed.\footnote{See https:/\!/www.kasploosh.com/cz/11800-spelunking/ for an extended discussion of these waves, including pictures.  The original waves are from the project {\it Casio CZ-1 Spelunking REMIXED} by John Thompson (https:/\!/www.facebook.com/Hardwood01) and Michael Rickard  (https:/\!/www.kasploosh.com).  Many thanks to them for giving me permission to extract the harmonics from these waves.  If you'd like to get the wave sources, just buy them for \$10 from the project home page at https:/\!/www.kasploosh.com/cz/16293-cz\_waves\_for\_your\_mix/}  Some wave names start with ``CZ\#'' rather than ``CZ''.  This denotes that a wave is one of the classic original waves directly accessible from the CZ front panel (many CZ waves could only be generated via sysex).
+
+Obviously morphing from a Sine wave to one of these waves in Flow won't be anything like applying Phase Distortion on a CZ: but there you go.
+\end{itemize}
+
+See also {\bf Draw}, which allows you to load single-cycle waves: the manual section on Draw has good suggestions for sources of these waves.  See also {\bf KHarmonics}, a similar collection drawn from various Kawai K5 harmonics.
 
 \paragraph{Wavetable}  Lets you load wavetables (as ``.WAV'' files) from https:/\!/waveeditonline.com/, then wander through them using the provided modulation.  You can turn off interpolation between waves.  Wavetables are loaded using the {\it Wavetable} button.
 
@@ -892,20 +903,18 @@ Partial Filter can be set to be {\it Relative}.  When relative, the partials are
 
 \paragraph{Smooth} This module smooths over the frequency and amplitude differences between successive sets of partials.  The degree of smoothing is specified by {\it Amount}.  Specifically, it maintains an internal set of Partials \(P\).  At every timestep, it takes the current incoming Partials \(Q\), and sets each amplitude \(A^P_i\) of \(P\) to \(A^P_i = (1-\alpha) A^P_i + \alpha A^Q_i\).  Likewise it sets each frequency \(F^P_i = (1-\alpha) F^P_i + \alpha F^Q_i\), where \(\alpha\) is the Amount.  Smooth has to deal with one unusual case: when the incoming partials of \(Q\) start wandering about in frequency and eventually cross one another.  This creates discontinuities in the smoothing.  Smooth handles this by trying to remember which partials were which; this strategy will work fine if Smooth is fed partials from the {\it first} partials output of any module.  No guarantees are made regarding other partials outputs.  Modules rarely have more than one output, anyway.
 
-\paragraph{Squish} The frequencies of the partials are squished {\it towards} a specific target partial, which you can specify.  The degree of squishing is specified by {\it Amount}, and the squishing function can be \(x\), \(x^2\), or \(x^3\), where \(x\) is the distance between a partial and the target.  There are two versions of each squishing function: the ``free'' version, where all partials freely move towards the target, and the non-``free'' version, where partials are restricted to still range between the original minimum and maximum partials: think of the non-``free'' version as a spring whose center can move towards some partial, but whose ends are fixed to two walls: and the ``free'' version doesn't have ends fixed to anything.  See also  {\bf Stretch.}
-
-\paragraph{Stretch} The frequencies of the partials are stretched {\it away} a specific target partial, which you can specify.  The degree of stretching is specified by {\it Amount}, scaled by {\it Max Amount}, and the stretching function can be \(x\), \(x^2\), or \(x^3\), where \(x\) is the distance between a partial and the target.  There are two versions of each stretching function: the ``free'' version, where all partials freely move away from the target, and the non-``free'' version, where partials are restricted to still range between the original minimum and maximum partials: think of the non-``free'' version as a spring whose rings can move away from some partial, but whose ends are fixed to two walls: and the ``free'' version doesn't have ends fixed to anything.  See also  {\bf Squish.}
-
-\paragraph{Swap} This divides the partials into groups {\it Distance} in size, then reverses the partials in each group (swapping their frequencies).  You are given the option of not including the Fundamental among these groups.
+%\paragraph{Stretch} The frequencies of the partials are stretched either towards or away from a specific target partial, which you can specify.  The degree of stretching is specified by {\it Amount}, scaled by (for stretching away only) {\it Max Stretch}, and the stretching function can be \(x\), \(x^2\), or \(x^3\), where \(x\) is the distance between a partial and the target.  There are two versions of each stretching function: the ``free'' version, where all partials freely move away from the target, and the non-``free'' version, where partials are restricted to still range between the original minimum and maximum partials: think of the non-``free'' version as a spring whose rings can move away from some partial, but whose ends are fixed to two walls: and the ``free'' version doesn't have ends fixed to anything.
 
 \paragraph{Sub} Adds up to four partials at octave spacing below the fundamental, eliminating the top four partials.  You can specify the amplitude of the partials relative to the fundamental.
+
+%\paragraph{Swap} This divides the partials into groups {\it Distance} in size, then reverses the partials in each group (swapping their frequencies).  You are given the option of not including the Fundamental among these groups.
 
 \paragraph{VCA} This is just what it says on the tin: an amplifier (VCA is the classic term).  A VCA is very commonly used in conjunction with an envelope.  It takes an input and multiplies all of its amplitudes by {\it mod} (which goes 0--1), then by {\it scale} (which goes 0--8).  The {\it mod} modulation is designed for you to attach LFOs or envelopes etc.  The {\it scale} modulation is not linear and so is just meant for you to dial in a maximum scale value.   %The VCA also sports a {\it bass boost} meant to, well, boost lower partials.  It's very simplistic: at maximum boost, partials of frequency 0 are boosted \(2\times\), and partials at Nyquist are boosted \(0\times\).  Partials in-between are boosted in linear proportion to their position between these two extremes.  
 
 \subsection{Special Modules}
 \label{specialmodules}
 
-There are currently five special modules: {\bf In}, {\bf Out}, {\bf Choice}, {\bf Fix}, {\bf Note}, and {\bf Macro}.  The {\bf Out} module is critical in every patch, and is discussed below in Section~\ref{outmodule}.  {\bf In} and {\bf Macro} enable {\it macros}\.---\,and {\bf Out} helps out here as well\,---\,as discussed below in Sectino~\ref{creatingmacros}.
+There are currently five special modules: {\bf In}, {\bf Out}, {\bf Choice}, {\bf Fix}, {\bf Note}, and {\bf Macro}.  The {\bf Out} module is critical in every patch, and is discussed below in Section~\ref{outmodule}.  {\bf In} and {\bf Macro} enable {\it macros}\.---\,and {\bf Out} helps out here as well\,---\,as discussed below in Section~\ref{creatingmacros}.  Here are the others:
 
 \paragraph{Choice}  The Choice module is an odd duck: it doesn't produce any sounds or modulation at all.  Instead, it enables you to change a module's checkboxes and comboboxes using a modulation signal.  To do this, note that Choice has a modulation input and a sound input port both called {\bf Target}.   Plug one of your target module's modulation or sound outputs into the appropriate Target port: this tells Choice what target module it should be modifying.  Don't attach to both of them, or Choice will just use the sound input port.
 
@@ -962,11 +971,11 @@ Note that although you can have as many In modules as you like, and they will al
 \subsection{Strategies for Mixing}
 \label{mixingstrategies}
 
-Ordinarily if you wanted to mix two sources into one stream, you'd imagine you could just lump all the partials together and be done with it.  But there are two catches.  First, {\name} has a fixed number of partials: so if you lump the partials from two sources together, half of them must be eliminated.  Second, partials are each associated with a sine wave oscillator in the output (that's the partial's {\it order}): when two sets of partials are mixed, you'll often have the situation where partials from each set are competing for that oscillator, and in the end only one can have it.  So it's a little more complex than you'd think.
+Ordinarily if you wanted to mix two sources into one stream, you'd imagine you could just lump all the partials together and be done with it.  But there are two catches.  First, {\name} has a fixed number of partials: so if you lump the partials from two sources together, half of them must be eliminated.  Second, partials are each associated with a sine wave oscillator in the output (that's the partial's {\it order}): when two sets of partials are mixed, you'll often have the situation where partials from each set are competing for the same oscillator, and in the end only one can have it.  So it's a little more complex than you'd think.
 
 {\name} has several modules which implement various strategies for mixing, depending on your needs: {\it Amp Math}, {\it Morph}, {\it Mix}, {\it Combine}, and {\it Fill}.  It's useful to understand how these strategies differ from one another.
 
-First some terminology.  Let the two sets of partials from incoming partials be \(A\) and \(B\), and the resulting outputted by the mixing module be \(O\).   Sets of partials are actually arrays (lists).  Thus each partial has a {\it position} in the list: {\name} requires that lower-frequency partials have lower positions than higher-frequency partials.  Partial \(O_i\) is the \(i\)th partial in the list for output \(O\) (similarly \(A_i\) and \(B_i\)).  Each partial has an {\it amplitude}, a {\it frequency}, and an {\it order} (the oscillator ultimately used to output the partial).  We'll call these amp(\(O_i)\), freq(\(O_i\)), and ord(\(O_i\)) (and similarly for \(A\) and \(B\)).  The order is a unique integer but it's not the same thing as \(i\): as partials change their frequencies, they can get rearranged in a list but maintain their respective order tags.
+First some terminology.  Let the two sets of partials from incoming partials be \(A\) and \(B\), and the resulting partials outputted by the mixing module be \(O\).   Sets of partials are actually arrays (lists).  Thus each partial has a {\it position} in the list: {\name} requires that lower-frequency partials have lower positions than higher-frequency partials.  Partial \(O_i\) is the \(i\)th partial in the list for output \(O\) (similarly \(A_i\) and \(B_i\)).  Each partial has an {\it amplitude}, a {\it frequency}, and an {\it order} (the oscillator ultimately used to output the partial).  We'll call these amp(\(O_i)\), freq(\(O_i\)), and ord(\(O_i\)) (and similarly for \(A\) and \(B\)).  The order is a unique integer ID, and it's not the same thing as the position in the list \(i\): as partials change their frequencies, they can get rearranged in a list but maintain their respective order tags.
 
 \begin{itemize}
 \item {\bf Amp Math} and {\bf Mix} both just line up the corresponding partials and perform a function on their amplitudes.  The frequencies of the first set of partials are used. That is, \(\text{amp}(O_i) = f(\text{amp}(A_i), \text{amp}(B_i))\) for some function \(f(...)\), but \(\text{freq}(O_i) = \text{freq}(A_i)\) and  \(\text{ord}(O_i) = \text{ord}(A_i)\).  
