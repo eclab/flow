@@ -619,16 +619,14 @@ public class Output
                 if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0;          // undenormalize prior to next go-around
                 currentAmp[oi] = amplitude;
 
-                if (amplitude <= MINIMUM_VOLUME)
-                    {
-                    continue;
-                    }
-                                
-                double position = pos[oi] + frequency * tr;
-                position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
-                pos[oi] = position;
-                        
-                sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude;
+                if (amplitude > MINIMUM_VOLUME)
+                    {                               
+                	double position = pos[oi] + frequency * tr;
+                	position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
+                	pos[oi] = position;
+                	        
+                	sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude;
+                	}
                 }
             }
         else
