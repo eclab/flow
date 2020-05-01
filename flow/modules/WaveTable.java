@@ -217,6 +217,85 @@ public class WaveTable extends Unit implements UnitSource
                     });
                 return box;
                 }
+                
+    public static final int BLOFELD_WAVE_SIZE = 128;
+    public static final int BLOFELD_WAVETABLE_SIZE = 64;
+
+            public void loadBlofeldSysex(File file, Rack rack)
+            	{
+            	HashMap h = new HashMap();
+            	DataInputStream f = new DatatInputStream(new BufferedInputStream(new FileInputStream(file)));
+    			
+            	while(true)
+            		{
+            		// read a wave
+            		
+            		// we start with 0xF0
+            		int b = f.read();
+            		if (b < 0 || b > 127) break;
+            		if (b != 0xF0) continue;
+            		
+            		// Waldorf ID
+            		b = f.read();
+            		if (b < 0 || b > 127) break;
+            		if (b != 0x3D) continue;
+
+            		// Blofeld ID
+            		b = f.read();
+            		if (b < 0 || b > 127) break;
+            		if (b != 0x13) continue;
+
+            		// Device ID
+            		b = f.read();
+            		if (b < 0 || b > 127) break;
+
+            		// Wavetable Dump Command
+            		b = f.read();
+            		if (b < 0 || b > 127) break;
+            		if (b != 0x12) continue;
+
+            		// Wavetable Number
+            		int wt;
+            		b = f.read();
+            		if (b < 0 || b > 127) break;
+            		if (b < 0x50 || b > 0x76) continue;
+            		wt = b;
+
+            		// "Format"
+            		b = f.read();
+            		if (b < 0 || b > 127) break;
+            		if (b != 0x0) continue;
+            		
+            		// Data
+            		byte[] data = new byte[384];
+            		for(int j = 0; j < data.length; j++)
+            			{
+	            		b = f.read();
+	            		if (b < 0 || b > 127) break;
+	            		data[j] = (byte)b;        			
+            			}
+            		
+            		byte[] n = new byte[14];
+            		for(int j = 0; j < n.length; j++)
+            			{
+	            		b = f.read();
+	            		if (b < 0 || b > 127) break;
+	            		n[j] = (byte)b;        			
+            			}
+            		String name = new String(n, "US-ASCII");
+
+            		if (b != 0xF0) break;
+            		int b = f.read()
+            		}
+            		
+            	for(int i = 0; i < BLOFELD_WAVETABLE_SIZE; i++)
+            		{
+            		int b = f.read();
+            		if (b != 0xF0) break;
+            		int b = f.read()
+            			
+            		}
+            	}
 
             public void loadFile(File file, Rack rack)
                 { 
