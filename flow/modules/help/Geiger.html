@@ -1,6 +1,6 @@
 A source of randomly-timed pulses.  A pulse is a square wave pulse plus a trigger.  
 
-<p>As incoming pulses arrive, with some probability a counter is increased.  When it reaches a certain size, it is reset to 0 and Geiger issues a pulse.
+<p>As incoming pulses arrive, with some probability a counter is increased.  When the counter reaches a certain value, it is reset to 0 and Geiger changes from 0 to 1 or vice versa, and issues a pulse.
 
 <dl>
 <dt>Trials
@@ -10,5 +10,7 @@ A source of randomly-timed pulses.  A pulse is a square wave pulse plus a trigge
 <dt>Trigger
 <dd>The incoming pulses
 <dt>Seed
-<dd>The random number seed, to guarantee determinism in the pulses..  If Free, then Geiger is nondeterministic.
+<dd>The random number seed, to guarantee determinism in the pulses.  If Free, then Geiger is nondeterministic.
+<dt>Pulsing
+<dd>After raising from 0 to 1, Geiger will always drop back to 0 on the next incoming pulse; and when dropping it will not issue a trigger.  This produces an up/down effect rather than changing from 0 to 1 or vice versa.
 </dl>

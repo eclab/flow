@@ -30,7 +30,30 @@ public class Geiger extends Modulation
     public static final int MOD_PROBABILITY = 1;
     public static final int MOD_TRIGGER = 2;
     public static final int MOD_SEED = 3;
-        
+    
+    public static final int OPTION_PULSING = 0;
+    
+    boolean pulsing = false;
+    public boolean isPulsing() { return pulsing; }
+    public void setPulsing(boolean val) { pulsing = val; }
+    public int getOptionValue(int option) 
+        { 
+        switch(option)
+            {
+            case OPTION_PULSING: return isPulsing() ? 1 : 0;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+                
+    public void setOptionValue(int option, int value)
+        { 
+        switch(option)
+            {
+            case OPTION_PULSING: setPulsing(value == 1); return;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+
     public Random random = null;
         
     void initializeRandom()     
@@ -53,6 +76,7 @@ public class Geiger extends Modulation
     public Geiger(Sound sound)
         {
         super(sound);
+        defineOptions(new String[] { "Pulsing" }, new String[][] { { "Pulsing" }});
         defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ZERO, Constant.ONE }, new String[] { "Trials", "Prob", "Trigger", "Seed" });
         }
 
@@ -78,17 +102,19 @@ public class Geiger extends Modulation
         {
         super.go();
 
+		boolean pulseDown = !down && isPulsing();
         if (isTriggered(MOD_TRIGGER))
             {
             Random rand = (random == null ? getSound().getRandom() : random);
-            if (rand.nextFloat() < modulate(MOD_PROBABILITY))
+            if (rand.nextFloat() < modulate(MOD_PROBABILITY) || pulseDown)
                 {
                 count++;
                 if (count > modulate(MOD_RATE) * MAX_RATE)
                     {
                     down = !down;
                     setModulationOutput(0, down ? 0 : 1);
-                    updateTrigger(0);
+                    if (!(down && pulseDown))
+                    	updateTrigger(0);
                     count = 0;
                     }
                 }
