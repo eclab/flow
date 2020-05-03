@@ -492,7 +492,7 @@ public class Out extends Unit implements Miscellaneous
                     oldRestrict[0] = restrict;
                     oldNumGroups[0] = numGroups;
 
-                    String labeladdendum = null;
+                    String labeladdendum = "";
                     if (playFirst)
                         {
                         labeladdendum = "  (Mono)";
@@ -526,8 +526,7 @@ public class Out extends Unit implements Miscellaneous
                     panel[0].getTitlePanel().setBackground(glitched ? Color.RED : (clipped ? Color.YELLOW : Color.BLACK));
                     panel[0].getTitleLabel().setForeground(glitched ? Color.WHITE : (clipped ? Color.BLACK : Color.WHITE));
                     String label = glitched ? " Glitch" : (clipped ? " Clip" : " Out");
-                    if (labeladdendum != null)
-                        label = label + labeladdendum;
+                    label = label + labeladdendum;
                     panel[0].getTitleLabel().setText(label);
                     panel[0].getRack().repaint();
                     }
