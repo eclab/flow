@@ -370,6 +370,8 @@ public class Sound
             // catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch name " + (i + 1)); break; };
             try { groups[i + 1].setGain(patch.getDouble("gain")); }
             catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid gain " + (i + 1)); break; };
+            try { groups[i + 1].setPan(patch.getDouble("pan")); }
+            catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid pan " + (i + 1)); break; };
             try { groups[i + 1].setNumRequestedSounds(patch.getInt("voices")); }
             catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid numRequestedSounds " + (i + 1)); break; };
             try { groups[i + 1].setChannel(patch.getInt("midi") - 1); }
@@ -404,6 +406,7 @@ public class Sound
                     };
                 patch.put("voices", group[i].getNumRequestedSounds());
                 patch.put("gain", group[i].getGain());
+                patch.put("pan", group[i].getPan());
                 array.put(patch);
                 }
                                 
