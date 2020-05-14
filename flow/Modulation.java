@@ -373,6 +373,23 @@ public abstract class Modulation implements Cloneable
         return getModulationValueDescription(num, modulate(num), isModulationConstant(num));
         }
 
+	/** Returns the strings to appear in a Modulation Dial's popup options.
+		If you return null, then the Dial will instead use its internal
+		options (see ModulationInput for ways to customize those). */
+	public String[] getPopupOptions(int modulation)
+		{
+		return null;
+		}
+
+	public static final double NO_POPUP_CONVERSION_IMPLEMENTED = -1;
+	/** Returns the double value in the range (0.0 ... 1.0) corresponding to the
+		Modulation Dial's popup menu index, or NO_POPUP_CONVERSION_IMPLEMENTED if
+		this method is not implemented (that's the default return value). */
+	public double getPopupConversion(int modulation, int index)
+		{
+		return NO_POPUP_CONVERSION_IMPLEMENTED;
+		}
+
     /** Returns the modulation value for the modulation currently at Input Modulation port INDEX */
     public final double modulate(int index)
         {
@@ -992,5 +1009,5 @@ public abstract class Modulation implements Cloneable
 		if (str == null) return null;
 		else return StringUtilities.read(str);
 		}
-
+		
     }

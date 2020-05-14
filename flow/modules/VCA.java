@@ -81,6 +81,35 @@ public class VCA extends Unit
         constrain();
         }       
 
+	public String[] getPopupOptions(int modulation)
+		{
+		if (modulation == MOD_SCALE)
+			{
+			return new String[] { "0", "1/4", "1/2", "1", "2", "4", "8" };
+			}
+        else return super.getPopupOptions(modulation);
+		}
+
+	public static final double[] POPUP_CONVERSIONS = new double[] 
+		{ 
+		// <= 0.5
+		0, 0.125, 0.25, 0.5,
+		// > 0.5
+		(6 + 2.0) / 14.0,
+		(6 + 4.0) / 14.0,
+		(6 + 8.0) / 14.0 
+		};
+				
+	public double getPopupConversion(int modulation, int index)
+		{
+		// when > 0.5, mod = (6 + scale) / 14
+		if (modulation == MOD_SCALE)
+			{
+			return POPUP_CONVERSIONS[index];
+			}
+        else return super.getPopupConversion(modulation, index);
+		}
+
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
         {
         if (isConstant)

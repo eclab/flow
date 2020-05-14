@@ -238,7 +238,6 @@ public class Out extends Unit implements Miscellaneous
             }
         }
 
-        
     public static final int LABEL_MAX_LENGTH = 24;
 
 
@@ -430,6 +429,10 @@ public class Out extends Unit implements Miscellaneous
         panel[0].getModulationInputs()[MOD_PAN].setOptionsAndConversions(
         	new String[] { "< 100", "< 50", "< 25", "--", "25 >", "50 >", "100 >" },
         	new double[] { 0, 0.25, 0.5 * 0.75, 0.5, 1.0 - 0.5 * 0.75, 0.75, 1.0 } );
+        
+        panel[0].getModulationInputs()[MOD_GAIN].setOptionsAndConversions(
+        	new String[] { "0", "1", "2", "3", "4" },
+        	new double[] { 0, 0.25, 0.5, 0.75, 1.0 } );
         
         ModulationInput[] a = panel[0].getModulationInputs();
         for(int i = 0; i < NUM_MOD_OUTPUTS; i++)
