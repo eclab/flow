@@ -221,14 +221,19 @@ public class AudioInput
                     }
                 if (mixer == null)
                     {
-                    tdl = AudioSystem.getTargetDataLine( output.audioFormat );
+                    // nothing available
+                    System.err.println("AudioInput.setMixer() WARNING: No available audio input");
+                    return;
                     }
                 else
                     {
                     tdl = AudioSystem.getTargetDataLine( output.audioFormat, mixer );
                     }
                 try { tdl.open(output.audioFormat, output.bufferSize); }                        // is this wise? Should we do something smaller?
-                catch (Exception ex) { ex.printStackTrace(); }
+                catch (Exception ex) 
+                	{ 
+                	ex.printStackTrace(); 
+                	}
                 tdl.start();
                 this.mixer = mixer;
                 }
