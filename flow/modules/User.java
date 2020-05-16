@@ -32,12 +32,13 @@ public class User extends Modulation implements ModSource
     public static final int NUM_MODULATIONS = 4;
     
     public static final String[] MODULATION_NAMES =   new String[] { "A", "B", "C", "D" };
+    public static final String[] MODULATION_OUTPUT_NAMES =   new String[] { "A", "B", "C", "D" };
         
     public User(Sound sound) 
         {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO}, MODULATION_NAMES);
-        defineModulationOutputs(new String[] { "A", "B", "C", "D" });  // even though they're unlabeled, it's important that these have names so they save properly.
+        defineModulationOutputs(MODULATION_OUTPUT_NAMES);  // even though they're unlabeled, it's important that these have names so they save properly.
         }
         
     boolean[] trigger = new boolean[NUM_MODULATIONS];
@@ -69,7 +70,7 @@ public class User extends Modulation implements ModSource
 
                     Box hbox = new Box(BoxLayout.X_AXIS);
                     ModulationOutput output = new ModulationOutput(mod, i, this);
-                    output.setTitleText("");
+                    output.setTitleText("", false);
                     ModulationInput input = new ModulationInput(mod, i, this);
                     hbox.add(input);
                     hbox.add(output);

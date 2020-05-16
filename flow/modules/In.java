@@ -30,6 +30,8 @@ public class In extends Unit implements Miscellaneous
         super(sound);
         // we want the original names around so we can refer to them later
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO }, (String[])(MOD_NAMES.clone()));
+        // notice that these are cloned.  This is so MOD_NAMES and UNIT_NAMES can't be changed via setModulationOutput() etc.
+        // See getKeyForModulation() below for a hint as to why
         defineModulationOutputs((String[])(MOD_NAMES.clone()));
         defineOutputs((String[])(UNIT_NAMES.clone()));
         defineInputs(new Unit[0], new String[0]);
@@ -163,6 +165,11 @@ public class In extends Unit implements Miscellaneous
 
 
     //// SERIALIZATION STUFF
+    
+    ////// Why are we overriding these three methods?  Because we want to use the standard "A B C D"
+    ////// as the KEYS for connection regardless of what the user sets the actual names to.  That way
+    ////// he can name the all "foo" if he likes, and they're still unique names.  
+    
     public String getKeyForModulation(int input)
         {
         // notice we're reusing a lot of stuff from getKeyForModulationOutput below
@@ -209,7 +216,7 @@ public class In extends Unit implements Miscellaneous
                 }
             for(int i = 0; i < num; i++)
                 {
-                setOutputName(i, array.getString(i));
+               setOutputName(i, array.getString(i));
                 }
             }
         }

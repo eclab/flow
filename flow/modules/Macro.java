@@ -34,6 +34,9 @@ public class Macro extends Unit implements Cloneable
 
     public static final String PATCH_NAME_KEY = "Patch Name";
 
+    public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
+	public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4" };
+	
     Modulation[] modules = new Modulation[0];
     Out out;
     ArrayList<In> ins = new ArrayList<>();
@@ -326,8 +329,10 @@ public class Macro extends Unit implements Cloneable
             }
         else
             {
-            defineModulationOutputs(new String[] { "1", "2", "3", "4" });
-            defineOutputs(new String[] { "A", "B", "C", "D" });
+        // notice that these are cloned.  This is so MOD_NAMES and UNIT_NAMES can't be changed via setModulationOutput() etc.
+        // See getKeyForModulation() below for a hint as to why
+            defineModulationOutputs((String[])(MOD_NAMES.clone()));
+            defineOutputs((String[])(UNIT_NAMES.clone()));
             }
             
         // set the inputs
@@ -348,11 +353,33 @@ public class Macro extends Unit implements Cloneable
             }
         else
             {        
-            defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO}, new String[] { "A", "B", "C", "D"});
-            defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, new String[] { "1", "2", "3", "4" } );  
+        // notice that these are cloned.  This is so MOD_NAMES and UNIT_NAMES can't be changed via setModulationOutput() etc.
+        // See getKeyForModulation() below for a hint as to why
+            defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO}, (String[])(MOD_NAMES.clone()));
+            defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[])(UNIT_NAMES.clone()));  
             }             
         }
     
+    ////// Why are we overriding these three methods?  Because we want to use the standard "A B C D"
+    ////// as the KEYS for connection regardless of what the user sets the actual names to.  That way
+    ////// he can name the all "foo" if he likes, and they're still unique names.  
+    
+    public String getKeyForModulationOutput(int output)
+        {
+        return MOD_NAMES[output];
+        }
+   
+    public String getKeyForOutput(int output)
+        {
+        // Some macros I've already made and am using inside patches have a single output renamed from "A" to "Out".
+        // So for backwards-compatibility with those patches, if we have a first output called "Out", that's okay.
+        String storedKeyName = super.getKeyForOutput(output);
+        if (output == 0 && storedKeyName.equals("Out"))
+        	return storedKeyName;
+        return UNIT_NAMES[output];
+        }
+
+
     public void setData(JSONObject data, int moduleVersion, int flowVersion) throws Exception
         {
         loadModules(Sound.loadModules(data, flowVersion), Sound.loadName(data));

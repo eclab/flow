@@ -232,7 +232,7 @@ public class Sound
         }
         
     /** Loads all the modules from the given JSONObject, and returns them.
-        Does not registers the modules: they are created with a null Sound. */
+        Does not register the modules: they are created with a null Sound. */
     public static Modulation[] loadModules(JSONObject obj, int patchVersion) throws Exception
         {
         JSONArray array = obj.getJSONArray("modules");

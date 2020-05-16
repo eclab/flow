@@ -187,13 +187,13 @@ public class Unit extends Modulation
     }
     
     /** Returns the name of a given unit output port. */
-    public final String getOutputName(int num) { return outputNames[num]; }
+    public String getOutputName(int num) { return outputNames[num]; }
 
     /** Sets the name of a given unit output port. */
-    public final void setOutputName(int num, String string) { outputNames[num] = string; }
+    public void setOutputName(int num, String string) { outputNames[num] = string; }
         
     /** Returns the names of all unit output ports. */
-    public final String[] getOutputNames() { return outputNames; }
+    public String[] getOutputNames() { return outputNames; }
 
     /** Returns the number unit output ports. */
     public int getNumOutputs() { return numOutputs; }
