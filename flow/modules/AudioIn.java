@@ -41,7 +41,7 @@ public class AudioIn extends Unit implements UnitSource
             {
             if (modulation == MOD_GAIN)
                 {
-                return "" + (value * MAX_GAIN);
+                return String.format("%.4f", (value * MAX_GAIN));
                 }
             else return super.getModulationValueDescription(modulation, value, isConstant);
             }
