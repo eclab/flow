@@ -205,68 +205,68 @@ public class ModulationInput extends InputOutput implements Rebuildable
     String[] options = DEFAULT_OPTIONS;
     
     /** Returns the value corresponding to option elt in the Modulation's pop-up window.  You can override
-    	this method; or you can just call setOptionsAndConversions or setOptionsWithDefaultConversions; or
-    	you can simply implement the getPopupOptions() and getConversions() methods in Modulation, which
-    	will be used instead. */
+        this method; or you can just call setOptionsAndConversions or setOptionsWithDefaultConversions; or
+        you can simply implement the getPopupOptions() and getConversions() methods in Modulation, which
+        will be used instead. */
     public double convert(int elt) 
-    	{
-    	if (modulation != null)
-    		{
-    		double conv = modulation.getPopupConversion(number, elt);
-    		if (conv != Modulation.NO_POPUP_CONVERSION_IMPLEMENTED)
-    			return conv;
-    		}
-    	return conversions[elt]; 
-    	}
+        {
+        if (modulation != null)
+            {
+            double conv = modulation.getPopupConversion(number, elt);
+            if (conv != Modulation.NO_POPUP_CONVERSION_IMPLEMENTED)
+                return conv;
+            }
+        return conversions[elt]; 
+        }
     
     /** Returns the options to be displayed in the ModulationInput's pop-up window.  These must correspond to,
-    	and thus have an array the same size as, the values from getConversions(), which are the actual values
-    	from 0 to 1 which correspond to each option.   You can override this method to return your own options,
-    	as long as you also override the method getConversions() to return a corresponding array.  Alternatively
-    	you can just call setOptionsAndConversions) or setOptionsWithDefaultConversions(). 
-    	Finally, if you implement the methods getPopupOptions() and getPopupConversions() in Modulation,
-    	they will be used instead.  */
+        and thus have an array the same size as, the values from getConversions(), which are the actual values
+        from 0 to 1 which correspond to each option.   You can override this method to return your own options,
+        as long as you also override the method getConversions() to return a corresponding array.  Alternatively
+        you can just call setOptionsAndConversions) or setOptionsWithDefaultConversions(). 
+        Finally, if you implement the methods getPopupOptions() and getPopupConversions() in Modulation,
+        they will be used instead.  */
     public String[] getOptions() 
-    	{
-    	String[] opt = null;
-    	if (modulation != null)
-    		 {
-    		 opt = modulation.getPopupOptions(number);
-    		 }
-		 if (opt == null)
-			{
-			opt = options;
-			}
-    	return opt; 
-    	}
-    	
+        {
+        String[] opt = null;
+        if (modulation != null)
+            {
+            opt = modulation.getPopupOptions(number);
+            }
+        if (opt == null)
+            {
+            opt = options;
+            }
+        return opt; 
+        }
+        
     /*
-    public double[] getConversions() 
-    	{
-    	double[] conv = null;
-    	System.err.println(modulation);
-    	if (modulation != null)
-    		 {
-    		 conv = modulation.getPopupConversions(number);
-    		 }
-		 if (conv == null)
-			{
-			conv = conversions;
-			}
-    	return conv; 
-    	}
+      public double[] getConversions() 
+      {
+      double[] conv = null;
+      System.err.println(modulation);
+      if (modulation != null)
+      {
+      conv = modulation.getPopupConversions(number);
+      }
+      if (conv == null)
+      {
+      conv = conversions;
+      }
+      return conv; 
+      }
     */
     
     /** Sets the *options* (the items presented in the ModulationInput's pop-up window and their 
-    	*conversions* (the numbers from 0.0 to 1.0 which are the values corresponding to them).  These arrays
-    	must be the same size.  Alternatively you can override the getOptions() and getConversions() methods if you wish. 
-    	This method also rebuilds the popup window.  */
+     *conversions* (the numbers from 0.0 to 1.0 which are the values corresponding to them).  These arrays
+     must be the same size.  Alternatively you can override the getOptions() and getConversions() methods if you wish. 
+     This method also rebuilds the popup window.  */
     public void setOptionsAndConversions( String[] options, double[] conversions) { this.options = options; this.conversions = conversions;  pop = getPopupMenu(); }
     /** Sets the *options* (the labels presented in the ModulationInput's pop-up window) corresponding to 
-    	the default conversion values from DEFAULT_CONVERSIONS.  The default conversions are 0, 1/4, 1/3, 1/2, 2/3, 3/4, and 1.
-    	The options array must thus be DEFAULT_CONVERSIONS.length in size.
-    	Alternatively you can override the getOptions() and getConversions() methods if you wish.  
-    	This method also rebuilds the popup window. */
+        the default conversion values from DEFAULT_CONVERSIONS.  The default conversions are 0, 1/4, 1/3, 1/2, 2/3, 3/4, and 1.
+        The options array must thus be DEFAULT_CONVERSIONS.length in size.
+        Alternatively you can override the getOptions() and getConversions() methods if you wish.  
+        This method also rebuilds the popup window. */
     public void setOptionsWithDefaultConversions(String[] options) { setOptionsAndConversions(options, DEFAULT_CONVERSIONS); }
       
     public JPopupMenu getPopupMenu()

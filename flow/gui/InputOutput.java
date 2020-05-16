@@ -41,7 +41,7 @@ public abstract class InputOutput extends JPanel
     
     /** Returns the text of the title JLabel */
     public String getTitleText() { return title.getText(); }
-    	
+        
     /** Sets the text of the title JLabel, including the underlying modulation/unit input/output name */
     public void setTitleText(String val)
         {
@@ -50,7 +50,7 @@ public abstract class InputOutput extends JPanel
 
     /** Sets the text of the title JLabel.  If changeUnderlying = true, then this includes the underlying modulation/unit input/output name */
     public void setTitleText(String val, boolean changeUnderlying)
-    	{
+        {
         val = val.trim();
         
         if (isInput())
@@ -58,57 +58,57 @@ public abstract class InputOutput extends JPanel
         else
             title.setText(val + " ");
 
-		if (changeUnderlying)
-			{
-			// distribute
-			Modulation mod = modPanel.getModulation();
-			Output output = mod.getSound().getOutput();
-			output.lock();
-			try
-				{
-				int index = mod.getSound().findRegistered(mod);
-				if (index == Sound.NOT_FOUND)
-					System.err.println("InputOutput.distributetitle: mod/unit " + mod + " not found!");
-				else
-					{
-					int numSounds = output.getNumSounds();
-					for(int i = 0; i < numSounds; i++)
-						{
-						Sound s = output.getSound(i);
-						if (s.getGroup() == Output.PRIMARY_GROUP)
-							{
-							if (isUnit())
-								{
-								Unit a = (Unit)(s.getRegistered(index));
-								if (isInput())
-									{
-									a.setInputName(number, val);
-									}
-								else
-									{
-									a.setOutputName(number, val);
-									}
-								}
-							else
-								{
-								Modulation a = (Modulation)(s.getRegistered(index));
-								if (isInput())
-									{
-									a.setModulationName(number, val);
-									}
-								else
-									{
-									a.setModulationOutputName(number, val);
-									}
-								}
-							}
-						}
-					}
-				}
-			finally 
-				{
-				output.unlock();
-				}
+        if (changeUnderlying)
+            {
+            // distribute
+            Modulation mod = modPanel.getModulation();
+            Output output = mod.getSound().getOutput();
+            output.lock();
+            try
+                {
+                int index = mod.getSound().findRegistered(mod);
+                if (index == Sound.NOT_FOUND)
+                    System.err.println("InputOutput.distributetitle: mod/unit " + mod + " not found!");
+                else
+                    {
+                    int numSounds = output.getNumSounds();
+                    for(int i = 0; i < numSounds; i++)
+                        {
+                        Sound s = output.getSound(i);
+                        if (s.getGroup() == Output.PRIMARY_GROUP)
+                            {
+                            if (isUnit())
+                                {
+                                Unit a = (Unit)(s.getRegistered(index));
+                                if (isInput())
+                                    {
+                                    a.setInputName(number, val);
+                                    }
+                                else
+                                    {
+                                    a.setOutputName(number, val);
+                                    }
+                                }
+                            else
+                                {
+                                Modulation a = (Modulation)(s.getRegistered(index));
+                                if (isInput())
+                                    {
+                                    a.setModulationName(number, val);
+                                    }
+                                else
+                                    {
+                                    a.setModulationOutputName(number, val);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            finally 
+                {
+                output.unlock();
+                }
             }
         }
 

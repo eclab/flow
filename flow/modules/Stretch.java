@@ -136,8 +136,8 @@ public class Stretch extends Unit
         
         boolean locked = (style == STYLE_X_LOCKED || style == STYLE_X_TIMES_X_LOCKED || style == STYLE_X_TIMES_X_TIMES_X_LOCKED);
 
-		boolean squished = getSquish();
-		
+        boolean squished = getSquish();
+                
         for(int i = 0; i < frequencies.length; i++)
             {
             double m = mod;
@@ -165,13 +165,13 @@ public class Stretch extends Unit
                 }
 
             if (squished)
-            	{
-	            frequencies[i] = targetFreq * m + frequencies[i] * (1.0 - m);
-	            }
-	        else
-	        	{
-	            frequencies[i] = (maxStretch * frequencies[i] - targetFreq) * m + frequencies[i] * (1.0 - m);
-	            }
+                {
+                frequencies[i] = targetFreq * m + frequencies[i] * (1.0 - m);
+                }
+            else
+                {
+                frequencies[i] = (maxStretch * frequencies[i] - targetFreq) * m + frequencies[i] * (1.0 - m);
+                }
             }
 
         if (constrain()) simpleSort(0, true);

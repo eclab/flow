@@ -81,17 +81,17 @@ public class Waves extends Unit implements UnitSource
                 {
                 HARMONICS[i][j] = scan.nextDouble();
                 if (max < HARMONICS[i][j]) 
-                	max = HARMONICS[i][j] ;
+                    max = HARMONICS[i][j] ;
                 }
             
             // Normalize
             if (max != 0.0)
-            	{
-				for(int j = 0; j < MAX_HARMONICS; j++)
-					{
-					HARMONICS[i][j] = HARMONICS[i][j] / max;
-					}
-				}
+                {
+                for(int j = 0; j < MAX_HARMONICS; j++)
+                    {
+                    HARMONICS[i][j] = HARMONICS[i][j] / max;
+                    }
+                }
             scan.nextLine();
             }
         scan.close();

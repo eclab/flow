@@ -98,10 +98,10 @@ public class AppMenu
         }
         
     public static File getLastFile()
-    	{
-    	return file;
-    	}
-	
+        {
+        return file;
+        }
+        
 
 /*
   static JMenuItem namePatchMenu(Rack rack)
@@ -1144,7 +1144,7 @@ return swapPrimary;
         return sync;
         }
 
-      // Produces the Microtuning menu
+    // Produces the Microtuning menu
     static JCheckBoxMenuItem microtuningMenu(Rack rack)
         {
         final JCheckBoxMenuItem microtuning = new JCheckBoxMenuItem("Microtuning");
@@ -1159,7 +1159,7 @@ return swapPrimary;
         return microtuning;
         }
 
-      // Produces the Microtuning menu
+    // Produces the Microtuning menu
     static JMenuItem loadMicrotuningMenu(Rack rack, JCheckBoxMenuItem microtuningMenu)
         {
         JMenuItem setup = new JMenuItem("Load Microtuning File...");
@@ -1167,18 +1167,18 @@ return swapPrimary;
             {
             public void actionPerformed(ActionEvent e)
                 {
-               	if (rack.loadMicrotuning())
-               		{
-               		microtuningMenu.setSelected(true);
-               		microtuningMenu.setEnabled(true);
-               		rack.setMicrotuning(true);
-               		}
+                if (rack.loadMicrotuning())
+                    {
+                    microtuningMenu.setSelected(true);
+                    microtuningMenu.setEnabled(true);
+                    rack.setMicrotuning(true);
+                    }
                 }
             });
         return setup;
         }
         
-  public static JMenuBar provideMenuBar(Rack rack)
+    public static JMenuBar provideMenuBar(Rack rack)
         {
         JMenuBar menubar = new JMenuBar();
         menubar.add(provideFileMenu(rack));

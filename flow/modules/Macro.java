@@ -35,8 +35,8 @@ public class Macro extends Unit implements Cloneable
     public static final String PATCH_NAME_KEY = "Patch Name";
 
     public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
-	public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4" };
-	
+    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4" };
+        
     Modulation[] modules = new Modulation[0];
     Out out;
     ArrayList<In> ins = new ArrayList<>();
@@ -329,8 +329,8 @@ public class Macro extends Unit implements Cloneable
             }
         else
             {
-        // notice that these are cloned.  This is so MOD_NAMES and UNIT_NAMES can't be changed via setModulationOutput() etc.
-        // See getKeyForModulation() below for a hint as to why
+            // notice that these are cloned.  This is so MOD_NAMES and UNIT_NAMES can't be changed via setModulationOutput() etc.
+            // See getKeyForModulation() below for a hint as to why
             defineModulationOutputs((String[])(MOD_NAMES.clone()));
             defineOutputs((String[])(UNIT_NAMES.clone()));
             }
@@ -353,8 +353,8 @@ public class Macro extends Unit implements Cloneable
             }
         else
             {        
-        // notice that these are cloned.  This is so MOD_NAMES and UNIT_NAMES can't be changed via setModulationOutput() etc.
-        // See getKeyForModulation() below for a hint as to why
+            // notice that these are cloned.  This is so MOD_NAMES and UNIT_NAMES can't be changed via setModulationOutput() etc.
+            // See getKeyForModulation() below for a hint as to why
             defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO}, (String[])(MOD_NAMES.clone()));
             defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[])(UNIT_NAMES.clone()));  
             }             
@@ -375,7 +375,7 @@ public class Macro extends Unit implements Cloneable
         // So for backwards-compatibility with those patches, if we have a first output called "Out", that's okay.
         String storedKeyName = super.getKeyForOutput(output);
         if (output == 0 && storedKeyName.equals("Out"))
-        	return storedKeyName;
+            return storedKeyName;
         return UNIT_NAMES[output];
         }
 

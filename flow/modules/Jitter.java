@@ -70,9 +70,9 @@ public class Jitter extends Unit
             obj.random = new Random();  // will be reset on gate()
         obj.targets = (double[][])(obj.targets.clone());
         for(int i = 0; i < obj.targets.length; i++)
-        	{
-        	if (obj.targets[i] != null)
-	            obj.targets[i] = (double[])(obj.targets[i].clone());
+            {
+            if (obj.targets[i] != null)
+                obj.targets[i] = (double[])(obj.targets[i].clone());
             }
         return obj;
         }

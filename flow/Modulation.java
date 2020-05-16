@@ -373,22 +373,22 @@ public abstract class Modulation implements Cloneable
         return getModulationValueDescription(num, modulate(num), isModulationConstant(num));
         }
 
-	/** Returns the strings to appear in a Modulation Dial's popup options.
-		If you return null, then the Dial will instead use its internal
-		options (see ModulationInput for ways to customize those). */
-	public String[] getPopupOptions(int modulation)
-		{
-		return null;
-		}
+    /** Returns the strings to appear in a Modulation Dial's popup options.
+        If you return null, then the Dial will instead use its internal
+        options (see ModulationInput for ways to customize those). */
+    public String[] getPopupOptions(int modulation)
+        {
+        return null;
+        }
 
-	public static final double NO_POPUP_CONVERSION_IMPLEMENTED = -1;
-	/** Returns the double value in the range (0.0 ... 1.0) corresponding to the
-		Modulation Dial's popup menu index, or NO_POPUP_CONVERSION_IMPLEMENTED if
-		this method is not implemented (that's the default return value). */
-	public double getPopupConversion(int modulation, int index)
-		{
-		return NO_POPUP_CONVERSION_IMPLEMENTED;
-		}
+    public static final double NO_POPUP_CONVERSION_IMPLEMENTED = -1;
+    /** Returns the double value in the range (0.0 ... 1.0) corresponding to the
+        Modulation Dial's popup menu index, or NO_POPUP_CONVERSION_IMPLEMENTED if
+        this method is not implemented (that's the default return value). */
+    public double getPopupConversion(int modulation, int index)
+        {
+        return NO_POPUP_CONVERSION_IMPLEMENTED;
+        }
 
     /** Returns the modulation value for the modulation currently at Input Modulation port INDEX */
     public final double modulate(int index)
@@ -619,20 +619,20 @@ public abstract class Modulation implements Cloneable
     // is inlined.
     static boolean printedModulationOutputError = false;
     void printModulationOutputError(double val) 
-    	{ 
-    	if (!printedModulationOutputError)
-    		{
-    		printedModulationOutputError = true;
-    		new RuntimeException("Modulation Ouput Set to " + val + "\n This will be printed only once.").printStackTrace();
-    		}
-    	}
+        { 
+        if (!printedModulationOutputError)
+            {
+            printedModulationOutputError = true;
+            new RuntimeException("Modulation Ouput Set to " + val + "\n This will be printed only once.").printStackTrace();
+            }
+        }
     
     /** Sets the current output value of modulation port INDEX to VAL. */
     public void setModulationOutput(int index, double val) 
-    	{
-    	if (val < 0 || val > 1) printModulationOutputError(val);
-    	else modulationOutputs[index] = val; 
-    	}
+        {
+        if (val < 0 || val > 1) printModulationOutputError(val);
+        else modulationOutputs[index] = val; 
+        }
     
     /** Returns the current output value of modulation port INDEX to VAL. */
     public double getModulationOutput(int index) { return modulationOutputs[index]; }
@@ -992,22 +992,22 @@ public abstract class Modulation implements Cloneable
 
 ////// HELP
 
-	/** Override this to provide help text in HTML format. 
-		By default this method looks for an HTML file called Foo.html, where
-		Foo is the name of your Modulation subclass, stored in
-		a subdirectory called "html" located next to Foo.class.  It reads
-		this file and returns it as a String.   If there is no such file,
-		null is returned, indicating no help text is provided.
-		
-		<p>Some rules about the HTML.  First, you don't need to say <html>...</html>, those
-		tags will be added later.  Second, the title of the help, which will be added automatically
-		by Flow, will be in <h2>title</h2>.  So you shouldn't use <h2> or <h1>.
-		*/
-	public String getHelpText() 
-		{ 
-		InputStream str = this.getClass().getResourceAsStream("help/" + this.getClass().getSimpleName() + ".html");
-		if (str == null) return null;
-		else return StringUtilities.read(str);
-		}
-		
+    /** Override this to provide help text in HTML format. 
+        By default this method looks for an HTML file called Foo.html, where
+        Foo is the name of your Modulation subclass, stored in
+        a subdirectory called "html" located next to Foo.class.  It reads
+        this file and returns it as a String.   If there is no such file,
+        null is returned, indicating no help text is provided.
+                
+        <p>Some rules about the HTML.  First, you don't need to say <html>...</html>, those
+        tags will be added later.  Second, the title of the help, which will be added automatically
+        by Flow, will be in <h2>title</h2>.  So you shouldn't use <h2> or <h1>.
+    */
+    public String getHelpText() 
+        { 
+        InputStream str = this.getClass().getResourceAsStream("help/" + this.getClass().getSimpleName() + ".html");
+        if (str == null) return null;
+        else return StringUtilities.read(str);
+        }
+                
     }

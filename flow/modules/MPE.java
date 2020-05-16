@@ -53,23 +53,23 @@ public class MPE extends Modulation implements ModSource
     public static final int MOD_IN_Y_OFFSET = 2;
     public static final int MOD_IN_Y_VARIANCE = 3;
 
-        public String[] getPopupOptions(int modulation)
-                {
-                if (modulation == MOD_IN_PRESSURE_VARIANCE || modulation == MOD_IN_Y_VARIANCE)
-                        {
-                        return new String[] { "-2", "-1 1/2", "-1", "-1/2", "0", "1/2", "1", "1 1/2", "2" };
-                        }
-        		else return super.getPopupOptions(modulation);
-                }
+    public String[] getPopupOptions(int modulation)
+        {
+        if (modulation == MOD_IN_PRESSURE_VARIANCE || modulation == MOD_IN_Y_VARIANCE)
+            {
+            return new String[] { "-2", "-1 1/2", "-1", "-1/2", "0", "1/2", "1", "1 1/2", "2" };
+            }
+        else return super.getPopupOptions(modulation);
+        }
 
-        public double getPopupConversion(int modulation, int index)
-                {
-                if (modulation == MOD_IN_PRESSURE_VARIANCE || modulation == MOD_IN_Y_VARIANCE)
-                        {
-                        return (index / 8.0);
-                        }
-        		else return super.getPopupConversion(modulation, index);
-                }
+    public double getPopupConversion(int modulation, int index)
+        {
+        if (modulation == MOD_IN_PRESSURE_VARIANCE || modulation == MOD_IN_Y_VARIANCE)
+            {
+            return (index / 8.0);
+            }
+        else return super.getPopupConversion(modulation, index);
+        }
 
                     
     public void go()

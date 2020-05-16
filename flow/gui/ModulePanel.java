@@ -64,22 +64,22 @@ public class ModulePanel extends JPanel implements Transferable
                 firstMouseDrag = true;
                 }
             public void mouseClicked(MouseEvent e)
-            	{
-            	if (e.getClickCount() == 2)
-            		{
-            		toggleHelpPanel();
-            		}
-            	}
+                {
+                if (e.getClickCount() == 2)
+                    {
+                    toggleHelpPanel();
+                    }
+                }
             });
         title.addMouseMotionListener(new MouseMotionAdapter()
             {
             public void mouseDragged(MouseEvent e)
                 {
                 if (firstMouseDrag)
-	                {
-	                getTransferHandler().exportAsDrag(ModulePanel.this, e, TransferHandler.COPY);
-	                }
-	            firstMouseDrag = false;
+                    {
+                    getTransferHandler().exportAsDrag(ModulePanel.this, e, TransferHandler.COPY);
+                    }
+                firstMouseDrag = false;
                 }
             });
                 
@@ -105,77 +105,77 @@ public class ModulePanel extends JPanel implements Transferable
         }
     
     void buildHelpPanel()
-    	{
-    	JPanel pan2 = new JPanel();		// just a scratch panel to get background
-		String helpText = modulation.getHelpText();
-		if (helpText != null)
-			{
-			JTextPane help = new JTextPane()
-				{
-				  @Override
-				  public void updateUI() {
-					  super.updateUI();
-					  putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
-				  }				
-				};
-			help.setContentType("text/html");
-			help.setText("<html><h2>About " + modulation.getNameForModulation() + "</h2>" + helpText + "</html>");
-      		help.setFont(Style.SMALL_FONT());
-			help.setBorder(null);
-			help.setBackground(pan2.getBackground());
-			help.setHighlighter(null);
-			help.setEditable(false);
-			help.setCaretPosition(0);  // scrolls to top
-			helpPanel = new JScrollPane(help)
-				{
-				public Dimension getPreferredSize()
-					{
-					// we want to be forced to fill the space but not go over
-					return new Dimension(HELP_WIDTH, 0);
-					}
-				};
-			helpPanel.setBorder(
-				BorderFactory.createCompoundBorder(
-					BorderFactory.createMatteBorder(5, 5, 5, 5, pan2.getBackground()),
-					BorderFactory.createCompoundBorder(
-						BorderFactory.createMatteBorder(0, 1, 0, 0, Color.BLACK),
-						BorderFactory.createMatteBorder(0, 5, 0, 0, pan2.getBackground()))));
+        {
+        JPanel pan2 = new JPanel();             // just a scratch panel to get background
+        String helpText = modulation.getHelpText();
+        if (helpText != null)
+            {
+            JTextPane help = new JTextPane()
+                {
+                @Override
+                public void updateUI() {
+                    super.updateUI();
+                    putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, true);
+                    }                             
+                };
+            help.setContentType("text/html");
+            help.setText("<html><h2>About " + modulation.getNameForModulation() + "</h2>" + helpText + "</html>");
+            help.setFont(Style.SMALL_FONT());
+            help.setBorder(null);
+            help.setBackground(pan2.getBackground());
+            help.setHighlighter(null);
+            help.setEditable(false);
+            help.setCaretPosition(0);  // scrolls to top
+            helpPanel = new JScrollPane(help)
+                {
+                public Dimension getPreferredSize()
+                    {
+                    // we want to be forced to fill the space but not go over
+                    return new Dimension(HELP_WIDTH, 0);
+                    }
+                };
+            helpPanel.setBorder(
+                BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(5, 5, 5, 5, pan2.getBackground()),
+                    BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, 1, 0, 0, Color.BLACK),
+                        BorderFactory.createMatteBorder(0, 5, 0, 0, pan2.getBackground()))));
 
-			//helpPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-			helpPanel.getViewport().setBackground(pan2.getBackground());
-			helpPanel.getVerticalScrollBar().setBackground(pan2.getBackground());
-			helpPanel.getVerticalScrollBar().setOpaque(false);
-    		try 
-    			{
-    			HTMLEditorKit kit = (HTMLEditorKit)(help.getEditorKit());
-    			StyleSheet sheet = kit.getStyleSheet();
-    			}
-    		catch (Exception e)
-    			{
-    			e.printStackTrace();
-    			}
-			}
-    	}
+            //helpPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+            helpPanel.getViewport().setBackground(pan2.getBackground());
+            helpPanel.getVerticalScrollBar().setBackground(pan2.getBackground());
+            helpPanel.getVerticalScrollBar().setOpaque(false);
+            try 
+                {
+                HTMLEditorKit kit = (HTMLEditorKit)(help.getEditorKit());
+                StyleSheet sheet = kit.getStyleSheet();
+                }
+            catch (Exception e)
+                {
+                e.printStackTrace();
+                }
+            }
+        }
     
     boolean showingHelp = false;
     public void toggleHelpPanel()
-    	{
-    	if (helpPanel == null)
-    		buildHelpPanel();
-    		
-    	if (showingHelp)
-    		{
-    		if (helpPanel != null)
-	    		remove(helpPanel);
-    		}
-    	else
-    		{
-    		if (helpPanel != null)
-    			add(helpPanel, BorderLayout.EAST);
-    		}
-    	revalidate();
-    	showingHelp = !showingHelp;
-    	}
+        {
+        if (helpPanel == null)
+            buildHelpPanel();
+                
+        if (showingHelp)
+            {
+            if (helpPanel != null)
+                remove(helpPanel);
+            }
+        else
+            {
+            if (helpPanel != null)
+                add(helpPanel, BorderLayout.EAST);
+            }
+        revalidate();
+        showingHelp = !showingHelp;
+        }
 
     // close box
     static final ImageIcon I_CLOSE = iconFor("BellyButton.png");

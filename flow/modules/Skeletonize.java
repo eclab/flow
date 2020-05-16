@@ -76,68 +76,68 @@ public class Skeletonize extends Unit
         double c = 1.0;
         
         if (direction == DIRECTION_BOTH)
-        	{
-			upcuts[0] = c;
-			for(int i = 1; i < amplitudes.length; i++)
-				{
-				if (amplitudes[i] <= amplitudes[i - 1])
-					{  c *= cut; }
-				else
-					{ c = 1.0; }
-				upcuts[i] = c;
-				}
-				
-			c = 1.0;
-			downcuts[amplitudes.length - 1] = c;
-			for(int i = amplitudes.length - 2; i >= 0; i--)
-				{
-				if (amplitudes[i] <= amplitudes[i + 1])
-					{  c *= cut; }
-				else
-					{ c = 1.0; }
-				downcuts[i] = c;
-				}
-				
-			for(int i = 0; i < amplitudes.length; i++)
-				{
-				amplitudes[i] = amplitudes[i] * Math.min(upcuts[i], downcuts[i]);
-				}
-        	}
+            {
+            upcuts[0] = c;
+            for(int i = 1; i < amplitudes.length; i++)
+                {
+                if (amplitudes[i] <= amplitudes[i - 1])
+                    {  c *= cut; }
+                else
+                    { c = 1.0; }
+                upcuts[i] = c;
+                }
+                                
+            c = 1.0;
+            downcuts[amplitudes.length - 1] = c;
+            for(int i = amplitudes.length - 2; i >= 0; i--)
+                {
+                if (amplitudes[i] <= amplitudes[i + 1])
+                    {  c *= cut; }
+                else
+                    { c = 1.0; }
+                downcuts[i] = c;
+                }
+                                
+            for(int i = 0; i < amplitudes.length; i++)
+                {
+                amplitudes[i] = amplitudes[i] * Math.min(upcuts[i], downcuts[i]);
+                }
+            }
         else if (direction == DIRECTION_RIGHT)
-        	{
-			upcuts[0] = c;
-			for(int i = 1; i < amplitudes.length; i++)
-				{
-				if (amplitudes[i] <= amplitudes[i - 1])
-					{  c *= cut; }
-				else
-					{ c = 1.0; }
-				upcuts[i] = c;
-				}
-				
-			for(int i = 0; i < amplitudes.length; i++)
-				{
-				amplitudes[i] = amplitudes[i] * upcuts[i];
-				}
-        	}
+            {
+            upcuts[0] = c;
+            for(int i = 1; i < amplitudes.length; i++)
+                {
+                if (amplitudes[i] <= amplitudes[i - 1])
+                    {  c *= cut; }
+                else
+                    { c = 1.0; }
+                upcuts[i] = c;
+                }
+                                
+            for(int i = 0; i < amplitudes.length; i++)
+                {
+                amplitudes[i] = amplitudes[i] * upcuts[i];
+                }
+            }
         else            // direction == DIRECTION_LEFT
-        	{
-			downcuts[amplitudes.length - 1] = c;
-			for(int i = amplitudes.length - 2; i >= 0; i--)
-				{
-				if (amplitudes[i] <= amplitudes[i + 1])
-					{  c *= cut; }
-				else
-					{ c = 1.0; }
-				downcuts[i] = c;
-				}
-				
-			for(int i = 0; i < amplitudes.length; i++)
-				{
-				amplitudes[i] = amplitudes[i] * downcuts[i];
-				}
-        	}
-        	
+            {
+            downcuts[amplitudes.length - 1] = c;
+            for(int i = amplitudes.length - 2; i >= 0; i--)
+                {
+                if (amplitudes[i] <= amplitudes[i + 1])
+                    {  c *= cut; }
+                else
+                    { c = 1.0; }
+                downcuts[i] = c;
+                }
+                                
+            for(int i = 0; i < amplitudes.length; i++)
+                {
+                amplitudes[i] = amplitudes[i] * downcuts[i];
+                }
+            }
+                
         constrain(); 
         }       
     }

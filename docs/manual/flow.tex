@@ -48,7 +48,7 @@
 \begin{document}
 
 \noindent {\Huge\bf {\name}}\\[0.5em]
-{\large \bf An Open-source, Fully Modular, Multitimbral, Polyphonic Additive Synthesizer\\[0.2em]
+{\large \bf An Open-source, Fully Modular, Multitimbral, Polyphonic, Additive Synthesizer\\[0.2em]
 Version 6\\[0.2em]
 https://github.com/eclab/flow\\\\[0.2em]
 By Sean Luke\\[0.2em]
@@ -67,7 +67,7 @@ sean@cs.gmu.edu}
 
 There have been many additive synthesizers, even semi-modular additive synths, but a fully-modular additive synthesizer is not very common.   It's been fun to write this.  Hopefully this software will inspire others to design similar systems.
 
-{\name} is an academic research experiment and a personal and amateur effort, not a professional product.  Synthesis of the kind attempted here is very costly, and furthermore {\name} tends to emphasize ease of development over efficiency.  This means it'll keep your laptop quite warm and will have lots of odd ends and strings poking out here and there.  {\bf This software is very much in beta.} Absolutely no guarantees are made with regard to its stability or correctness.  It will have a lot of bugs and we will be making regular major, non-backward-compatible changes to it which will break your patches and annoy you.  If you find problems with the software, repeatable bugs, or general irritations, send me mail (sean@cs.gmu.edu).
+{\name} is an academic research experiment and a personal and amateur effort, not a professional product.  Synthesis of the kind attempted here is very costly, and furthermore {\name} tends to emphasize ease of development over efficiency.  This means it'll keep your laptop quite warm and will have lots of odd ends and strings poking out here and there.  Absolutely no guarantees are made with regard to its stability or correctness.  If you find problems with the software, repeatable bugs, or general irritations, send me mail (sean@cs.gmu.edu).
 
 {\name} was written in Java because it is highly portable and still pretty fast: perhaps using this synthesizer will convince you of this.  You can run a great many modules at once in a patch as necessary.  But because {\name} is in Java, it must be a standalone application, not a VST or AU.  The software should run fine on Windows, OS X, and Linux, though it was developed for OS X and has not been tuned or tested much on the other platforms to date (especially not Windows).
 
@@ -163,17 +163,19 @@ If you look carefully at Figure~\ref{screenshot}, you'll see that there are not 
 \subsection{Tuning Parameters}
 First things first.  {\name} is very computationally expensive and benefits from tuning for your computer speed.  If your computer can't keep up with Flow's demands, you'll hear a {\bf glitch}.  This is a pop or a buzz in the audio stream, and will be accompanied by the {\bf Out} module (the top-right module shown in Figure \ref{screenshot}) coloring its black title bar red and saying \smash{\fcolorbox{black}{red}{\color{white}\small\sf{Glitch}}}\,.  A glitch occurs when Flow can't keep the audio buffer filled fast enough, so your computer is forced to start filling it with zeros.  You don't want that.
 
-How do we tamp down glitches?  By playing with a few parameters. If you select {\bf Tuning Parameters} from the {\bf Options} menu, you can at present change three parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session. 
+How do we tamp down glitches?  By playing with a few parameters. If you select {\bf Tuning Parameters} from the {\bf Options} menu, you can at present change six parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session. 
 
 \begin{itemize}
 \item {\bf Polyphony} (1--16, default: 8)\qquad This is the number of voices the synthesizer can play at once.  More voices incurs a higher load.
+
 \item {\bf Buffer Size Per Channel} (default: 1152, which is crummy, but the best Java on the Mac can do)\qquad This is the size of the audio buffer (for each channel) that {\name} keeps filled for your operating system to tap into to generate sounds.  You want a low buffer if you can (much less latency); but a bigger buffer makes it easier for Flow to keep up.  Some operating systems require a large buffer size: for example, OS X typically needs at least 1152 . On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{connecting} for more information.  I can't help you much regarding Windows.
 
-\item {\bf Partials} (64--256, default: 128)\qquad This is the number of partials passed around from module to module.  More partials will produce a richer sound, particularly in bass notes, but incur a much higher load.
+\item {\bf Partials} (64--256, default: 128)\qquad This is the number of partials passed around from module to module.  More partials will produce a richer sound, particularly in bass notes, but incurs a much higher load.
 
-\item {\bf Voices Per Thread} (1, 2, 4, 8, 16, default: 8)\qquad This is the number of voices which will be assigned to a single CPU thread in the partials-updating stage of synthesis.  More voices per thread means fewer threads.  You'd like as many voices assigned to a given thread as possible, because switching threads incurs significant computational overhead.  However if you have too many voices on a thread, then they cannot take advantage of the parallelism afforded by your laptop's nifty multi-core CPU and you won't have fast partials updates.  Also if you have very few voices per thread, then you'll have many more threads in the partials-updating stage and this may nudge out the critical output threads, resulting in more glitches.  You have to find a balance.  
+\item {\bf Voices Per Thread} (1, 2, 4, 8, 16, default: 8)\qquad This is the number of voices which will be assigned to a single CPU thread in the partials-updating stage of synthesis.  More voices per thread means fewer threads.  You'd like as many voices assigned to a given thread as possible, because switching threads incurs significant computational overhead.  However if you have too many voices on a thread, then they cannot take advantage of the parallelism afforded by your laptop's nifty multi-core CPU and you won't have fast partials updates.  Also if you have very few voices per thread, then you'll have many more threads in the partials-updating stage and this may nudge out the critical output threads, resulting in more glitches.  You have to find a balance.   I have found 8 to be a good default.
 
-\item {\bf Outputs Per Thread} (1, 2, 4, 8, 16, default: 2)\qquad This is the number of voices which will be assigned to a single CPU thread in the sound-output stage of synthesis.  More voices per thread means fewer threads.  You'd like as many voices assigned to a given thread as possible, because switching threads incurs significant computational overhead.  However if you have too many voices on a thread, then they cannot take advantage of the parallelism afforded by your laptop's nifty multi-core CPU and you will glitch because Flow can't service the audio output fast enough.  You have to find a balance.  
+\item {\bf Outputs Per Thread} (1, 2, 4, 8, 16, default: 2)\qquad This is the number of voices which will be assigned to a single CPU thread in the sound-output stage of synthesis.  More voices per thread means fewer threads.  You'd like as many voices assigned to a given thread as possible, because switching threads incurs significant computational overhead.  However if you have too many voices on a thread, then they cannot take advantage of the parallelism afforded by your laptop's multi-core CPU.  You have to find a balance.    I have found 2 to be a good default.
+
 
 \item {\bf Stereo}  If this is unchecked, then Flow will output mono sound regardless of the setting of the pan knob or slider. This might incur a somewhat lower overhead, but it's likely to be minor.
 \end{itemize}
@@ -337,7 +339,7 @@ If Flow is playing too loudly its sound will {\bf clip}. The title bar of the {\
 
 \paragraph{Synced to MIDI Clock}  This toggles whether Flow allows modules to define their timing according to an incoming MIDI clock rather than an internal clock.  Just because you have selected this doesn't mean a module uses the incoming MIDI clock: you often also have to set that in the module itself.
 
-\paragraph{Microtuning \textit{and} Load Microtuning File...}  If you load a microtuning file (a {\it Scala} or \textsf{.scl} file), Flow will use it to map standard MIDI notes to the tunings defined in the file.  You'll also be asked to stipulate a root note corresponding to some MIDI note (such as middle C).  Once you have things set up, you can then toggle microtuning on and off by selecting {\it Microtuning}.  
+\subsubsection{Microtuning}  If you load a microtuning file (a {\it Scala} or \textsf{.scl} file), via {\bf Load Microtuning File...} then Flow will use it to map standard MIDI notes to the tunings defined in the file.  You'll also be asked to stipulate a root note corresponding to some MIDI note (such as middle C).  Once you have things set up, you can then toggle microtuning on and off by selecting {\bf Microtuning}.  
 
 \subsubsection{Using MPE}
 
@@ -574,7 +576,7 @@ The Modules are divided into five categories:
 \begin{wrapfigure}{r}{3.1in}
 \vspace{-1em}
 \includegraphics[height=1.5in]{CurveUp}~~~\includegraphics[height=1.5in]{CurveDown}
-\caption{Envelope modulation curves, shown both in rising and falling scenarios.  Solid lines are (right to left) {\it Linear}, \(x^2\), \(x^4\), \(x^8\), \(x^{16}\), and \(x^{32}\).  {\bf If you're looking for an exponential-sounding curve, \(\bm x^4\) works pretty well.}  Dashed lines are (right to left) \((x^2 + x^8)/2\),  \((x^4 + x^{16})/2\), and  \((x^8 + x^{32})/2\).  Dot-dash lines are (left to right) \(1-(1-x)^2, 1-(1-x)^4,\) and \(1-(1-x)^8\) (denoted {\it Inv \(x^2\), Inv \(x^4\),} and {\it Inv \(x^8\)} in Flow's menu).  The dotted line is {\it Step}, which stays put until the very end, then suddenly jumps to the ultimate value. }
+\caption{Envelope modulation curves, shown both in rising and falling scenarios.  Solid lines are (right to left) {\it Linear}, \(x^2\), \(x^4\), \(x^8\), \(x^{16}\), and \(x^{32}\).  {\bf If you're looking for an exponential-sounding curve, \(\bm x^4\) works pretty well.}  Dashed lines are (right to left) \((x^2 + x^8)/2\),  \((x^4 + x^{16})/2\), and  \((x^8 + x^{32})/2\) (denoted \(x^2, 8\),\ \  \(x^4, 16\),\ \  and \(x^8, 32\)\ \  in a module's popup menu).  Dot-dash lines are (left to right) \(1-(1-x)^2, 1-(1-x)^4,\) and \(1-(1-x)^8\) (denoted {\it Inv \(x^2\), Inv \(x^4\),} and {\it Inv \(x^8\)} in a module's popup menu).  The dotted line is {\it Step}, which stays put until the very end, then suddenly jumps to the ultimate value. }
 \label{curves}
 \end{wrapfigure}
 
@@ -787,11 +789,11 @@ This module is designed to merge with other sources to add hiss to them: most co
 Obviously morphing from a Sine wave to one of these waves in Flow won't be anything like applying Phase Distortion on a CZ: but there you go.
 \end{itemize}
 
-See also {\bf Draw}, which allows you to load single-cycle waves: the manual section on Draw has good suggestions for sources of these waves.  See also {\bf KHarmonics}, a similar collection drawn from various Kawai K5 harmonics.
+See also {\bf Draw}, which can load single-cycle waves: the manual section on Draw has suggestions for other single-cycle wave sources.  See also {\bf KHarmonics}, a similar collection drawn from Kawai K5 harmonics.
 
-\paragraph{Wavetable}  Lets you load wavetables (as ``.WAV'' files) from https:/\!/waveeditonline.com/, then wander through them using the provided modulation.  You can turn off interpolation between waves.  Wavetables are loaded using the {\it Wavetable} button.
+\paragraph{Wavetable}  Lets you load wavetables from WaveEditOnline (https:/\!/waveeditonline.com/), then wander through them using the provided modulation.  You can turn off interpolation between waves.  Wavetables are loaded (as ``.WAV'' files) using the {\it Wavetable} button.  If you're interested, you can edit wavetables directly using WaveEdit (https:/\!/synthtech.com/waveedit).
 
-You can also load an arbitrary sound directly and Flow will chop it up into a wavetable for you by pressing the {\it Sample} button.  Your sound file must be a 16-bit signed integer WAV file, mono only.   The Sample button is different from the Wavetable button in that it isdesigned to remove some of the choppiness from reading an arbitrary sound: but it won't remove all of it.  You can eliminate most of the rest by running the partials through a Smooth module set to about 0.5.  Note: this is only for sampling arbitrary sounds:  you don't want to do any of this stuff (the sample option, Smooth) if you're reading a prepared wavetable from https:/\!/waveeditonline.com/.  The sampled option uses the same basic procedure as Audio In uses to sample its real-time input.  See also {\bf Audio In}.
+You can also load an arbitrary sound directly and Flow will chop it up into a wavetable for you by pressing the {\it Sample} button.  Your sound file must be a 16-bit signed integer WAV file, mono only.   The Sample button is different from the Wavetable button in that it is designed to remove some of the choppiness from reading an arbitrary sound: but it won't remove all of it.  You can eliminate most of the rest by running the partials through a Smooth module set to about 0.5.  Note: this is only for sampling arbitrary sounds:  you don't want to do any of this stuff (the sample option, Smooth) if you're reading a prepared wavetable.  The sampled option uses the same basic procedure as Audio In uses to sample its real-time input.  See also {\bf Audio~In}.
 
 
 \subsection{Partials Shapers}
@@ -1556,12 +1558,13 @@ Third: you might also change your module, which causes problems when trying to b
 \item {\it unit-input-value:}\quad{\tt \{ "at":{\it unit-output-name}, "id":{\it id} \}}\qquad The id is for the attached module.
 \item {\it unit-output-name:}\quad A unit output name (a string).  Normally this is the same as returned by {\tt getOutputName(...)}.
 \item {\it optional-subpatches:}\quad {\tt {\it subpatch,*} }
-\item {\it subpatch:}\quad {\tt \{ "voices":{\it subpatch-voices}, "gain":{\it subpatch-gain}, "note": {\it optional-subpach-note}, \\
-\rule[0in]{0in}{0in}~\hspace{\fill}\hbox{"midi":{\it optional-subpatch-midi-channel},  "flow":{\it flow-version}, "name":{\it patch-name},} \\ 
-\rule[0in]{0in}{0in}~\hspace{\fill}\hbox{"by":{\it patch-author}, "on":{\it patch-date}, "info":{\it patch-info}, "v":{\it patch-version},}
- "modules":{\it modules} \} }
+\item {\it subpatch:}\quad {\tt \{ "voices":{\it subpatch-voices}, "gain":{\it subpatch-gain}, "pan":{\it subpatch-pan},\\
+\rule[0in]{0in}{0in}~\hspace{\fill}\hbox{"midi":{\it optional-subpatch-midi-channel}, "note":{\it optional-subpach-note},}\\ 
+\rule[0in]{0in}{0in}~\hspace{\fill}\hbox{"by":{\it patch-author}, "on":{\it patch-date}, "info":{\it patch-info}, "v":{\it patch-version},}\\
+\rule[0in]{0in}{0in}~\hspace{\fill}\hbox{ "flow":{\it flow-version}, "name":{\it patch-name},  "modules":{\it modules} \}}}
 \item {\it subpatch-voices:}\quad The requested number of voices (Sounds) for this subpatch (an integer).
-\item {\it subpatch-gain:}\quad The requested gain for this subpatch (a double).
+\item {\it subpatch-gain:}\quad The requested gain for this subpatch (a double \(\geq 0.0\)).
+\item {\it subpatch-pan:}\quad The requested pan for this subpatch (a double 0.0--1.0).
 \item {\it optional-subpatch-midi-channel:}\quad The subpatch's midi channel, 0--16.  0, or missing, means ``No channel''. 
 \item {\it optional-subpatch-midi-channel:}\quad The MIDI note for the subpath, 0--128.  0, or missing, means ``Any note''.  Otherwise the note is the value, minus 1.
 \end{itemize}
@@ -1651,7 +1654,7 @@ public class MyUnit extends Unit
         {
         super.go();
         double mod = modulate(0);
-        double cutoff = modToFrequency(mod);
+        double cutoff = modToFrequency(makeVeryInsensitive(mod));
         double pitch = getSound().getPitch();
         
         pushFrequencies(0);
@@ -1675,7 +1678,9 @@ public class MyUnit extends Unit
 
 Now we're cooking!  We just do a for-loop over the amplitudes and zero them if the corresponding frequency is too high.  But notice the usage of {\it pitch}.  Frequencies in partials aren't absolute frequencies: they're multiples of the pitch frequency of the current note (which typically, but not always, corresponds to the frequency of the fundamental).  So if we want to get the true frequency of a partial, we have to multiply it by the pitch.  The pitch is extracted from the module's {\bf Sound}, that is, the voice it's assigned to.  Sounds have a number of items they can provide: pitch is one of them.
 
-Now, modulation values go from 0...1.  How do we convert that into a frequency?  We could just multiply by half the sampling rate (remember that anything over half the sampling rate is beyond the Nyquist limit), that is, something like \hbox{\tt cutoff = mod * Output.SAMPLING\_RATE}\quad But frequency is exponential, so we'd like something exponential-ish.  That's what the Modulation utility method {\tt modToFrequency(...)} does.  You might prefer it, or not.
+Now, modulation values go from 0...1.  How do we convert that into a frequency?  We could just multiply by half the sampling rate (remember that anything over half the sampling rate is beyond the Nyquist limit), that is, something like \hbox{\tt cutoff = mod * Output.SAMPLING\_RATE}\quad But frequency is exponential, so we'd like something exponential-ish.  That's what the Modulation utility method {\tt modToFrequency(...)} does.
+
+The problem with modToFrequency is that by itself it takes too long to reach a reasonable value: so modToFrequency(0.5) is only 11 Hz.  This is a waste of dial space.  So we make the dial much less sensitive to the exponential-ish effect by including {\tt makeVeryInsensitive(...)}. Now the two together yield 6567 Hz at 0.5.
 
 \paragraph{Add Trigger Response} 
 Now let's throw in a monkey wrench.  Imagine that we'd like to swap between low-pass and high-pass depending on the state of a trigger sent to us, oh, let's say, the Modulation we just developed in Section~\ref{buildlingamodulation}.   We might write:
@@ -1712,7 +1717,7 @@ public class MyUnit extends Unit
           {
           super.go();
           double mod = modulate(0);
-          double cutoff = modToFrequency(mod);
+          double cutoff = modToFrequency(makeVeryInsensitive(mod));
           double pitch = getSound().getPitch();
         
           pushFrequencies(0);
@@ -1746,7 +1751,7 @@ One item many filter-style Units have is a {\it constraints facility}.  This is 
           {
           super.go();
           double mod = modulate(0);
-          double cutoff = modToFrequency(mod);
+          double cutoff = modToFrequency(makeVeryInsensitive(mod));
           double pitch = getSound().getPitch();
         
           pushFrequencies(0);
@@ -1800,13 +1805,38 @@ Right now our cutoff frequency dial just gives values from 0...1.  That's not ve
         {
         if (isConstant)  // we don't have anything plugged in
             {
-            if (modulation == 0)  // cutoff
+            if (modulation == 0)  // cutoff -- there's only one
                 {
                 return String.format("%.4f", modToFrequency(value));
                 }
             else return super.getModulationValueDescription(modulation);
             }
         else return "";
+        }
+\end{verbatim}
+}
+
+We might wish to change the popup menu as well.  This can be done in a variety of ways, but here's an easy one: we add two methods, {\tt getPopupOptions(...)} and {\tt getPopupConversions(...)}.  The first returns a list of popup text strings; the second returns a list of double values (0...1) corresponding to them.  So we could do this:
+
+
+\vbox{\footnotesize
+\begin{verbatim}
+    public String[] getPopupOptions(int modulation)
+        {
+        if (modulation == 0)  // cutoff -- there's only one
+            {
+            return new String[] { "10 Hz", "100 Hz", "1000 Hz", "10000 Hz" };
+            }
+        else return super.getPopupOptions(modulation);
+        }
+
+    public double[] getPopupConversions(int modulation)
+        {
+        if (modulation == 0)  // cutoff -- there's only one
+            {
+            return new double[] { 0.155, 0.2475, 0.359, 0.55183 };
+            }
+        else return super.getPopupConversions(modulation);
         }
 \end{verbatim}
 }

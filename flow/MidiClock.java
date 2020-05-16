@@ -103,10 +103,10 @@ public class MidiClock
     int lastPulseRealTick = 0;
     // The tick that we believe we currently are at.  This is a smoothed estimate. 
     double midiTickEstimate = 0;
-	// Stores the same data as midiTickEstimate, and is updated when appropriate.
-	// Volatile so that we can load it atomically as getTick()
+    // Stores the same data as midiTickEstimate, and is updated when appropriate.
+    // Volatile so that we can load it atomically as getTick()
     volatile int syncTick = 0;
-	// Stores the same data as syncTick, and is updated during syncTick()
+    // Stores the same data as syncTick, and is updated during syncTick()
     int tick = 0;
     
     public void syncTick()
@@ -120,9 +120,9 @@ public class MidiClock
         }
         
     public boolean isRunning()
-    	{
-    	return state > STATE_STOPPED && state <= STATE_RUNNING;
-    	}
+        {
+        return state > STATE_STOPPED && state <= STATE_RUNNING;
+        }
         
     ///// CLOCK
 
@@ -147,8 +147,8 @@ public class MidiClock
     // continues the clock
     synchronized void continueClock()
         {
-		int currentRealTick = input.getOutput().getTick();
-		midiTickEstimate = getPulses() * TICKS_PER_PULSE + (currentRealTick - lastPulseRealTick) / rateEstimate * TICKS_PER_PULSE;
+        int currentRealTick = input.getOutput().getTick();
+        midiTickEstimate = getPulses() * TICKS_PER_PULSE + (currentRealTick - lastPulseRealTick) / rateEstimate * TICKS_PER_PULSE;
         syncTick = (int)midiTickEstimate;
         state = STATE_WAITING_FOR_FIRST_PULSE;
         }
@@ -163,8 +163,8 @@ public class MidiClock
             pulses++;
             clockPulseTrigger = 1;
             }
-		
-		if (state == STATE_WAITING_FOR_FIRST_PULSE)
+                
+        if (state == STATE_WAITING_FOR_FIRST_PULSE)
             {
             // we have just now gotten our first pulse.  So we record the tick as the last pulse tick 
             lastPulseRealTick = currentRealTick;
@@ -209,17 +209,17 @@ public class MidiClock
             int currentRealTick = input.getOutput().getTick();
             double newPulses = (currentRealTick - lastPulseRealTick) / rateEstimate;
             if (newPulses >= BIG_PULSES_BEHIND)
-            	return;  // we haven't been getting many pulses lately
-            	
+                return;  // we haven't been getting many pulses lately
+                
             double midiTickTarget = (getPulses() + newPulses) * TICKS_PER_PULSE;
             
             // We are far ahead.  Lock it.
             if (midiTickTarget > midiTickEstimate + BIG_CHANGE)
-            	{
+                {
                 System.err.println("WARNING(MidiClock.java): Clock locked forward to " + (midiTickEstimate - midiTickTarget));
                 // lock it
                 midiTickEstimate = midiTickTarget;
-            	}
+                }
             // We roll in our computed target from the difference only if we're ahead.  If we're behind, we're not there yet.
             // Therefore we can't go backwards
             else if (midiTickTarget > midiTickEstimate)

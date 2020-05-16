@@ -216,7 +216,7 @@ public class In extends Unit implements Miscellaneous
                 }
             for(int i = 0; i < num; i++)
                 {
-               setOutputName(i, array.getString(i));
+                setOutputName(i, array.getString(i));
                 }
             }
         }

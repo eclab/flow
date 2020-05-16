@@ -102,7 +102,7 @@ public class Geiger extends Modulation
         {
         super.go();
 
-		boolean pulseDown = !down && isPulsing();
+        boolean pulseDown = !down && isPulsing();
         if (isTriggered(MOD_TRIGGER))
             {
             Random rand = (random == null ? getSound().getRandom() : random);
@@ -114,7 +114,7 @@ public class Geiger extends Modulation
                     down = !down;
                     setModulationOutput(0, down ? 0 : 1);
                     if (!(down && pulseDown))
-                    	updateTrigger(0);
+                        updateTrigger(0);
                     count = 0;
                     }
                 }

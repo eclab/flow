@@ -355,10 +355,10 @@ public class Envelope extends Modulation implements ModSource
         
         long tick = getSyncTick(sync);
 
-    	if (tick < start) // uh oh, probably switched to MIDI Sync
-    		{
-    		start = tick;
-    		}
+        if (tick < start) // uh oh, probably switched to MIDI Sync
+            {
+            start = tick;
+            }
                 
         // Do we need to transition to a new state?
         boolean transitioned = false;

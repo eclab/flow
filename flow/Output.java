@@ -615,18 +615,18 @@ public class Output
                 // partials below, we can get a denormalled number -- try the IComeInPeace patch
                 // after commenting out     if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0; 
                 double amplitude = (currentAmp[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA) +
-                					(amp[i] * PARTIALS_INTERPOLATION_ALPHA);
+                    (amp[i] * PARTIALS_INTERPOLATION_ALPHA);
                 if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0;          // undenormalize prior to next go-around
                 currentAmp[oi] = amplitude;
 
                 if (amplitude > MINIMUM_VOLUME)
                     {                               
-                	double position = pos[oi] + frequency * tr;
-                	position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
-                	pos[oi] = position;
-                	        
-                	sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude;
-                	}
+                    double position = pos[oi] + frequency * tr;
+                    position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
+                    pos[oi] = position;
+                                
+                    sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude;
+                    }
                 }
             }
         else
@@ -642,7 +642,7 @@ public class Output
                 // partials below, we can get a denormalled number -- try the IComeInPeace patch
                 // after commenting out     if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0; 
                 double amplitude = (currentAmp[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA) +
-                					(amp[i] * PARTIALS_INTERPOLATION_ALPHA);
+                    (amp[i] * PARTIALS_INTERPOLATION_ALPHA);
                 if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0;          // undenormalize prior to next go-around
                 currentAmp[oi] = amplitude;
                                 

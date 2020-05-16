@@ -38,7 +38,7 @@ public class FormantFilter extends Unit
         defineOptions(new String[] { "Vowel 1", "Vowel 2", "Vowel 3", "Vowel 4", "Vowel 5", "Vowel 6", "Vowel 7", "Vowel 8", "Four Pole" }, 
             new String[][] { vowelNames, vowelNames, vowelNames, vowelNames, vowelNames, vowelNames, vowelNames, vowelNames, { "Four Pole" }});
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.ONE, new Constant(1.0 / MAX_Q_GAIN) }, 
-        	new String[] { "Interpolation", "Num Vowels", "Gain", "Formants", "Resonance" });
+            new String[] { "Interpolation", "Num Vowels", "Gain", "Formants", "Resonance" });
         }
 
     int vowelIndex[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -107,8 +107,8 @@ public class FormantFilter extends Unit
              
         double sum = 0;   
         for(int i = 0; i < numFormants; i++)
-        	{
-        	sum += singleFormantFilter(frequency,  f1[i] * alpha1 + f2[i] * alpha,
+            {
+            sum += singleFormantFilter(frequency,  f1[i] * alpha1 + f2[i] * alpha,
                 b1[i] * alpha1 + b2[i] * alpha,
                 a1[i] * alpha1 + a2[i] * alpha, qgain);
             }
@@ -116,24 +116,24 @@ public class FormantFilter extends Unit
         
         
         /*
-        return 
-            singleFormantFilter(frequency,  f1[0] * alpha1 + f2[0] * alpha,
-                b1[0] * alpha1 + b2[0] * alpha,
-                a1[0] * alpha1 + a2[0] * alpha) +
-            singleFormantFilter(frequency,  f1[1] * alpha1 + f2[1] * alpha,
-                b1[1] * alpha1 + b2[1] * alpha,
-                a1[1] * alpha1 + a2[1] * alpha) +
-            singleFormantFilter(frequency,  f1[2] * alpha1 + f2[2] * alpha,
-                b1[2] * alpha1 + b2[2] * alpha,
-                a1[2] * alpha1 + a2[2] * alpha)
-                                                  +
-                                                  singleFormantFilter(frequency,  f1[3] * alpha1 + f2[3] * alpha,
-                                                  b1[3] * alpha1 + b2[3] * alpha,
-                                                  a1[3] * alpha1 + a2[3] * alpha) +
-                                                  singleFormantFilter(frequency,  f1[4] * alpha1 + f2[4] * alpha,
-                                                  b1[4] * alpha1 + b2[4] * alpha,
-                                                  a1[4] * alpha1 + a2[4] * alpha)
-            ;                                                                    
+          return 
+          singleFormantFilter(frequency,  f1[0] * alpha1 + f2[0] * alpha,
+          b1[0] * alpha1 + b2[0] * alpha,
+          a1[0] * alpha1 + a2[0] * alpha) +
+          singleFormantFilter(frequency,  f1[1] * alpha1 + f2[1] * alpha,
+          b1[1] * alpha1 + b2[1] * alpha,
+          a1[1] * alpha1 + a2[1] * alpha) +
+          singleFormantFilter(frequency,  f1[2] * alpha1 + f2[2] * alpha,
+          b1[2] * alpha1 + b2[2] * alpha,
+          a1[2] * alpha1 + a2[2] * alpha)
+          +
+          singleFormantFilter(frequency,  f1[3] * alpha1 + f2[3] * alpha,
+          b1[3] * alpha1 + b2[3] * alpha,
+          a1[3] * alpha1 + a2[3] * alpha) +
+          singleFormantFilter(frequency,  f1[4] * alpha1 + f2[4] * alpha,
+          b1[4] * alpha1 + b2[4] * alpha,
+          a1[4] * alpha1 + a2[4] * alpha)
+          ;                                                                    
         */             
         }
     
@@ -216,15 +216,15 @@ public class FormantFilter extends Unit
                 return super.getModulationValueDescription(modulation, value * MAX_GAIN, isConstant);
                 }
             else if (modulation == MOD_NUM_FORMANTS)
-            	{
+                {
                 return "" + (int)(value * (NUM_FORMANTS - 1) + 1.0);
-            	}
+                }
             else if (modulation == MOD_RESONANCE)
-            	{
-        		double qgain = value * MAX_Q_GAIN; 
-        		if (qgain < MIN_Q_GAIN) qgain = MIN_Q_GAIN;
-            	return String.format("%.4f", qgain);
-            	}
+                {
+                double qgain = value * MAX_Q_GAIN; 
+                if (qgain < MIN_Q_GAIN) qgain = MIN_Q_GAIN;
+                return String.format("%.4f", qgain);
+                }
             else return super.getModulationValueDescription(modulation, value, isConstant);
             }
         else return "";

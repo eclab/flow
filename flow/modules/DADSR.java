@@ -257,10 +257,10 @@ public class DADSR extends Modulation implements ModSource
             
         long tick = getSyncTick(sync);
 
-    	if (tick < start) // uh oh, probably switched to MIDI Sync
-    		{
-    		start = tick;
-    		}
+        if (tick < start) // uh oh, probably switched to MIDI Sync
+            {
+            start = tick;
+            }
     
         // need to reset level[DONE]        
         if (state > DELAY)

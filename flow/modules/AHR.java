@@ -251,10 +251,10 @@ public class AHR extends Modulation implements ModSource
 
         // What state are we in?
                         
-    	if (tick < start) // uh oh, probably switched to MIDI Sync
-    		{
-    		start = tick;
-    		}
+        if (tick < start) // uh oh, probably switched to MIDI Sync
+            {
+            start = tick;
+            }
     
         // if we're in a sticky state, just return the level
         if (state == DONE)
@@ -295,7 +295,7 @@ public class AHR extends Modulation implements ModSource
             firstLevel = level[state - 1];  
 
         double alpha = (tick - start) / interval;
-				
+                                
         int c = CURVE_LINEAR;
                 
         if (state == ATTACK)
