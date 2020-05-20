@@ -20,7 +20,7 @@ import java.util.zip.*;
 public class Flow
     {
     // Flow Version
-    public static int VERSION = 6;
+    public static int VERSION = 7;
     
     public static void main(String[] args)
         {
