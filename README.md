@@ -110,7 +110,7 @@ Flow should work fine if you have installed at least *Java 8*.
 
 2. Download Flow's jar file, called [flow.jar](https://cs.gmu.edu/~eclab/projects/flow/flow.jar).
 
-3. Grab some [patches](https://cs.gmu.edu/~eclab/projects/flow), some [wavetables](https://waveeditonline.com/), and the [manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf).  
+3. Grab some [patches](https://cs.gmu.edu/~eclab/projects/flow/patches.zip), some [wavetables](https://waveeditonline.com/), and the [manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf).  
 
 4. Run Flow as:   `java -jar flow.jar`
 
