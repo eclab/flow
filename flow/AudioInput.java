@@ -231,9 +231,9 @@ public class AudioInput
                     }
                 try { tdl.open(output.audioFormat, output.bufferSize); }                        // is this wise? Should we do something smaller?
                 catch (Exception ex) 
-                	{ 
-                	ex.printStackTrace(); 
-                	}
+                    { 
+                    ex.printStackTrace(); 
+                    }
                 tdl.start();
                 this.mixer = mixer;
                 }
