@@ -21,7 +21,7 @@ Donations are welcome via Paypal.
 
 ## About
 
-Flow is a fully-modular multitimbral and polyphonic additive software synthesizer written in pure Java.  It runs on OS X, Linux, and Windows.  I have used it to play individual patches and to play many simultaneous patches for a full song controlled over MIDI via a DAW.
+Flow is a fully-modular multitimbral and polyphonic additive software synthesizer written in pure Java.  It runs on MacOS, Linux, and Windows.  I have used it to play individual patches and to play many simultaneous patches for a full song controlled over MIDI via a DAW.
 
 Flow has almost 70 modules of different shapes and sizes, and currently supports up to 32 voices at up to 256 partials and 44.1KHz with a rate of one new partial update every 32 samples.  Flow is a very computationally expensive program and will keep your laptop quite warm and your fan busy.  You need to have some fairly good hardware to run Flow at full blast successfully (for reference, Flow was developed on a 2.8Ghz i7 2015 Macbook Pro Retina).  There are options for reducing Flow's footprint (such as reducing the number of voices or partials).
 
@@ -49,8 +49,7 @@ Flow has almost 70 modules of different shapes and sizes, and currently supports
 
 ## Install and Run Flow
 
-Flow is cross-platform and will run on a variety of platforms (Windows, Linux) but we are personally developing on and for
-OS X and Linux. We'd appreciate feedback and screenshots of it running on Windows so we can tweak things.
+Flow is cross-platform and will run on a variety of platforms (Windows, Linux) but we are personally developing on and for MacOS and Linux. We'd appreciate feedback and screenshots of it running on Windows so we can tweak things.
 
 
 ### Installation and Running on MacOS
@@ -70,6 +69,8 @@ Let's assume you stuck Flow in the /Applications directory as usual.  Then:
 5. Quit the Terminal Program
 
 Now you should be able to run Flow.  Let us know if this all works.
+
+#### Note on Catalina...
 
 Note that Catalina may have added additional requirements to running Flow properly: but I don't have a Catalina machine to test on.  Let me know if you run into issues and/or find solutions to them.
 
@@ -106,7 +107,7 @@ Flow should work fine if you have installed at least *Java 8*.
 5. Thereafter you should be able to just double-click on the file to launch Flow.
 
 
-### Running from the command line (OS X, Windows, Linux)
+### Running from the command line (MacOS, Windows, Linux)
 
 1. Make sure Java is installed as discussed earlier.
 
