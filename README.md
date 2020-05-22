@@ -53,7 +53,7 @@ Flow is cross-platform and will run on a variety of platforms (Windows, Linux) b
 OS X and Linux. We'd appreciate feedback and screenshots of it running on Windows so we can tweak things.
 
 
-### Installation and Running on OS X 
+### Installation and Running on MacOS
 
 First install Flow from this link: [Flow.app.zip](https://cs.gmu.edu/~eclab/projects/flow/Flow.app.zip). 
 Sadly, it's a whopping 70MB because it includes the Java VM.  :-(
@@ -70,6 +70,8 @@ Let's assume you stuck Flow in the /Applications directory as usual.  Then:
 5. Quit the Terminal Program
 
 Now you should be able to run Flow.  Let us know if this all works.
+
+Note that Catalina may have added additional requirements to running Flow properly: but I don't have a Catalina machine to test on.  Let me know if you run into issues and/or find solutions to them.
 
 
 ### Installation and Running on Windows
