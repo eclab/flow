@@ -1,0 +1,20 @@
+Switches between four different sources.
+
+<p>You select the new sound to play by sending a trigger the corresponding modulation input.  Select will then interpolate the frequencies and amplitudes between the old sound and the newly chosen sound until old sound is entirely faded out.  You can use this in combination with the individual modulation outputs of an envelope to select one sound, then another, then a final sound, for example.  
+
+<p>Select has an output trigger: this will send a trigger when its sound has been chosen, and will also output the current interpolation value of the sound.
+
+<p>The first selected sound is always A.
+
+<dl>
+<dt>Input A ... D
+<dd>The four input partials sources
+<dt>Trig A ... D [Input]
+<dd>When triggered, selects the corresponding input.
+<dt>Trig A ... D [Output]
+<dd>Outputs a trigger when the sound has been selected, and also outputs the interpolation value for that sound.
+<dt>Rate  
+<dd>The rate at which the sounds are faded in/out.  This is useful for preventing pops when a new sound is suddenly selected.
+<dt>Free
+<dd>When a Note On occurs, Select does not reset to input A, but instead starts right where it had left off.
+</dl>
