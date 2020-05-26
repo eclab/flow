@@ -1048,7 +1048,7 @@ public class Output
             }
         }
 
-
+	volatile int count = 0;
 
     double[] zeroAmplitudes = new double[Unit.NUM_PARTIALS];
     double[] zeroFrequencies = new double[Unit.NUM_PARTIALS];
@@ -1061,6 +1061,10 @@ public class Output
         or via calling startPrimaryVoiceThread(). */ 
     public void go()
         {
+        // reduce the number of sounds to 1 if monophonic
+        int ns = numSounds;
+        if (onlyPlayFirstSound) ns = 1;
+
         lock();
         try
             {
@@ -1070,14 +1074,14 @@ public class Output
             input.go();
             
             if (!soundThreadsStarted)
-                for (int i = 0; i < numSounds; i++)
+                for (int i = 0; i < ns; i++)
                     {
                     sounds[i].reset();
                     }
                 
-            if (numSounds <= numVoicesPerThread)
+            if (ns <= numVoicesPerThread)
                 {
-                for (int i = 0; i < numSounds; i++)
+                for (int i = 0; i < ns; i++)
                     {
                     sounds[i].go();
                     }
@@ -1085,7 +1089,7 @@ public class Output
                 }
             else
                 {
-                int numThreads = (int)(Math.ceil(numSounds / (double)numVoicesPerThread));
+                int numThreads = (int)(Math.ceil(ns / (double)numVoicesPerThread));
                 if (!soundThreadsStarted)
                     {
                     startPerVoiceThreads(numThreads);
@@ -1121,7 +1125,7 @@ public class Output
         try
             {
             Unit e = sounds[0].getEmits();
-            for (int i = 0 ; i < numSounds; i++)
+            for (int i = 0 ; i < ns; i++)
                 {
                 Unit emits = sounds[i].getEmits();
                 if (emits != null)

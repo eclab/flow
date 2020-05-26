@@ -51,8 +51,6 @@ public abstract class InputOutput extends JPanel
     /** Sets the text of the title JLabel.  If changeUnderlying = true, then this includes the underlying modulation/unit input/output name */
     public void setTitleText(String val, boolean changeUnderlying)
         {
-        val = val.trim();
-        
         if (isInput())
             title.setText(" " + val);
         else
