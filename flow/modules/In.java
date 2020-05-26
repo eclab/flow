@@ -94,12 +94,12 @@ public class In extends Unit implements Miscellaneous
                         ModulationOutput[] a = panel[0].getModulationOutputs();
                         ModulationOutput[] aa = all[i].getModulationOutputs();
                         for(int j = 0; j < a.length; j++)
-                            a[j].setTitleText(aa[j].getTitleText());
+                            a[j].setTitleText(aa[j].getTitleText().trim());
 
                         UnitOutput[] b = panel[0].getUnitOutputs();
                         UnitOutput[] bb = all[i].getUnitOutputs();
                         for(int j = 0; j < b.length; j++)
-                            b[j].setTitleText(bb[j].getTitleText());
+                            b[j].setTitleText(bb[j].getTitleText().trim());
 
                         break;  // we're done, no more changing
                         }
@@ -111,7 +111,7 @@ public class In extends Unit implements Miscellaneous
                 // update the assocated Input
                 for(int i = 0; i < 4; i++)
                     {
-                    getModIn(i).setTitleText(getModOut(i).getTitleText());
+                    getModIn(i).setTitleText(getModOut(i).getTitleText().trim());
                     }
                 
                 // Here we're going to redistribute the title to all the Ins in the patch
@@ -157,7 +157,7 @@ public class In extends Unit implements Miscellaneous
         // update the assocated Input
         for(int i = 0; i < 4; i++)
             {
-            panel[0].getModIn(i).setTitleText(panel[0].getModOut(i).getTitleText());
+            panel[0].getModIn(i).setTitleText(panel[0].getModOut(i).getTitleText().trim());
             }
 
         return panel[0];
