@@ -72,7 +72,8 @@ public class Partials extends Unit implements UnitSource
                 Box box = new Box(BoxLayout.Y_AXIS);
                 Unit unit = (Unit) getModulation();
                 box.add(new UnitOutput(unit, 0, this));
-                                
+                
+                /*                
                 Box box2 = new Box(BoxLayout.X_AXIS);
                 Box box3 = new Box(BoxLayout.Y_AXIS);
                 for(int i = 0; i < NUM_PARTIALS; i++)
@@ -90,6 +91,28 @@ public class Partials extends Unit implements UnitSource
                     }
                 box2.add(box4);
                 box.add(box2);
+                */
+
+                Box box1 = new Box(BoxLayout.Y_AXIS);
+                for(int i = 0; i < NUM_PARTIALS; i++)
+                    {
+                    mi[i] = new ModulationInput(unit, i, this);
+                    box1.add(mi[i]);
+                    }
+				
+                Box box2 = new Box(BoxLayout.Y_AXIS);
+                for(int i = NUM_PARTIALS; i < NUM_PARTIALS * 2; i++)
+                    {
+                    mi[i] = new ModulationInput(unit, i , this);
+                    box2.add(mi[i]);
+                    }
+				
+				Box box3 = new Box(BoxLayout.X_AXIS);
+				box3.add(box1);
+				box3.add(Strut.makeHorizontalStrut(3));
+				box3.add(box2);
+				box.add(box3);
+
                 
                 PushButton sample = new PushButton("Get")
                     {
