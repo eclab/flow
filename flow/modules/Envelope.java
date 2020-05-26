@@ -30,8 +30,16 @@ public class Envelope extends Modulation implements ModSource
     public static final int NUM_STATES = 8;
     public static final int NOT_STARTED = -1;
     public static final int START = 0;
+    public static final int PRE_1 = 0;
+    public static final int PRE_2 = 1;
+    public static final int PRE_3 = 2;
     public static final int SUSTAIN_START_STATE = 3;
+    public static final int SUS_1 = 3;
+    public static final int SUS_2 = 4;
     public static final int SUSTAIN_END_STATE = 5;
+    public static final int SUS_3 = 5;
+    public static final int REL_1 = 6;
+    public static final int REL_2 = 7;
     public static final int DONE = 8;
         
     public static final int MOD_GATE_TR = NUM_STATES * 2;
@@ -65,6 +73,17 @@ public class Envelope extends Modulation implements ModSource
     public static final int OPTION_TYPE = 1;
     public static final int OPTION_GATE_RESET = 2;
     public static final int OPTION_SYNC = 3;
+    
+    public static final int OUT_MOD = 0;
+    public static final int OUT_PRE_1 = 1;
+    public static final int OUT_PRE_2 = 2;
+    public static final int OUT_PRE_3 = 3;
+    public static final int OUT_SUS_1 = 4;
+    public static final int OUT_SUS_2 = 5;
+    public static final int OUT_SUS_3 = 6;
+    public static final int OUT_REL_1 = 7;
+    public static final int OUT_REL_2 = 8;
+    public static final int OUT_DONE = 9;
     
     public int getOptionValue(int option) 
         { 
@@ -146,9 +165,10 @@ public class Envelope extends Modulation implements ModSource
             "Rel 1", "Level",
             "Rel 2", "Level",
             "On Tr", "Off Tr",
-            "Start"
+            "Start Lvl"
             };
         defineModulations(mods, names);
+        defineModulationOutputs(new String[] { "Mod", "Pre 1", "Pre 2", "Pre 3", "Sus 1", "Sus 2", "Sus 3", "Rel 1", "Rel 2", "E" }); 
         setModulationOutput(0, 0);  
         this.type = SUSTAIN;
         firstLevel = 0;
@@ -198,7 +218,6 @@ public class Envelope extends Modulation implements ModSource
                 
         interval = 0;
         start = getSyncTick(sync);
-        resetTrigger(0);
 
         state = NOT_STARTED;  // so we start at the very beginning with findNextState() next
         state = findNextState();
@@ -206,6 +225,7 @@ public class Envelope extends Modulation implements ModSource
             {
             interval = toTicks(time[state]);
             }
+        scheduleTrigger(state);
         }
         
     public void release()
@@ -222,20 +242,74 @@ public class Envelope extends Modulation implements ModSource
         released = true;
         start = getSyncTick(sync);
         firstLevel = getModulationOutput(0);            // so we change from there when we start
-        state = SUSTAIN_END_STATE;// so we start sustain findNextState() next
+        int oldState = state;
         state = findNextState();
         if (state != DONE)
             {
             interval = toTicks(time[state]);
             }
+        if (oldState != state)
+        	scheduleTrigger(state);
         }
         
+    public static final int T_PRE_1 = 0;
+    public static final int T_PRE_2 = 1;
+    public static final int T_PRE_3 = 2;
+    public static final int T_SUS_1 = 3;
+    public static final int T_SUS_2 = 4;
+    public static final int T_SUS_3 = 5;
+    public static final int T_REL_1 = 6;
+    public static final int T_REL_2 = 7;
+    public static final int T_DONE = 8;
+    
+    int scheduledTriggers = 0;
+    void scheduleTrigger(int val)
+    	{
+    	 if (val == T_PRE_1)
+    		{
+    		scheduledTriggers |= 1;
+    		}
+    	else if (val == T_PRE_2)
+    		{
+    		scheduledTriggers |= 2;
+    		}
+    	else if (val == T_PRE_3)
+    		{
+    		scheduledTriggers |= 4;
+    		}
+    	else if (val == T_SUS_1)
+    		{
+    		scheduledTriggers |= 8;
+    		}
+    	else if (val == T_SUS_2)
+    		{
+    		scheduledTriggers |= 16;
+    		}
+    	else if (val == T_SUS_3)
+    		{
+    		scheduledTriggers |= 32;
+    		}
+    	else if (val == T_REL_1)
+    		{
+    		scheduledTriggers |= 64;
+    		}
+    	else if (val == T_REL_2)
+    		{
+    		scheduledTriggers |= 128;
+    		}
+    	else if (val == T_DONE)
+    		{
+    		scheduledTriggers |= 256;
+    		}
+    	}
+
+
     public int findNextState()
         {
         if (type == FULL_LOOPING)
             {
             // Go through all N states, looping around, and return the next one which doesn't skip.
-            // If you couldn't find one, return the original state (which might be -1)
+            // If you couldn't find one, return DONE
             int s = state;  
             for(int i = 0; i < NUM_STATES; i++)
                 {
@@ -253,7 +327,7 @@ public class Envelope extends Modulation implements ModSource
                 return DONE;
                 
             // Go through all N states, looping around, and return the next one which doesn't skip.
-            // If you couldn't find one, return the original state (which might be -1)
+            // If you couldn't find one, return DONE
             int s = state;  
             for(int i = 0; i < NUM_STATES; i++)
                 {
@@ -287,24 +361,28 @@ public class Envelope extends Modulation implements ModSource
                 if (s >= DONE) return DONE;
                 if (modulate(s * 2) > 0) return s;
                 }
-            return DONE;        // will never happen
+            
+            // If absolutely nothing is turned on....
+            return DONE;
             }
         else if (type == SUSTAIN && state <= SUSTAIN_END_STATE && !released)
             {
-            // Go through all later states, ending at SUSTAIN_END_STATE, and return the next one which doesn't skip.
-            // If you couldn't find one, return the original state (which might be -1)
+            // Go through all later states, stoppping at SUSTAIN_END_STATE, and return the next one which doesn't skip.
             int s = state;  
-            for(int i = 0; i < SUSTAIN_END_STATE + 1; i++)
+            for(int i = 0; i <= SUSTAIN_END_STATE; i++)
                 {
                 s++;
-                if (s > SUSTAIN_END_STATE) return state;
+                if (s > SUSTAIN_END_STATE) break; 
                 if (modulate(s * 2) > 0) return s;
                 }
-            
             // if we've gotten here, we couldn't find a valid sustain state, so we're going to continue just like one shot
 
+			// try SUSTAIN_END_STATE to see if we hold there
+			s = SUSTAIN_END_STATE;
+            if (modulate(s * 2) > 0) return s;
+
             // Go through all later states, ending at DONE, and return the next one which doesn't skip.
-            // If you couldn't find one, return the original state (which might be -1)
+            // If you couldn't find one, DONE
             s = SUSTAIN_END_STATE;
             for(int i = 0; i < NUM_STATES; i++)
                 {
@@ -312,9 +390,11 @@ public class Envelope extends Modulation implements ModSource
                 if (s >= DONE) return DONE;
                 if (modulate(s * 2) > 0) return s;
                 }
-            return DONE;        // will never happen
+            
+            // If absolutely nothing is turned on....
+            return DONE;
             }
-        else // ONE_SHOT, release, etc.
+        else // SUSTAIN release, SUSTAIN LOOPING release, ONE_SHOT, etc.
             {
             // Go through all later states, ending at DONE, and return the next one which doesn't skip.
             // If you couldn't find one, return the original state (which might be -1)
@@ -347,6 +427,55 @@ public class Envelope extends Modulation implements ModSource
             doRelease();
             }
                 
+        if (scheduledTriggers != 0)
+        	{
+        	if ((scheduledTriggers & 1) == 1)
+        		{
+        		updateTrigger(OUT_PRE_1);
+        		}
+        	if ((scheduledTriggers & 2) == 2)
+        		{
+        		updateTrigger(OUT_PRE_2);
+        	updateTrigger(OUT_MOD);
+        		}
+        	if ((scheduledTriggers & 4) == 4)
+        		{
+        		updateTrigger(OUT_PRE_3);
+        	updateTrigger(OUT_MOD);
+        		}
+        	if ((scheduledTriggers & 8) == 8)
+        		{
+        		updateTrigger(OUT_SUS_1);
+        	updateTrigger(OUT_MOD);
+        		}
+        	if ((scheduledTriggers & 16) == 16)
+        		{
+        		updateTrigger(OUT_SUS_2);
+        	updateTrigger(OUT_MOD);
+        		}
+        	if ((scheduledTriggers & 32) == 32)
+        		{
+        		updateTrigger(OUT_SUS_3);
+        	updateTrigger(OUT_MOD);
+        		}
+        	if ((scheduledTriggers & 64) == 64)
+        		{
+        		updateTrigger(OUT_REL_1);
+        	updateTrigger(OUT_MOD);
+        		}
+        	if ((scheduledTriggers & 128) == 128)
+        		{
+        		updateTrigger(OUT_REL_2);
+        	updateTrigger(OUT_MOD);
+        		}
+        	if ((scheduledTriggers & 256) == 256)
+        		{
+        		updateTrigger(OUT_DONE);
+        	updateTrigger(OUT_MOD);
+        		}
+        	scheduledTriggers = 0;
+        	}
+
         if (state == NOT_STARTED)               // haven't started the envelope yet
             return;
         
@@ -366,7 +495,53 @@ public class Envelope extends Modulation implements ModSource
         while (tick >= start + interval)
             {
             state = findNextState();
-            updateTrigger(0);
+            if (lastState != state)
+            	{
+				if (state == PRE_1)			// shouldn't happen
+					{
+					updateTrigger(OUT_PRE_1);
+					}
+				else if (state == PRE_2)
+					{
+					updateTrigger(OUT_MOD);
+					updateTrigger(OUT_PRE_2);
+					}
+				else if (state == PRE_3)
+					{
+					updateTrigger(OUT_MOD);
+					updateTrigger(OUT_PRE_3);
+					}
+				else if (state == SUS_1)
+					{
+					updateTrigger(OUT_MOD);
+					updateTrigger(OUT_SUS_1);
+					}
+				else if (state == SUS_2)
+					{
+					updateTrigger(OUT_MOD);
+					updateTrigger(OUT_SUS_2);
+					}
+				else if (state == SUS_3)
+					{
+					updateTrigger(OUT_MOD);
+					updateTrigger(OUT_SUS_3);
+					}
+				else if (state == REL_1)
+					{
+					updateTrigger(OUT_MOD);
+					updateTrigger(OUT_REL_1);
+					}
+				else if (state == REL_2)
+					{
+					updateTrigger(OUT_MOD);
+					updateTrigger(OUT_REL_2);
+					}
+				else if (state == DONE)
+					{
+					updateTrigger(OUT_MOD);
+					updateTrigger(OUT_DONE);
+					}
+            	}
                  
             if (state == DONE)      // we're done again
                 return;
@@ -557,7 +732,79 @@ public class Envelope extends Modulation implements ModSource
                     box.add(new OptionsChooser(mod, i));
                     }
 
-                return box;
+ 
+                box2 = new Box(BoxLayout.X_AXIS);
+                box2.add(Box.createGlue());
+                
+                JPanel pan = new JPanel();
+                pan.setLayout(new BorderLayout());
+                pan.add(box2, BorderLayout.EAST);
+                box.add(pan);
+
+				box.add(Strut.makeVerticalStrut(5));
+
+                box2 = new Box(BoxLayout.X_AXIS);
+                box2.add(Box.createGlue());
+
+                Box box3 = new Box(BoxLayout.Y_AXIS);
+
+                ModulationOutput mo = new ModulationOutput(mod, OUT_PRE_1, this);
+                mo.setTitleText(" Pre 1", false);
+                box3.add(mo);
+				box3.add(Strut.makeVerticalStrut(5));
+
+                mo = new ModulationOutput(mod, OUT_SUS_1, this);
+                mo.setTitleText(" Sus 1", false);
+                box3.add(mo);
+				box3.add(Strut.makeVerticalStrut(5));
+
+                mo = new ModulationOutput(mod, OUT_REL_1, this);
+                mo.setTitleText(" Rel 1", false);
+                box3.add(mo);
+
+
+                box2.add(box3);
+				box3 = new Box(BoxLayout.Y_AXIS);
+
+                mo = new ModulationOutput(mod, OUT_PRE_2, this);
+                mo.setTitleText(" 2", false);
+                box3.add(mo);
+				box3.add(Strut.makeVerticalStrut(5));
+
+                mo = new ModulationOutput(mod, OUT_SUS_2, this);
+                mo.setTitleText(" 2", false);
+                box3.add(mo);
+				box3.add(Strut.makeVerticalStrut(5));
+
+                mo = new ModulationOutput(mod, OUT_REL_2, this);
+                mo.setTitleText(" 2", false);
+                box3.add(mo);
+
+                box2.add(box3);
+				box3 = new Box(BoxLayout.Y_AXIS);
+
+                mo = new ModulationOutput(mod, OUT_PRE_3, this);
+                mo.setTitleText(" 3", false);
+                box3.add(mo);
+				box3.add(Strut.makeVerticalStrut(5));
+
+                mo = new ModulationOutput(mod, OUT_SUS_3, this);
+                mo.setTitleText(" 3", false);
+                box3.add(mo);
+				box3.add(Strut.makeVerticalStrut(5));
+
+                mo = new ModulationOutput(mod, OUT_DONE, this);
+                mo.setTitleText(" E", false);
+                box3.add(mo);
+
+                box2.add(box3);
+
+                pan = new JPanel();
+                pan.setLayout(new BorderLayout());
+                pan.add(box2, BorderLayout.EAST);
+                box.add(pan);
+
+               return box;
                 }
             };
         }

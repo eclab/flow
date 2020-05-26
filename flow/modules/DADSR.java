@@ -103,11 +103,19 @@ public class DADSR extends Modulation implements ModSource
     public static final int MOD_GATE_TR = 8;
     public static final int MOD_REL_TR = 9;
         
+    public static final int OUT_MOD = 0;
+    public static final int OUT_DELAY = 1;
+    public static final int OUT_ATTACK = 2;
+    public static final int OUT_DECAY = 3;
+    public static final int OUT_SUSTAIN = 4;
+    public static final int OUT_RELEASE = 5;
+    public static final int OUT_DONE = 6;
+    
     double[] level = new double[6];         // not all of these slots will be used
     double[] time = new double[6];          // not all of these slots will be used
     double start;
     double interval;
-    int state;
+    int state = DONE;
     boolean released;
 
     int curve;
@@ -175,6 +183,7 @@ public class DADSR extends Modulation implements ModSource
         defineOptions(new String[] { "Curve", "One Shot", "Gate Reset", "MIDI Sync", "Fast Release" }, 
             new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32", "Inv x^2", "Inv x^4", "Inv x^8"  }, 
                 { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" }, { "No Release" } } );
+        defineModulationOutputs(new String[] { "Mod", "G", "A", "D", "S", "R", "E" }); 
         setModulationOutput(0, 0);  
         }
 
@@ -207,8 +216,9 @@ public class DADSR extends Modulation implements ModSource
         state = DELAY;
         start = getSyncTick(sync);
         interval = toTicks(time[DELAY]);
-        resetTrigger(0);
         released = false;
+
+        scheduleTrigger(T_DELAY);
         }
         
     public void release()
@@ -222,6 +232,11 @@ public class DADSR extends Modulation implements ModSource
         {
         if (oneshot) return;
         
+        if (state != RELEASE && state != DONE)
+        	{
+            scheduleTrigger(T_RELEASE);
+        	}
+        
         if (state == DECAY && !quickRelease)
             {
             released = true;
@@ -234,6 +249,42 @@ public class DADSR extends Modulation implements ModSource
         level[SUSTAIN] = getModulationOutput(0);  // so we decrease from there during release
         }
     
+    public static final int T_DELAY = 0;
+    public static final int T_ATTACK = 1;
+    public static final int T_DECAY = 2;
+    public static final int T_SUSTAIN = 3;
+    public static final int T_RELEASE = 4;
+    public static final int T_DONE = 5;
+    
+    int scheduledTriggers = 0;
+    void scheduleTrigger(int val)
+    	{
+    	if (val == T_DELAY)
+    		{
+    		scheduledTriggers |= 1;
+    		}
+    	if (val == T_ATTACK)
+    		{
+    		scheduledTriggers |= 2;
+    		}
+    	else if (val == T_DECAY)
+    		{
+    		scheduledTriggers |= 4;
+    		}
+    	else if (val == T_SUSTAIN)
+    		{
+    		scheduledTriggers |= 8;
+    		}
+    	else if (val == T_RELEASE)
+    		{
+    		scheduledTriggers |= 16;
+    		}
+    	else if (val == T_DONE)
+    		{
+    		scheduledTriggers |= 32;
+    		}
+    	}
+
     public double toTicks(double mod)
         {
         return modToLongRate(mod) * Output.SAMPLING_RATE;
@@ -247,14 +298,45 @@ public class DADSR extends Modulation implements ModSource
             {
             doGate();
             }
-        else 
-            {
-            if (isTriggered(MOD_REL_TR))
-                {
-                doRelease();
-                }
-            }
+        else if (isTriggered(MOD_REL_TR))
+			{
+			doRelease();
+			}
             
+        if (scheduledTriggers != 0)
+        	{
+        	if ((scheduledTriggers & 1) == 1)
+        		{
+        		updateTrigger(OUT_DELAY);
+        		}
+        	if ((scheduledTriggers & 2) == 2)
+        		{
+        		updateTrigger(OUT_ATTACK);
+        	updateTrigger(OUT_MOD);
+        		}
+        	if ((scheduledTriggers & 4) == 4)
+        		{
+        		updateTrigger(OUT_DECAY);
+        	updateTrigger(OUT_MOD);
+        		}
+        	if ((scheduledTriggers & 8) == 8)
+        		{
+        		updateTrigger(OUT_SUSTAIN);
+        	updateTrigger(OUT_MOD);
+        		}
+        	if ((scheduledTriggers & 16) == 16)
+        		{
+        		updateTrigger(OUT_RELEASE);
+        	updateTrigger(OUT_MOD);
+        		}
+        	if ((scheduledTriggers & 32) == 32)
+        		{
+        		updateTrigger(OUT_DONE);
+        	updateTrigger(OUT_MOD);
+        		}
+        	scheduledTriggers = 0;
+        	}
+
         long tick = getSyncTick(sync);
 
         if (tick < start) // uh oh, probably switched to MIDI Sync
@@ -288,7 +370,35 @@ public class DADSR extends Modulation implements ModSource
         while (tick >= start + interval)
             {
             state++;
-            updateTrigger(0);
+            if (state == DELAY)				// this can't happen
+            	{
+	            updateTrigger(OUT_DELAY);
+               	}
+            else if (state == ATTACK)
+            	{
+            	updateTrigger(OUT_MOD);
+	            updateTrigger(OUT_ATTACK);
+               	}
+            else if (state == DECAY)
+            	{
+            	updateTrigger(OUT_MOD);
+	            updateTrigger(OUT_DECAY);
+               	}
+        	else if (state == SUSTAIN)
+        		{
+            	updateTrigger(OUT_MOD);
+	            updateTrigger(OUT_SUSTAIN);
+        		}
+        	else if (state == RELEASE)
+        		{
+            	updateTrigger(OUT_MOD);
+	            updateTrigger(OUT_RELEASE);
+        		}
+        	else if (state == DONE)
+        		{
+            	updateTrigger(OUT_MOD);
+	            updateTrigger(OUT_DONE);
+        		}
                  
             // try sticky again
             if (state == DONE)
@@ -473,11 +583,55 @@ public class DADSR extends Modulation implements ModSource
                     box.add(t);
                     }
 
-                for(int i = 0; i < mod.getNumOptions(); i++)
+               for(int i = 0; i < mod.getNumOptions(); i++)
                     {
                     box.add(new OptionsChooser(mod, i));
                     }
                     
+
+				box.add(Strut.makeVerticalStrut(5));
+                Box box2 = new Box(BoxLayout.X_AXIS);
+                box2.add(Box.createGlue());
+                
+                
+                Box box3 = new Box(BoxLayout.Y_AXIS);
+                box3.add(Box.createGlue());
+                ModulationOutput mo = new ModulationOutput(mod, OUT_DELAY, this);
+                mo.setTitleText(" D", false);
+                box3.add(mo);
+				box3.add(Strut.makeVerticalStrut(5));
+                
+                mo = new ModulationOutput(mod, OUT_SUSTAIN, this);
+                mo.setTitleText(" S", false);
+                box3.add(mo);
+                
+                box2.add(box3);
+				box3 = new Box(BoxLayout.Y_AXIS);
+				
+                mo = new ModulationOutput(mod, OUT_ATTACK, this);
+                mo.setTitleText(" A", false);
+                box3.add(mo);
+				box3.add(Strut.makeVerticalStrut(5));
+                
+                mo = new ModulationOutput(mod, OUT_RELEASE, this);
+                mo.setTitleText(" R", false);
+                box3.add(mo);
+
+                box2.add(box3);
+				box3 = new Box(BoxLayout.Y_AXIS);
+				
+                mo = new ModulationOutput(mod, OUT_DECAY, this);
+                mo.setTitleText(" D", false);
+                box3.add(mo);
+				box3.add(Strut.makeVerticalStrut(5));
+
+                mo = new ModulationOutput(mod, OUT_DONE, this);
+                mo.setTitleText(" E", false);
+                box3.add(mo);
+
+                box2.add(box3);
+
+				box.add(box2);
                 return box;
                 }
             };

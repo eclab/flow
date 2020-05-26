@@ -35,4 +35,6 @@ A general-purpose envelope with many stages.  Envelope contains stages in three 
 <dd>When a Note On occurs, the envelope immediately resets to the Start level.  Otherwise the envelope starts from whatever level it is currently at (the default).
 <dt>MIDI Sync
 <dd>Delay, Attack, Decay, and Release times assume that we are playing at 120 BPM.  If MIDI sync is faster (or slower), these times will be correspondingly faster (or slower).
+<dt>Pre 1, 2, 3, Sus 1, 2, 3, Rel 1, 2, E
+<dd>Trigger outputs which fire when the envelope reaches its Pre 1 ... 3, Sus 1 ... 3, or Rel 1 ... 2 stages, or Ends.
 </dl>
