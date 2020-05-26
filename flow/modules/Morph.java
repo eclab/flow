@@ -70,6 +70,11 @@ import java.util.*;
       
 */
 
+
+/// Bug: if you build a Morph from scratch, it's initially got its lo and high inputs set to 3,
+/// so the first interpolation scan won't work right.  But if you load one from a patch or do reset(),
+/// it's already hooked up and so it'll find those initially and work right.
+
 public class Morph extends Unit
     {
     private static final long serialVersionUID = 1;
@@ -86,7 +91,8 @@ public class Morph extends Unit
     boolean includesFundamental;
     boolean morphFrequency = true;
     boolean morphAmplitude = true;
-        
+ 	boolean shuffle = false; 
+       
     public Object clone()
         {
         Morph obj = (Morph)(super.clone());
@@ -101,6 +107,9 @@ public class Morph extends Unit
         
     public void setIncludesFundamental(boolean val) { lastMorph = -1; includesFundamental = val; }
     public boolean getIncludesFundamental() { return includesFundamental; }
+        
+    public void setShuffle(boolean val) { shuffle = val; }
+    public boolean getShuffle() { return shuffle; }
         
     public void setMorph(int morph) { this.morph = morph; }
     public int getMorph() { return morph; }
@@ -117,6 +126,7 @@ public class Morph extends Unit
     public static final int OPTION_MORPH_FREQUENCY = 2;
     public static final int OPTION_MORPH_AMPLITUDE = 3;
     public static final int OPTION_FREE = 4;
+    public static final int OPTION_RANDOM = 5;
 
     public int getOptionValue(int option) 
         { 
@@ -127,6 +137,7 @@ public class Morph extends Unit
             case OPTION_MORPH_FREQUENCY: return getMorphFrequency() ? 1 : 0;
             case OPTION_MORPH_AMPLITUDE: return getMorphAmplitude() ? 1 : 0;
             case OPTION_FREE: return getFree() ? 1 : 0;
+            case OPTION_RANDOM: return getShuffle() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -140,6 +151,7 @@ public class Morph extends Unit
             case OPTION_MORPH_FREQUENCY: setMorphFrequency(value != 0); return;
             case OPTION_MORPH_AMPLITUDE: setMorphAmplitude(value != 0); return;
             case OPTION_FREE: setFree(value != 0); return;
+            case OPTION_RANDOM: setShuffle(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -150,9 +162,9 @@ public class Morph extends Unit
         doStatic();
         
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, new String[] { "Input A", "Input B", "Input C", "Input D" });
-        defineModulationOutputs(new String[] { "Trig", "Trig", "Trig", "Trig" });
+        defineModulationOutputs(new String[] { "Trig A", "Trig B", "Trig C", "Trig D" });
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ONE }, new String[] { "Interpolation", "Variance", "Seed" });
-        defineOptions(new String[] { "Type", "Fundamental", "Frequency", "Amplitude", "Free" }, new String[][] { MORPH_NAMES, { "Fundamental" }, { "Frequency" }, { "Amplitude" }, { "Free" } });
+        defineOptions(new String[] { "Type", "Fundamental", "Frequency", "Amplitude", "Free", "Random" }, new String[][] { MORPH_NAMES, { "Fundamental" }, { "Frequency" }, { "Amplitude" }, { "Free" }, { "Random" } });
         lastMorph = -1;
         lastRamp = -1;
         this.morph = MORPH_STANDARD;
@@ -174,8 +186,6 @@ public class Morph extends Unit
         lastRamp = Double.NaN;
         loInput = -1;
         hiInput = -1;
-        loInput = findNextAndUpdate(-1);
-        hiInput = findNextAndUpdate(-1);
         direction = 0;  // unknown
         }
 
@@ -212,8 +222,6 @@ public class Morph extends Unit
             lastRamp = Double.NaN;
             loInput = -1;
             hiInput = -1;
-            loInput = findNextAndUpdate(-1);
-            hiInput = findNextAndUpdate(-1);
             direction = 0;  // unknown
             }
         }
@@ -224,25 +232,66 @@ public class Morph extends Unit
     int direction = 0;  // 0 is "unknown" or "unmoved"
     double lastRamp = Double.NaN;
 
-    public int findNextAndUpdate(int input)
+    public int findNextAndUpdate(int input, int prevInput)
         {
-        for(int i = 0 ; i < inputs.length; i++)
-            {
-            input++;
-            if (input >= inputs.length)
-                input = 0;
-            if (!(inputs[input] instanceof Nil) && (input != loInput) && (input != hiInput))
-                {
-                break;
-                }
-            }
+        if (shuffle)
+        	{
+        	Random rand = (random == null ? getSound().getRandom() : random);
+        	int total = 0;
+        	int totalWithPrev = 0;
+        	for(int i = 0; i < inputs.length; i++)
+        		{
+        		if (!(inputs[i] instanceof Nil))
+        			{
+        			totalWithPrev++;
+        			if (i != prevInput)
+	        			total++;
+	        		}
+        		}
+        	if (totalWithPrev == 0) return 0;
+        	if (total == 0) 
+        		{
+        		int in = (input == - 1 ? 0 : input);
+		        updateTrigger(in);
+        		return in;
+        		}
+        	
+        	while(true)
+        		{
+        		int v = rand.nextInt(4);
+        		if (!(inputs[v] instanceof Nil) && (v != prevInput))
+        			{
+        			updateTrigger(v);
+        			return v;
+        			}
+        		}
+        	}
+        else
+        	{	
+			for(int i = 0 ; i < inputs.length; i++)
+				{
+				input++;
+				if (input >= inputs.length)
+					input = 0;
+				if (!(inputs[input] instanceof Nil) && (input != loInput) && (input != hiInput))
+					{
+					break;
+					}
+				}
 
-        updateTrigger(input);
-        return input;
+			updateTrigger(input);
+			return input;
+			}
         }
 
     public void updateInputs(double ramp)
         {
+        if (hiInput == -1 && loInput == -1)
+        	{
+            loInput = findNextAndUpdate(-1, hiInput);
+            hiInput = findNextAndUpdate(-1, loInput);
+        	}
+
         // is this our first time?
         if (direction == 0 && lastRamp != lastRamp)  // that is, lastRamp == NaN
             {
@@ -262,18 +311,34 @@ public class Morph extends Unit
             {
             direction = -1;
             // we need a new lo input
-            loInput = findNextAndUpdate(loInput);
+            loInput = findNextAndUpdate(loInput, hiInput);
             }
         else if (direction == -1 && lastRamp < ramp)  // changed direction, going up
             {
             direction = 1;
             // we need a new hi input
-            hiInput = findNextAndUpdate(hiInput);
+            hiInput = findNextAndUpdate(hiInput, loInput);
             }
         else
             {
             // do nothing
             }
+
+		for(int i = 0; i < inputs.length; i++)
+			{
+			if (i == loInput)
+				{
+				setModulationOutput(i, 1.0 - ramp);
+				}
+			else if (i == hiInput)
+				{
+				setModulationOutput(i, ramp);
+				}
+			else
+				{
+				setModulationOutput(i, 0.0);
+				}
+			}
 
         lastRamp = ramp;
         }
@@ -300,7 +365,7 @@ public class Morph extends Unit
         
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
-                
+        
         if (morphFrequency)
             {
             for(int i = 0; i < p1frequencies.length; i++)
@@ -561,7 +626,9 @@ morphs[MORPH_RANDOM_128] = new int[] { 0, 67, 119, 97, 120, 107, 46, 20, 41, 63,
 
                 for(int i = 0; i < unit.getNumModulationOutputs(); i++)
                     {
-                    box3.add(new ModulationOutput(unit, i, this));
+                    ModulationOutput m = new ModulationOutput(unit, i, this);
+                    m.setTitleText("Trig", false);
+                    box3.add(m);
                     }
                 box2.add(box3);
                 box.add(box2);
