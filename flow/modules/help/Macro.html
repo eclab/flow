@@ -8,4 +8,10 @@ This is a <b>Macro.</b> A Macro is a patch that you have loaded as a module.
 <dl>
 <dt>Info
 <dd>Provides the version, author, date, and information of the patch loaded as a Macro.
+<dt>On Tr
+<dd>If you send a trigger here, the Macro's underlying modules will receive a Gate (Note On) message, effectively resetting them.
+<dt>Off Tr
+<dd>If you send a trigger here, the Macro's underlying modules will receieve a Release (Note Off) message.
+<dt>Pause
+<dd>If this is set, then On Tr has another feature: as long as On Tr's value is set to zero (0.0), then the Macro's underlying modules will be paused: they won't recieve any steps.  This can save computational power when used in combination with Switch or Morph, whose output triggers also go to zero.  Be careful using this feature: see the manual.
 </dl>

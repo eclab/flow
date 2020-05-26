@@ -36,16 +36,48 @@ public class Macro extends Unit implements Cloneable
 
     public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
     public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4" };
-        
+    public static final int NUM_MOD_INS = MOD_NAMES.length;
+    public static final int MOD_ON_TR = NUM_MOD_INS;
+    public static final int MOD_OFF_TR = NUM_MOD_INS + 1;
+    public static final int MOD_PAUSE_TR = NUM_MOD_INS + 2;
+    
+    public static final int OPTION_PAUSE = 0;
+    
+    public static final boolean INCLUDE_PAUSE = true;
+    
     Modulation[] modules = new Modulation[0];
     Out out;
     ArrayList<In> ins = new ArrayList<>();
     String patchName = Sound.UNTITLED_PATCH_NAME;
     
+    boolean pause = false;
+    public boolean getPause() { return pause; }
+    public void setPause(boolean val) { pause = val; } 
+    
     boolean[] unitOuts = new boolean[4];
     boolean[] unitIns = new boolean[4];
     boolean[] modOuts = new boolean[4];
     boolean[] modIns = new boolean[4];
+
+
+    public int getOptionValue(int option) 
+        { 
+        switch(option)
+            {
+            case OPTION_PAUSE: return getPause() ? 1 : 0;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+                
+    public void setOptionValue(int option, int value)
+        { 
+        switch(option)
+            {
+            case OPTION_PAUSE: setPause(value != 0); return;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+
 
     public Object clone()
         {
@@ -111,17 +143,17 @@ public class Macro extends Unit implements Cloneable
 
     public String getNameForModulation() { return patchName; }
     
-    public int getTriggerCount(int num)
+    public int getOutputTriggerCount(int num)
         {
         if (out != null && out.getNumModulationOutputs() > num)
-            return out.getTriggerCount(num);
+            return out.getOutputTriggerCount(num);
         else return NO_TRIGGER;
         }
     
-    public boolean isTriggered(int num)
+    public boolean isOutputTriggered(int num)
         {
         if (out != null && out.getNumModulationOutputs() > num)
-            return out.isTriggered(num);
+            return out.isOutputTriggered(num);
         else return false;
         }
     
@@ -143,21 +175,36 @@ public class Macro extends Unit implements Cloneable
     public void gate()
         {
         super.gate();
-        for(int i = 0; i < modules.length; i++)
-            modules[i].gate();
+        if (isModulationConstant(MOD_ON_TR))
+        	for(int i = 0; i < modules.length; i++)
+        	    modules[i].gate();
         }
  
     public void release()
         {
         super.release();
-        for(int i = 0; i < modules.length; i++)
-            modules[i].release();
+		if (isModulationConstant(MOD_OFF_TR))
+            for(int i = 0; i < modules.length; i++)
+        	    modules[i].release();
         }
    
     public void go()
         {
         super.go();
         
+        if (isTriggered(MOD_ON_TR))
+        	for(int i = 0; i < modules.length; i++)
+        	    modules[i].gate();
+
+        if (isTriggered(MOD_OFF_TR))
+            for(int i = 0; i < modules.length; i++)
+        	    modules[i].release();
+        	    
+        if (getPause() && modulate(MOD_ON_TR) == 0.0)
+        	{
+        	return;		// pause
+        	}
+
         double note = sound.getNote();
 
         for(int i = 0; i < modules.length; i++)
@@ -339,26 +386,40 @@ public class Macro extends Unit implements Cloneable
         if (ins.size() > 0)
             {
             // compute the default settings for each one
-            Constant[] c = new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO };
+            Constant[] c = new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.HALF };
             for(int i = 0; i < 4; i++)
                 if (ins.get(0).getModulation(i) instanceof Constant)
                     {
                     c[i] = new Constant(ins.get(0).modulate(i));
                     }
             
-            String[] s = ins.get(0).getModulationOutputNames();
-            defineModulations(c, ins.get(0).getModulationOutputNames());
+            String[] s = concatenate(ins.get(0).getModulationOutputNames(), new String[] { "On Tr", "Off Tr" });
+            defineModulations(c, s);
             defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, 
                 ins.get(0).getOutputNames());
+        	if (INCLUDE_PAUSE)
+        		defineOptions(new String[] { "Pause", },  new String[][] { { "Pause" } } );
             }
         else
             {        
             // notice that these are cloned.  This is so MOD_NAMES and UNIT_NAMES can't be changed via setModulationOutput() etc.
             // See getKeyForModulation() below for a hint as to why
-            defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO}, (String[])(MOD_NAMES.clone()));
+            // It's important that Pause have Constant.ONE, else it's always pausing things
+            defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.HALF }, 
+            		concatenate((String[])(MOD_NAMES.clone()), new String[] { "On Tr", "Off Tr" }));
             defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[])(UNIT_NAMES.clone()));  
+        	if (INCLUDE_PAUSE)
+        		defineOptions(new String[] { "Pause", },  new String[][] { { "Pause" } } );
             }             
         }
+        
+    String[] concatenate(String[] a, String[] b)
+    	{
+    	String[] res = new String[a.length + b.length];
+    	System.arraycopy(a, 0, res, 0, a.length);
+    	System.arraycopy(b, 0, res, a.length, b.length);
+    	return res;
+    	}
     
     ////// Why are we overriding these three methods?  Because we want to use the standard "A B C D"
     ////// as the KEYS for connection regardless of what the user sets the actual names to.  That way
@@ -525,7 +586,7 @@ public class Macro extends Unit implements Cloneable
                         box.add(new ModulationOutput(unit, i, this));
                         }
                     }                
-                for(int i = 0; i < unit.getNumModulations(); i++)
+                for(int i = 0; i < NUM_MOD_INS; i++)
                     {
                     if (modIns[i])
                         {
@@ -541,6 +602,11 @@ public class Macro extends Unit implements Cloneable
                 DisclosurePanel disclosure = new DisclosurePanel(disclosureLabel, disclosureP, null);
                 box.add(disclosure);
 
+				box.add(new ModulationInput(unit, MOD_ON_TR, this));
+				box.add(new ModulationInput(unit, MOD_OFF_TR, this));
+				if (INCLUDE_PAUSE)
+					box.add(new OptionsChooser(unit, OPTION_PAUSE));
+				
                 return box;
                 }
             };
