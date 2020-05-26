@@ -18,7 +18,7 @@ public class Harmonics extends Unit implements UnitSource
     {
     private static final long serialVersionUID = 1;
         
-    public static final int NUM_HARMONICS = 16;
+    public static final int NUM_HARMONICS = 32;
 
     public Harmonics(Sound sound) 
         {
@@ -58,11 +58,25 @@ public class Harmonics extends Unit implements UnitSource
                 
                 box.add(new UnitOutput(unit, 0, this));
                 
-                for(int i = 0; i < NUM_HARMONICS; i++)
+                Box box1 = new Box(BoxLayout.Y_AXIS);
+                for(int i = 0; i < NUM_HARMONICS/2; i++)
                     {
                     mi[i] = new ModulationInput(unit, i, this);
-                    box.add(mi[i]);
+                    box1.add(mi[i]);
                     }
+				
+                Box box2 = new Box(BoxLayout.Y_AXIS);
+                for(int i = NUM_HARMONICS/2; i < NUM_HARMONICS; i++)
+                    {
+                    mi[i] = new ModulationInput(unit, i, this);
+                    box2.add(mi[i]);
+                    }
+				
+				Box box3 = new Box(BoxLayout.X_AXIS);
+				box3.add(box1);
+				box3.add(Strut.makeHorizontalStrut(3));
+				box3.add(box2);
+				box.add(box3);
 
                 PushButton sample = new PushButton("Get")
                     {
@@ -108,8 +122,11 @@ public class Harmonics extends Unit implements UnitSource
                         }
                     };
                 
-                box.add(sample);
-                box.add(new UnitInput(unit, 0, this));
+                Box box5 = new Box(BoxLayout.X_AXIS);
+                box5.add(new UnitInput(unit, 0, this));
+                box5.add(sample);
+                box5.add(Box.createGlue());
+                box.add(box5);
                 return box;
                 }
             };
