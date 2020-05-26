@@ -96,6 +96,7 @@ public class Modules
     //flow.modules.Stretch.class,
     flow.modules.Sub.class,
     //flow.modules.Swap.class,
+    flow.modules.Switch.class,
     flow.modules.Tinkle.class,
     flow.modules.Triangle.class,
     flow.modules.User.class,
