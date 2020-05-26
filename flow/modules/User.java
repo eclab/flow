@@ -89,16 +89,44 @@ public class User extends Modulation implements ModSource
                             int numSounds = output.getNumSounds();
                             try
                                 {
-                                int index = sound.findRegistered(User.this);
-                                for(int j = 0; j < numSounds; j++)
-                                    {
-                                    Sound s = output.getSound(j);
-                                    if (s.getGroup() == Output.PRIMARY_GROUP)
-                                        {
-                                        User user = (User)(s.getRegistered(index));
-                                        user.trigger[_i] = true;
-                                        }
-                                    }
+                                if (output.getOnlyPlayFirstSound())
+                                	{
+									// This triggers sound 0
+									int index = sound.findRegistered(User.this);
+
+									Sound s = output.getInput().getLastPlayedSound();
+									try 
+										{
+										if (s == null) 
+											s = output.getSound(0);
+										}
+									catch (Exception e)
+										{
+										s = null;
+										}
+									if (s != null)
+										{
+										if (s.getGroup() == Output.PRIMARY_GROUP)
+											{
+											User user = (User)(s.getRegistered(index));
+											user.trigger[_i] = true;
+											}
+										}
+									}
+                                else
+                                	{
+									// This triggers *all* the sounds.
+									int index = sound.findRegistered(User.this);
+									for(int j = 0; j < numSounds; j++)
+										{
+										Sound s = output.getSound(j);
+										if (s.getGroup() == Output.PRIMARY_GROUP)
+											{
+											User user = (User)(s.getRegistered(index));
+											user.trigger[_i] = true;
+											}
+										}
+									}                                
                                 }
                             finally 
                                 {
