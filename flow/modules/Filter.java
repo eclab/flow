@@ -34,9 +34,13 @@ public class Filter extends Unit
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineOptions(new String[] { "4-Pole" , "Relative" }, new String[][] { { "4-Pole"} , {"Relative"}});
+        defineOptions(new String[] { "4-Pole" , "Relative", "Taper" }, new String[][] { { "4-Pole"} , {"Relative"}, {"Taper"}});
         defineModulations(new Constant[] { Constant.ONE, Constant.HALF, Constant.ZERO }, new String[] { "Cutoff", "State", "Resonance" });
         }
+        
+    boolean taper = false;
+    public boolean getTaper() { return taper; }
+    public void setTaper(boolean val) { taper = val; }
 
     boolean pole4 = false;
     public boolean get4Pole() { return pole4; }
@@ -48,6 +52,7 @@ public class Filter extends Unit
         
     public static final int OPTION_4POLE = 0;
     public static final int OPTION_RELATIVE = 1;
+    public static final int OPTION_TAPER = 2;
 
     public int getOptionValue(int option) 
         { 
@@ -55,6 +60,7 @@ public class Filter extends Unit
             {
             case OPTION_4POLE: return get4Pole() ? 1 : 0;
             case OPTION_RELATIVE: return getRelative() ? 1 : 0;
+            case OPTION_TAPER: return getTaper() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -65,6 +71,7 @@ public class Filter extends Unit
             {
             case OPTION_4POLE: set4Pole(value != 0); return;
             case OPTION_RELATIVE: setRelative(value != 0); return;
+            case OPTION_TAPER: setTaper(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -176,15 +183,35 @@ public class Filter extends Unit
             {
             cutoff = cutoff / MIDDLE_C_FREQUENCY * pitch;
             }
-                
+            
+        double taperVal = 0.0;                
         double state = modulate(MOD_STATE);     
         double resonance = INVERSE_SQRT_2 * Utility.fastpow(10, modulate(MOD_RESONANCE));
         boolean pole4 = get4Pole();
         
-        for(int i = 0; i < amplitudes.length; i++)
-            {
-            amplitudes[i] = amplitudes[i] * filter(state, frequencies[i] * pitch, resonance, cutoff, pole4);
+        if (getTaper())
+        	{
+			for(int i = 0; i < amplitudes.length; i++)
+				{
+				// taper to Nyquist with an N^2 cutdown function
+				if (frequencies[i] * pitch > cutoff)
+					{
+					taperVal = (frequencies[i] * pitch - cutoff) / (Output.NYQUIST - cutoff);
+					taperVal = 1.0 - (taperVal * taperVal);
+					if (taperVal < 0) taperVal = 0;
+					}
+				else taperVal = 1.0;
+
+            	amplitudes[i] = taperVal * amplitudes[i] * filter(state, frequencies[i] * pitch, resonance, cutoff, pole4);
+            	}
             }
+		else
+			{
+			for(int i = 0; i < amplitudes.length; i++)
+				{
+				amplitudes[i] = amplitudes[i] * filter(state, frequencies[i] * pitch, resonance, cutoff, pole4);
+				}
+			}
 
         constrain();
         }       
