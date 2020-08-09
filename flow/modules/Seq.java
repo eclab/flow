@@ -154,6 +154,17 @@ public class Seq extends Modulation
                 "29", "30", "31", "32",
                 "Steps", "Trigger"
                 });
+        	defineModulationOutputs(new String[] {
+        		"Mod",
+        		"1", "2", "3", "4", 
+                "5", "6", "7", "8",
+                "9", "10", "11", "12", 
+                "13", "14", "15", "16",
+                "17", "18", "19", "20",
+                "21", "22", "23", "24",
+                "25", "26", "27", "28",
+                "29", "30", "31", "32"
+                });
         }
         
     void resetSequencerPosition()
@@ -333,6 +344,7 @@ public class Seq extends Modulation
                 }
             updateModulation();
             updateTrigger(0);
+			updateTrigger(state + 1);		// Mod is 0
             }
         else if (!sample)
             {
@@ -474,15 +486,36 @@ public class Seq extends Modulation
                     }
                 box.add(box2);
                 }
-            box.add(new ModulationInput(mod, MOD_STEPS, this));
-            box.add(new ModulationInput(mod, MOD_TRIGGER, this));
-
+        	box.add(new ModulationInput(mod, MOD_STEPS, this), BorderLayout.WEST);
+            box.add(new ModulationInput(mod, MOD_TRIGGER, this), BorderLayout.EAST);
+            
             for(int i = 0; i < mod.getNumOptions(); i++)
                 {
                 box.add(new OptionsChooser(mod, i));
                 }
+                
+            box.add(Strut.makeVerticalStrut(5));
                     
-            return box;
+            Box box2 = null;
+            JPanel h = null;
+            for(int i = 0; i < 32; i++)
+    			{
+    			if (i == 0 || i == 8 || i == 16 || i == 24)
+    				{
+    				box2 = new Box(BoxLayout.X_AXIS);
+		            h = new JPanel();
+        			h.setLayout(new BorderLayout());
+		        	h.add(box2, BorderLayout.EAST);
+    				box.add(h);
+    				}
+    			ModulationOutput mo = new ModulationOutput(mod, i + 1, this);
+    			if (i == 0 || i == 8 || i == 16 || i == 24)
+    				mo.setTitleText("" + (i + 1) + "-" + (i + 8), false);
+    			else mo.setTitleText("", false);
+    			box2.add(mo);
+    			}
+    			            
+           	return box;
             }
         }
 
