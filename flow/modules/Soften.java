@@ -52,7 +52,7 @@ public class Soften extends Modulation
     public Soften(Sound sound)
         {
         super(sound);
-        defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ZERO }, 
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
             new String[] { "Input", "Amount", "Scale" });
         }
 
