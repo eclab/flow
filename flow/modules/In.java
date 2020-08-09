@@ -7,6 +7,8 @@ package flow.modules;
 import flow.*;
 import flow.gui.*;
 import org.json.*;
+import java.awt.*;
+import javax.swing.*;
 
 /**
    A module which works with the Macro facility to route
@@ -20,16 +22,16 @@ public class In extends Unit implements Miscellaneous
     {
     private static final long serialVersionUID = 1;
 
-    public static final int NUM_MOD_INPUTS = 4;
-    public static final int NUM_UNIT_INPUTS = 4;
-    public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
-    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4" };
+    public static final int NUM_MOD_INPUTS = 8;
+    public static final int NUM_UNIT_INPUTS = 8;
+    public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D", "E", "F", "G", "H" };
+    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4", "5", "6", "7", "8" };
        
     public In(Sound sound)
         {
         super(sound);
         // we want the original names around so we can refer to them later
-        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO }, (String[])(MOD_NAMES.clone()));
+        defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO }, (String[])(MOD_NAMES.clone()));
         // notice that these are cloned.  This is so MOD_NAMES and UNIT_NAMES can't be changed via setModulationOutput() etc.
         // See getKeyForModulation() below for a hint as to why
         defineModulationOutputs((String[])(MOD_NAMES.clone()));
@@ -77,9 +79,35 @@ public class In extends Unit implements Miscellaneous
 
     public ModulePanel getPanel()
         {
-        final ModulePanel[] panel = new ModulePanel[1];
-        panel[0] = new ModulePanel(this)
+        final ModulePanel[] modpanel = new ModulePanel[1];
+		final ModulationInput[] modIn = new ModulationInput[NUM_MOD_INPUTS];
+		final ModulationOutput[] modOut = new ModulationOutput[NUM_MOD_INPUTS];
+
+        modpanel[0] = new ModulePanel(this)
             {
+            public JComponent buildPanel()
+                {
+                Unit unit =  (Unit) getModulation();
+                Box outer = new Box(BoxLayout.Y_AXIS);
+                
+                for(int i = 0; i < NUM_UNIT_INPUTS; i++)
+                	{
+                	outer.add(new UnitOutput(unit, i, this));
+                	}
+                	
+                for(int i = 0; i < NUM_MOD_INPUTS; i++)
+                	{
+                	outer.add(modOut[i] = new ModulationOutput(unit, i, this));
+                	}
+
+                for(int i = 0; i < NUM_MOD_INPUTS; i++)
+                	{
+                	outer.add(modIn[i] = new ModulationInput(unit, i, this));
+                	}
+
+                return outer;
+                }
+
             public void setRack(Rack rack)
                 {
                 super.setRack(rack);
@@ -88,15 +116,15 @@ public class In extends Unit implements Miscellaneous
                 // are there any other Ins?  Find the first one
                 for(int i = 0; i < all.length; i++)
                     {
-                    if (all[i].getModulation() instanceof In && all[i] != panel[0])
+                    if (all[i].getModulation() instanceof In && all[i] != this)
                         {
                         // set me to the same values as the first one
-                        ModulationOutput[] a = panel[0].getModulationOutputs();
+                        ModulationOutput[] a = getModulationOutputs();
                         ModulationOutput[] aa = all[i].getModulationOutputs();
                         for(int j = 0; j < a.length; j++)
                             a[j].setTitleText(aa[j].getTitleText().trim());
 
-                        UnitOutput[] b = panel[0].getUnitOutputs();
+                        UnitOutput[] b = getUnitOutputs();
                         UnitOutput[] bb = all[i].getUnitOutputs();
                         for(int j = 0; j < b.length; j++)
                             b[j].setTitleText(bb[j].getTitleText().trim());
@@ -109,9 +137,9 @@ public class In extends Unit implements Miscellaneous
             public void updateTitleChange(InputOutput inout, int number, String newTitle)
                 {
                 // update the assocated Input
-                for(int i = 0; i < 4; i++)
+                for(int i = 0; i < NUM_MOD_INPUTS; i++)
                     {
-                    getModIn(i).setTitleText(getModOut(i).getTitleText().trim());
+                    modIn[i].setTitleText(modOut[i].getTitleText().trim());
                     }
                 
                 // Here we're going to redistribute the title to all the Ins in the patch
@@ -145,22 +173,26 @@ public class In extends Unit implements Miscellaneous
                     }
                 }
             };
-            
-        ModulationOutput[] a = panel[0].getModulationOutputs();
-        for(int i = 0; i < a.length; i++)
-            a[i].setTitleCanChange(true);
 
-        UnitOutput[] b = panel[0].getUnitOutputs();
-        for(int i = 0; i < b.length; i++)
-            b[i].setTitleCanChange(true);
+			ModulationInput[] a = modpanel[0].getModulationInputs();
+			for(int i = 0; i < a.length; i++)
+				a[i].setTitleText("", false);
 
-        // update the assocated Input
-        for(int i = 0; i < 4; i++)
-            {
-            panel[0].getModIn(i).setTitleText(panel[0].getModOut(i).getTitleText().trim());
-            }
+			ModulationOutput[] c = modpanel[0].getModulationOutputs();
+			for(int i = 0; i < c.length; i++)
+				c[i].setTitleCanChange(true);
 
-        return panel[0];
+			UnitOutput[] b = modpanel[0].getUnitOutputs();
+			for(int i = 0; i < b.length; i++)
+				b[i].setTitleCanChange(true);
+
+			// update the assocated Input
+			for(int i = 0; i < NUM_MOD_INPUTS; i++)
+				{
+				modIn[i].setTitleText(modOut[i].getTitleText().trim());
+				}
+				
+			return modpanel[0];
         }
 
 

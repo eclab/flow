@@ -13,4 +13,6 @@ A state-variable Butterworth filter.
 <dd>The filter is normally a 2-pole filter.  This changes to a 4-pole (by doing two 2-pole filters in series).
 <dt>Relative
 <dd>Is the cutoff frequency shifted relative to the base pitch of the note?
+<dt>Taper
+<dd>Should we gradually taper off the amplitude so that it reaches 0 at the Nyquist limit?  Tapering more closely approximates a digital filter; not tapering (the default) more closely approximates an analog filter.
 </dl>
