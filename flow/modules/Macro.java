@@ -34,12 +34,9 @@ public class Macro extends Unit implements Cloneable
 
     public static final String PATCH_NAME_KEY = "Patch Name";
 
-    public static final String[] UNIT_NAMES = new String[]  { "A", "B", "C", "D" };
-    public static final String[] MOD_NAMES = new String[] { "1", "2", "3", "4" };
-    public static final int NUM_MOD_INS = MOD_NAMES.length;
-    public static final int MOD_ON_TR = NUM_MOD_INS;
-    public static final int MOD_OFF_TR = NUM_MOD_INS + 1;
-    public static final int MOD_PAUSE_TR = NUM_MOD_INS + 2;
+    public static final int MOD_ON_TR = In.NUM_MOD_INPUTS;
+    public static final int MOD_OFF_TR = In.NUM_MOD_INPUTS + 1;
+    public static final int MOD_PAUSE_TR = In.NUM_MOD_INPUTS + 2;
     
     public static final int OPTION_PAUSE = 0;
     
@@ -54,10 +51,10 @@ public class Macro extends Unit implements Cloneable
     public boolean getPause() { return pause; }
     public void setPause(boolean val) { pause = val; } 
     
-    boolean[] unitOuts = new boolean[4];
-    boolean[] unitIns = new boolean[4];
-    boolean[] modOuts = new boolean[4];
-    boolean[] modIns = new boolean[4];
+    boolean[] unitOuts = new boolean[Out.NUM_UNIT_OUTPUTS];
+    boolean[] unitIns = new boolean[In.NUM_UNIT_INPUTS];
+    boolean[] modOuts = new boolean[Out.NUM_MOD_OUTPUTS];
+    boolean[] modIns = new boolean[In.NUM_MOD_INPUTS];
 
 
     public int getOptionValue(int option) 
@@ -314,11 +311,15 @@ public class Macro extends Unit implements Cloneable
                 
                 // identify which outputs are being used so we can reduce them
                 // to make the macro prettier
-                for(int i = 0; i < 4; i++)
+                for(int i = 0; i < unitOuts.length; i++)
                     {
                     unitOuts[i] = !out.isInputNil(i);
+                    }
+                for(int i = 0; i < modOuts.length; i++)
+                    {
                     modOuts[i] = !out.isModulationConstant(i);
                     }
+
                 break;
                 }
             }
@@ -336,7 +337,7 @@ public class Macro extends Unit implements Cloneable
                 // to make the macro prettier
                 // This is more complex because we don't have back-pointers
                 // so we must search through all possible inputs
-                for(int i = 0; i < 4; i++)
+                for(int i = 0; i < In.NUM_MOD_INPUTS; i++)
                     {
                     for(int j = 0; j < modules.length; j++)
                         {
@@ -351,7 +352,13 @@ public class Macro extends Unit implements Cloneable
                                     }
                                 }
                             }
+                        }
+                    }
 
+                for(int i = 0; i < In.NUM_UNIT_INPUTS; i++)
+                    {
+                    for(int j = 0; j < modules.length; j++)
+                        {
                         Modulation mm = (Modulation)(modules[j]);
                         for(int k = 0; k < modules[j].getNumModulations(); k++)
                             {
@@ -370,24 +377,24 @@ public class Macro extends Unit implements Cloneable
             {
             defineOutputs(out.getInputNames());
             // eliminate "Gain"
-            String[] names = new String[4];
-            System.arraycopy(out.getModulationNames(), 0, names, 0, 4);
+            String[] names = new String[Out.NUM_MOD_OUTPUTS];
+            System.arraycopy(out.getModulationNames(), 0, names, 0, Out.NUM_MOD_OUTPUTS);
             defineModulationOutputs(names);
             }
         else
             {
             // notice that these are cloned.  This is so MOD_NAMES and UNIT_NAMES can't be changed via setModulationOutput() etc.
             // See getKeyForModulation() below for a hint as to why
-            defineModulationOutputs((String[])(MOD_NAMES.clone()));
-            defineOutputs((String[])(UNIT_NAMES.clone()));
+            defineModulationOutputs((String[])(Out.MOD_NAMES.clone()));
+            defineOutputs((String[])(Out.UNIT_NAMES.clone()));
             }
             
         // set the inputs
         if (ins.size() > 0)
             {
             // compute the default settings for each one
-            Constant[] c = new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.HALF };
-            for(int i = 0; i < 4; i++)
+            Constant[] c = new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.HALF };
+            for(int i = 0; i < In.NUM_MOD_INPUTS; i++)
                 if (ins.get(0).getModulation(i) instanceof Constant)
                     {
                     c[i] = new Constant(ins.get(0).modulate(i));
@@ -395,7 +402,7 @@ public class Macro extends Unit implements Cloneable
             
             String[] s = concatenate(ins.get(0).getModulationOutputNames(), new String[] { "On Tr", "Off Tr" });
             defineModulations(c, s);
-            defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, 
+            defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, 
                 ins.get(0).getOutputNames());
         	if (INCLUDE_PAUSE)
         		defineOptions(new String[] { "Pause", },  new String[][] { { "Pause" } } );
@@ -405,9 +412,9 @@ public class Macro extends Unit implements Cloneable
             // notice that these are cloned.  This is so MOD_NAMES and UNIT_NAMES can't be changed via setModulationOutput() etc.
             // See getKeyForModulation() below for a hint as to why
             // It's important that Pause have Constant.ONE, else it's always pausing things
-            defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.HALF }, 
-            		concatenate((String[])(MOD_NAMES.clone()), new String[] { "On Tr", "Off Tr" }));
-            defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[])(UNIT_NAMES.clone()));  
+            defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.HALF }, 
+            		concatenate((String[])(In.MOD_NAMES.clone()), new String[] { "On Tr", "Off Tr" }));
+            defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[])(In.UNIT_NAMES.clone()));  
         	if (INCLUDE_PAUSE)
         		defineOptions(new String[] { "Pause", },  new String[][] { { "Pause" } } );
             }             
@@ -427,7 +434,7 @@ public class Macro extends Unit implements Cloneable
     
     public String getKeyForModulationOutput(int output)
         {
-        return MOD_NAMES[output];
+        return Out.MOD_NAMES[output];
         }
    
     public String getKeyForOutput(int output)
@@ -437,7 +444,7 @@ public class Macro extends Unit implements Cloneable
         String storedKeyName = super.getKeyForOutput(output);
         if (output == 0 && storedKeyName.equals("Out"))
             return storedKeyName;
-        return UNIT_NAMES[output];
+        return Out.UNIT_NAMES[output];
         }
 
 
@@ -586,7 +593,7 @@ public class Macro extends Unit implements Cloneable
                         box.add(new ModulationOutput(unit, i, this));
                         }
                     }                
-                for(int i = 0; i < NUM_MOD_INS; i++)
+                for(int i = 0; i < In.NUM_MOD_INPUTS; i++)
                     {
                     if (modIns[i])
                         {
@@ -597,16 +604,16 @@ public class Macro extends Unit implements Cloneable
                 if (hasIns && hasOuts)
                     box.add(new ConstraintsChooser(unit, this));
 
+				if (INCLUDE_PAUSE)
+					box.add(new OptionsChooser(unit, OPTION_PAUSE));
+				box.add(new ModulationInput(unit, MOD_ON_TR, this));
+				box.add(new ModulationInput(unit, MOD_OFF_TR, this));
+				
                 JLabel disclosureLabel = new JLabel("Info  ");
                 disclosureLabel.setFont(Style.SMALL_FONT());
                 DisclosurePanel disclosure = new DisclosurePanel(disclosureLabel, disclosureP, null);
                 box.add(disclosure);
 
-				box.add(new ModulationInput(unit, MOD_ON_TR, this));
-				box.add(new ModulationInput(unit, MOD_OFF_TR, this));
-				if (INCLUDE_PAUSE)
-					box.add(new OptionsChooser(unit, OPTION_PAUSE));
-				
                 return box;
                 }
             };
