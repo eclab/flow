@@ -11,7 +11,9 @@ package flow;
 
 public class Utility 
     {
-    static double[] sqrtTable = new double[65536];
+    public static final int SQRT_TABLE_LENGTH = 65536;
+    public static final int SQRT_TABLE_LENGTH_MINUS_1 = SQRT_TABLE_LENGTH - 1;
+    static double[] sqrtTable = new double[SQRT_TABLE_LENGTH];
 
     /** A faster (~1.5x) approximation of Square Root.  Uses Math.sqrt for values >= 1,
         else uses a lookup table 64K in size. */
@@ -19,8 +21,35 @@ public class Utility
     public static double fastSqrt(final double a)
         {
         if (a >= 1) return Math.sqrt(a);
-        return sqrtTable[(int)(a * 65536)];
+        return sqrtTable[(int)(a * SQRT_TABLE_LENGTH)];
         }
+
+    /** A fast approximation of Cosine using a lookup table and Catmull-Rom cubic spline interpolation. */
+    public static final double fastIntSqrt(double f) 
+        {
+        double v = (f * SQRT_TABLE_LENGTH);
+        int conv = (int) v;
+        double alpha = v - conv;
+        
+        int slot1 = conv;
+        int slot0 = (slot1 - 1);
+        if (slot0 < 0) slot0 = 0;
+        int slot2 = (slot1 + 1);
+        if (slot2 >= SQRT_TABLE_LENGTH) slot2--;
+        int slot3 = (slot2 + 1);
+        if (slot3 >= SQRT_TABLE_LENGTH) slot3--;
+        
+        double f0 = sqrtTable[slot0];
+        double f1 = sqrtTable[slot1];
+        double f2 = sqrtTable[slot2];
+        double f3 = sqrtTable[slot3];
+        
+        return alpha * alpha * alpha * (-0.5 * f0 + 1.5 * f1 - 1.5 * f2 + 0.5 * f3) +
+            alpha * alpha * (f0 - 2.5 * f1 + 2 * f2 - 0.5 * f3) +
+            alpha * (-0.5 * f0 + 0.5 * f2) +
+            f1;
+        }
+
 
     /** A very fast (53x) but poor approximation of a^b. */
     // about 53 times faster
@@ -183,7 +212,7 @@ public class Utility
             }
         }
 
-
+/*
     public static void main(String[] args)
         {
         double sum = 0;
@@ -193,8 +222,8 @@ public class Utility
             }
         System.err.println(sum);
         }
+*/
 
-    /*
       public static void main(String[] args)
       {
       double sum = 0;
@@ -205,7 +234,6 @@ public class Utility
       }
       System.err.println(sum);
       }
-    */
 
 
     /*
