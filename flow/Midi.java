@@ -42,6 +42,8 @@ public class Midi
             {
             this.device = device;
             }
+            
+        public MidiDevice getDevice() { return device; }
         
         public String toLongString()
             {
@@ -211,23 +213,58 @@ public class Midi
         return allDevices;
         }
         
-    Object lock = new Object[0];
+    //Object lock = new Object[0];
+    java.util.concurrent.locks.ReentrantLock lock = new java.util.concurrent.locks.ReentrantLock(true);
 
     // All current MIDI Messages which have not been grabbed yet
     ArrayList<MidiMessage> nextMessages = new ArrayList<MidiMessage>();
     MidiMessage[] empty = new MidiMessage[0];
+    MidiMessage[] one = new MidiMessage[1];		// fast return
+    MidiMessage[] two = new MidiMessage[2];		// fast return
+    
     /** Returns all MIDI Messages, in order, that have not yet been processed.  By calling this,
         the messages are processed and removed from this queue. */    
     public MidiMessage[] getNextMessages()
         {
-        MidiMessage[] ret = empty;
-        synchronized(lock)
-            {
-            if (nextMessages.size() == 0) return empty;  // fast return
-            ret = (MidiMessage[]) nextMessages.toArray(new MidiMessage[nextMessages.size()]);
-            nextMessages.clear();
-            }
-        return ret;
+        try
+			{
+			boolean result = lock.tryLock(0L, java.util.concurrent.TimeUnit.MILLISECONDS);
+			if (result)
+				{
+				try
+					{
+					// This is a little faster than just doing toArray()
+					int size = nextMessages.size();
+					if (size == 0) return empty;
+					else if (size == 1)
+						{
+						one[0] = nextMessages.get(0);
+						nextMessages.clear();
+						return one;
+						}
+					else if (size == 2)
+						{
+						two[0] = nextMessages.get(0);
+						two[1] = nextMessages.get(1);
+						nextMessages.clear();
+						return two;
+						}
+					else
+						{
+						System.err.println("big " + size);
+						MidiMessage[] ret = (MidiMessage[]) nextMessages.toArray(new MidiMessage[size]);
+						nextMessages.clear();
+						return ret;
+						}
+					}
+				finally
+					{
+					lock.unlock();
+					}
+				}
+        	}
+        catch (InterruptedException ex) { }
+        return empty;	// not reachable
         }
         
     // Our special kind of receiver.
@@ -238,10 +275,15 @@ public class Midi
         // these have to be public because the superclass has them public         
         public void close() 
             { 
-            synchronized(lock)
-                {
-                live = false; 
-                }
+            lock.lock();
+            try
+            	{
+	            live = false;
+	            }
+	        finally
+	        	{
+	            lock.unlock();
+	            }
             }
                
         // these have to be public because the superclass has them public         
@@ -250,8 +292,9 @@ public class Midi
             boolean l = false;
             int command = message.getStatus();              // Note NOT getCommand().  getCommand() only works for channel messages.
 
-            synchronized(lock)
-                {                       
+			lock.lock();
+			try
+				{
                 // first things first, get out of the lock as fast as we can.
                 // We do that by adding the message if we need to.
 
@@ -261,7 +304,11 @@ public class Midi
                     nextMessages.add(message);
                     return;
                     }
-                }            
+                }
+            finally
+            	{
+            	lock.unlock();
+            	}           
                 
             // Now we can pulse the clock -- it has its own separate lock.
             // We do it here rather than letting the voice sync thread handle
@@ -299,8 +346,9 @@ public class Midi
     /** Sets the In Reciever to receive from the device in the given wrapper */
     public void setInReceiver(MidiDeviceWrapper wrapper)
         {
-        synchronized(lock)
-            {
+        lock.lock();
+        try
+        	{
             if (inReceiver != null)
                 {
                 inReceiver.close();
@@ -308,13 +356,18 @@ public class Midi
             inReceiver = new InReceiver();
             wrapper.setReceiver(inReceiver);
             }
+        finally
+        	{
+            lock.unlock();
+        	}
         }
         
     /** Sets the In Reciever to receive from the device in the given wrapper */
     public void setInReceiver2(MidiDeviceWrapper wrapper)
         {
-        synchronized(lock)
-            {
+        lock.lock();
+        try
+        	{
             if (inReceiver2 != null)
                 {
                 inReceiver2.close();
@@ -322,6 +375,10 @@ public class Midi
             inReceiver2 = new InReceiver();
             wrapper.setReceiver(inReceiver2);
             }
+        finally
+        	{
+            lock.unlock();
+        	}
         }
         
                 

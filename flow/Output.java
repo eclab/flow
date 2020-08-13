@@ -69,10 +69,12 @@ public class Output
     /** Number of samples emitted before reading the next partials output.
         Ideally this is 1; but it uses more juice.  If this is a large number
         then it contributes to lag because we interpolate from the previous partials
-        to the current one.  At any rate, SKIP &leq BUFFER_SIZE for sure,
+        to the current one; and also because MIDI has to wait for the next SKIP before
+        it can be processed.  At any rate, SKIP &leq BUFFER_SIZE for sure,
         typically significantly smaller.  I've found 32 seems to work well on my Mac.  16 seems to be okay too.
     */
-    public static final int SKIP = 32;
+    public static final int DEFAULT_SKIP = 32;
+    static int skip = -1;
 
     /** The most voices you're permitted to register with the Output. 
         Obviously more voices, more CPU usage.
@@ -124,8 +126,8 @@ public class Output
 
     // Audio buffer, which the audio output drains.
     // It's the Output Thread's job to keep this sucker filled as much as possible.
-    // If we wanted this to be stereo, we'd say new byte[SKIP * 2 * 2]; 
-    byte[] audioBuffer = new byte[SKIP * 2 * (isStereo() ? 2 : 1)];
+    // If we wanted this to be stereo, we'd say new byte[skip * 2 * 2]; 
+    byte[] audioBuffer = new byte[skip * 2 * (isStereo() ? 2 : 1)];
     
     // The current number of voices spawned so far.  This increases as sounds register themselves.
     // This is will be threadsafe even though we increment it with ++ because that's only done in one thread.
@@ -140,7 +142,7 @@ public class Output
         bufferSize = Prefs.getLastBufferSize();
         masterGain = Prefs.getLastMasterGain();
         stereo = Prefs.getLastStereo();
-        //skip = Prefs.getLastSkip();   
+        skip = Prefs.getLastSkip();   
         }
     
     public Output()
@@ -647,7 +649,9 @@ public class Output
                 currentAmp[oi] = amplitude;
                                 
                 // Unlike the dephase situation, we MUST update the position for all partials            
-                    
+                
+                //if (amplitude != 0)
+                // 	System.err.println("-->" + i + " " + frequency + " " + oi);
                 double position = pos[oi] + frequency * tr;
                 position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
                 pos[oi] = position;
@@ -713,7 +717,7 @@ public class Output
 
 
 
-    double samples[][] = new double[0][SKIP];
+    double samples[][] = new double[0][skip];
 
     // Starts the output thread.  Called from the constructor.
     void startOutputThread()
@@ -754,7 +758,7 @@ public class Output
                                     if (j < samples.length)         // voice hasn't been loaded yet, hang tight
                                         {
                                         double[] samplessnd = samples[j];
-                                        for (int samp = 0; samp < SKIP; samp++)
+                                        for (int samp = 0; samp < skip; samp++)
                                             {
                                             samplessnd[samp] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
                                             }
@@ -784,7 +788,7 @@ public class Output
                         
                     if (samples.length != numSounds)
                         {
-                        samples = new double[numSounds][SKIP];
+                        samples = new double[numSounds][skip];
                         }
 
                     checkAndSwap();
@@ -798,7 +802,7 @@ public class Output
                             solo = sound.getIndex();
                                                         
                         double[] samplessnd = samples[solo];
-                        for (int samp = 0; samp < SKIP; samp++)
+                        for (int samp = 0; samp < skip; samp++)
                             {
                             samplessnd[samp] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
                             }
@@ -825,7 +829,7 @@ public class Output
                         
                     double gain = masterGain;           // so we're not reading a volatile variable!
                                         
-                    for (int samp = 0; samp < SKIP; samp++)
+                    for (int samp = 0; samp < skip; samp++)
                         {
                         double left = 0;
                         double right = 0;
@@ -1054,6 +1058,8 @@ public class Output
     double[] zeroFrequencies = new double[Unit.NUM_PARTIALS];
     byte[] standardOrders = new byte[Unit.NUM_PARTIALS];
     
+    long ttick = 0;
+    
     /** Called to pulse the Output.  This will cause the Output to wait until the user is no longer
         modifying modules via the GUI, then have all the Sounds produce new partials by calling
         go() on them.  The resulting partials will then be loaded for the Output Thread to 
@@ -1065,14 +1071,12 @@ public class Output
         int ns = numSounds;
         if (onlyPlayFirstSound) ns = 1;
 
+		syncTick();
+		input.go();
+
         lock();
         try
             {
-            syncTick();
-            input.getMidiClock().syncTick();
-            
-            input.go();
-            
             if (!soundThreadsStarted)
                 for (int i = 0; i < ns; i++)
                     {
@@ -1080,7 +1084,7 @@ public class Output
                     }
                 
             if (ns <= numVoicesPerThread)
-                {
+                {                
                 for (int i = 0; i < ns; i++)
                     {
                     sounds[i].go();
@@ -1121,7 +1125,7 @@ public class Output
             Thread.currentThread().yield();
             }
                 
-        lock();
+       lock();
         try
             {
             Unit e = sounds[0].getEmits();
@@ -1141,6 +1145,10 @@ public class Output
                     System.arraycopy(zeroFrequencies, 0, swap.frequencies[i], 0, zeroFrequencies.length); 
                     System.arraycopy(standardOrders, 0, swap.orders[i], 0, standardOrders.length); 
                     }
+
+				//for(int q = 0; q < emits.amplitudes[0].length; q++)
+	            //    if (emits.amplitudes[0][q] != 0)
+    	        //    	System.err.println("++>" + q + " " + emits.frequencies[0][q] + " " + emits.orders[0][q]);
                     
                 swap.pitches[i] = sounds[i].getPitch();
                 swap.velocities[i] = (velocitySensitive ? sounds[i].getVelocity() : Sound.DEFAULT_VELOCITY);

@@ -118,11 +118,12 @@ public class Input
     // this is O(groups) unfortunately
     public int findGroup(int channel, int note)
         {
+        return Output.PRIMARY_GROUP;
+        /*
         for (int i = 1; i < Output.MAX_GROUPS; i++)
             {
             Group g = output.getGroup(i);
-            if ((g.getChannel() == channel) && (note == ANY_NOTE
-                    || (g.getMinNote() <= note && g.getMaxNote() >= note)))
+            if ((g.getChannel() == channel) && (note == ANY_NOTE || (g.getMinNote() <= note && g.getMaxNote() >= note)))
                 {
                 return i;
                 }
@@ -154,6 +155,7 @@ public class Input
                 }
             }
         return Output.NO_GROUP;
+        */
         }
 
     Midi.MidiDeviceWrapper currentWrapper;
@@ -529,7 +531,8 @@ public class Input
                         sustain = false;
                         }
                     }
-                } finally
+                } 
+                finally
                 {
                 output.unlock();
                 }
@@ -539,8 +542,7 @@ public class Input
             {
             if (ccdata.increment)
                 {
-                nrpn[ccdata.number] =
-                    (short) (nrpn[ccdata.number] + ccdata.value);
+                nrpn[ccdata.number] = (short) (nrpn[ccdata.number] + ccdata.value);
                 if (nrpn[ccdata.number] < 0)
                     {
                     nrpn[ccdata.number] = 0;
@@ -593,8 +595,7 @@ public class Input
                 {
                 int c = sound.getChannel();
                 if (c == CHANNEL_OMNI || c == sm.getChannel()
-                    || (isMPEChannel(c) && sm
-                        .getChannel() == getMPEGlobalChannel()))
+                    || (isMPEChannel(c) && sm.getChannel() == getMPEGlobalChannel()))
                     {
                     if (sound.getMIDINote() == i)
                         {
@@ -616,8 +617,7 @@ public class Input
                 {
                 int c = sound.getChannel();
                 if (c == CHANNEL_OMNI || c == sm.getChannel()
-                    || (isMPEChannel(c) && sm
-                        .getChannel() == getMPEGlobalChannel()))
+                    || (isMPEChannel(c) && sm.getChannel() == getMPEGlobalChannel()))
                     {
                     sound.setAftertouch(d);
                     }
@@ -627,8 +627,7 @@ public class Input
                 {
                 int c = sound.getChannel();
                 if (c == CHANNEL_OMNI || c == sm.getChannel()
-                    || (isMPEChannel(c) && sm
-                        .getChannel() == getMPEGlobalChannel()))
+                    || (isMPEChannel(c) && sm.getChannel() == getMPEGlobalChannel()))
                     {
                     sound.setAftertouch(d);
                     }
@@ -663,7 +662,8 @@ public class Input
         int i = sm.getData1();
         boolean noteCurrentlyOn = false;
         int g = 0;
-        synchronized (lock)
+        
+        synchronized(lock)
             {
             g = findGroup(sm.getChannel(), i);
 
@@ -678,9 +678,7 @@ public class Input
             if (g == Output.PRIMARY_GROUP && output.getOnlyPlayFirstSound())
                 {
                 notesOnMono.add(Integer.valueOf(i));
-                sound = output.getSoundUnsafe(0);  // I think I can do this
-                // because they're not
-                // changing at this point
+                sound = output.getSoundUnsafe(0);  // I think I can do this because they're not changing at this point
 
                 // Find Sound 0 and remove it from wherever it is
                 if (!notesOff.remove(sound))
@@ -733,11 +731,13 @@ public class Input
                     sound.release();
                     }
                 }
-
             notesOn.addFirst(sound);
             }
 
         double d = Math.pow(2.0, (double) (i - 69.0) / 12.0) * 440.0;
+
+
+		// At this point we're modifying the sound.  So we need to acquire the lock.
 
         output.lock();
         try
@@ -780,12 +780,12 @@ public class Input
                 {
                 lastPlayedSound = sound;
                 }
-
             }
         catch (Exception e)
             {
             e.printStackTrace();
-            } finally
+    	     } 
+        finally
             {
             output.unlock();
             }
@@ -869,12 +869,10 @@ public class Input
                         {
                         int j = i;
                         i = notesOnMono.getLast().intValue();
-                        double d = Math.pow(2.0, (double) (i - 69) / 12.0)
-                            * 440.0;
+                        double d = Math.pow(2.0, (double) (i - 69) / 12.0) * 440.0;
 
                         // set the channel, including OMNI
-                        if (output.getGroup(sound.getGroup())
-                            .getChannel() == CHANNEL_OMNI)
+                        if (output.getGroup(sound.getGroup()).getChannel() == CHANNEL_OMNI)
                             {
                             sound.setChannel(CHANNEL_OMNI);
                             }
@@ -897,7 +895,8 @@ public class Input
                     sound.setReleaseVelocity(
                         (double) sm.getData2() / 127.0);
                     }
-                } finally
+                } 
+                finally
                 {
                 output.unlock();
                 }
@@ -910,8 +909,7 @@ public class Input
     public boolean loadScala(File file, double rootFrequency, int rootNote)
         throws IOException
         {
-        MicroTuning mt =
-            MicroTuning.fromScalaFile(file, rootFrequency, rootNote);
+        MicroTuning mt = MicroTuning.fromScalaFile(file, rootFrequency, rootNote);
         if (mt == null)
             {
             return false;
@@ -939,6 +937,7 @@ public class Input
     void go()
         {
         MidiMessage[] messages = midi.getNextMessages();
+
         for (int i = 0; i < messages.length; i++)
             {
             MidiMessage message = messages[i];
@@ -952,13 +951,8 @@ public class Input
                 {
                 Midi.CCData ccdata;
 
-                int command = sm.getCommand();                  // Note not
-                // getStatus().
-                // See
-                // below.
-                if (command == ShortMessage.NOTE_OFF
-                    || command == ShortMessage.NOTE_ON
-                    && sm.getData2() == 0)
+                int command = sm.getCommand();                  // Note not getStatus().  See below.
+                if ((command == ShortMessage.NOTE_OFF || command == ShortMessage.NOTE_ON) && sm.getData2() == 0)
                     {
                     processNoteOff(sm);
                     }
@@ -986,6 +980,7 @@ public class Input
             }
 
         midiClock.go();
+        midiClock.syncTick();
         }
 
     }
