@@ -126,10 +126,12 @@ public class Noise extends Unit implements UnitSource
         double sum = 0;
         for(int i = start; i < start + n; i++)
             {
-            sum = sum - Math.log(random.nextDouble());
+            double d = random.nextDouble();
+            sum = sum - Math.log(d);
             freq[i] = sum;
             }
-        sum = sum - Math.log(random.nextDouble());
+        double d = random.nextDouble();
+        sum = sum - Math.log(d);
         double invsum = 1.0 / sum;
         for(int i = start; i < start + n; i++)
             freq[i] = freq[i] * invsum;
@@ -184,7 +186,10 @@ public class Noise extends Unit implements UnitSource
             if (_var == 0.0)
                 amplitudes[j] = ramping;  
             else
-                amplitudes[j] = (1-_var) * ramping + _var * rand.nextDouble();
+            	{
+            	double d = rand.nextDouble();
+                amplitudes[j] = (1-_var) * ramping + _var * d;
+                }
             total += amplitudes[j];
             if (amplitudes[j] > max) max = amplitudes[j];
             }
