@@ -20,16 +20,15 @@ public class VCA extends Unit
 
     public static final int MOD_MOD = 0;
     public static final int MOD_SCALE = 1;
-    //public static final int MOD_BOOST = 2;
+    public static final int MOD_ADD = 2;
 
     public static final double MAX_SCALE = 8.0;
-    //public static final double MAX_BOOST = 2.0;
         
     public VCA(Sound sound)
         {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
-        defineModulations(new Constant[] { Constant.ONE, Constant.HALF, /* Constant.ZERO */ }, new String[] { "Mod", "Scale", /* "Bass Boost" */ });
+        defineModulations(new Constant[] { Constant.ONE, Constant.HALF, Constant.ZERO }, new String[] { "Mod", "Scale", "Add" });
         }
                 
     public void go()
@@ -43,6 +42,7 @@ public class VCA extends Unit
                 
         double mod = modulate(MOD_MOD);
         double scale = modulate(MOD_SCALE);
+        double add = modulate(MOD_ADD) * MAX_SCALE;
         if (scale == 0.5)
             scale = 1.0;
         else if (scale > 0.5) 
@@ -50,33 +50,10 @@ public class VCA extends Unit
         else
             scale = scale * 2.0;
         
+        double val = mod * scale + add;
+        
         for(int i = 0; i < amplitudes.length; i++)
-            amplitudes[i] = amplitudes[i] * mod * scale; 
-        
-        /*
-          double boost = modulate(MOD_BOOST) * MAX_BOOST;
-          double[] frequencies = getFrequencies(0);
-          double nyquist = Output.SAMPLING_RATE * 0.5;
-          double pitch = sound.getPitch();
-        
-          ////
-          // amplitudes *= (freq - 0) / (nyquist - 0)
-        
-          double invnyquist = 1.0 / nyquist;
-          for(int i = 0; i < amplitudes.length; i++)
-          {
-          if (frequencies[i] * pitch <= nyquist)
-          {
-          double alpha = ( 1 - frequencies[i] * pitch * invnyquist);
-          //alpha *= alpha;
-          //alpha *= alpha;
-          //alpha *= alpha;
-          //alpha *= alpha;
-          //alpha *= alpha;
-          amplitudes[i] = amplitudes[i]  *  alpha * boost;
-          }
-          }
-        */
+            amplitudes[i] = amplitudes[i] * val; 
 
         constrain();
         }       
@@ -121,6 +98,10 @@ public class VCA extends Unit
                 else
                     value = value * 2.0;
                 return String.format("%.4f", value);
+                }
+            else if (modulation == MOD_ADD)
+                {
+                return String.format("%.4f", value * MAX_SCALE);
                 }
             else return super.getModulationValueDescription(modulation, value, isConstant);
             }
