@@ -192,12 +192,21 @@ public class Prefs {
         return Output.DEFAULT_BUFFER_SIZE;
         }
 
-    /*
-     * public static void setLastSkip(int skip) { setLastX("" + skip, "Skip"); }
-     * public static int getLastSkip() { String s = getLastX("Skip"); try { if (s !=
-     * null) return Integer.parseInt(s); } catch (NumberFormatException e) { }
-     * return Output.SKIP; }
-     */
+    public static void setLastSkip(int skip) 
+    	{ 
+    	setLastX("" + skip, "Skip"); 
+    	}
+    	
+    public static int getLastSkip() 
+    { 
+    String s = getLastX("Skip"); 
+	try 
+		{ 
+		if (s !=null) return Integer.parseInt(s); 
+			} 
+			catch (NumberFormatException e) { }
+    return Output.DEFAULT_SKIP; 
+    }
 
     public static void setLastBendOctave(int bendOctave) {
         setLastX("" + bendOctave, "BendOctave");
