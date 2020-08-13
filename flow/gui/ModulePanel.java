@@ -40,11 +40,6 @@ public class ModulePanel extends JPanel implements Transferable
     // be big.
     public static final int HELP_WIDTH = 300;
     
-    ModulationInput[] modIn = new ModulationInput[0];
-    ModulationOutput[] modOut = new ModulationOutput[0];
-    public ModulationInput getModIn(int i) { return modIn[i]; }
-    public ModulationOutput getModOut(int i) { return modOut[i]; }
-    
     public boolean getFillPanel() { return false; }
         
     boolean firstMouseDrag = false;
@@ -317,16 +312,14 @@ public class ModulePanel extends JPanel implements Transferable
                 }
             }
 
-        modOut = new ModulationOutput[modulation.getNumModulationOutputs()];
         for(int i = 0; i < modulation.getNumModulationOutputs(); i++)
             {
-            box.add(modOut[i] = new ModulationOutput(modulation, i, this));
+            box.add(new ModulationOutput(modulation, i, this));
             }
 
-        modIn = new ModulationInput[modulation.getNumModulations()];
         for(int i = 0; i < modulation.getNumModulations(); i++)
             {
-            box.add(modIn[i] = new ModulationInput(modulation, i, this));
+            box.add(new ModulationInput(modulation, i, this));
             }
                         
         for(int i = 0; i < modulation.getNumOptions(); i++)

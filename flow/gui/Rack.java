@@ -870,6 +870,23 @@ public class Rack extends JPanel
         int outputPerThread = Prefs.getLastNumOutputsPerThread();
         outputsPerThreadCombo.setSelectedIndex(outputPerThread == 1 ? 0 : (outputPerThread == 2 ? 1 : (outputPerThread == 4 ? 2 : (outputPerThread == 8 ? 3 : 4))));
 
+        // Skip
+        int[] skips = new int[] { 1, 2, 4, 8, 16, 32, 64, 128 };
+        String[] s_skips = new String[] { "1", "2", "4", "8", "16", "32", "64", "128" };
+        JComboBox skipsCombo = new JComboBox(s_skips);
+        int skip = Prefs.getLastSkip();
+        boolean found = false;
+        for(int i = 0; i < skips.length; i++)
+        	{
+        	if (skips[i] == skip) { found = true; break; }
+        	}
+        if (!found) skip = Output.DEFAULT_SKIP;			// normally 16 or 32
+        for(int i = 0; i < skips.length; i++)
+        	{
+        	if (skips[i] == skip) { index = i; break;}
+        	}
+        skipsCombo.setSelectedIndex(index);
+        
         JCheckBox stereoCheckbox = new JCheckBox();
         stereoCheckbox.setSelected(Prefs.getLastStereo());
         JPanel b = new JPanel();
@@ -878,8 +895,8 @@ public class Rack extends JPanel
         b.add(Stretch.makeHorizontalStretch(), BorderLayout.CENTER);
 
         int result = showMultiOption(this, 
-            new String[] { "Polyphony", "Buffer Size Per Channel", "Partials", "Voices Per Thread", "Outputs Per Thread", "Stereo" }, 
-            new JComponent[] { voicesCombo, bufferSizeCombo, partialsCombo, voicesPerThreadCombo, outputsPerThreadCombo, b }, 
+            new String[] { "Polyphony", "Buffer Size Per Channel", "Partials", "Voices Per Thread", "Outputs Per Thread", "Samples Per Partials Update", "Stereo" }, 
+            new JComponent[] { voicesCombo, bufferSizeCombo, partialsCombo, voicesPerThreadCombo, outputsPerThreadCombo, skipsCombo, b }, 
             "Tuning Parameters", 
             "<html>Parameter changes don't take effect<br>until the synthesizer is restarted.",
             new String[] { "Okay", "Reset", "Cancel", });
@@ -892,6 +909,7 @@ public class Rack extends JPanel
             Prefs.setLastNumVoicesPerThread(voicesPerThread[voicesPerThreadCombo.getSelectedIndex()]);
             Prefs.setLastNumOutputsPerThread(outputsPerThread[outputsPerThreadCombo.getSelectedIndex()]);
             Prefs.setLastStereo(stereoCheckbox.isSelected());
+            Prefs.setLastSkip(skips[skipsCombo.getSelectedIndex()]);
             }
         else if (result == 1) // RESET
             {
@@ -901,6 +919,7 @@ public class Rack extends JPanel
             Prefs.setLastNumVoicesPerThread(Output.DEFAULT_NUM_VOICES_PER_THREAD);
             Prefs.setLastNumOutputsPerThread(Output.DEFAULT_NUM_OUTPUTS_PER_THREAD);
             Prefs.setLastStereo(Output.DEFAULT_STEREO);
+            Prefs.setLastSkip(Output.DEFAULT_SKIP);
             }
         else if (result == 2 || result == -1)           // CANCEL
             {
