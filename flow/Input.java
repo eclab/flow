@@ -792,7 +792,7 @@ public class Input
         }
 
     // Processes a NOTE OFF message.
-    void processNoteOff(ShortMessage sm)
+    void processNoteOff(ShortMessage sm, boolean noteOnMessage)
         {
         Sound sound = null;
         int i = sm.getData1();
@@ -892,8 +892,10 @@ public class Input
                         }
 
                     // either way, let's set the release velocity
-                    sound.setReleaseVelocity(
-                        (double) sm.getData2() / 127.0);
+                    if (noteOnMessage)
+                    	sound.setReleaseVelocity(0.5);		// From MIDI spec: a NOTE ON of 0 velocity shall be interpreted as a NOTE OFF of 64 velocity
+                    else
+	                    sound.setReleaseVelocity((double) sm.getData2() / 127.0);
                     }
                 } 
                 finally
@@ -952,9 +954,9 @@ public class Input
                 Midi.CCData ccdata;
 
                 int command = sm.getCommand();                  // Note not getStatus().  See below.
-                if ((command == ShortMessage.NOTE_OFF || command == ShortMessage.NOTE_ON) && sm.getData2() == 0)
+                if ((command == ShortMessage.NOTE_OFF || (command == ShortMessage.NOTE_ON && sm.getData2() == 0)))
                     {
-                    processNoteOff(sm);
+                    processNoteOff(sm, command == ShortMessage.NOTE_ON);
                     }
                 else if (command == ShortMessage.NOTE_ON)
                     {
