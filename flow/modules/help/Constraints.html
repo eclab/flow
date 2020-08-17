@@ -1,0 +1,18 @@
+Provides constraints useful to feed into the constraints sections of various modules.
+
+<p>There are four groupings similar to modules' constraint sections: <b>Include</b>, <b>Also Include...</b>, <b>Also Include...</b>, and <b>Reduce To...</b>.  The constraints from the first three are all added together (OR or UNION).  Then the results are whittled down to only include partials which also appear in the last one (AND or INTERSECTION).
+
+<p>In set notation, this is (X1 v X2 v X3) ^ X4.
+
+<p>The final partials can be fed into the <b>Only</b> souce of any module's constraint section to constrain to just those partials.
+
+Each grouping has:
+
+<dl>
+<dt>"Include...", "Also Include...", or "Reduce To..."
+<dd>Specify partials to constrain. If Only (below) was attached to, its partials take precedence and these are not used.
+<dt>Only
+<dd>Feed partials into here to constrain to just those partials.
+<dt>Not
+<dd>Constrain to those partials <i>not</i> included in the above.
+</dl>
