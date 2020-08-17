@@ -106,7 +106,7 @@ An additive synthesizer is a synthesizer which produces sounds by {\it adding up
 
 Consider Figure~\ref{sinewaves}, which shows three sine waves in green, orange, and blue.  These sine waves are differing in their {\it frequency} (how fast they go up and down), and in their {\it amplitude} (how far they go up and down).  If you add the three sine waves up, you get the wave shown in bold.  In fact, it's easily shown that in theory you can synthesize {\it any wave} by adding up the right combination of sine waves.
 
-Notice we didn't mention {\it phase}.  Phase is the horizontal shift in the sine wave, as shown in Figure \ref{phases}.  As it turns out, humans often can't easily distinguish between sounds whose partials only differ in phase relative to one another: we just don't have the hardware built-in to do it.\footnote{While this is certainly true for high- and mid-pitch sounds, it isn't entirely true for bass sounds: a low-frequency square wave (for example) sounds pretty different\,---\,buzzier\,---\,than one whose partials have randomly-assigned phases.}   As a result,  many additive synthesizers, including {\name}, don't consider phase in order to simplify matters.
+Notice we didn't mention {\it phase}.  Phase is the horizontal shift in the sine wave, as shown in Figure \ref{phases}.  As it turns out, humans often can't easily distinguish between sounds whose partials only differ in phase relative to one another: we just don't have the hardware built-in to do it.\footnote{While this is certainly true for high- and mid-pitch sounds, it isn't entirely true for bass sounds: a low-frequency square wave (for example) sounds pretty different\,---\,buzzier\,---\,than one whose partials have randomly-assigned phases.}   As a result, most additive synthesizers, including {\name}, don't consider phase in order to simplify matters.
 
 If we only consider frequency and amplitude, we can chart our three sine waves as shown in Figure~\ref{partials}: showing the amplitude of each partial by frequency.  Notice that the \(Y\) axis is still Amplitude, but the \(X\) axis has changed from {\it time} to {\it frequency}. For this reason, thinking of a sound in this fashion is known as casting the sound into the {\bf frequency domain}; whereas thinking of a sound as a wave in the traditional way (Figure~\ref{sinewaves}) is known as considering it in the {\bf time domain}.  While we have been trained to think of sound waves in the time domain: in fact our brains receive sound information in the frequency domain: hardware in our ears first breaks out the sounds into high and low frequencies before our brains even get them.
 
@@ -218,7 +218,6 @@ By default, modules are added to the beginning of the rack.  You might find this
 \vspace{-1.5em}
 \includegraphics[width=2.6in]{simplepatch.png}
 \caption{A Simple, and Terrible, Patch}
-\vspace{-1em}
 \label{simplepatch}
 \end{wrapfigure}
 
@@ -264,7 +263,7 @@ It's best to think of the Rack not as a single Rack, but as \(N\) parallel copie
 Though modules such as envelopes (or LFOs) already know that notes have been played, it's occasionally useful to trigger them manually for other purposes rather than having them trigger themselves automatically; there are certain additional options available to do this.
 
 \subsection{Options and Constraints}
-
+\label{constraints}
 
 In addition to input and output jacks and dials, modules also sport options in the form of pop-up combobox menus and check boxes.  For example, on the LFO you can choose a wave {\it Type} (currently set to ``Sine'').  You can also click a checkbox to {\it Invert} the wave among other features.  Another checkbox option on the LFO, {\it Half Trigger}, tells it to send triggers every half of a wave rather than every full wave.
 
@@ -749,7 +748,7 @@ At the bottom are outputs which trigger when the step sequencer reaches any sing
 \paragraph{Soften}  A modulation signal smoother.\footnote{So why isn't this called Smooth?  Because there's another module called Smooth: see later in Section~\ref{unitshapers}}  Takes an incoming modulation signal and a degree with which to smooth it.  You can also specify whether or not Soften is free-running or always resets on gate.   Because softening will often significantly reduce the amplitude of a signal, Soften has an additional modulation, {\it Scale}, which lets you scale it back up.
 
 
-\paragraph{User}  A tool for user control over modulation signals, mostly for testing.  User contains four modulation inputs, each of which is simply directly connected to a modulation output.  Thus if you connect the modulation output to multiple items, you can change all of them by changing the single input knob. Additionally there are four trigger buttons: pressing a button will issue a trigger to the associated modulation output.
+\paragraph{User}  A tool for user control over modulation signals, mostly for testing.  User contains four modulation inputs, each of which is directly connected to a modulation output.  Thus if you connect the modulation output to multiple items, you can change all of them by changing the single input knob. Additionally there are four trigger buttons: pressing a button will issue a trigger to the associated modulation output.
 
 %\begin{figure}[t]
 %\begin{center}\includegraphics[width=6in]{UnitSources1}\end{center}
@@ -766,15 +765,15 @@ At the bottom are outputs which trigger when the step sequencer reaches any sing
 % --- Bell is not completed yet -- 
 %\paragraph{Bell}   An experimental bell module (not working yet) which lets you specify the pitch, peak amplitude, and attack/decay of 10 different bell partials, in addition to the total length.
 
+\paragraph{Constraints}   A module which makes it easy to create more complex constraints to feed into the constraints facility of other modules (Section~\ref{constraints}). You set up three constraints definitions and lump their partials together (perform a union), then whittle down the results to only those partials which are also in a fourth constraints definitions.  The resulting output can be fed into the {\it Only} jack of a module's constraints facility.
+
 \paragraph{Draw}   Lets you draw partials, which are then output,   You can constrain the partials being drawn to a variety of subsets.  When you click on the {\it Menu} button, you can also save your scribbles and load them again, clear them, maximize, normalize, and standardize them, and (importantly) take a snapshot of partials from an incoming source.  The module can be collapsed to a smaller size if you wish.
 
-Draw also allows you to load {\it single-cycle waveforms}, that is, sound files which start and end at zero and represent a single cycle of a sound wave.  You can do this by choosing {\it Load Wave...} from the {\it Menu} button.  These must be WAV files, mono, and cannot be very long (presently at most 2048 samples).  After loading, Flow converts them (naturally) into harmonics.
-
-A good source of single-cycle waves is the AdventureKid Single Cycle Waveforms collection, available at https:/\!/www.adventurekid.se/akrt/waveforms/\quad Flow can read all of these.
+Draw also allows you to load {\it single-cycle waveforms}, that is, sound files which start and end at zero and represent a single cycle of a sound wave.  You can do this by choosing {\it Load Wave...} from the {\it Menu} button.  These must be WAV files, mono, and cannot be very long (presently at most 2048 samples).  After loading, Flow converts them (naturally) into harmonics.  A good source of single-cycle waves is the AdventureKid Single Cycle Waveforms collection, available at https:/\!/www.adventurekid.se/akrt/waveforms/%\quad Flow can read these.
 
 See also {\bf Waves}, which contains harmonics of single-cycle waves from certain well-known synthesizers.  See also {\bf KHarmonics}, a similar collection drawn from various Kawai K5 harmonics.
 
-\paragraph{Drawbars}   Produces the sine wave equivalents of the drawbars of a classic tone wheel organ.  You can also set the percussion type as well as its decay and volume.  There are three different tuning options: the ``classic'' tuning found on drawbar organs, the equal temperment tuning which the classic tuning tries to approximate, and the true harmonic ratio tuning (integer harmonics).\footnote{See https:/\!/electricdruid.net/technical-aspects-of-the-hammond-organ/ for more information on these tunings.}  Finally, there are a number of preset options for the drawbars.
+\paragraph{Drawbars}   Produces the sine wave equivalents of the drawbars of a tone wheel organ.  You can also set the percussion type, decay, and volume.  There are three different tuning options: the ``classic'' tuning found on drawbar organs, the equal temperment tuning which the classic tuning tries to approximate, and the true harmonic ratio tuning (integer harmonics).\footnote{See https:/\!/electricdruid.net/technical-aspects-of-the-hammond-organ/ for more information on these tunings.}  Finally, there are a number of preset options for the drawbars.
 
 \paragraph{HarmonicLab}  Allows you to describe a sound as a combination of three mathematical functions operating on your harmonics.  For each of the three, you can define the function type, a function parameter, the gain of the function, and the harmonics the function manipulates.  When multiple functions manipulate the same harmonic, the earlier function takes precedence.  {\bf Important Note 1}\quad Unlike standard constraints menus, PartialLab's constraints menus include ``All'' at the end.  {\bf Important Note 2}\quad This is a costly module if you are modulating any of these values in real time, perhaps by an LFO (there are many calls to \(x^y\)): you can do it, but it'll keep your laptop warm.
 
@@ -782,7 +781,7 @@ See also {\bf Waves}, which contains harmonics of single-cycle waves from certai
 
 \paragraph{KHarmonics}  Produces a wide range of partials drawn from patches from the Kawai K5 synthesizer, including both factory patches (with Kawai's permission) and various patches in the public domain.  You have the additional option of {\it Normalizing} the partials.  Note that among the harmonics are ones purporting to be drawn from the Kawai K3.  These are just wrong.  However the {\bf Waves} module has the correct ones.
 
-See also {\bf Draw}, which allows you to load single-cycle waves: the manual section on Draw has good suggestions for sources of these waves.  See also {\bf Waves}, a similar collection drawn from various other synthesizers.
+See also {\bf Draw}, which allows you to load single-cycle waves: the manual section on Draw has suggestions for sources of these waves.  See also {\bf Waves}, a similar collection drawn from various other synthesizers.
 
 
 %\begin{figure}[t]
@@ -792,7 +791,7 @@ See also {\bf Draw}, which allows you to load single-cycle waves: the manual sec
 
 \paragraph{Noise}  Random noise, hiss, etc.  This is done by creating and immediately destroying random partials independent of the pitch.  You can specify the number of partials being used (using fewer partials is less computationally costly and you can get away with surprisingly few to make a decent hiss).   To change the color of the partials: you can also specify the high and low frequency bounds for the partials; you can create a ramp in amplitude from the low to high partials; and you can specify the degree of variance in amplitude among the random partials.  You can also set the average volume (the gain) of the hiss.  Finally, if the {\it Seed} is {\it Free} (0), then the noise will be completely random and vary from note to note; if it's non-zero, then the randomness will be reset from on Note on and Reset, meaning that the pattern of randomness will be the same from note to note: the seed specifies which pattern it is.
 
-This module is designed to merge with other sources to add hiss to them: most commonly, you would use it as the primary source in the {\bf Fill} module.  To make this convenient, by default the partials used are the highest numbered ones: the lower ones are all set to amplitude 0 and frequency 0.0.  However if you use this in combination with a merging option like {\bf Combine} which steals from the high partials, or other adjusters like {\bf Fatten}, you'd want the low partials to be used.  By setting {\it Top} to false, you can cause the low partials to be used for the hiss, with the remainder set to amplitude 0 and a frequency somewhat beyond the high frequency bound.  
+This module is designed to merge with other sources to add hiss to them: most commonly, you would use it as the primary source in the {\bf Fill} module.  To make this convenient, by default the partials used are the highest numbered ones: the lower ones are all set to amplitude 0 and frequency 0.  If you use this in combination with a merging option like {\bf Combine} which steals from the high partials, or other adjusters like {\bf Fatten}, you'd want the low partials to be used.  By setting {\it Top} to false, you can cause the low partials to be used for the hiss, with the remainder set to amplitude 0 and a frequency beyond the high frequency bound.  
 
 
 \paragraph{Partials}  Outputs 16 partials whose amplitude and frequency you can define independently.  You optionally can load these partials from a source.  See also {\bf Harmonics}.
@@ -805,8 +804,9 @@ This module is designed to merge with other sources to add hiss to them: most co
 
 \paragraph{Sine}  A single harmonic at 1.0 amplitude.  The harmonic can be any partial frequency from 1.0 to 128.0.
 
-\paragraph{Tinkle}  Produces random partials, creating a tinkling effect.  Some {\it number} of new partials are created whenever the {\it trigger} occurs, and at the given {\it volume}.  The partials {\it decay} at some rate.  The {\it probability} specifies the likelihood that partials will be created when a trigger occurs.   Finally, if the {\it seed} is {\it Free} (0), then the tinkles will be completely random and vary from note to note; if it's non-zero, then the pattern of randomness will be the same for each note: the seed specifies which pattern it is.
+\paragraph{Tinkle}  Produces random partials, creating a tinkling effect.  Some {\it number} of new partials are created whenever the {\it trigger} occurs, and at the given {\it volume}.  The partials {\it decay} at some rate.  The {\it probability} specifies the likelihood that partials will be created when a trigger occurs.   If the {\it seed} is {\it Free} (0), then the tinkles will be completely random and vary from note to note; if it's non-zero, then the pattern of randomness will be the same for each note: the seed specifies which pattern it is.  Finally, if {\it Hold} is true, then the decay of the most recent tinkles won't start until the next tinkles are entered.  Furthermore, {\it Hold} causes {\it decay} to behave differently when set to 0: normally this would be a very fast decay, but if {\it Hold} is true, then it's an {\it immediate} decay\,---\,the previous tinkles go straight to zero amplitude.  Try turning on Hold and setting decay to 0 to get a kind of sample and hold effect.
 
+Tinkle behaves differently than other modules when it comes to constraints.  Whereas in most modules the constraints {\it undo} the action of the module for certain partials, in Tinkle the constraints {\it bound} its actions.  For example, if you had 4 partials tinkling and you restricted the constraints to the low 32 harmonics, then you'd still be guaranteed to get 4 tinkles each time: they'd just be within 0...31.  Indeed, setting the constraints to bound to the low \(N\) harmonics is a useful way to guarantee that tinkles won't occur beyond Nyquist.
 
 \paragraph{Triangle}  A triangle wave.  Note that normally triangle waves include negative amplitude harmonics, that is ones with inverted phases.  As {\name} does not produce phases, these harmonics become all positive (you likely won't hear a difference).
 
@@ -845,9 +845,6 @@ Okay, here we go.
 %\caption{Partials Shapers (1)}
 %\end{figure}
 
-\enlargethispage{1em}
-\vbox
-{
 \paragraph{Amp Math}  This shaper modifies the partials from two sources \(A\) and \(B\) by putting every pair of them \(\langle A_i, B_i\rangle\) through the same function, along with a modulation source \(M\).  The operations are:
 \begin{itemize}
 \item \(\boldsymbol{+}\)\quad Does \(A_i + B_i + M\)
@@ -869,7 +866,7 @@ Okay, here we go.
 \item {\bf clampup}\quad Does \(\max(A_i,\ M) + B_i\)
 %\item {\bf remove}\quad If \(i\ \text{mod} (M \times 127) = 0\) then returns \(A_i\), else \(B_i\)
 \end{itemize}
-}
+
 
 You have the option of normalizing the resulting partials.   Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Combine} and {\bf Fill} and {\bf Mix} and {\bf Morph}.
 
