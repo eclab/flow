@@ -44,6 +44,7 @@ public class Modules
     flow.modules.Choice.class,
     flow.modules.Combine.class,
     flow.modules.Compress.class,
+    flow.modules.Constraints.class,
     flow.modules.DADSR.class,
     flow.modules.Delay.class,
     flow.modules.Dilate.class,

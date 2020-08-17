@@ -31,7 +31,60 @@ public class OptionsChooser extends JPanel implements Rebuildable
 
     /** Returns the checkbox, if there is any. */
     public JCheckBox getCheckBox() { return checkbox; }
-    
+        
+    /** Returns the text of the title JLabel */
+    public String getTitleText() { if (checkbox != null) return checkbox.getText();  else return label.getText(); }
+        
+    /** Sets the text of the title JLabel, but NOT the underlying associated name. */
+    public void setTitleText(String val)
+        {
+        if (checkbox != null)
+        	checkbox.setText(val);
+        else
+        	label.setText(val);
+        
+        /*
+        if (changeUnderlying)
+            {
+            // distribute
+            Modulation mod = modPanel.getModulation();
+            Output output = mod.getSound().getOutput();
+            output.lock();
+            try
+                {
+                int index = mod.getSound().findRegistered(mod);
+                if (index == Sound.NOT_FOUND)
+                    System.err.println("InputOutput.distributetitle: mod/unit " + mod + " not found!");
+                else
+                    {
+                    int numSounds = output.getNumSounds();
+                    for(int i = 0; i < numSounds; i++)
+                        {
+                        Sound s = output.getSound(i);
+                        if (s.getGroup() == Output.PRIMARY_GROUP)
+                            {
+                                Modulation a = (Modulation)(s.getRegistered(index));
+                                if (isInput())
+                                    {
+                                    a.setOptionsName(number, val);
+                                    }
+                                else
+                                    {
+                                    a.setOptionsName(number, val);
+                                    }
+                                }
+                        }
+                    }
+                }
+            finally 
+                {
+                output.unlock();
+                }
+            }
+        */
+        }
+
+
     public void rebuild()
         {
         if (modulation.getOptionValues(optionNumber).length == 1)

@@ -923,10 +923,10 @@ public class Unit extends Modulation
     static final int[] FIRST_SIXTY_FOUR_HARMONICS = new int[64];
     
     /* All harmonics by harmonics option */
-    static final int[][] HARMONICS;
+    public static final int[][] HARMONICS;
     
     /* All partials EXCEPT harmonics by harmonics option */
-    static final int[][] ANTI_HARMONICS;
+    public static final int[][] ANTI_HARMONICS;
         
     Unit constraintIn;
     int constraintIndex;
