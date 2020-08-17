@@ -35,10 +35,39 @@ public class Tinkle extends Unit implements UnitSource
     public static final int MOD_NUMBER = 3;
     public static final int MOD_PROBABILITY = 4;
     public static final int MOD_SEED = 5;
+    public static final int MOD_MAX_PARTIAL = 6;
 
     double[] currentAmplitudes = new double[NUM_PARTIALS];
+    boolean[] lastTinkle = new boolean[NUM_PARTIALS];
+    final static boolean[] emptyTinkle = new boolean[NUM_PARTIALS];	// to copy into lastTinkle to clear it fast
+    
     public Random random = null;
         
+    boolean hold;
+        
+    public boolean getHold() { return hold; }
+    public void setHold(boolean val) { hold = val; }
+        
+    public static final int OPTION_HOLD = 0;
+
+    public int getOptionValue(int option) 
+        { 
+        switch(option)
+            {
+            case OPTION_HOLD: return getHold() ? 1 : 0;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+                
+    public void setOptionValue(int option, int value)
+        { 
+        switch(option)
+            {
+            case OPTION_HOLD: setHold(value != 0); return;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+
     public Object clone()
         {
         Tinkle obj = (Tinkle)(super.clone());
@@ -52,8 +81,9 @@ public class Tinkle extends Unit implements UnitSource
         {
         super(sound);
         defineModulations(new Constant[] { Constant.HALF, Constant.HALF, Constant.ONE, Constant.HALF, Constant.ONE, Constant.ONE }, 
-            new String[] { "Trigger", "Decay", "Volume", "Number", "Probability", "Seed"   });
-        }
+            new String[] { "Trigger", "Decay", "Volume", "Number", "Probability", "Seed" });
+         defineOptions(new String[] { "Hold" }, new String[][] { { "Hold" } } );
+         }
                 
     public static final int MAX_NUMBER = 16;
 
@@ -106,13 +136,15 @@ public class Tinkle extends Unit implements UnitSource
             {
             tinkle();
             }
-                        
-        reduce();
+            
+        reduce();            
         interpolate();
         }
                 
     void tinkle()
         {
+        System.arraycopy(emptyTinkle, 0, lastTinkle, 0, emptyTinkle.length);		// clear
+        
         int number = (int)(modulate(MOD_NUMBER) * MAX_NUMBER);
         double probability = modulate(MOD_PROBABILITY);
         Random rand = (random == null ? getSound().getRandom() : random);
@@ -127,6 +159,7 @@ public class Tinkle extends Unit implements UnitSource
                     int q;
                     int harm = constrainedPartials[q = rand.nextInt(constrainedPartials.length)];
                     currentAmplitudes[harm] = amp;
+                    lastTinkle[harm] = true;
                     }
                 }
             }
@@ -134,10 +167,16 @@ public class Tinkle extends Unit implements UnitSource
         
     void reduce()
         {
-        double alpha = modulate(MOD_DECAY) * 0.01 + 0.99;
+        double mod = modulate(MOD_DECAY);
+        double alpha = mod * 0.01 + 0.99;
+        
+        if (hold && mod == 0)	// special case
+        	alpha = 0;		// clear old tinkles
+        	
         for(int i = 0; i < currentAmplitudes.length; i++)
             {
-            currentAmplitudes[i] = currentAmplitudes[i] * alpha;
+            if (!hold || !lastTinkle[i])
+            	currentAmplitudes[i] = currentAmplitudes[i] * alpha;
             }
         }
                 
