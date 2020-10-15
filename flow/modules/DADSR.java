@@ -233,9 +233,9 @@ public class DADSR extends Modulation implements ModSource
         if (oneshot) return;
         
         if (state != RELEASE && state != DONE)
-        	{
+            {
             scheduleTrigger(T_RELEASE);
-        	}
+            }
         
         if (state == DECAY && !quickRelease)
             {
@@ -258,32 +258,32 @@ public class DADSR extends Modulation implements ModSource
     
     int scheduledTriggers = 0;
     void scheduleTrigger(int val)
-    	{
-    	if (val == T_DELAY)
-    		{
-    		scheduledTriggers |= 1;
-    		}
-    	if (val == T_ATTACK)
-    		{
-    		scheduledTriggers |= 2;
-    		}
-    	else if (val == T_DECAY)
-    		{
-    		scheduledTriggers |= 4;
-    		}
-    	else if (val == T_SUSTAIN)
-    		{
-    		scheduledTriggers |= 8;
-    		}
-    	else if (val == T_RELEASE)
-    		{
-    		scheduledTriggers |= 16;
-    		}
-    	else if (val == T_DONE)
-    		{
-    		scheduledTriggers |= 32;
-    		}
-    	}
+        {
+        if (val == T_DELAY)
+            {
+            scheduledTriggers |= 1;
+            }
+        if (val == T_ATTACK)
+            {
+            scheduledTriggers |= 2;
+            }
+        else if (val == T_DECAY)
+            {
+            scheduledTriggers |= 4;
+            }
+        else if (val == T_SUSTAIN)
+            {
+            scheduledTriggers |= 8;
+            }
+        else if (val == T_RELEASE)
+            {
+            scheduledTriggers |= 16;
+            }
+        else if (val == T_DONE)
+            {
+            scheduledTriggers |= 32;
+            }
+        }
 
     public double toTicks(double mod)
         {
@@ -299,43 +299,43 @@ public class DADSR extends Modulation implements ModSource
             doGate();
             }
         else if (isTriggered(MOD_REL_TR))
-			{
-			doRelease();
-			}
+            {
+            doRelease();
+            }
             
         if (scheduledTriggers != 0)
-        	{
-        	if ((scheduledTriggers & 1) == 1)
-        		{
-        		updateTrigger(OUT_DELAY);
-        		}
-        	if ((scheduledTriggers & 2) == 2)
-        		{
-        		updateTrigger(OUT_ATTACK);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 4) == 4)
-        		{
-        		updateTrigger(OUT_DECAY);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 8) == 8)
-        		{
-        		updateTrigger(OUT_SUSTAIN);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 16) == 16)
-        		{
-        		updateTrigger(OUT_RELEASE);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 32) == 32)
-        		{
-        		updateTrigger(OUT_DONE);
-        	updateTrigger(OUT_MOD);
-        		}
-        	scheduledTriggers = 0;
-        	}
+            {
+            if ((scheduledTriggers & 1) == 1)
+                {
+                updateTrigger(OUT_DELAY);
+                }
+            if ((scheduledTriggers & 2) == 2)
+                {
+                updateTrigger(OUT_ATTACK);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 4) == 4)
+                {
+                updateTrigger(OUT_DECAY);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 8) == 8)
+                {
+                updateTrigger(OUT_SUSTAIN);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 16) == 16)
+                {
+                updateTrigger(OUT_RELEASE);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 32) == 32)
+                {
+                updateTrigger(OUT_DONE);
+                updateTrigger(OUT_MOD);
+                }
+            scheduledTriggers = 0;
+            }
 
         long tick = getSyncTick(sync);
 
@@ -370,35 +370,35 @@ public class DADSR extends Modulation implements ModSource
         while (tick >= start + interval)
             {
             state++;
-            if (state == DELAY)				// this can't happen
-            	{
-	            updateTrigger(OUT_DELAY);
-               	}
+            if (state == DELAY)                         // this can't happen
+                {
+                updateTrigger(OUT_DELAY);
+                }
             else if (state == ATTACK)
-            	{
-            	updateTrigger(OUT_MOD);
-	            updateTrigger(OUT_ATTACK);
-               	}
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_ATTACK);
+                }
             else if (state == DECAY)
-            	{
-            	updateTrigger(OUT_MOD);
-	            updateTrigger(OUT_DECAY);
-               	}
-        	else if (state == SUSTAIN)
-        		{
-            	updateTrigger(OUT_MOD);
-	            updateTrigger(OUT_SUSTAIN);
-        		}
-        	else if (state == RELEASE)
-        		{
-            	updateTrigger(OUT_MOD);
-	            updateTrigger(OUT_RELEASE);
-        		}
-        	else if (state == DONE)
-        		{
-            	updateTrigger(OUT_MOD);
-	            updateTrigger(OUT_DONE);
-        		}
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_DECAY);
+                }
+            else if (state == SUSTAIN)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_SUSTAIN);
+                }
+            else if (state == RELEASE)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_RELEASE);
+                }
+            else if (state == DONE)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_DONE);
+                }
                  
             // try sticky again
             if (state == DONE)
@@ -583,13 +583,13 @@ public class DADSR extends Modulation implements ModSource
                     box.add(t);
                     }
 
-               for(int i = 0; i < mod.getNumOptions(); i++)
+                for(int i = 0; i < mod.getNumOptions(); i++)
                     {
                     box.add(new OptionsChooser(mod, i));
                     }
                     
 
-				box.add(Strut.makeVerticalStrut(5));
+                box.add(Strut.makeVerticalStrut(5));
                 Box box2 = new Box(BoxLayout.X_AXIS);
                 box2.add(Box.createGlue());
                 
@@ -599,31 +599,31 @@ public class DADSR extends Modulation implements ModSource
                 ModulationOutput mo = new ModulationOutput(mod, OUT_DELAY, this);
                 mo.setTitleText(" D", false);
                 box3.add(mo);
-				box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
                 
                 mo = new ModulationOutput(mod, OUT_SUSTAIN, this);
                 mo.setTitleText(" S", false);
                 box3.add(mo);
                 
                 box2.add(box3);
-				box3 = new Box(BoxLayout.Y_AXIS);
-				
+                box3 = new Box(BoxLayout.Y_AXIS);
+                                
                 mo = new ModulationOutput(mod, OUT_ATTACK, this);
                 mo.setTitleText(" A", false);
                 box3.add(mo);
-				box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
                 
                 mo = new ModulationOutput(mod, OUT_RELEASE, this);
                 mo.setTitleText(" R", false);
                 box3.add(mo);
 
                 box2.add(box3);
-				box3 = new Box(BoxLayout.Y_AXIS);
-				
+                box3 = new Box(BoxLayout.Y_AXIS);
+                                
                 mo = new ModulationOutput(mod, OUT_DECAY, this);
                 mo.setTitleText(" D", false);
                 box3.add(mo);
-				box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
 
                 mo = new ModulationOutput(mod, OUT_DONE, this);
                 mo.setTitleText(" E", false);
@@ -631,7 +631,7 @@ public class DADSR extends Modulation implements ModSource
 
                 box2.add(box3);
 
-				box.add(box2);
+                box.add(box2);
                 return box;
                 }
             };

@@ -132,7 +132,7 @@ public class Output
     // The current number of voices spawned so far.  This increases as sounds register themselves.
     // This is will be threadsafe even though we increment it with ++ because that's only done in one thread.
     volatile int numSounds = 0;   
-        
+    
     static
         {
         // Load preferences
@@ -651,7 +651,7 @@ public class Output
                 // Unlike the dephase situation, we MUST update the position for all partials            
                 
                 //if (amplitude != 0)
-                // 	System.err.println("-->" + i + " " + frequency + " " + oi);
+                //      System.err.println("-->" + i + " " + frequency + " " + oi);
                 double position = pos[oi] + frequency * tr;
                 position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
                 pos[oi] = position;
@@ -1052,7 +1052,7 @@ public class Output
             }
         }
 
-	volatile int count = 0;
+    volatile int count = 0;
 
     double[] zeroAmplitudes = new double[Unit.NUM_PARTIALS];
     double[] zeroFrequencies = new double[Unit.NUM_PARTIALS];
@@ -1071,8 +1071,8 @@ public class Output
         int ns = numSounds;
         if (onlyPlayFirstSound) ns = 1;
 
-		syncTick();
-		input.go();
+        syncTick();
+        input.go();
 
         lock();
         try
@@ -1125,7 +1125,7 @@ public class Output
             Thread.currentThread().yield();
             }
                 
-       lock();
+        lock();
         try
             {
             Unit e = sounds[0].getEmits();
@@ -1146,9 +1146,9 @@ public class Output
                     System.arraycopy(standardOrders, 0, swap.orders[i], 0, standardOrders.length); 
                     }
 
-				//for(int q = 0; q < emits.amplitudes[0].length; q++)
-	            //    if (emits.amplitudes[0][q] != 0)
-    	        //    	System.err.println("++>" + q + " " + emits.frequencies[0][q] + " " + emits.orders[0][q]);
+                //for(int q = 0; q < emits.amplitudes[0].length; q++)
+                //    if (emits.amplitudes[0][q] != 0)
+                //      System.err.println("++>" + q + " " + emits.frequencies[0][q] + " " + emits.orders[0][q]);
                     
                 swap.pitches[i] = sounds[i].getPitch();
                 swap.velocities[i] = (velocitySensitive ? sounds[i].getVelocity() : Sound.DEFAULT_VELOCITY);

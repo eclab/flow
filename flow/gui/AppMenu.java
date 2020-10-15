@@ -827,6 +827,23 @@ public class AppMenu
         }
 
 
+    // Returns the Reset on Gate menu
+    static JMenuItem resetOnGateMenu(final Rack rack)
+        {
+        final JCheckBoxMenuItem display = new JCheckBoxMenuItem("Reset Phase on Note On");
+        display.setSelected(Prefs.getResetOnGate());
+        rack.setResetOnGate(display.isSelected());
+        display.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+                rack.setResetOnGate(display.isSelected());
+                Prefs.setResetOnGate(display.isSelected());
+                }
+            });
+        return display;
+        }       
+
     static JMenuItem showDisplay(Rack rack)
         {
         final JCheckBoxMenuItem display = new JCheckBoxMenuItem("Show Displays");
@@ -1217,6 +1234,7 @@ return swapPrimary;
         menu.add(bendMenu(rack));
         menu.add(velMenu(rack));
         menu.add(syncMenu(rack));
+        menu.add(resetOnGateMenu(rack));
         menu.addSeparator();
         
         JCheckBoxMenuItem m = microtuningMenu(rack);

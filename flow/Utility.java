@@ -213,27 +213,27 @@ public class Utility
         }
 
 /*
+  public static void main(String[] args)
+  {
+  double sum = 0;
+  for(double i = 0; i < 10000; i+= 0.000005)
+  {
+  sum += Utility.fastSin(i);
+  }
+  System.err.println(sum);
+  }
+*/
+
     public static void main(String[] args)
         {
         double sum = 0;
-        for(double i = 0; i < 10000; i+= 0.000005)
+        for(double i = 0; i < 1; i+= 0.0000000002)
             {
-            sum += Utility.fastSin(i);
+            //sum += Utility.fastSqrt(i);
+            sum += Math.sqrt(i);
             }
         System.err.println(sum);
         }
-*/
-
-      public static void main(String[] args)
-      {
-      double sum = 0;
-      for(double i = 0; i < 1; i+= 0.0000000002)
-      {
-      //sum += Utility.fastSqrt(i);
-      sum += Math.sqrt(i);
-      }
-      System.err.println(sum);
-      }
 
 
     /*

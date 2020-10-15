@@ -20,7 +20,11 @@ public class Input
     Output output;
     MicroTuning microTuning = null;
     MicroTuning microTuningBackup = null;
-
+    boolean resetOnGate = true;
+        
+    public boolean getResetOnGate() { return resetOnGate; }
+    public void setResetOnGate(boolean val) { resetOnGate = val; }
+        
     public Midi getMidi()
         {
         return midi;
@@ -120,41 +124,41 @@ public class Input
         {
         return Output.PRIMARY_GROUP;
         /*
-        for (int i = 1; i < Output.MAX_GROUPS; i++)
-            {
-            Group g = output.getGroup(i);
-            if ((g.getChannel() == channel) && (note == ANY_NOTE || (g.getMinNote() <= note && g.getMaxNote() >= note)))
-                {
-                return i;
-                }
-            }
+          for (int i = 1; i < Output.MAX_GROUPS; i++)
+          {
+          Group g = output.getGroup(i);
+          if ((g.getChannel() == channel) && (note == ANY_NOTE || (g.getMinNote() <= note && g.getMaxNote() >= note)))
+          {
+          return i;
+          }
+          }
 
-        Group g = primaryGroup();
-        if (g.getChannel() == channel)
-            {
-            return Output.PRIMARY_GROUP;
-            }
-        else if (g.getChannel() == CHANNEL_OMNI)
-            {
-            return Output.PRIMARY_GROUP;
-            }
-        else if (g.getChannel() == CHANNEL_LOWER_ZONE)
-            {
-            // legal channels are 0 ... 0 + numMPEChannels inclusive
-            if (channel <= numMPEChannels)
-                {
-                return Output.PRIMARY_GROUP;
-                }
-            }
-        else if (g.getChannel() == CHANNEL_UPPER_ZONE)
-            {
-            // legal channels are 15 ... 15 - numMPEChannels inclusive
-            if (channel >= 15 - numMPEChannels)
-                {
-                return Output.PRIMARY_GROUP;
-                }
-            }
-        return Output.NO_GROUP;
+          Group g = primaryGroup();
+          if (g.getChannel() == channel)
+          {
+          return Output.PRIMARY_GROUP;
+          }
+          else if (g.getChannel() == CHANNEL_OMNI)
+          {
+          return Output.PRIMARY_GROUP;
+          }
+          else if (g.getChannel() == CHANNEL_LOWER_ZONE)
+          {
+          // legal channels are 0 ... 0 + numMPEChannels inclusive
+          if (channel <= numMPEChannels)
+          {
+          return Output.PRIMARY_GROUP;
+          }
+          }
+          else if (g.getChannel() == CHANNEL_UPPER_ZONE)
+          {
+          // legal channels are 15 ... 15 - numMPEChannels inclusive
+          if (channel >= 15 - numMPEChannels)
+          {
+          return Output.PRIMARY_GROUP;
+          }
+          }
+          return Output.NO_GROUP;
         */
         }
 
@@ -532,7 +536,7 @@ public class Input
                         }
                     }
                 } 
-                finally
+            finally
                 {
                 output.unlock();
                 }
@@ -737,7 +741,7 @@ public class Input
         double d = Math.pow(2.0, (double) (i - 69.0) / 12.0) * 440.0;
 
 
-		// At this point we're modifying the sound.  So we need to acquire the lock.
+        // At this point we're modifying the sound.  So we need to acquire the lock.
 
         output.lock();
         try
@@ -773,6 +777,10 @@ public class Input
                 }
             if (!noteCurrentlyOn)
                 {
+                if (resetOnGate)
+                    {
+                    sound.resetPartialPhases();
+                    }
                 sound.gate();
                 }
 
@@ -784,7 +792,7 @@ public class Input
         catch (Exception e)
             {
             e.printStackTrace();
-    	     } 
+            } 
         finally
             {
             output.unlock();
@@ -893,12 +901,12 @@ public class Input
 
                     // either way, let's set the release velocity
                     if (noteOnMessage)
-                    	sound.setReleaseVelocity(0.5);		// From MIDI spec: a NOTE ON of 0 velocity shall be interpreted as a NOTE OFF of 64 velocity
+                        sound.setReleaseVelocity(0.5);          // From MIDI spec: a NOTE ON of 0 velocity shall be interpreted as a NOTE OFF of 64 velocity
                     else
-	                    sound.setReleaseVelocity((double) sm.getData2() / 127.0);
+                        sound.setReleaseVelocity((double) sm.getData2() / 127.0);
                     }
                 } 
-                finally
+            finally
                 {
                 output.unlock();
                 }

@@ -193,20 +193,20 @@ public class Prefs {
         }
 
     public static void setLastSkip(int skip) 
-    	{ 
-    	setLastX("" + skip, "Skip"); 
-    	}
-    	
+        { 
+        setLastX("" + skip, "Skip"); 
+        }
+        
     public static int getLastSkip() 
-    { 
-    String s = getLastX("Skip"); 
-	try 
-		{ 
-		if (s !=null) return Integer.parseInt(s); 
-			} 
-			catch (NumberFormatException e) { }
-    return Output.DEFAULT_SKIP; 
-    }
+        { 
+        String s = getLastX("Skip"); 
+        try 
+            { 
+            if (s !=null) return Integer.parseInt(s); 
+            } 
+        catch (NumberFormatException e) { }
+        return Output.DEFAULT_SKIP; 
+        }
 
     public static void setLastBendOctave(int bendOctave) {
         setLastX("" + bendOctave, "BendOctave");
@@ -286,28 +286,39 @@ public class Prefs {
         return Unit.DEFAULT_NUM_PARTIALS;
         }
 
-    public static void setShowsDisplays(boolean val) {
-        setLastX("" + val, "ShowDisplays");
+/*
+  public static int showMultiOption(String[] labels, JComponent[] widgets, String[] options, int defaultOption,
+  String title, String message) {
+  WidgetList list = new WidgetList(labels, widgets);
+
+  JPanel panel = new JPanel();
+  panel.setLayout(new BorderLayout());
+  JPanel p = new JPanel();
+  p.setLayout(new BorderLayout());
+  p.add(new JLabel("    "), BorderLayout.NORTH);
+  p.add(new JLabel(message), BorderLayout.CENTER);
+  p.add(new JLabel("    "), BorderLayout.SOUTH);
+  panel.add(list, BorderLayout.CENTER);
+  panel.add(p, BorderLayout.NORTH);
+
+  int ret = JOptionPane.showOptionDialog(
+  null, panel, title, JOptionPane.DEFAULT_OPTION,
+  JOptionPane.PLAIN_MESSAGE, null, options, options[defaultOption]);
+  return ret;
+  }
+*/
+
+    public static void setResetOnGate(boolean val) {
+        setLastX("" + val, "ResetOnGate");
         }
 
-    public static int showMultiOption(String[] labels, JComponent[] widgets, String[] options, int defaultOption,
-        String title, String message) {
-        WidgetList list = new WidgetList(labels, widgets);
+    public static boolean getResetOnGate() {
+        String s = getLastX("ResetOnGate");
+        return Boolean.parseBoolean(s); // default is FALSE
+        }
 
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        JPanel p = new JPanel();
-        p.setLayout(new BorderLayout());
-        p.add(new JLabel("    "), BorderLayout.NORTH);
-        p.add(new JLabel(message), BorderLayout.CENTER);
-        p.add(new JLabel("    "), BorderLayout.SOUTH);
-        panel.add(list, BorderLayout.CENTER);
-        panel.add(p, BorderLayout.NORTH);
-
-        int ret = JOptionPane.showOptionDialog(
-            null, panel, title, JOptionPane.DEFAULT_OPTION,
-            JOptionPane.PLAIN_MESSAGE, null, options, options[defaultOption]);
-        return ret;
+    public static void setShowsDisplays(boolean val) {
+        setLastX("" + val, "ShowDisplays");
         }
 
     public static boolean getShowsDisplays() {

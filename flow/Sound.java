@@ -197,7 +197,7 @@ public class Sound
     /** Resets all Modulations / Units to their initial positions. */
     public void resetPartialPhases()
         {
-        output.positions = new double[output.numVoices][Unit.NUM_PARTIALS];
+        output.positions[index] = new double[Unit.NUM_PARTIALS];        // FIXME: maybe we should bzero
         }
 
     /** Informs all Modulations / Units that a clock reset, or MIDI CLOCK START, occurred. */

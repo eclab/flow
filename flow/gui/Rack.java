@@ -214,6 +214,32 @@ public class Rack extends JPanel
     public boolean getAddModulesAfter() { return addModulesAfter; }
     public void setAddModulesAfter(boolean val) { addModulesAfter = val; }
 
+    public boolean getResetOnGate() 
+        {
+        output.lock();
+        try
+            {
+            return output.getInput().getResetOnGate(); 
+            }
+        finally 
+            {
+            output.unlock();
+            }
+        }
+        
+    public void setResetOnGate(boolean val)
+        {
+        output.lock();
+        try
+            {
+            output.getInput().setResetOnGate(val); 
+            }
+        finally 
+            {
+            output.unlock();
+            }
+        }
+
 /*
   public boolean getSwapPrimaryWithMIDIVoice() { return swapPrimaryWithMIDIVoice; }
   public void setSwapPrimaryWithMIDIVoice(boolean val) { swapPrimaryWithMIDIVoice = val; }
@@ -877,14 +903,14 @@ public class Rack extends JPanel
         int skip = Prefs.getLastSkip();
         boolean found = false;
         for(int i = 0; i < skips.length; i++)
-        	{
-        	if (skips[i] == skip) { found = true; break; }
-        	}
-        if (!found) skip = Output.DEFAULT_SKIP;			// normally 16 or 32
+            {
+            if (skips[i] == skip) { found = true; break; }
+            }
+        if (!found) skip = Output.DEFAULT_SKIP;                 // normally 16 or 32
         for(int i = 0; i < skips.length; i++)
-        	{
-        	if (skips[i] == skip) { index = i; break;}
-        	}
+            {
+            if (skips[i] == skip) { index = i; break;}
+            }
         skipsCombo.setSelectedIndex(index);
         
         JCheckBox stereoCheckbox = new JCheckBox();
@@ -1002,14 +1028,24 @@ public class Rack extends JPanel
             {
             audioMixerNames[i] = audioMixers[i].getName();
             }
-        JComboBox audioMixersCombo = new JComboBox(audioMixerNames);
-        audioMixersCombo.setSelectedItem(output.getAudioInput().getMixer().toString());
-        String audioMix = Prefs.getLastInputAudioDevice();
-        for(String m : audioMixerNames)
-            {
-            if (m.equals(audioMix))
-                { audioMixersCombo.setSelectedItem(m); break; }
-            }
+		JComboBox audioMixersCombo = null;
+        if (audioMixerNames.length > 0)
+        	{
+	        audioMixersCombo = new JComboBox(audioMixerNames);
+	        Mixer.Info inputMixer = output.getAudioInput().getMixer();
+	        if (inputMixer != null)
+		        audioMixersCombo.setSelectedItem(inputMixer.toString());
+	        String audioMix = Prefs.getLastInputAudioDevice();
+	        for(String m : audioMixerNames)
+	            {
+	            if (m.equals(audioMix))
+	                { audioMixersCombo.setSelectedItem(m); break; }
+	            }
+	        }
+	    else
+	    	{
+	        audioMixersCombo = new JComboBox();
+	    	}
  
         /*
           final JLabel scratch0 = new JLabel(" G#8 ");
@@ -1094,7 +1130,8 @@ public class Rack extends JPanel
                     devicesCombo.getSelectedIndex() == devices2Combo.getSelectedIndex() ?
                     devices.get(0) : devices.get(devices2Combo.getSelectedIndex()));
                     
-                output.getAudioInput().setMixer(audioMixers[audioMixersCombo.getSelectedIndex()]);
+                if (audioMixersCombo.getSelectedIndex() > -1)
+                	output.getAudioInput().setMixer(audioMixers[audioMixersCombo.getSelectedIndex()]);
                 /*
                   if (restrictSlider.getValue() == 0)
                   {
@@ -1119,7 +1156,8 @@ public class Rack extends JPanel
             Prefs.setLastChannel(channelsCombo.getSelectedIndex() - Input.NUM_SPECIAL_CHANNELS);
             Prefs.setLastNumMPEChannels(mpeChannelsCombo.getSelectedIndex() + 1);
             Prefs.setLastAudioDevice(mixersCombo.getSelectedItem().toString());
-            Prefs.setLastInputAudioDevice(audioMixersCombo.getSelectedItem().toString());
+            if (audioMixersCombo.getSelectedIndex() > -1)
+            	Prefs.setLastInputAudioDevice(audioMixersCombo.getSelectedItem().toString());
             }
         else
             {

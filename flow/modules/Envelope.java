@@ -249,7 +249,7 @@ public class Envelope extends Modulation implements ModSource
             interval = toTicks(time[state]);
             }
         if (oldState != state)
-        	scheduleTrigger(state);
+            scheduleTrigger(state);
         }
         
     public static final int T_PRE_1 = 0;
@@ -264,44 +264,44 @@ public class Envelope extends Modulation implements ModSource
     
     int scheduledTriggers = 0;
     void scheduleTrigger(int val)
-    	{
-    	 if (val == T_PRE_1)
-    		{
-    		scheduledTriggers |= 1;
-    		}
-    	else if (val == T_PRE_2)
-    		{
-    		scheduledTriggers |= 2;
-    		}
-    	else if (val == T_PRE_3)
-    		{
-    		scheduledTriggers |= 4;
-    		}
-    	else if (val == T_SUS_1)
-    		{
-    		scheduledTriggers |= 8;
-    		}
-    	else if (val == T_SUS_2)
-    		{
-    		scheduledTriggers |= 16;
-    		}
-    	else if (val == T_SUS_3)
-    		{
-    		scheduledTriggers |= 32;
-    		}
-    	else if (val == T_REL_1)
-    		{
-    		scheduledTriggers |= 64;
-    		}
-    	else if (val == T_REL_2)
-    		{
-    		scheduledTriggers |= 128;
-    		}
-    	else if (val == T_DONE)
-    		{
-    		scheduledTriggers |= 256;
-    		}
-    	}
+        {
+        if (val == T_PRE_1)
+            {
+            scheduledTriggers |= 1;
+            }
+        else if (val == T_PRE_2)
+            {
+            scheduledTriggers |= 2;
+            }
+        else if (val == T_PRE_3)
+            {
+            scheduledTriggers |= 4;
+            }
+        else if (val == T_SUS_1)
+            {
+            scheduledTriggers |= 8;
+            }
+        else if (val == T_SUS_2)
+            {
+            scheduledTriggers |= 16;
+            }
+        else if (val == T_SUS_3)
+            {
+            scheduledTriggers |= 32;
+            }
+        else if (val == T_REL_1)
+            {
+            scheduledTriggers |= 64;
+            }
+        else if (val == T_REL_2)
+            {
+            scheduledTriggers |= 128;
+            }
+        else if (val == T_DONE)
+            {
+            scheduledTriggers |= 256;
+            }
+        }
 
 
     public int findNextState()
@@ -377,8 +377,8 @@ public class Envelope extends Modulation implements ModSource
                 }
             // if we've gotten here, we couldn't find a valid sustain state, so we're going to continue just like one shot
 
-			// try SUSTAIN_END_STATE to see if we hold there
-			s = SUSTAIN_END_STATE;
+            // try SUSTAIN_END_STATE to see if we hold there
+            s = SUSTAIN_END_STATE;
             if (modulate(s * 2) > 0) return s;
 
             // Go through all later states, ending at DONE, and return the next one which doesn't skip.
@@ -428,53 +428,53 @@ public class Envelope extends Modulation implements ModSource
             }
                 
         if (scheduledTriggers != 0)
-        	{
-        	if ((scheduledTriggers & 1) == 1)
-        		{
-        		updateTrigger(OUT_PRE_1);
-        		}
-        	if ((scheduledTriggers & 2) == 2)
-        		{
-        		updateTrigger(OUT_PRE_2);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 4) == 4)
-        		{
-        		updateTrigger(OUT_PRE_3);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 8) == 8)
-        		{
-        		updateTrigger(OUT_SUS_1);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 16) == 16)
-        		{
-        		updateTrigger(OUT_SUS_2);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 32) == 32)
-        		{
-        		updateTrigger(OUT_SUS_3);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 64) == 64)
-        		{
-        		updateTrigger(OUT_REL_1);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 128) == 128)
-        		{
-        		updateTrigger(OUT_REL_2);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 256) == 256)
-        		{
-        		updateTrigger(OUT_DONE);
-        	updateTrigger(OUT_MOD);
-        		}
-        	scheduledTriggers = 0;
-        	}
+            {
+            if ((scheduledTriggers & 1) == 1)
+                {
+                updateTrigger(OUT_PRE_1);
+                }
+            if ((scheduledTriggers & 2) == 2)
+                {
+                updateTrigger(OUT_PRE_2);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 4) == 4)
+                {
+                updateTrigger(OUT_PRE_3);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 8) == 8)
+                {
+                updateTrigger(OUT_SUS_1);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 16) == 16)
+                {
+                updateTrigger(OUT_SUS_2);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 32) == 32)
+                {
+                updateTrigger(OUT_SUS_3);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 64) == 64)
+                {
+                updateTrigger(OUT_REL_1);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 128) == 128)
+                {
+                updateTrigger(OUT_REL_2);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 256) == 256)
+                {
+                updateTrigger(OUT_DONE);
+                updateTrigger(OUT_MOD);
+                }
+            scheduledTriggers = 0;
+            }
 
         if (state == NOT_STARTED)               // haven't started the envelope yet
             return;
@@ -496,52 +496,52 @@ public class Envelope extends Modulation implements ModSource
             {
             state = findNextState();
             if (lastState != state)
-            	{
-				if (state == PRE_1)			// shouldn't happen
-					{
-					updateTrigger(OUT_PRE_1);
-					}
-				else if (state == PRE_2)
-					{
-					updateTrigger(OUT_MOD);
-					updateTrigger(OUT_PRE_2);
-					}
-				else if (state == PRE_3)
-					{
-					updateTrigger(OUT_MOD);
-					updateTrigger(OUT_PRE_3);
-					}
-				else if (state == SUS_1)
-					{
-					updateTrigger(OUT_MOD);
-					updateTrigger(OUT_SUS_1);
-					}
-				else if (state == SUS_2)
-					{
-					updateTrigger(OUT_MOD);
-					updateTrigger(OUT_SUS_2);
-					}
-				else if (state == SUS_3)
-					{
-					updateTrigger(OUT_MOD);
-					updateTrigger(OUT_SUS_3);
-					}
-				else if (state == REL_1)
-					{
-					updateTrigger(OUT_MOD);
-					updateTrigger(OUT_REL_1);
-					}
-				else if (state == REL_2)
-					{
-					updateTrigger(OUT_MOD);
-					updateTrigger(OUT_REL_2);
-					}
-				else if (state == DONE)
-					{
-					updateTrigger(OUT_MOD);
-					updateTrigger(OUT_DONE);
-					}
-            	}
+                {
+                if (state == PRE_1)                     // shouldn't happen
+                    {
+                    updateTrigger(OUT_PRE_1);
+                    }
+                else if (state == PRE_2)
+                    {
+                    updateTrigger(OUT_MOD);
+                    updateTrigger(OUT_PRE_2);
+                    }
+                else if (state == PRE_3)
+                    {
+                    updateTrigger(OUT_MOD);
+                    updateTrigger(OUT_PRE_3);
+                    }
+                else if (state == SUS_1)
+                    {
+                    updateTrigger(OUT_MOD);
+                    updateTrigger(OUT_SUS_1);
+                    }
+                else if (state == SUS_2)
+                    {
+                    updateTrigger(OUT_MOD);
+                    updateTrigger(OUT_SUS_2);
+                    }
+                else if (state == SUS_3)
+                    {
+                    updateTrigger(OUT_MOD);
+                    updateTrigger(OUT_SUS_3);
+                    }
+                else if (state == REL_1)
+                    {
+                    updateTrigger(OUT_MOD);
+                    updateTrigger(OUT_REL_1);
+                    }
+                else if (state == REL_2)
+                    {
+                    updateTrigger(OUT_MOD);
+                    updateTrigger(OUT_REL_2);
+                    }
+                else if (state == DONE)
+                    {
+                    updateTrigger(OUT_MOD);
+                    updateTrigger(OUT_DONE);
+                    }
+                }
                  
             if (state == DONE)      // we're done again
                 return;
@@ -741,7 +741,7 @@ public class Envelope extends Modulation implements ModSource
                 pan.add(box2, BorderLayout.EAST);
                 box.add(pan);
 
-				box.add(Strut.makeVerticalStrut(5));
+                box.add(Strut.makeVerticalStrut(5));
 
                 box2 = new Box(BoxLayout.X_AXIS);
                 box2.add(Box.createGlue());
@@ -751,12 +751,12 @@ public class Envelope extends Modulation implements ModSource
                 ModulationOutput mo = new ModulationOutput(mod, OUT_PRE_1, this);
                 mo.setTitleText(" Pre 1", false);
                 box3.add(mo);
-				box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
 
                 mo = new ModulationOutput(mod, OUT_SUS_1, this);
                 mo.setTitleText(" Sus 1", false);
                 box3.add(mo);
-				box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
 
                 mo = new ModulationOutput(mod, OUT_REL_1, this);
                 mo.setTitleText(" Rel 1", false);
@@ -764,34 +764,34 @@ public class Envelope extends Modulation implements ModSource
 
 
                 box2.add(box3);
-				box3 = new Box(BoxLayout.Y_AXIS);
+                box3 = new Box(BoxLayout.Y_AXIS);
 
                 mo = new ModulationOutput(mod, OUT_PRE_2, this);
                 mo.setTitleText(" 2", false);
                 box3.add(mo);
-				box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
 
                 mo = new ModulationOutput(mod, OUT_SUS_2, this);
                 mo.setTitleText(" 2", false);
                 box3.add(mo);
-				box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
 
                 mo = new ModulationOutput(mod, OUT_REL_2, this);
                 mo.setTitleText(" 2", false);
                 box3.add(mo);
 
                 box2.add(box3);
-				box3 = new Box(BoxLayout.Y_AXIS);
+                box3 = new Box(BoxLayout.Y_AXIS);
 
                 mo = new ModulationOutput(mod, OUT_PRE_3, this);
                 mo.setTitleText(" 3", false);
                 box3.add(mo);
-				box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
 
                 mo = new ModulationOutput(mod, OUT_SUS_3, this);
                 mo.setTitleText(" 3", false);
                 box3.add(mo);
-				box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
 
                 mo = new ModulationOutput(mod, OUT_DONE, this);
                 mo.setTitleText(" E", false);
@@ -804,7 +804,7 @@ public class Envelope extends Modulation implements ModSource
                 pan.add(box2, BorderLayout.EAST);
                 box.add(pan);
 
-               return box;
+                return box;
                 }
             };
         }
