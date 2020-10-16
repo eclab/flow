@@ -105,7 +105,7 @@ public class Shift extends Unit
                 for(int i = 0; i < frequencies.length; i++)
                     {
                     frequencies[i] = frequencies[i] * multiplier;
-                    if (frequencies[i] < 0.0001) frequencies[i] = 0.0001;		// that'd be pretty dang low, but it wouldn't be 0 so we won't have a singularity if we're recurrent
+                    if (frequencies[i] < 0.0001) frequencies[i] = 0.0001;               // that'd be pretty dang low, but it wouldn't be 0 so we won't have a singularity if we're recurrent
                     }
                 }
             break; 

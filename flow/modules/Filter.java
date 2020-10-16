@@ -190,28 +190,28 @@ public class Filter extends Unit
         boolean pole4 = get4Pole();
         
         if (getTaper())
-        	{
-			for(int i = 0; i < amplitudes.length; i++)
-				{
-				// taper to Nyquist with an N^2 cutdown function
-				if (frequencies[i] * pitch > cutoff)
-					{
-					taperVal = (frequencies[i] * pitch - cutoff) / (Output.NYQUIST - cutoff);
-					taperVal = 1.0 - (taperVal * taperVal);
-					if (taperVal < 0) taperVal = 0;
-					}
-				else taperVal = 1.0;
+            {
+            for(int i = 0; i < amplitudes.length; i++)
+                {
+                // taper to Nyquist with an N^2 cutdown function
+                if (frequencies[i] * pitch > cutoff)
+                    {
+                    taperVal = (frequencies[i] * pitch - cutoff) / (Output.NYQUIST - cutoff);
+                    taperVal = 1.0 - (taperVal * taperVal);
+                    if (taperVal < 0) taperVal = 0;
+                    }
+                else taperVal = 1.0;
 
-            	amplitudes[i] = taperVal * amplitudes[i] * filter(state, frequencies[i] * pitch, resonance, cutoff, pole4);
-            	}
+                amplitudes[i] = taperVal * amplitudes[i] * filter(state, frequencies[i] * pitch, resonance, cutoff, pole4);
+                }
             }
-		else
-			{
-			for(int i = 0; i < amplitudes.length; i++)
-				{
-				amplitudes[i] = amplitudes[i] * filter(state, frequencies[i] * pitch, resonance, cutoff, pole4);
-				}
-			}
+        else
+            {
+            for(int i = 0; i < amplitudes.length; i++)
+                {
+                amplitudes[i] = amplitudes[i] * filter(state, frequencies[i] * pitch, resonance, cutoff, pole4);
+                }
+            }
 
         constrain();
         }       

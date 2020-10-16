@@ -33,9 +33,9 @@ public class Drawbars extends Unit implements UnitSource, Presetable
     public static final int MOD_DECAY = 11;
     public static final int MOD_VOLUME = 12;
 
-	public static final int TUNING_HAMMOND = 0;
-	public static final int TUNING_EQUAL_TEMPERMENT = 1;
-	public static final int TUNING_TRUE_HARMONIC = 2;
+    public static final int TUNING_HAMMOND = 0;
+    public static final int TUNING_EQUAL_TEMPERMENT = 1;
+    public static final int TUNING_TRUE_HARMONIC = 2;
 
     public static final int NUM_DRAWBARS = 11;
 
@@ -100,57 +100,57 @@ public class Drawbars extends Unit implements UnitSource, Presetable
         {
         double[] frequencies = getFrequencies(0);
         if (tuning == TUNING_HAMMOND)
-        	{
-        	// For precision information, see
-        	// https://electricdruid.net/technical-aspects-of-the-hammond-organ/
-        	
-			frequencies[0] = 8.0 / (16.0);
-			frequencies[1] = 8.0 / (8.0);           /// yes, they're flipped relative to the mods
-			frequencies[2] = 1.498823530; 			/// yes, they're flipped relative to the mods
-			frequencies[3] = 8.0 / (4.0);
-			frequencies[4] = 2.997647060;
-			frequencies[5] = 8.0 / (2.0);
-			frequencies[6] = 5.040941178;
-			frequencies[7] = 5.995294120;
-			frequencies[8] = 8.0 / (1.0);        
-			frequencies[9] = 8.0 / (1.0 + 1.0/7.0);        	// I have no precision information on this drawbar
-			frequencies[10] = 8.0 / (4.0 / 5.0);           	// I have no precision information on this drawbar     
-			frequencies[11] = 8.0 / (8.0 / 9.0);           	// I have no precision information on this drawbar     
-			frequencies[12] = 8.0 / (2.0 / 3.0);           	// I have no precision information on this drawbar
-        	}
+            {
+            // For precision information, see
+            // https://electricdruid.net/technical-aspects-of-the-hammond-organ/
+                
+            frequencies[0] = 8.0 / (16.0);
+            frequencies[1] = 8.0 / (8.0);           /// yes, they're flipped relative to the mods
+            frequencies[2] = 1.498823530;                   /// yes, they're flipped relative to the mods
+            frequencies[3] = 8.0 / (4.0);
+            frequencies[4] = 2.997647060;
+            frequencies[5] = 8.0 / (2.0);
+            frequencies[6] = 5.040941178;
+            frequencies[7] = 5.995294120;
+            frequencies[8] = 8.0 / (1.0);        
+            frequencies[9] = 8.0 / (1.0 + 1.0/7.0);         // I have no precision information on this drawbar
+            frequencies[10] = 8.0 / (4.0 / 5.0);            // I have no precision information on this drawbar     
+            frequencies[11] = 8.0 / (8.0 / 9.0);            // I have no precision information on this drawbar     
+            frequencies[12] = 8.0 / (2.0 / 3.0);            // I have no precision information on this drawbar
+            }
         else if (tuning == TUNING_EQUAL_TEMPERMENT)
-        	{
-			frequencies[0] = 8.0 / (16.0);
-			frequencies[1] = 8.0 / (8.0);           /// yes, they're flipped relative to the mods
-			frequencies[2] = 1.498307077; 			/// yes, they're flipped relative to the mods
-			frequencies[3] = 8.0 / (4.0);
-			frequencies[4] = 2.996614154;
-			frequencies[5] = 8.0 / (2.0);
-			frequencies[6] = 5.039684200;
-			frequencies[7] = 5.993228307;
-			frequencies[8] = 8.0 / (1.0);        
-			frequencies[9] = 8.0 / (1.0 + 1.0/7.0);        	// I have no precision information on this drawbar
-			frequencies[10] = 8.0 / (4.0 / 5.0);           	// I have no precision information on this drawbar     
-			frequencies[11] = 8.0 / (8.0 / 9.0);           	// I have no precision information on this drawbar     
-			frequencies[12] = 8.0 / (2.0 / 3.0);           	// I have no precision information on this drawbar
-        	}
-        else			// TUNING_TRUE_HARMONIC
-        	{
-			frequencies[0] = 8.0 / (16.0);
-			frequencies[1] = 8.0 / (8.0);           /// yes, they're flipped relative to the mods
-			frequencies[2] = 8.0 / (5.0 + 1.0/3.0); /// yes, they're flipped relative to the mods
-			frequencies[3] = 8.0 / (4.0);
-			frequencies[4] = 8.0 / (2.0 + 2.0/3.0);
-			frequencies[5] = 8.0 / (2.0);
-			frequencies[6] = 8.0 / (1.0 + 3.0/5.0);
-			frequencies[7] = 8.0 / (1.0 + 1.0/3.0);
-			frequencies[8] = 8.0 / (1.0);        
-			frequencies[9] = 8.0 / (1.0 + 1.0/7.0);        
-			frequencies[10] = 8.0 / (4.0 / 5.0);        
-			frequencies[11] = 8.0 / (8.0 / 9.0);        
-			frequencies[12] = 8.0 / (2.0 / 3.0);   
-        	}
-        lastTuning = tuning;		// we're all done
+            {
+            frequencies[0] = 8.0 / (16.0);
+            frequencies[1] = 8.0 / (8.0);           /// yes, they're flipped relative to the mods
+            frequencies[2] = 1.498307077;                   /// yes, they're flipped relative to the mods
+            frequencies[3] = 8.0 / (4.0);
+            frequencies[4] = 2.996614154;
+            frequencies[5] = 8.0 / (2.0);
+            frequencies[6] = 5.039684200;
+            frequencies[7] = 5.993228307;
+            frequencies[8] = 8.0 / (1.0);        
+            frequencies[9] = 8.0 / (1.0 + 1.0/7.0);         // I have no precision information on this drawbar
+            frequencies[10] = 8.0 / (4.0 / 5.0);            // I have no precision information on this drawbar     
+            frequencies[11] = 8.0 / (8.0 / 9.0);            // I have no precision information on this drawbar     
+            frequencies[12] = 8.0 / (2.0 / 3.0);            // I have no precision information on this drawbar
+            }
+        else                    // TUNING_TRUE_HARMONIC
+            {
+            frequencies[0] = 8.0 / (16.0);
+            frequencies[1] = 8.0 / (8.0);           /// yes, they're flipped relative to the mods
+            frequencies[2] = 8.0 / (5.0 + 1.0/3.0); /// yes, they're flipped relative to the mods
+            frequencies[3] = 8.0 / (4.0);
+            frequencies[4] = 8.0 / (2.0 + 2.0/3.0);
+            frequencies[5] = 8.0 / (2.0);
+            frequencies[6] = 8.0 / (1.0 + 3.0/5.0);
+            frequencies[7] = 8.0 / (1.0 + 1.0/3.0);
+            frequencies[8] = 8.0 / (1.0);        
+            frequencies[9] = 8.0 / (1.0 + 1.0/7.0);        
+            frequencies[10] = 8.0 / (4.0 / 5.0);        
+            frequencies[11] = 8.0 / (8.0 / 9.0);        
+            frequencies[12] = 8.0 / (2.0 / 3.0);   
+            }
+        lastTuning = tuning;            // we're all done
         }
         
     public void setPreset(int preset) 
@@ -208,7 +208,7 @@ public class Drawbars extends Unit implements UnitSource, Presetable
         {
         super.go();
         if (lastTuning != tuning)
-        	setupOrganFrequencies();
+            setupOrganFrequencies();
         
         
 //        Drawbar 8 is value 1.0.  A drawbar stop corresponds to 3db, or a Sqrt(2) increase in volume/amplitude.

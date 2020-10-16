@@ -24,11 +24,11 @@ import java.util.*;
    1.0, the output is the same as B.  In-between, it's an interpolation between
    the two.
    
-  <p>You select the new sound to play by sending a trigger the corresponding modulation input.  Select will then interpolate the frequencies and amplitudes between the old sound and the newly chosen sound until old sound is entirely faded out.  You can use this in combination with the individual modulation outputs of an envelope to select one sound, then another, then a final sound, for example.
+   <p>You select the new sound to play by sending a trigger the corresponding modulation input.  Select will then interpolate the frequencies and amplitudes between the old sound and the newly chosen sound until old sound is entirely faded out.  You can use this in combination with the individual modulation outputs of an envelope to select one sound, then another, then a final sound, for example.
 
-<p>Select has an output trigger: this will send a trigger when its sound has been chosen, and will also output the current interpolation value of the sound.
+   <p>Select has an output trigger: this will send a trigger when its sound has been chosen, and will also output the current interpolation value of the sound.
 
-<p>The first selected sound is always A.
+   <p>The first selected sound is always A.
 
    <p>You can also specify how rapidly the switch occurs (via Rate).   And you can choose whether Switch is FREE, that is, whether its initial selected sound is reset to A on gate or not.
    
@@ -38,9 +38,9 @@ public class Switch extends Unit
     {
     private static final long serialVersionUID = 1;
 
-	public static final int NUM_INPUTS = 4;
-	public static final int MOD_ALPHA = NUM_INPUTS;
-	
+    public static final int NUM_INPUTS = 4;
+    public static final int MOD_ALPHA = NUM_INPUTS;
+        
     boolean free = false;
        
     public void setFree(boolean val) { free = val; }
@@ -86,7 +86,7 @@ public class Switch extends Unit
         beta = 0.0;
         }
 
-	boolean shouldTrigger0 = false;
+    boolean shouldTrigger0 = false;
     public void gate()
         {
         super.gate();
@@ -103,30 +103,30 @@ public class Switch extends Unit
 
     int currentInput = 0;
     int lastInput = 0;
-	double alpha = 0.0;
-	double beta = 0.0;
-	public static final double MINIMUM_ALPHA = 0.0001;	// slightly less than 1/8192, for 16-bit
-	
+    double alpha = 0.0;
+    double beta = 0.0;
+    public static final double MINIMUM_ALPHA = 0.0001;      // slightly less than 1/8192, for 16-bit
+        
     public void go()
         {
         super.go();
         
         if (shouldTrigger0) 
-        	{ updateTrigger(0); shouldTrigger0 = false; }
-        	
-        for(int i = 0; i < getNumModulations() - 1; i++)			// No
-        	{
-        	if (i != currentInput && isTriggered(i))
-        		{
-        		lastInput = currentInput;
-        		currentInput = i;
-        		updateTrigger(i);
-        		beta = alpha;
-        		alpha = 1.0;
-        		//alpha = 1.0 - alpha;			// Note that we're just flipping the alpha so we start where we left off rather than jumping suddenly
-        		break;
-        		}
-        	}
+            { updateTrigger(0); shouldTrigger0 = false; }
+                
+        for(int i = 0; i < getNumModulations() - 1; i++)                        // No
+            {
+            if (i != currentInput && isTriggered(i))
+                {
+                lastInput = currentInput;
+                currentInput = i;
+                updateTrigger(i);
+                beta = alpha;
+                alpha = 1.0;
+                //alpha = 1.0 - alpha;                  // Note that we're just flipping the alpha so we start where we left off rather than jumping suddenly
+                break;
+                }
+            }
 
         double[] p1frequencies = getFrequenciesIn(lastInput);
         double[] p2frequencies = getFrequenciesIn(currentInput);
@@ -136,45 +136,45 @@ public class Switch extends Unit
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
         
-            for(int i = 0; i < p1frequencies.length; i++)
-                {
-                frequencies[i] = (p1frequencies[i] * beta) + (p2frequencies[i] * (1.0 - alpha));
-                }
+        for(int i = 0; i < p1frequencies.length; i++)
+            {
+            frequencies[i] = (p1frequencies[i] * beta) + (p2frequencies[i] * (1.0 - alpha));
+            }
 
-            for(int i = 0; i < p1amplitudes.length; i++)
-                {
-                amplitudes[i] = (p1amplitudes[i] * beta) + (p2amplitudes[i] * (1.0 - alpha));
-                }
+        for(int i = 0; i < p1amplitudes.length; i++)
+            {
+            amplitudes[i] = (p1amplitudes[i] * beta) + (p2amplitudes[i] * (1.0 - alpha));
+            }
 
         // always sort    
         simpleSort(0, false);
         
-		if (alpha >= MINIMUM_ALPHA)
-			alpha = alpha * makeVeryInsensitive(modulate(MOD_ALPHA));
-		else
-			alpha = 0.0;
-		
-		if (beta >= MINIMUM_ALPHA)
-			beta = beta * makeVeryInsensitive(modulate(MOD_ALPHA));
-		else
-			beta = 0.0;
-		
-        for(int i = 0; i < getNumModulations() - 1; i++)			// No
-        	{
-        	setModulationOutput(i, 0.0);
-        	}
+        if (alpha >= MINIMUM_ALPHA)
+            alpha = alpha * makeVeryInsensitive(modulate(MOD_ALPHA));
+        else
+            alpha = 0.0;
+                
+        if (beta >= MINIMUM_ALPHA)
+            beta = beta * makeVeryInsensitive(modulate(MOD_ALPHA));
+        else
+            beta = 0.0;
+                
+        for(int i = 0; i < getNumModulations() - 1; i++)                        // No
+            {
+            setModulationOutput(i, 0.0);
+            }
         
         if (lastInput == currentInput)
-        	{
-        	alpha = 1.0;
-        	beta = 1.0;
-        	setModulationOutput(currentInput, alpha);
-        	}
+            {
+            alpha = 1.0;
+            beta = 1.0;
+            setModulationOutput(currentInput, alpha);
+            }
         else
-        	{
-			setModulationOutput(lastInput, beta);
-			setModulationOutput(currentInput, 1.0 - alpha);
-			}
+            {
+            setModulationOutput(lastInput, beta);
+            setModulationOutput(currentInput, 1.0 - alpha);
+            }
         }
 
     public ModulePanel getPanel()
@@ -188,35 +188,35 @@ public class Switch extends Unit
                 Box outer = new Box(BoxLayout.Y_AXIS);
                 outer.add(new UnitOutput(unit, 0, this));
                  
-				Box box = new Box(BoxLayout.X_AXIS);
+                Box box = new Box(BoxLayout.X_AXIS);
                 
                 Box box2 = new Box(BoxLayout.Y_AXIS);
                 for(int i = 0; i < NUM_INPUTS; i++)
-                	{
-                	box2.add(new UnitInput(unit, i, this));
-                	}
+                    {
+                    box2.add(new UnitInput(unit, i, this));
+                    }
                 box.add(box2);
 
-				box.add(Strut.makeHorizontalStrut(5));
-
-                box2 = new Box(BoxLayout.Y_AXIS);
-                for(int i = 0; i < NUM_INPUTS; i++)
-                	{
-                	ModulationInput m = new ModulationInput(unit, i, this);
-                	m.setTitleText("", false);
-                	box2.add(m);
-                	}
-                box.add(box2);
+                box.add(Strut.makeHorizontalStrut(5));
 
                 box2 = new Box(BoxLayout.Y_AXIS);
                 for(int i = 0; i < NUM_INPUTS; i++)
-                	{
-                	box2.add(new ModulationOutput(unit, i, this));
-                	}
+                    {
+                    ModulationInput m = new ModulationInput(unit, i, this);
+                    m.setTitleText("", false);
+                    box2.add(m);
+                    }
                 box.add(box2);
-				outer.add(box);
-				
-				outer.add(new ModulationInput(unit, MOD_ALPHA, this));
+
+                box2 = new Box(BoxLayout.Y_AXIS);
+                for(int i = 0; i < NUM_INPUTS; i++)
+                    {
+                    box2.add(new ModulationOutput(unit, i, this));
+                    }
+                box.add(box2);
+                outer.add(box);
+                                
+                outer.add(new ModulationInput(unit, MOD_ALPHA, this));
                 
                 for(int i = 0; i < unit.getNumOptions(); i++)
                     {
@@ -234,7 +234,7 @@ public class Switch extends Unit
             {
             if (modulation < NUM_INPUTS)
                 {
-                return "";	// So Trigger modulation values aren't displayed
+                return "";      // So Trigger modulation values aren't displayed
                 }
             else return super.getModulationValueDescription(modulation, value, isConstant);
             }

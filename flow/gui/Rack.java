@@ -1028,25 +1028,25 @@ public class Rack extends JPanel
             {
             audioMixerNames[i] = audioMixers[i].getName();
             }
-		JComboBox audioMixersCombo = null;
+        JComboBox audioMixersCombo = null;
         if (audioMixerNames.length > 0)
-        	{
-	        audioMixersCombo = new JComboBox(audioMixerNames);
-	        Mixer.Info inputMixer = output.getAudioInput().getMixer();
-	        if (inputMixer != null)
-		        audioMixersCombo.setSelectedItem(inputMixer.toString());
-	        String audioMix = Prefs.getLastInputAudioDevice();
-	        for(String m : audioMixerNames)
-	            {
-	            if (m.equals(audioMix))
-	                { audioMixersCombo.setSelectedItem(m); break; }
-	            }
-	        }
-	    else
-	    	{
-	        audioMixersCombo = new JComboBox();
-	        audioMixersCombo.setEnabled(false);
-	    	}
+            {
+            audioMixersCombo = new JComboBox(audioMixerNames);
+            Mixer.Info inputMixer = output.getAudioInput().getMixer();
+            if (inputMixer != null)
+                audioMixersCombo.setSelectedItem(inputMixer.toString());
+            String audioMix = Prefs.getLastInputAudioDevice();
+            for(String m : audioMixerNames)
+                {
+                if (m.equals(audioMix))
+                    { audioMixersCombo.setSelectedItem(m); break; }
+                }
+            }
+        else
+            {
+            audioMixersCombo = new JComboBox();
+            audioMixersCombo.setEnabled(false);
+            }
  
         /*
           final JLabel scratch0 = new JLabel(" G#8 ");
@@ -1132,7 +1132,7 @@ public class Rack extends JPanel
                     devices.get(0) : devices.get(devices2Combo.getSelectedIndex()));
                     
                 if (audioMixersCombo.getSelectedIndex() > -1)
-                	output.getAudioInput().setMixer(audioMixers[audioMixersCombo.getSelectedIndex()]);
+                    output.getAudioInput().setMixer(audioMixers[audioMixersCombo.getSelectedIndex()]);
                 /*
                   if (restrictSlider.getValue() == 0)
                   {
@@ -1158,7 +1158,7 @@ public class Rack extends JPanel
             Prefs.setLastNumMPEChannels(mpeChannelsCombo.getSelectedIndex() + 1);
             Prefs.setLastAudioDevice(mixersCombo.getSelectedItem().toString());
             if (audioMixersCombo.getSelectedIndex() > -1)
-            	Prefs.setLastInputAudioDevice(audioMixersCombo.getSelectedItem().toString());
+                Prefs.setLastInputAudioDevice(audioMixersCombo.getSelectedItem().toString());
             }
         else
             {

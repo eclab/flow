@@ -64,19 +64,19 @@ public class Harmonics extends Unit implements UnitSource
                     mi[i] = new ModulationInput(unit, i, this);
                     box1.add(mi[i]);
                     }
-				
+                                
                 Box box2 = new Box(BoxLayout.Y_AXIS);
                 for(int i = NUM_HARMONICS/2; i < NUM_HARMONICS; i++)
                     {
                     mi[i] = new ModulationInput(unit, i, this);
                     box2.add(mi[i]);
                     }
-				
-				Box box3 = new Box(BoxLayout.X_AXIS);
-				box3.add(box1);
-				box3.add(Strut.makeHorizontalStrut(3));
-				box3.add(box2);
-				box.add(box3);
+                                
+                Box box3 = new Box(BoxLayout.X_AXIS);
+                box3.add(box1);
+                box3.add(Strut.makeHorizontalStrut(3));
+                box3.add(box2);
+                box.add(box3);
 
                 PushButton sample = new PushButton("Get")
                     {

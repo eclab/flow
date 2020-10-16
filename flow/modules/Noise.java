@@ -186,8 +186,8 @@ public class Noise extends Unit implements UnitSource
             if (_var == 0.0)
                 amplitudes[j] = ramping;  
             else
-            	{
-            	double d = rand.nextDouble();
+                {
+                double d = rand.nextDouble();
                 amplitudes[j] = (1-_var) * ramping + _var * d;
                 }
             total += amplitudes[j];

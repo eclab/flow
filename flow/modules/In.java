@@ -80,8 +80,8 @@ public class In extends Unit implements Miscellaneous
     public ModulePanel getPanel()
         {
         final ModulePanel[] modpanel = new ModulePanel[1];
-		final ModulationInput[] modIn = new ModulationInput[NUM_MOD_INPUTS];
-		final ModulationOutput[] modOut = new ModulationOutput[NUM_MOD_INPUTS];
+        final ModulationInput[] modIn = new ModulationInput[NUM_MOD_INPUTS];
+        final ModulationOutput[] modOut = new ModulationOutput[NUM_MOD_INPUTS];
 
         modpanel[0] = new ModulePanel(this)
             {
@@ -91,19 +91,19 @@ public class In extends Unit implements Miscellaneous
                 Box outer = new Box(BoxLayout.Y_AXIS);
                 
                 for(int i = 0; i < NUM_UNIT_INPUTS; i++)
-                	{
-                	outer.add(new UnitOutput(unit, i, this));
-                	}
-                	
+                    {
+                    outer.add(new UnitOutput(unit, i, this));
+                    }
+                        
                 for(int i = 0; i < NUM_MOD_INPUTS; i++)
-                	{
-                	outer.add(modOut[i] = new ModulationOutput(unit, i, this));
-                	}
+                    {
+                    outer.add(modOut[i] = new ModulationOutput(unit, i, this));
+                    }
 
                 for(int i = 0; i < NUM_MOD_INPUTS; i++)
-                	{
-                	outer.add(modIn[i] = new ModulationInput(unit, i, this));
-                	}
+                    {
+                    outer.add(modIn[i] = new ModulationInput(unit, i, this));
+                    }
 
                 return outer;
                 }
@@ -174,25 +174,25 @@ public class In extends Unit implements Miscellaneous
                 }
             };
 
-			ModulationInput[] a = modpanel[0].getModulationInputs();
-			for(int i = 0; i < a.length; i++)
-				a[i].setTitleText("", false);
+        ModulationInput[] a = modpanel[0].getModulationInputs();
+        for(int i = 0; i < a.length; i++)
+            a[i].setTitleText("", false);
 
-			ModulationOutput[] c = modpanel[0].getModulationOutputs();
-			for(int i = 0; i < c.length; i++)
-				c[i].setTitleCanChange(true);
+        ModulationOutput[] c = modpanel[0].getModulationOutputs();
+        for(int i = 0; i < c.length; i++)
+            c[i].setTitleCanChange(true);
 
-			UnitOutput[] b = modpanel[0].getUnitOutputs();
-			for(int i = 0; i < b.length; i++)
-				b[i].setTitleCanChange(true);
+        UnitOutput[] b = modpanel[0].getUnitOutputs();
+        for(int i = 0; i < b.length; i++)
+            b[i].setTitleCanChange(true);
 
-			// update the assocated Input
-			for(int i = 0; i < NUM_MOD_INPUTS; i++)
-				{
-				modIn[i].setTitleText(modOut[i].getTitleText().trim());
-				}
-				
-			return modpanel[0];
+        // update the assocated Input
+        for(int i = 0; i < NUM_MOD_INPUTS; i++)
+            {
+            modIn[i].setTitleText(modOut[i].getTitleText().trim());
+            }
+                                
+        return modpanel[0];
         }
 
 

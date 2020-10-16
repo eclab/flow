@@ -173,16 +173,16 @@ public class Macro extends Unit implements Cloneable
         {
         super.gate();
         if (isModulationConstant(MOD_ON_TR))
-        	for(int i = 0; i < modules.length; i++)
-        	    modules[i].gate();
+            for(int i = 0; i < modules.length; i++)
+                modules[i].gate();
         }
  
     public void release()
         {
         super.release();
-		if (isModulationConstant(MOD_OFF_TR))
+        if (isModulationConstant(MOD_OFF_TR))
             for(int i = 0; i < modules.length; i++)
-        	    modules[i].release();
+                modules[i].release();
         }
    
     public void go()
@@ -190,17 +190,17 @@ public class Macro extends Unit implements Cloneable
         super.go();
         
         if (isTriggered(MOD_ON_TR))
-        	for(int i = 0; i < modules.length; i++)
-        	    modules[i].gate();
+            for(int i = 0; i < modules.length; i++)
+                modules[i].gate();
 
         if (isTriggered(MOD_OFF_TR))
             for(int i = 0; i < modules.length; i++)
-        	    modules[i].release();
-        	    
+                modules[i].release();
+                    
         if (getPause() && modulate(MOD_ON_TR) == 0.0)
-        	{
-        	return;		// pause
-        	}
+            {
+            return;         // pause
+            }
 
         double note = sound.getNote();
 
@@ -404,8 +404,8 @@ public class Macro extends Unit implements Cloneable
             defineModulations(c, s);
             defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, 
                 ins.get(0).getOutputNames());
-        	if (INCLUDE_PAUSE)
-        		defineOptions(new String[] { "Pause", },  new String[][] { { "Pause" } } );
+            if (INCLUDE_PAUSE)
+                defineOptions(new String[] { "Pause", },  new String[][] { { "Pause" } } );
             }
         else
             {        
@@ -413,20 +413,20 @@ public class Macro extends Unit implements Cloneable
             // See getKeyForModulation() below for a hint as to why
             // It's important that Pause have Constant.ONE, else it's always pausing things
             defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.HALF }, 
-            		concatenate((String[])(In.MOD_NAMES.clone()), new String[] { "On Tr", "Off Tr" }));
+                concatenate((String[])(In.MOD_NAMES.clone()), new String[] { "On Tr", "Off Tr" }));
             defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, (String[])(In.UNIT_NAMES.clone()));  
-        	if (INCLUDE_PAUSE)
-        		defineOptions(new String[] { "Pause", },  new String[][] { { "Pause" } } );
+            if (INCLUDE_PAUSE)
+                defineOptions(new String[] { "Pause", },  new String[][] { { "Pause" } } );
             }             
         }
         
     String[] concatenate(String[] a, String[] b)
-    	{
-    	String[] res = new String[a.length + b.length];
-    	System.arraycopy(a, 0, res, 0, a.length);
-    	System.arraycopy(b, 0, res, a.length, b.length);
-    	return res;
-    	}
+        {
+        String[] res = new String[a.length + b.length];
+        System.arraycopy(a, 0, res, 0, a.length);
+        System.arraycopy(b, 0, res, a.length, b.length);
+        return res;
+        }
     
     ////// Why are we overriding these three methods?  Because we want to use the standard "A B C D"
     ////// as the KEYS for connection regardless of what the user sets the actual names to.  That way
@@ -604,11 +604,11 @@ public class Macro extends Unit implements Cloneable
                 if (hasIns && hasOuts)
                     box.add(new ConstraintsChooser(unit, this));
 
-				if (INCLUDE_PAUSE)
-					box.add(new OptionsChooser(unit, OPTION_PAUSE));
-				box.add(new ModulationInput(unit, MOD_ON_TR, this));
-				box.add(new ModulationInput(unit, MOD_OFF_TR, this));
-				
+                if (INCLUDE_PAUSE)
+                    box.add(new OptionsChooser(unit, OPTION_PAUSE));
+                box.add(new ModulationInput(unit, MOD_ON_TR, this));
+                box.add(new ModulationInput(unit, MOD_OFF_TR, this));
+                                
                 JLabel disclosureLabel = new JLabel("Info  ");
                 disclosureLabel.setFont(Style.SMALL_FONT());
                 DisclosurePanel disclosure = new DisclosurePanel(disclosureLabel, disclosureP, null);

@@ -39,7 +39,7 @@ public class Tinkle extends Unit implements UnitSource
 
     double[] currentAmplitudes = new double[NUM_PARTIALS];
     boolean[] lastTinkle = new boolean[NUM_PARTIALS];
-    final static boolean[] emptyTinkle = new boolean[NUM_PARTIALS];	// to copy into lastTinkle to clear it fast
+    final static boolean[] emptyTinkle = new boolean[NUM_PARTIALS];     // to copy into lastTinkle to clear it fast
     
     public Random random = null;
         
@@ -82,8 +82,8 @@ public class Tinkle extends Unit implements UnitSource
         super(sound);
         defineModulations(new Constant[] { Constant.HALF, Constant.HALF, Constant.ONE, Constant.HALF, Constant.ONE, Constant.ONE }, 
             new String[] { "Trigger", "Decay", "Volume", "Number", "Probability", "Seed" });
-         defineOptions(new String[] { "Hold" }, new String[][] { { "Hold" } } );
-         }
+        defineOptions(new String[] { "Hold" }, new String[][] { { "Hold" } } );
+        }
                 
     public static final int MAX_NUMBER = 16;
 
@@ -143,7 +143,7 @@ public class Tinkle extends Unit implements UnitSource
                 
     void tinkle()
         {
-        System.arraycopy(emptyTinkle, 0, lastTinkle, 0, emptyTinkle.length);		// clear
+        System.arraycopy(emptyTinkle, 0, lastTinkle, 0, emptyTinkle.length);            // clear
         
         int number = (int)(modulate(MOD_NUMBER) * MAX_NUMBER);
         double probability = modulate(MOD_PROBABILITY);
@@ -170,13 +170,13 @@ public class Tinkle extends Unit implements UnitSource
         double mod = modulate(MOD_DECAY);
         double alpha = mod * 0.01 + 0.99;
         
-        if (hold && mod == 0)	// special case
-        	alpha = 0;		// clear old tinkles
-        	
+        if (hold && mod == 0)   // special case
+            alpha = 0;              // clear old tinkles
+                
         for(int i = 0; i < currentAmplitudes.length; i++)
             {
             if (!hold || !lastTinkle[i])
-            	currentAmplitudes[i] = currentAmplitudes[i] * alpha;
+                currentAmplitudes[i] = currentAmplitudes[i] * alpha;
             }
         }
                 

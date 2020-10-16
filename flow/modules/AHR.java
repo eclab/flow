@@ -219,38 +219,38 @@ public class AHR extends Modulation implements ModSource
     
     int scheduledTriggers = 0;
     void scheduleTrigger(int val)
-    	{
-    	if (val == T_ATTACK)
-    		{
-    		scheduledTriggers |= 1;
-    		}
-    	if (val == T_HOLD)
-    		{
-    		scheduledTriggers |= 2;
-    		}
-    	else if (val == T_RELEASE)
-    		{
-    		scheduledTriggers |= 4;
-    		}
-    	else if (val == T_DONE)
-    		{
-    		scheduledTriggers |= 8;
-    		}
-    	}
+        {
+        if (val == T_ATTACK)
+            {
+            scheduledTriggers |= 1;
+            }
+        if (val == T_HOLD)
+            {
+            scheduledTriggers |= 2;
+            }
+        else if (val == T_RELEASE)
+            {
+            scheduledTriggers |= 4;
+            }
+        else if (val == T_DONE)
+            {
+            scheduledTriggers |= 8;
+            }
+        }
     
     void doRelease()
         {
         if (oneshot) return;
         
         if (state != RELEASE && state != DONE)
-        	{
+            {
             scheduleTrigger(T_RELEASE);
-        	}
+            }
         
         if (state == DONE)
-        	{
-        	// do nothing
-        	}
+            {
+            // do nothing
+            }
         else if (ramp)
             {
             state = HOLD;
@@ -281,35 +281,35 @@ public class AHR extends Modulation implements ModSource
             doGate();
             }
         else if (isTriggered(MOD_REL_TR))
-			{
-			doRelease();
-			}
+            {
+            doRelease();
+            }
             
-         if (scheduledTriggers != 0)
-        	{
-        	if ((scheduledTriggers & 1) == 1)
-        		{
-        		updateTrigger(OUT_ATTACK);
-        		}
-        	if ((scheduledTriggers & 2) == 2)
-        		{
-        		updateTrigger(OUT_HOLD);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 4) == 4)
-        		{
-        		updateTrigger(OUT_RELEASE);
-        	updateTrigger(OUT_MOD);
-        		}
-        	if ((scheduledTriggers & 8) == 8)
-        		{
-        		updateTrigger(OUT_DONE);
-        	updateTrigger(OUT_MOD);
-        		}
-        	scheduledTriggers = 0;
-        	}
+        if (scheduledTriggers != 0)
+            {
+            if ((scheduledTriggers & 1) == 1)
+                {
+                updateTrigger(OUT_ATTACK);
+                }
+            if ((scheduledTriggers & 2) == 2)
+                {
+                updateTrigger(OUT_HOLD);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 4) == 4)
+                {
+                updateTrigger(OUT_RELEASE);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 8) == 8)
+                {
+                updateTrigger(OUT_DONE);
+                updateTrigger(OUT_MOD);
+                }
+            scheduledTriggers = 0;
+            }
 
-       long tick = getSyncTick(sync);
+        long tick = getSyncTick(sync);
 
         // What state are we in?
                         
@@ -336,26 +336,26 @@ public class AHR extends Modulation implements ModSource
                 }
                            
             state++;
-            if (state == ATTACK)				// this can't happen
-            	{
-	            updateTrigger(OUT_ATTACK);
-               	}
+            if (state == ATTACK)                                // this can't happen
+                {
+                updateTrigger(OUT_ATTACK);
+                }
             else if (state == HOLD)
-            	{
-            	updateTrigger(OUT_MOD);
-	            updateTrigger(OUT_HOLD);
-               	}
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_HOLD);
+                }
             else if (state == RELEASE)
-            	{
-            	updateTrigger(OUT_MOD);
-	            updateTrigger(OUT_RELEASE);
-               	}
-        	else if (state == DONE)
-        		{
-            	updateTrigger(OUT_MOD);
-	            updateTrigger(OUT_DONE);
-        		}
-               	 
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_RELEASE);
+                }
+            else if (state == DONE)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_DONE);
+                }
+                 
             // try sticky again
             if (state == DONE)
                 {
@@ -543,7 +543,7 @@ public class AHR extends Modulation implements ModSource
                     box.add(new OptionsChooser(mod, i));
                     }
                     
-				box.add(Strut.makeVerticalStrut(5));
+                box.add(Strut.makeVerticalStrut(5));
                 Box box2 = new Box(BoxLayout.X_AXIS);
                 
                 Box box3 = new Box(BoxLayout.Y_AXIS);
@@ -551,19 +551,19 @@ public class AHR extends Modulation implements ModSource
                 mo.setTitleText(" A", false);
                 box3.add(mo);
 
-				box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
                 
-                 mo = new ModulationOutput(mod, OUT_RELEASE, this);
+                mo = new ModulationOutput(mod, OUT_RELEASE, this);
                 mo.setTitleText(" R", false);
                 box3.add(mo);
 
-               box2.add(box3);
-				box3 = new Box(BoxLayout.Y_AXIS);
-				
+                box2.add(box3);
+                box3 = new Box(BoxLayout.Y_AXIS);
+                                
                 mo = new ModulationOutput(mod, OUT_HOLD, this);
                 mo.setTitleText(" H", false);
                 box3.add(mo);
-				box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
                 
                 mo = new ModulationOutput(mod, OUT_DONE, this);
                 mo.setTitleText(" E", false);
@@ -571,11 +571,11 @@ public class AHR extends Modulation implements ModSource
 
                 box2.add(box3);
                 
-				JPanel pan = new JPanel();
-				pan.setLayout(new BorderLayout());
-				pan.add(box2, BorderLayout.EAST);
+                JPanel pan = new JPanel();
+                pan.setLayout(new BorderLayout());
+                pan.add(box2, BorderLayout.EAST);
 
-				box.add(pan);
+                box.add(pan);
                 return box;
                 }
             };

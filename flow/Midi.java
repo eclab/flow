@@ -426,7 +426,7 @@ public class Midi
             { this.type = type; this.number = number; this.value = value; this.increment = increment; this.channel = channel; }
 
         public String toString() { return "CCData[" + (type == TYPE_RAW_CC ? "CC" : (type == TYPE_NRPN ? "NRPN" : (type == TYPE_RPN ? "RPN" : type)))
-        											+ ", " + number + ", " + value + ", " + channel + ", " + increment + "]"; }
+                + ", " + number + ", " + value + ", " + channel + ", " + increment + "]"; }
         }
         
         

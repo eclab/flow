@@ -173,19 +173,19 @@ public class MIDIIn extends Modulation implements ModSource
                         {
                         public String[] getOptions() { return OPTIONS; }
                         public double convert(int elt) 
-                        	{
-                        	if (elt == 0)  // "Learn"
-                        		{
-                        		int last = MIDIIn.this.sound.getOutput().getInput().getLastCCNumber();
-                        		if (last == Input.UNSPECIFIED)
-                        			{
-									AppMenu.showSimpleError("No CCs Received", "Cannot set this CC parameter because no CC has been received.", getRack());
-									return 0;
-                        			}
-                        		else return last / 127.0;
-                        		} 
-                        	return CCS[elt] / 127.0; 
-                        	}
+                            {
+                            if (elt == 0)  // "Learn"
+                                {
+                                int last = MIDIIn.this.sound.getOutput().getInput().getLastCCNumber();
+                                if (last == Input.UNSPECIFIED)
+                                    {
+                                    AppMenu.showSimpleError("No CCs Received", "Cannot set this CC parameter because no CC has been received.", getRack());
+                                    return 0;
+                                    }
+                                else return last / 127.0;
+                                } 
+                            return CCS[elt] / 127.0; 
+                            }
                         });
                     hbox.add(new ModulationOutput(mod, i + MOD_CC, this));
                     box.add(hbox);

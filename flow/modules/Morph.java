@@ -91,7 +91,7 @@ public class Morph extends Unit
     boolean includesFundamental;
     boolean morphFrequency = true;
     boolean morphAmplitude = true;
- 	boolean shuffle = false; 
+    boolean shuffle = false; 
        
     public Object clone()
         {
@@ -235,62 +235,62 @@ public class Morph extends Unit
     public int findNextAndUpdate(int input, int prevInput)
         {
         if (shuffle)
-        	{
-        	Random rand = (random == null ? getSound().getRandom() : random);
-        	int total = 0;
-        	int totalWithPrev = 0;
-        	for(int i = 0; i < inputs.length; i++)
-        		{
-        		if (!(inputs[i] instanceof Nil))
-        			{
-        			totalWithPrev++;
-        			if (i != prevInput)
-	        			total++;
-	        		}
-        		}
-        	if (totalWithPrev == 0) return 0;
-        	if (total == 0) 
-        		{
-        		int in = (input == - 1 ? 0 : input);
-		        updateTrigger(in);
-        		return in;
-        		}
-        	
-        	while(true)
-        		{
-        		int v = rand.nextInt(4);
-        		if (!(inputs[v] instanceof Nil) && (v != prevInput))
-        			{
-        			updateTrigger(v);
-        			return v;
-        			}
-        		}
-        	}
+            {
+            Random rand = (random == null ? getSound().getRandom() : random);
+            int total = 0;
+            int totalWithPrev = 0;
+            for(int i = 0; i < inputs.length; i++)
+                {
+                if (!(inputs[i] instanceof Nil))
+                    {
+                    totalWithPrev++;
+                    if (i != prevInput)
+                        total++;
+                    }
+                }
+            if (totalWithPrev == 0) return 0;
+            if (total == 0) 
+                {
+                int in = (input == - 1 ? 0 : input);
+                updateTrigger(in);
+                return in;
+                }
+                
+            while(true)
+                {
+                int v = rand.nextInt(4);
+                if (!(inputs[v] instanceof Nil) && (v != prevInput))
+                    {
+                    updateTrigger(v);
+                    return v;
+                    }
+                }
+            }
         else
-        	{	
-			for(int i = 0 ; i < inputs.length; i++)
-				{
-				input++;
-				if (input >= inputs.length)
-					input = 0;
-				if (!(inputs[input] instanceof Nil) && (input != loInput) && (input != hiInput))
-					{
-					break;
-					}
-				}
+            {       
+            for(int i = 0 ; i < inputs.length; i++)
+                {
+                input++;
+                if (input >= inputs.length)
+                    input = 0;
+                if (!(inputs[input] instanceof Nil) && (input != loInput) && (input != hiInput))
+                    {
+                    break;
+                    }
+                }
 
-			updateTrigger(input);
-			return input;
-			}
+            updateTrigger(input);
+            return input;
+            }
         }
 
     public void updateInputs(double ramp)
         {
         if (hiInput == -1 && loInput == -1)
-        	{
+            {
             loInput = findNextAndUpdate(-1, hiInput);
             hiInput = findNextAndUpdate(-1, loInput);
-        	}
+            }
 
         // is this our first time?
         if (direction == 0 && lastRamp != lastRamp)  // that is, lastRamp == NaN
@@ -324,21 +324,21 @@ public class Morph extends Unit
             // do nothing
             }
 
-		for(int i = 0; i < inputs.length; i++)
-			{
-			if (i == loInput)
-				{
-				setModulationOutput(i, 1.0 - ramp);
-				}
-			else if (i == hiInput)
-				{
-				setModulationOutput(i, ramp);
-				}
-			else
-				{
-				setModulationOutput(i, 0.0);
-				}
-			}
+        for(int i = 0; i < inputs.length; i++)
+            {
+            if (i == loInput)
+                {
+                setModulationOutput(i, 1.0 - ramp);
+                }
+            else if (i == hiInput)
+                {
+                setModulationOutput(i, ramp);
+                }
+            else
+                {
+                setModulationOutput(i, 0.0);
+                }
+            }
 
         lastRamp = ramp;
         }

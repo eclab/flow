@@ -122,41 +122,41 @@ public class Input
     // this is O(groups) unfortunately
     public int findGroup(int channel, int note)
         {
-          for (int i = 1; i < Output.MAX_GROUPS; i++)
-          {
-          Group g = output.getGroup(i);
-          if ((g.getChannel() == channel) && (note == ANY_NOTE || (g.getMinNote() <= note && g.getMaxNote() >= note)))
-          {
-          return i;
-          }
-          }
+        for (int i = 1; i < Output.MAX_GROUPS; i++)
+            {
+            Group g = output.getGroup(i);
+            if ((g.getChannel() == channel) && (note == ANY_NOTE || (g.getMinNote() <= note && g.getMaxNote() >= note)))
+                {
+                return i;
+                }
+            }
 
-          Group g = primaryGroup();
-          if (g.getChannel() == channel)
-          {
-          return Output.PRIMARY_GROUP;
-          }
-          else if (g.getChannel() == CHANNEL_OMNI)
-          {
-          return Output.PRIMARY_GROUP;
-          }
-          else if (g.getChannel() == CHANNEL_LOWER_ZONE)
-          {
-          // legal channels are 0 ... 0 + numMPEChannels inclusive
-          if (channel <= numMPEChannels)
-          {
-          return Output.PRIMARY_GROUP;
-          }
-          }
-          else if (g.getChannel() == CHANNEL_UPPER_ZONE)
-          {
-          // legal channels are 15 ... 15 - numMPEChannels inclusive
-          if (channel >= 15 - numMPEChannels)
-          {
-          return Output.PRIMARY_GROUP;
-          }
-          }
-          return Output.NO_GROUP;
+        Group g = primaryGroup();
+        if (g.getChannel() == channel)
+            {
+            return Output.PRIMARY_GROUP;
+            }
+        else if (g.getChannel() == CHANNEL_OMNI)
+            {
+            return Output.PRIMARY_GROUP;
+            }
+        else if (g.getChannel() == CHANNEL_LOWER_ZONE)
+            {
+            // legal channels are 0 ... 0 + numMPEChannels inclusive
+            if (channel <= numMPEChannels)
+                {
+                return Output.PRIMARY_GROUP;
+                }
+            }
+        else if (g.getChannel() == CHANNEL_UPPER_ZONE)
+            {
+            // legal channels are 15 ... 15 - numMPEChannels inclusive
+            if (channel >= 15 - numMPEChannels)
+                {
+                return Output.PRIMARY_GROUP;
+                }
+            }
+        return Output.NO_GROUP;
         }
 
     Midi.MidiDeviceWrapper currentWrapper;
@@ -448,23 +448,23 @@ public class Input
     // The maximum legal NRPN value
     static final int MAX_NRPN_VAL = 16383;
 
-	/** Returns the most recent CC parameter number on any channel, disregarding NRPN CCs, or returns UNSPECIFIED if there is none */
-	public int getLastCCNumber()
-		{
-		return lastCCNumber;
-		}
+    /** Returns the most recent CC parameter number on any channel, disregarding NRPN CCs, or returns UNSPECIFIED if there is none */
+    public int getLastCCNumber()
+        {
+        return lastCCNumber;
+        }
 
-	/** Returns the most recent NRPN parameter number on any channel, or returns UNSPECIFIED if there is none */
-	public int getLastNRPNNumber()
-		{
-		return lastNRPNNumber;
-		}
+    /** Returns the most recent NRPN parameter number on any channel, or returns UNSPECIFIED if there is none */
+    public int getLastNRPNNumber()
+        {
+        return lastNRPNNumber;
+        }
 
-	/** Returns the most recent RPN parameter number on any channel, or returns UNSPECIFIED if there is none */
-	public int getLastRPNNumber()
-		{
-		return lastRPNNumber;
-		}
+    /** Returns the most recent RPN parameter number on any channel, or returns UNSPECIFIED if there is none */
+    public int getLastRPNNumber()
+        {
+        return lastRPNNumber;
+        }
 
     /**
      * Returns the current value for the given CC on the given channel, or
