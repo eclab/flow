@@ -1,6 +1,8 @@
 INSTALLATION
 
-Edisyn uses coremidi4j.  You don't need to install it, it's part of Edisyn's jar file and executable.
+Flow uses coremidi4j.  You don't need to install it, it's part of Flow's jar file and executable.
+
+Flow also uses org.json in order to save and load patches.
 
 
 
@@ -15,3 +17,6 @@ The CoreMidi4J distribution is maintained here:
 	https://github.com/DerekCook/CoreMidi4J
 
 I'd go there for the most recent copies.
+
+The Jar File json.jar is distributed under the JSON License.
+
