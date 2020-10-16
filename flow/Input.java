@@ -430,14 +430,14 @@ public class Input
     public static final byte CC_OMNI = NUM_MIDI_CHANNELS;
 
     // CC array
-    byte[][] cc = new byte[NUM_MIDI_CHANNELS + 1][NUM_CC];              // one
-    // more
-    // for
-    // "omni"
+    byte[][] cc = new byte[NUM_MIDI_CHANNELS + 1][NUM_CC];              // one more for "omni"
 
     // The array of NRPN values
     short[] nrpn = new short[NUM_NRPN];
     boolean[] nrpnMSBWasSentLast = new boolean[NUM_NRPN];
+    int lastCCNumber = UNSPECIFIED;
+    int lastNRPNNumber = UNSPECIFIED;
+    int lastRPNNumber = UNSPECIFIED;
 
     // The number of CC values.
     static final int NUM_CC = 128;
@@ -447,6 +447,24 @@ public class Input
     static final int NUM_NRPN = 16384;
     // The maximum legal NRPN value
     static final int MAX_NRPN_VAL = 16383;
+
+	/** Returns the most recent CC parameter number on any channel, disregarding NRPN CCs, or returns UNSPECIFIED if there is none */
+	public int getLastCCNumber()
+		{
+		return lastCCNumber;
+		}
+
+	/** Returns the most recent NRPN parameter number on any channel, or returns UNSPECIFIED if there is none */
+	public int getLastNRPNNumber()
+		{
+		return lastNRPNNumber;
+		}
+
+	/** Returns the most recent RPN parameter number on any channel, or returns UNSPECIFIED if there is none */
+	public int getLastRPNNumber()
+		{
+		return lastRPNNumber;
+		}
 
     /**
      * Returns the current value for the given CC on the given channel, or
@@ -489,14 +507,14 @@ public class Input
 
         if (ccdata.type == Midi.CCData.TYPE_RAW_CC)
             {
+            lastCCNumber = ccdata.number;
             byte val = (byte) ccdata.value;
             if (val < 0)
                 val = 0;
             if (val > MAX_CC_VAL)
                 val = MAX_CC_VAL;
             cc[ccdata.channel][ccdata.number] = val;
-            cc[CC_OMNI][ccdata.number] = val;                  // set it for
-            // OMNI too
+            cc[CC_OMNI][ccdata.number] = val;                  // set it for OMNI too
 
             // if it's global mpe, we need to distribute to all the MPE
             // channels
@@ -541,6 +559,7 @@ public class Input
             }
         else if (ccdata.type == Midi.CCData.TYPE_NRPN)
             {
+            lastNRPNNumber = ccdata.number;
             if (ccdata.increment)
                 {
                 nrpn[ccdata.number] = (short) (nrpn[ccdata.number] + ccdata.value);
@@ -562,6 +581,7 @@ public class Input
             }
         else if (ccdata.type == Midi.CCData.TYPE_RPN)
             {
+            lastRPNNumber = ccdata.number;
             if (ccdata.number == MPE_CONFIGURATION_RPN_NUMBER)
                 {
                 if (ccdata.validMSB)
@@ -710,7 +730,6 @@ public class Input
                         Sound s = notesOn.get(j);
                         if (s.getGroup() == g)
                             {
-                            System.err.println(s);
                             sound = s;
                             notesOn.remove(j);
                             break;

@@ -251,7 +251,6 @@ public class Midi
                         }
                     else
                         {
-                        System.err.println("big " + size);
                         MidiMessage[] ret = (MidiMessage[]) nextMessages.toArray(new MidiMessage[size]);
                         nextMessages.clear();
                         return ret;
@@ -425,6 +424,9 @@ public class Midi
         
         public CCData(int type, int number, int value, int channel, boolean increment)
             { this.type = type; this.number = number; this.value = value; this.increment = increment; this.channel = channel; }
+
+        public String toString() { return "CCData[" + (type == TYPE_RAW_CC ? "CC" : (type == TYPE_NRPN ? "NRPN" : (type == TYPE_RPN ? "RPN" : type)))
+        											+ ", " + number + ", " + value + ", " + channel + ", " + increment + "]"; }
         }
         
         
@@ -562,6 +564,7 @@ public class Midi
         // we presume that the channel never changes
         CCData parseCC(int channel, int number, int value, boolean requireLSB, boolean requireMSB)
             {
+            System.err.println("In");
             // BEGIN PARSER
 
             // Start of NRPN
