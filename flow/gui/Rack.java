@@ -1045,6 +1045,7 @@ public class Rack extends JPanel
 	    else
 	    	{
 	        audioMixersCombo = new JComboBox();
+	        audioMixersCombo.setEnabled(false);
 	    	}
  
         /*
