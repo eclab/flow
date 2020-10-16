@@ -122,8 +122,6 @@ public class Input
     // this is O(groups) unfortunately
     public int findGroup(int channel, int note)
         {
-        return Output.PRIMARY_GROUP;
-        /*
           for (int i = 1; i < Output.MAX_GROUPS; i++)
           {
           Group g = output.getGroup(i);
@@ -159,7 +157,6 @@ public class Input
           }
           }
           return Output.NO_GROUP;
-        */
         }
 
     Midi.MidiDeviceWrapper currentWrapper;
@@ -713,6 +710,7 @@ public class Input
                         Sound s = notesOn.get(j);
                         if (s.getGroup() == g)
                             {
+                            System.err.println(s);
                             sound = s;
                             notesOn.remove(j);
                             break;
