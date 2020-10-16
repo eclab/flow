@@ -954,7 +954,6 @@ public class Output
     void startPerVoiceThreads(int numThreads)
         {
         // build the sound threads
-        soundThreadsStarted = true;
         lightweightSemaphores = new boolean[numThreads];
         voiceLocks = new Object[numThreads];
         for (int i = 0; i < numThreads; i++) 
@@ -1082,7 +1081,6 @@ public class Output
                     {
                     sounds[i].reset();
                     }
-                
             if (ns <= numVoicesPerThread)
                 {                
                 for (int i = 0; i < ns; i++)
@@ -1094,7 +1092,7 @@ public class Output
             else
                 {
                 int numThreads = (int)(Math.ceil(ns / (double)numVoicesPerThread));
-                if (!soundThreadsStarted)
+                if (voiceLocks == null)
                     {
                     startPerVoiceThreads(numThreads);
 
@@ -1112,6 +1110,7 @@ public class Output
                     {
                     blockVoiceUntil(i, false);
                     }
+                soundThreadsStarted = true;
                 }
             }
         finally 
