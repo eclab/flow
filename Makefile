@@ -1,11 +1,18 @@
-.PHONY: install
+.PHONY: jar install
+
+all:
+	javac -cp libraries/coremidi4j-1.1.jar:libraries/json.jar:flow $$(find flow -name '*.java')
+
+run: DUMMY
+	java -cp libraries/coremidi4j-1.1.jar:libraries/json.jar flow.Flow
+
 indent:
 	touch ${HOME}/.emacs
 	find . -name "*.java" -print -exec emacs --batch --load ~/.emacs --eval='(progn (find-file "{}") (mark-whole-buffer) (setq indent-tabs-mode nil) (untabify (point-min) (point-max)) (indent-region (point-min) (point-max) nil) (save-buffer))' \;
 
-
-install:
-	rm -rf install/Flow.app.zip install/Flow.app install/flow.jar install/bundles install/Flow.dmg.html install/Flow.dmg.jnlp uk META-INF org
+jar:
+	rm -rf install/flow.jar uk META-INF
+	javac flow/*.java flow/*/*.java
 	touch /tmp/manifest.add
 	rm /tmp/manifest.add
 	echo "Main-Class: flow.Flow" > /tmp/manifest.add
@@ -15,5 +22,10 @@ install:
 	mv libraries/org .
 	jar -cvfm install/flow.jar /tmp/manifest.add `find flow -name "*.class"` `find flow -name "*.init"` `find flow -name "*.html"` `find flow -name "*.png"` `find flow -name "*.jpg"` `find flow -name "*.out"` `find flow -name "Manufacturers.txt"` org/ uk/ META-INF/
 	rm -rf uk META-INF org
-	javapackager -deploy -native dmg -srcfiles install/flow.jar -appclass flow.Flow -name Flow -outdir install -outfile Flow.dmg -v
-	mv install/bundles/Flow-0.0.dmg install/Flow.dmg
+
+install: jar
+	rm -rf install/Flow.app install/bundles install/Flow.dmg.html install/Flow.dmg.jnlp
+	- javapackager -deploy -native dmg -srcfiles install/flow.jar -appclass flow.Flow -name Flow -outdir install -outfile Flow.dmg -v
+	- mv install/bundles/Flow-0.0.dmg install/Flow.dmg
+	rm -rf install/bundles install/Flow.dmg.html install/Flow.dmg.jnlp
+	
