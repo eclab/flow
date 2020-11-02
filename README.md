@@ -1,7 +1,7 @@
 ![Flow Splash Banner](docs/web/Banner.png)
 
 
-# Flow 
+# Flow  
 A Polyphonic, Multitimbral, Modular Additive Synthesizer (Version 7)
  
 By Sean Luke (sean@cs.gmu.edu) \
