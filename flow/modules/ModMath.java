@@ -91,27 +91,34 @@ public class ModMath extends Modulation
     public static final int TRIGGER_192_A = 25;
     public static final int TRIGGER_DIR = 26;
     public static final int TRIGGER_CENTER = 27;
-        
+    public static final int TRIGGER_A_UNTIL_B = 28;
+
     public static final int DISCRETIZATION = 128;
         
-    public static final String[] OPERATION_NAMES = new String[] { "+", "-", "x", "min", "max", "square", "sqrt", "cube", "discretize", "map hi", "average", "threshold", "+/-", "switch"  };
-    public static final String[] TRIGGER_NAMES = new String[] { "A", "A or B", "A and B", "A but not B", "2 A",  "3 A",  "4 A",  "5 A",  "6 A",   "7 A",   "8 A",  "9 A", "10 A", "11 A", "12 A", "16 A", "18 A",  "24 A",  "32 A", "36 A", "48 A", "64 A", "72 A", "96 A", "144 A", "192 A", "dir", "center" };
+    public static final String[] OPERATION_NAMES = new String[] { "+", "-", "x", "min", "max", "square", "sqrt", "cube", "discretize", "map hi", "average", "threshold", "+/-", "switch" };
+    public static final String[] TRIGGER_NAMES = new String[] { "A", "A or B", "A and B", "A but not B", "2 A",  "3 A",  "4 A",  "5 A",  "6 A",   "7 A",   "8 A",  "9 A", "10 A", "11 A", "12 A", "16 A", "18 A",  "24 A",  "32 A", "36 A", "48 A", "64 A", "72 A", "96 A", "144 A", "192 A", "dir", "center", "A until B" };
     public static final int[] TRIGGER_DIVIDERS = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 16, 18, 24, 32, 36, 48, 64, 72, 96, 144, 192 };
     int operation = ADD;
     int triggerOperation = TRIGGER_A;
     int triggerCount = 0;
+    boolean bTriggered = false;
     boolean _switch = false;
     boolean lastDir = false;
     double lastMod0 = -1;
+    boolean bipolar = false;
                 
     public int getOperation() { return operation; }
     public void setOperation(int val) { operation = val; }
 
     public int getTriggerOperation() { return triggerOperation; }
     public void setTriggerOperation(int val) { triggerOperation = val; }
+    
+    public boolean isBipolar() { return bipolar; }
+    public void setBipolar(boolean val) { bipolar = val; }
 
     public static final int OPTION_OPERATION = 0;
     public static final int OPTION_TRIGGER_OPERATION = 1;
+    public static final int OPTION_BIPOLAR = 2;
 
     public int getOptionValue(int option) 
         { 
@@ -119,6 +126,7 @@ public class ModMath extends Modulation
             {
             case OPTION_OPERATION: return getOperation();
             case OPTION_TRIGGER_OPERATION: return getTriggerOperation();
+            case OPTION_BIPOLAR: return isBipolar() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -129,6 +137,7 @@ public class ModMath extends Modulation
             {
             case OPTION_OPERATION: setOperation(value); return;
             case OPTION_TRIGGER_OPERATION: setTriggerOperation(value); return;
+            case OPTION_BIPOLAR: setBipolar(value == 1); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -137,8 +146,18 @@ public class ModMath extends Modulation
         {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.ONE }, new String[] { "Signal A", "Signal B" });
-        defineOptions(new String[] { "Operation", "Trigger On" }, new String[][] { OPERATION_NAMES, TRIGGER_NAMES } );
+        defineOptions(new String[] { "Operation", "Trigger On", "Bipolar" }, new String[][] { OPERATION_NAMES, TRIGGER_NAMES, { "Bipolar" } } );
         }
+        
+    public void gate()
+    	{
+    	bTriggered = false;
+    	}
+
+    public void reset()
+    	{
+    	bTriggered = false;
+    	}
 
     public void go()
         {
@@ -147,17 +166,23 @@ public class ModMath extends Modulation
         double mod0 = modulate(MOD_A);
         double mod1 = modulate(MOD_B);
         double val = 0;
+        
+        if (bipolar && operation != DISCRETIZE)
+        	{
+        	mod0 -= 0.5;
+        	mod1 -= 0.5;
+        	}
                 
         switch(operation)
             {
             case ADD:
                 {
-                val = Math.min(1.0, mod1 + mod0);
+                val = mod1 + mod0;
                 }
             break;
             case SUBTRACT:
                 {
-                val = Math.max(0.0, mod0 - mod1);
+                val = mod0 - mod1;
                 }
             break;
             case MULTIPLY:
@@ -177,18 +202,28 @@ public class ModMath extends Modulation
             break;
             case SQUARE:
                 {
-                val = Math.min(1.0, mod1 + mod0 * mod0);
+                val = mod1 + mod0 * mod0;
                 }
             break;
             case SQUARE_ROOT:
                 {
-                // dunno if this could benefit from an approximation
-                val = Math.min(1.0, mod1 + Utility.fastSqrt(mod0)); //Math.sqrt(mod0);
+                if (bipolar)
+                	{
+                	if (mod0 > 0)
+	                	val = mod1 + Utility.fastSqrt(mod0 * 2) * 0.5;
+	                else
+	                	val = mod1 - Utility.fastSqrt(-mod0 * 2) * 0.5;
+                	}
+                else
+                	{
+	                // dunno if this could benefit from an approximation
+    	            val = mod1 + Utility.fastSqrt(mod0);
+    	            }
                 }
             break;
             case CUBE:
                 {
-                val = Math.min(1.0, mod1 + mod0 * mod0 * mod0);
+                val = mod1 + mod0 * mod0 * mod0;
                 }
             break;
             case DISCRETIZE:
@@ -223,7 +258,7 @@ public class ModMath extends Modulation
             break;
             case ADD_SUBTRACT:
                 {
-                val = Math.max(0.0, Math.min(1.0, mod1 + mod0 - 0.5));
+                val = mod1 + mod0 - 0.5;
                 }
             break;
             case SWITCH:
@@ -260,6 +295,11 @@ public class ModMath extends Modulation
                 val = 0;
                 }
             }
+                
+        if (bipolar && operation != DISCRETIZE)
+        	{
+        	val += 0.5;
+        	}
                 
         if (val > 1)
             val = 1;
@@ -336,6 +376,11 @@ public class ModMath extends Modulation
                         lastMod0 < 0.5 && mod0 >= 0.5)          // crossed center
                         updateTrigger(0);
                     }
+                break;
+            case TRIGGER_A_UNTIL_B:
+            	if (isTriggered(MOD_B)) bTriggered = true;
+                if (isTriggered(MOD_A) && ! bTriggered)
+                    updateTrigger(0);
                 break;
             }
         setModulationOutput(0, val);
