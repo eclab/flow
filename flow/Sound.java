@@ -31,6 +31,10 @@ public class Sound
     public int getNoteCounter() { return noteCounter; }
     public void incrementNoteCounter() { noteCounter++; }
     
+    int allocation = -1;
+    public void setAllocation(int allocation) { this.allocation = allocation; }
+    public int getAllocation() { return allocation; }
+    
     int group = Output.PRIMARY_GROUP;
     public int getGroup() { return group; }
     public void setGroup(int g) { group = g; }
@@ -66,6 +70,8 @@ public class Sound
     // Input.channel, but MPE will assign this specially.  We'll assign this during
     // voice allocation in Input.java 
     volatile int channel = Input.CHANNEL_OMNI;  // we need to assign it *something* initially...
+
+	volatile boolean requestReset = false;
 
     public Sound(Output output)
         {
@@ -174,6 +180,7 @@ public class Sound
         int len = elements.size();
         for(int i = 0; i < len; i++)
             elements.get(i).gate();
+        requestReset = true;
         }
 
     /** Causes all Modulations / Units to have their release() methods called, in order.
@@ -191,7 +198,7 @@ public class Sound
         int len = elements.size();
         for(int i = 0; i < len; i++)
             elements.get(i).reset();
-        resetPartialPhases();
+        requestReset = true;
         }
 
     /** Resets all Modulations / Units to their initial positions. */
