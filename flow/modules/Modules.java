@@ -82,6 +82,7 @@ public class Modules
     //flow.modules.PartialMod.class,
     flow.modules.PartialFilter.class,
     flow.modules.Partials.class,
+    flow.modules.RandMod.class,
     //flow.modules.Rand.class,
     flow.modules.Rectified.class,
     flow.modules.Rotate.class,
