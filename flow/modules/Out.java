@@ -49,7 +49,7 @@ public class Out extends Unit implements Miscellaneous
     public static final int UNIT_DISPLAY_1 = 0;
     public static final int UNIT_DISPLAY_2 = 1;
         
-    public static final int WAVE_SIZE = 100;
+    public static final int WAVE_SIZE = 96;
     public static final double MAX_GAIN = 4.0;
 
     double gain;
