@@ -1007,6 +1007,23 @@ public class AppMenu
         }
 
 
+    static JMenuItem showKeyboard(Rack rack)
+        {
+        final JCheckBoxMenuItem display = new JCheckBoxMenuItem("Show Keyboard");
+        display.setSelected(Prefs.getShowsKeyboard());
+        rack.setShowsKeyboard(display.isSelected());
+        display.addActionListener(new ActionListener()
+            {
+            public void actionPerformed(ActionEvent e)
+                {
+                rack.setShowsKeyboard(display.isSelected());
+                Prefs.setShowsKeyboard(display.isSelected());
+                }
+            });
+        return display;
+        }
+
+
     static JMenuItem playFirstMenu(Rack rack)
         {
         final JCheckBoxMenuItem playFirst = new JCheckBoxMenuItem("Monophonic");
@@ -1253,6 +1270,7 @@ return swapPrimary;
         menu.add(waterfallDisplay(rack));
         menu.add(maxDisplayedHarmonic(rack));
         menu.add(minDisplayedHarmonic(rack));
+        menu.add(showKeyboard(rack));
         menu.addSeparator();
         menu.add(addModulesAfterMenu(rack));
         menu.add(setupPatchMenu(rack));

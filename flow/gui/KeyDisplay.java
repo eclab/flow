@@ -228,6 +228,7 @@ public class KeyDisplay extends JPanel
                 {
                 public void mousePressed(MouseEvent e)
                     {
+                    if (dynamicKey != -1) userReleased(dynamicKey);
                     dynamicKey = findKey(e.getX(), e.getY());
                     userPressed(dynamicKey);
                     redoTitle(dynamicKey);
@@ -257,6 +258,7 @@ public class KeyDisplay extends JPanel
                     {
                     if (dynamicKey != -1)
                         {
+		                if (dynamicKey != -1) userReleased(dynamicKey);
                         setState(dynamicKey + transpose);
                         dynamicKey = -1;
                         repaint();
@@ -276,7 +278,11 @@ public class KeyDisplay extends JPanel
                         int oldDynamicKey = dynamicKey;
                         dynamicKey = findKey(e.getX(), e.getY());
                         if (oldDynamicKey != dynamicKey)
+                        	{
                             userPressed(dynamicKey);
+                            // we release AFTER so that monophonic glides work right
+		                    if (oldDynamicKey != -1) userReleased(oldDynamicKey);
+                            }
         
                         if (dynamicUpdate)
                             {
@@ -288,6 +294,7 @@ public class KeyDisplay extends JPanel
                         }
                     else
                         {
+		                if (dynamicKey != -1) userReleased(dynamicKey);
                         dynamicKey = -1;
                         redoTitle(getState());
                         repaint();
@@ -313,7 +320,7 @@ public class KeyDisplay extends JPanel
             graphics.setPaint(Style.KEYBOARD_WHITE_COLOR());
             graphics.fill(rect);
 
-            if (isWhiteKey(midKey))
+            if (midKey <= maxKey && midKey >= minKey && isWhiteKey(midKey))
                 {
                 graphics.setPaint(new Color(200, 200, 200));
                 for(int i = 0; i < whiteKeyVals.length; i++)
@@ -342,7 +349,7 @@ public class KeyDisplay extends JPanel
                         int xpos = (int)Math.ceil(rect.width * whiteKeys[i].getX());
                         int xwidth = (int)Math.ceil(rect.width * whiteKeys[i].getWidth());
                         int yheight = (int)Math.ceil(rect.height * whiteKeys[i].getHeight());
-                        Rectangle2D.Double r = new Rectangle2D.Double(xpos, 0, xwidth, yheight);
+                        Rectangle2D.Double r = new Rectangle2D.Double(xpos, 0, xwidth-2, yheight+2);
                         graphics.fill(r);
                         break;
                         }
@@ -361,7 +368,7 @@ public class KeyDisplay extends JPanel
                         int xpos = (int)Math.ceil(rect.width * whiteKeys[i].getX());
                         int xwidth = (int)Math.ceil(rect.width * whiteKeys[i].getWidth());
                         int yheight = (int)Math.ceil(rect.height * whiteKeys[i].getHeight());
-                        Rectangle2D.Double r = new Rectangle2D.Double(xpos, 0, xwidth, yheight);
+                        Rectangle2D.Double r = new Rectangle2D.Double(xpos, 0, xwidth-2, yheight+2);
                         graphics.fill(r);
                         break;
                         }
@@ -426,6 +433,8 @@ public class KeyDisplay extends JPanel
         a realistic sound in response to it.  Override this as you see fit.
     */
     public void userPressed(int key) { }
+
+    public void userReleased(int key) { }
     }
 
 

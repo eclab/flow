@@ -111,6 +111,7 @@ public class Input
                 {
                 Sound s = notesOn.removeFirst();
                 notesOff.addFirst(s);
+                s.release();
                 }
             }
         }
@@ -352,8 +353,7 @@ public class Input
 
         // Linux Java distros have a bug: pitch bend data is treated
         // as a signed two's complement integer, which is wrong, wrong,
-        // wrong.
-        // So we have to special-case it here. See:
+        // wrong.  So we have to special-case it here. See:
         //
         // https://bugs.openjdk.java.net/browse/JDK-8075073
         // https://bugs.launchpad.net/ubuntu/+source/openjdk-8/+bug/1755640
@@ -389,8 +389,7 @@ public class Input
                 {
                 int c = sound.getChannel();
                 if (c == CHANNEL_OMNI || c == sm.getChannel()
-                    || (isMPEChannel(c) && sm
-                        .getChannel() == getMPEGlobalChannel()))
+                    || (isMPEChannel(c) && sm.getChannel() == getMPEGlobalChannel()))
                     {
                     sound.setBend(d);
                     }
@@ -400,8 +399,7 @@ public class Input
                 {
                 int c = sound.getChannel();
                 if (c == CHANNEL_OMNI || c == sm.getChannel()
-                    || (isMPEChannel(c) && sm
-                        .getChannel() == getMPEGlobalChannel()))
+                    || (isMPEChannel(c) && sm.getChannel() == getMPEGlobalChannel()))
                     {
                     sound.setBend(d);
                     }
@@ -415,6 +413,8 @@ public class Input
     ArrayList<Sound> sustainQueue = new ArrayList<Sound>();
 
     public static final int CC_SUSTAIN_PEDAL = 64;
+    public static final int CC_ALL_SOUNDS_OFF = 120;
+    public static final int CC_ALL_NOTES_OFF = 123;
 
     /**
      * CC values and NRPN values are all set to this initially to indicate
@@ -550,6 +550,14 @@ public class Input
                         sustain = false;
                         }
                     }
+                else if (ccdata.number == CC_ALL_SOUNDS_OFF)
+                    {
+					output.reset();
+                    }
+                else if (ccdata.number == CC_ALL_NOTES_OFF)
+                    {
+					reset();
+                    }
                 } 
             finally
                 {
@@ -666,6 +674,10 @@ public class Input
     LinkedList<Integer> notesOnMono = new LinkedList<Integer>();
     // Last sound which was started in response to a NOTE ON
     volatile Sound lastPlayedSound = null;
+    
+    // A simple counter to indicate which allocation we've performed.
+    // This can be useful for certain modules.  Otherwise you can ignore it.
+    int allocationCounter = 0;
 
     /**
      * Returns the last sound which was played as a result of NOTE_ON, or
@@ -677,7 +689,7 @@ public class Input
         }
 
     // Processes a NOTE ON message.
-    void processNoteOn(ShortMessage sm)
+    public void processNoteOn(ShortMessage sm)
         {
         Sound sound = null;
         int i = sm.getData1();
@@ -817,7 +829,7 @@ public class Input
         }
 
     // Processes a NOTE OFF message.
-    void processNoteOff(ShortMessage sm, boolean noteOnMessage)
+    public void processNoteOff(ShortMessage sm, boolean noteOnMessage)
         {
         Sound sound = null;
         int i = sm.getData1();
@@ -858,12 +870,9 @@ public class Input
                     }
                 else
                     {
-                    if (!onlyPlayFirstSound || monoIsEmpty)        // release
-                        // our
-                        // sound
+                    if (!onlyPlayFirstSound || monoIsEmpty)        // release our sound
                         {
-                        // add to queue but don't release if we're
-                        // sustaining
+                        // add to queue but don't release if we're sustaining
                         if (sustain && !sustainQueue.contains(sound))
                             {
                             sustainQueue.add(sound);
@@ -909,6 +918,7 @@ public class Input
                         sound.setNote(d);
                         sound.setMIDINote(i);
                         sound.incrementNoteCounter();
+                        sound.setAllocation(++allocationCounter);
 
                         if (sound.getGroup() == Output.PRIMARY_GROUP)
                             {

@@ -564,7 +564,6 @@ public class Midi
         // we presume that the channel never changes
         CCData parseCC(int channel, int number, int value, boolean requireLSB, boolean requireMSB)
             {
-            System.err.println("In");
             // BEGIN PARSER
 
             // Start of NRPN
