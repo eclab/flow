@@ -89,6 +89,16 @@ public class Combine extends Unit
         byte[] orders = getOrders(0);
                 
                 
+	/// PROPOSAL FOR COMBINING
+	/// 1: Determine WHICH partials of A and B will be preserved 
+	/// 2: Map A's partials to low 1/n partials?  Preserving numbers when possible.  When not possible, fill remainder in low-to-high
+	/// 3. Map B's partials to low 1/m partials?  In same way
+    /// 4. Remap to even-odd afterwards: A -> even, B -> odd, then remainder	// this way, both A and B have low partials in case of further combination
+    /// 5. Load partials
+    /// 6. Sort by frequency
+    
+    
+                
         // Combine is kind of a mess at preserving orders.  So we're doing it as follows:
         // 1. All of A's orders are preserved
         // 2. Any of B's orders which CAN be preserved without conflicting with #1 will be preserved
