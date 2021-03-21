@@ -490,6 +490,7 @@ public class Output
         float reverbRoomSize = 0.5f;
         float reverbDamp = 0.5f;
         boolean dephase[];
+        boolean reset[];
               
         public Swap()
             {
@@ -500,6 +501,7 @@ public class Output
             pitches = new double[numVoices];
             velocities = new double[numVoices];
             dephase = new boolean[numVoices];
+            reset = new boolean[numVoices];
             }
         }
     
@@ -517,7 +519,12 @@ public class Output
     void checkAndSwap()
         {
         // notice that we're effectively spin-waiting here.  
-        if (emitsReady)
+        //while(!emitsReady)
+        //    {
+        //    Thread.currentThread().yield();
+        //    }
+
+		if (emitsReady)
             {
             Swap temp = swap;
             swap = with;
@@ -536,6 +543,13 @@ public class Output
 
     /// Current positions of the sine wave functions (from 0 ... 2PI)
     double[][] positions;
+    static final double[] blankPositions = new double[Unit.NUM_PARTIALS];  // for zeroing out
+
+	void resetPositions(int voice)
+		{
+		System.arraycopy(blankPositions, 0, positions[voice], 0, blankPositions.length);
+		}
+
 
     // 0.05 is about 3 32-sample periods before we get to near to 100%
     // 0.03 is about 3 32-sample periods before we get to near to 95%
@@ -578,6 +592,13 @@ public class Output
         return val;
         }
     
+    
+    /*
+	double equalize(double frequency, double low, double high, double mid, double midFreq, double amplitude)
+		{
+		return amplitude * (low 
+		}
+	*/
 
     // Builds a single sample from the partials.  ALPHA is the current interpolation
     // factor (from 0...1) 
@@ -749,6 +770,12 @@ public class Output
                                 {
                                 blockOutputUntil(_i, true); 
                                 
+								if (with.reset[_i])
+									{
+									resetPositions(_i);
+									with.reset[_i] = false;
+									}
+
                                 int n = numVoices;
                                 if (n >  _i + numOutputsPerThread)
                                     n =  _i + numOutputsPerThread;
@@ -778,6 +805,12 @@ public class Output
                                 
                 while(true)
                     {
+                    if (numSounds == 0) // nothing allocated yet
+                    	{ 
+                    	try { Thread.currentThread().sleep(25); } catch (InterruptedException ex) { }
+                    	continue;
+                    	}
+                    
                     int solo = -1;
                     
                     int available = sdl.available();
@@ -790,7 +823,7 @@ public class Output
                         {
                         samples = new double[numSounds][skip];
                         }
-
+                        
                     checkAndSwap();
                     
                     if (onlyPlayFirstSound)
@@ -800,11 +833,20 @@ public class Output
                             solo = 0;
                         else
                             solo = sound.getIndex();
+                    	
+                    	if (with.reset[solo])
+                    		{
+                    		resetPositions(solo);
+                    		with.reset[solo] = false;
+                    		}
                                                         
+//                        for(int i = 0; i < currentAmplitudes[0].length; i++)
+//                        	System.err.println("" + i + " " + currentAmplitudes[0][i]);
                         double[] samplessnd = samples[solo];
                         for (int samp = 0; samp < skip; samp++)
                             {
                             samplessnd[samp] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+//                            System.err.println(samplessnd[samp]);
                             }
                         }
                     else
@@ -828,7 +870,8 @@ public class Output
                         }
                         
                     double gain = masterGain;           // so we're not reading a volatile variable!
-                                        
+                                 
+                    int j = 0;       
                     for (int samp = 0; samp < skip; samp++)
                         {
                         double left = 0;
@@ -935,10 +978,27 @@ public class Output
                             audioBuffer[samp * 2 + 0] = (byte)(val & 255);
                             audioBuffer[samp * 2 + 1] = (byte)((val >> 8) & 255);
                             }
+                        j++;
+                        if (j >= 4)
+                        	{
+                            leftSamples[sampleCounter] = left;
+                        	if (stereo)
+                        		{
+                            	rightSamples[sampleCounter] = right;
+                        		}
+                        	else
+                        		{
+                            	rightSamples[sampleCounter] = left;
+                        		}
+                        	sampleCounter++;
+                        	j = 0;
+                        	}
                         tick++;                                 /// See documentation elsewhere about threadsafe nature of tick
                         }
                     
                     sdl.write(audioBuffer, 0, audioBuffer.length);
+                    if (sampleCounter >= leftSamples.length)
+                    	updateOutputOscilloscope();
                     }
                 }
             });
@@ -948,6 +1008,23 @@ public class Output
         thread.start();
         }
         
+    int sampleCounter = 0;
+    double leftSamples[] = new double[96];
+    double rightSamples[] = new double[96];
+    public double leftSamplesOut[] = new double[96];
+    double rightSamplesOut[] = new double[96];
+    
+    public void updateOutputOscilloscope()
+    	{
+    	sampleCounter = 0;
+    	synchronized(leftSamplesOut)
+    		{
+    		System.arraycopy(leftSamples, 0, leftSamplesOut, 0, leftSamplesOut.length);
+    		System.arraycopy(rightSamples, 0, rightSamplesOut, 0, rightSamplesOut.length);
+    		}
+    	}
+    
+
 
 
     // Starts the per-voice threads.  Called from primary voice thread if it needs to.
@@ -1130,6 +1207,8 @@ public class Output
             Unit e = sounds[0].getEmits();
             for (int i = 0 ; i < ns; i++)
                 {
+                swap.reset[i] = sounds[i].requestReset;
+                sounds[i].requestReset = false;
                 Unit emits = sounds[i].getEmits();
                 if (emits != null)
                     {
@@ -1640,6 +1719,40 @@ public class Output
             }
         }
     
+    public void reset()
+        {
+        lock();
+        try
+            {
+            int len = getNumSounds();
+            
+            // Clear all notes
+            for(int i = 0; i < len; i++)
+                {
+                getSound(i).release();
+                }
+            
+            // Perform reset
+            for(int i = 0; i < len; i++)
+                {
+                getSound(i).reset();
+                }
+                
+            // Reset phases for good measure
+            for(int i = 0; i < len; i++)
+                {
+                getSound(i).resetPartialPhases();
+                }
+                
+            // Reset stuck notes
+            getInput().reset();
+            }
+        finally 
+            {
+            unlock();
+            }
+        }
+
     static volatile double masterGain = 1.0;
     
     public double getMasterGain() 

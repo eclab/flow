@@ -21,6 +21,7 @@ import java.awt.dnd.*;
 import java.awt.datatransfer.*;
 
 import javax.sound.sampled.*;
+import javax.sound.midi.*;
 
 import java.io.*;
 
@@ -54,8 +55,15 @@ public class Rack extends JPanel
     public Display display2;
     public Oscilloscope osc1;
     public Oscilloscope osc2;
+    public Oscilloscope oscout;
     public Box displayBox;
     boolean showsDisplays = true;
+    
+    public Box keyboardBox;
+    public KeyDisplay keyboard;
+    public JScrollPane keyboardScroll;
+    public JPanel keyboardPane;
+    boolean showsKeyboard = false;
     
     // A list of all current module panels.  Note that this isn't all the
     // *Modulations* in use -- Constants and NILs don't get panels.  But they're
@@ -100,27 +108,110 @@ public class Rack extends JPanel
         pane1.setLayout(new BorderLayout());
         pane1.add(box, BorderLayout.WEST);
         pane = new JScrollPane(pane1, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        pane.setBorder(BorderFactory.createEmptyBorder());
         setLayout(new BorderLayout());
         add(pane, BorderLayout.CENTER);
         
         displayBox = new Box(BoxLayout.X_AXIS);
         display1 = new Display(output, false);
-        display1.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
+        display1.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new JLabel().getBackground()));
         displayBox.add(display1);
-        osc1 = new Oscilloscope(output, false);
-        osc1.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
+        osc1 = new Oscilloscope(output, Oscilloscope.FUNCTION_MAIN_MOD);
+        osc1.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new JLabel().getBackground()));
         displayBox.add(osc1);
-        osc2 = new Oscilloscope(output, true);
-        osc2.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 2, new JLabel().getBackground()));
+        osc2 = new Oscilloscope(output, Oscilloscope.FUNCTION_AUX_MOD);
+        osc2.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new JLabel().getBackground()));
         displayBox.add(osc2);
         display2 = new Display(output, true);
-        display2.setBorder(BorderFactory.createMatteBorder(0, 2, 0, 0, new JLabel().getBackground()));
+        display2.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, new JLabel().getBackground()));
         displayBox.add(display2);
-                
+        oscout = new Oscilloscope(output, Oscilloscope.FUNCTION_OUTPUT);
+        oscout.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, new JLabel().getBackground()));
+        displayBox.add(oscout);
+        oscout.setClipping(true);
+
         add(displayBox, BorderLayout.NORTH);
         
+        JPanel pane2 = new JPanel();
+        pane2.setLayout(new BorderLayout());
         subpatchBox = new Box(BoxLayout.Y_AXIS);
-        add(subpatchBox, BorderLayout.SOUTH);
+        pane2.add(subpatchBox, BorderLayout.CENTER);
+        
+        JPanel pane3 = new JPanel();
+        pane3.setLayout(new BorderLayout());
+        keyboardBox = new Box(BoxLayout.X_AXIS);
+        
+        final JLabel throwaway = new JLabel("127 ");
+        throwaway.setFont(Style.SMALL_FONT());
+        final JLabel sliderValue = new JLabel("127 ");
+        sliderValue.setFont(Style.SMALL_FONT());
+        sliderValue.setBackground(Style.BACKGROUND_COLOR());
+        sliderValue.setMinimumSize(throwaway.getPreferredSize());
+        sliderValue.setPreferredSize(throwaway.getPreferredSize());
+        JSlider slider = new JSlider(0, 127, 127);
+        slider.addChangeListener(new ChangeListener()
+        	{
+        	public void stateChanged(ChangeEvent e)
+        		{
+        		sliderValue.setText("" + slider.getValue() + " ");
+        		}
+        	});
+        Dimension d = slider.getPreferredSize();
+        d.width /= 2;
+        slider.setPreferredSize(d);
+        JLabel sliderLabel = new JLabel(" Vel");
+        sliderLabel.setFont(Style.SMALL_FONT());
+        sliderLabel.setBackground(Style.BACKGROUND_COLOR());
+        Box sliderBox = new Box(BoxLayout.X_AXIS);
+        sliderBox.add(sliderLabel);
+        sliderBox.add(slider);
+        sliderBox.add(sliderValue);
+        Box vertBox = new Box(BoxLayout.Y_AXIS);
+        vertBox.add(sliderBox);
+        
+    	final JCheckBox latch = new JCheckBox("Latch");
+        latch.setFont(Style.SMALL_FONT());
+        latch.setBackground(Style.BACKGROUND_COLOR());
+        latch.addActionListener(new ActionListener()
+        	{
+            public void actionPerformed(ActionEvent e)
+                {
+				getOutput().getInput().reset();
+                }
+        	});
+        JPanel latchPanel = new JPanel();
+        latchPanel.setLayout(new BorderLayout());
+        latchPanel.add(latch, BorderLayout.WEST);
+		vertBox.add(latchPanel);
+        keyboardBox.add(vertBox);
+        
+       	keyboard = new KeyDisplay(null, Color.GREEN, 0, 127, 60, 0)
+       		{
+       		public void setState(int state) { } 
+       		public void userPressed(int key)
+       			{
+       			try { getOutput().getInput().processNoteOn(new ShortMessage(ShortMessage.NOTE_ON,key,slider.getValue())); }
+       			catch (InvalidMidiDataException ex) { System.err.println(ex); }
+       			}
+       		public void userReleased(int key)
+       			{
+       			if (!latch.isSelected())
+       				{
+	       			try { getOutput().getInput().processNoteOff(new ShortMessage(ShortMessage.NOTE_OFF,key, 64), false); }
+	       			catch (InvalidMidiDataException ex) { System.err.println(ex); }
+	       			}
+       			}
+       		};
+       	keyboardBox.add(keyboard);
+        pane3.add(keyboardBox, BorderLayout.WEST);
+        pane3.add(new JPanel(), BorderLayout.CENTER);
+       	keyboardScroll = new JScrollPane(pane3, JScrollPane.VERTICAL_SCROLLBAR_NEVER, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+       	keyboardScroll.setBorder(BorderFactory.createEmptyBorder());
+       	keyboardPane = new JPanel();
+       	keyboardPane.setLayout(new BorderLayout());
+       	keyboardPane.add(keyboardScroll, BorderLayout.CENTER);
+       	pane2.add(keyboardPane, BorderLayout.SOUTH);
+       	add(pane2, BorderLayout.SOUTH);
 
         setTransferHandler(new ModulePanelTransferHandler());
         this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener()));
@@ -202,7 +293,7 @@ public class Rack extends JPanel
 
     public void setShowsDisplays(boolean val)
         {
-        if (showsDisplays == val) return;  // no need to do anything
+//        if (showsDisplays == val) return;  // no need to do anything
         remove(displayBox);
         if (val) add(displayBox, BorderLayout.NORTH);
         revalidate();
@@ -211,6 +302,17 @@ public class Rack extends JPanel
         
     public boolean getShowsDisplays() { return showsDisplays; }
         
+    public void setShowsKeyboard(boolean val)
+        {
+//        if (showsKeyboard == val) return;  // no need to do anything
+        keyboardPane.remove(keyboardScroll);
+        if (val) keyboardPane.add(keyboardScroll, BorderLayout.CENTER);
+        revalidate();
+        showsKeyboard = val;
+        }
+        
+    public boolean getShowsKeyboard() { return showsKeyboard; }
+
     public boolean getAddModulesAfter() { return addModulesAfter; }
     public void setAddModulesAfter(boolean val) { addModulesAfter = val; }
 
@@ -343,36 +445,7 @@ public class Rack extends JPanel
     
     public void reset()
         {
-        output.lock();
-        try
-            {
-            int len = output.getNumSounds();
-            
-            // Clear all notes
-            for(int i = 0; i < len; i++)
-                {
-                output.getSound(i).release();
-                }
-            
-            // Perform reset
-            for(int i = 0; i < len; i++)
-                {
-                output.getSound(i).reset();
-                }
-                
-            // Reset phases for good measure
-            for(int i = 0; i < len; i++)
-                {
-                output.getSound(i).resetPartialPhases();
-                }
-                
-            // Reset stuck notes
-            output.getInput().reset();
-            }
-        finally 
-            {
-            output.unlock();
-            }
+        output.reset();
         }
 
     /** Loads a Macro from the given file and adds it to the Rack. */
@@ -897,8 +970,8 @@ public class Rack extends JPanel
         outputsPerThreadCombo.setSelectedIndex(outputPerThread == 1 ? 0 : (outputPerThread == 2 ? 1 : (outputPerThread == 4 ? 2 : (outputPerThread == 8 ? 3 : 4))));
 
         // Skip
-        int[] skips = new int[] { 1, 2, 4, 8, 16, 32, 64, 128 };
-        String[] s_skips = new String[] { "1", "2", "4", "8", "16", "32", "64", "128" };
+        int[] skips = new int[] { 1, 2, 4, 6, 8, 12, 16, 24, 32, 36, 40, 48, 64, 80, 96, 128 };
+        String[] s_skips = new String[] { "1", "2", "4", "6", "8", "12", "16", "24", "32", "36", "40", "48", "64", "80", "96", "128" };
         JComboBox skipsCombo = new JComboBox(s_skips);
         int skip = Prefs.getLastSkip();
         boolean found = false;

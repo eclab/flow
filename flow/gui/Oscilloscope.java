@@ -18,18 +18,30 @@ import javax.swing.*;
 
 public class Oscilloscope extends JComponent
     {
-    public static final int WAVE_SIZE = 100;
-    public static final int WAVE_HEIGHT = 100;
+    public static final int WAVE_SIZE = 96;
+    public static final int WAVE_HEIGHT = 96;
     public static final int BORDER = 8;
     public static final float STROKE_WIDTH = 1f;
     
+    public static final int FUNCTION_MAIN_MOD = 0;
+    public static final int FUNCTION_AUX_MOD = 1;
+    public static final int FUNCTION_OUTPUT = 2;
+    
+    public static final Color CLIP_COLOR = Color.RED;
+    
     Output output;
-    boolean aux;
+	int function;
     Color axisColor = DARK_GREEN;
     Stroke stroke;
 
     // are we currently triggered?
     boolean trig = false;
+    
+    // are we clipping
+    boolean clip = false;
+    
+    public void setClipping(boolean val) { clip = val; }
+    public boolean isClipping() { return clip; }
     
     // wave is a circular buffer of the current wave information; and wavePos is our position in it
     double[] wave = new double[WAVE_SIZE];
@@ -38,9 +50,9 @@ public class Oscilloscope extends JComponent
     static final Color DARK_GREEN = new Color(0, 127, 0);
     static final Color DARK_BLUE = new Color(0, 0, 180);
         
-    public Oscilloscope(Output output, boolean aux)
+    public Oscilloscope(Output output, int function)
         {
-        this.aux = aux;
+        this.function = function;
         this.output = output;
         stroke = new BasicStroke(STROKE_WIDTH);
 
@@ -79,15 +91,29 @@ public class Oscilloscope extends JComponent
             if (sound != null)
                 {
                 Unit emit = sound.getEmits();
-                int incoming = (aux ? 1 : 0);
 
                 if (emit != null && emit instanceof Out)
                     {
-                    Out out = (Out)emit;
-                    System.arraycopy(out.getModWave(incoming), 0, wave, 0, wave.length);
-                    p = out.getWavePos(incoming);
-                    if (out.getAndClearWaveTriggered(incoming))
-                        trig = !trig;
+                    if (function <= FUNCTION_AUX_MOD)
+                    	{
+						Out out = (Out)emit;
+						System.arraycopy(out.getModWave(function), 0, wave, 0, wave.length);
+						p = out.getWavePos(function);
+						if (out.getAndClearWaveTriggered(function))
+							trig = !trig;
+						}
+					else
+						{
+						synchronized(output.leftSamplesOut)
+							{
+							System.arraycopy(output.leftSamplesOut, 0, wave, 0, wave.length);
+							}
+						for(int i = 0; i < wave.length; i++)
+							{
+							wave[i] *= (0.5 / 32768);
+							wave[i] += 0.5;
+							}
+						}
                     }
                 }
             }
@@ -121,6 +147,13 @@ public class Oscilloscope extends JComponent
             double xx = x + 1;
             double yy = WAVE_HEIGHT * (1 - wave[q]) + BORDER;
             g.draw(new Line2D.Double(x, y, xx, yy));
+            if (clip && (wave[p] >= (1.0 / 65536) * 65535 || wave[p] <= 0.0))
+            	{
+            	g.setColor(CLIP_COLOR);
+            	g.draw(new Line2D.Double(x, y, x, y));
+        		g.setColor(Color.WHITE);
+            	}
+
             p++;
             if (p >= WAVE_SIZE) p = 0;
             }
