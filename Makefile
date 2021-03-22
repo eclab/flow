@@ -1,10 +1,10 @@
 .PHONY: jar install
 
 all:
-	javac -cp libraries/coremidi4j-1.1.jar:libraries/json.jar:flow $$(find flow -name '*.java')
+	javac -cp libraries/coremidi4j-1.5.jar:libraries/json.jar:flow $$(find flow -name '*.java')
 
 run: DUMMY
-	java -cp libraries/coremidi4j-1.1.jar:libraries/json.jar flow.Flow
+	java -cp libraries/coremidi4j-1.5.jar:libraries/json.jar flow.Flow
 
 indent:
 	touch ${HOME}/.emacs
@@ -16,7 +16,7 @@ jar:
 	touch /tmp/manifest.add
 	rm /tmp/manifest.add
 	echo "Main-Class: flow.Flow" > /tmp/manifest.add
-	cd libraries ; jar -xvf coremidi4j-1.1.jar
+	cd libraries ; jar -xvf coremidi4j-1.5.jar
 	mv libraries/META-INF . ; mv libraries/uk .
 	cd libraries ; jar -xvf json.jar
 	mv libraries/org .
