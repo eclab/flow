@@ -51,35 +51,38 @@ public class Presets extends JPanel
             public void actionPerformed(ActionEvent e)
                 {
                 final int selection = combo.getSelectedIndex();
-                Rack rack = modpanel.getRack();
-                Output output = rack.getOutput();                        
-                int index = rack.getIndex(modpanel);
-                output.lock();
-                try
-                    {
-                    int numSounds = output.getNumSounds();
-                    for(int i = 0; i < numSounds; i++)
-                        {
-                        Sound s = output.getSound(i);
-                        if (s.getGroup() == Output.PRIMARY_GROUP)
-                            {
-                            Modulation m = s.getRegistered(index);
-                            if (m instanceof Presetable)
-                                {
-                                Presetable p = (Presetable) m;
-                                p.setPreset(selection);
-                                }
-                            }
-                        }
-                    }
-                finally 
-                    {
-                    output.unlock();
-                    }
-                combo.setSelectedIndex(-1);
-                modpanel.rebuild();
-                rack.repaint();      // when the ModulePanel repaints we have to also redraw the wires...
-                }
+                if (selection >= 0)
+                	{
+					Rack rack = modpanel.getRack();
+					Output output = rack.getOutput();                        
+					int index = rack.getIndex(modpanel);
+					output.lock();
+					try
+						{
+						int numSounds = output.getNumSounds();
+						for(int i = 0; i < numSounds; i++)
+							{
+							Sound s = output.getSound(i);
+							if (s.getGroup() == Output.PRIMARY_GROUP)
+								{
+								Modulation m = s.getRegistered(index);
+								if (m instanceof Presetable)
+									{
+									Presetable p = (Presetable) m;
+									p.setPreset(selection);
+									}
+								}
+							}
+						}
+					finally 
+						{
+						output.unlock();
+						}
+					combo.setSelectedIndex(-1);
+					modpanel.rebuild();
+					rack.repaint();      // when the ModulePanel repaints we have to also redraw the wires...
+					}
+				}
             });
 
 
