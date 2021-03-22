@@ -660,7 +660,7 @@ Note that CC values 6, 38, 98, 99, 100, and 101 are invalid: they are used by {\
 
 Keep in mind that gate, velocity, pitch bend, note, and clock information are already passed to all the modules internally; so this is really auxiliary stuff that might be useful for you to hook up.   See also the {\bf NRPN} module, next.
 
-\paragraph{MPE}  A source of Multidimensional Polyphonic Expression (MPE) information.  Modulation sources include:
+\paragraph{MPE}  A source of Multidimensional Polyphonic Expression (MPE) information.  Sources include:
 
 \begin{itemize}
 \item The most recent attack velocity value, drawn from NOTE ON. This modulation triggers on NOTE ON.
@@ -680,6 +680,8 @@ The purpose of the offsets and variances is that different controllers issue qui
 
 Like parameters, values also can be in the range 0...16383.  {\name} always expects incoming NRPN data in ``Fine'' or ``14-bit'' mode: that is, the whole value range 0...16383 is mapped to modulation values \(0.0\ ...\ 1.0\).  If you need more than 6 NRPNs, just create another NRPN module.\footnote{A technical note.  NRPN data comes in chunks of four different types: MSB, LSB, Increment, and Decrement.  Flow's NRPN module doesn't update its value when it receives an MSB chunk.  It waits until an LSB, Increment, or Decrement shows up.}  See also {\bf MIDIIn}, previous.
 
+\paragraph{Random}  A source of random modulation values.  Random changes its current value on three events: resetting {\name}, on an incoming trigger to Trigger, and (if Note On is set) on note on.  You could attach a Note-On Random module to Output's Pan to create a pan spread, for example.  The random values emitted are chosen from the range between Low and High.    If the seed is set to {\it Free} (0), then the random values are; but if the seed is \(\neq 0\), then on reset the random sequence will be the same for a given seed. 
+
 %\paragraph{PartialMod}  This is an unusual and experimental modulation source.  It takes an input in the form of a set of partials, and a modulation (``Partial'') which indicates {\it which} partial.  Then it outputs as a modulation the value of that partial, bounded to between 0 and 1.  PartialMod can smoothly interpolate between partial values or not.
 
 %\begin{figure}[t]
@@ -697,18 +699,22 @@ Like parameters, values also can be in the range 0...16383.  {\name} always expe
 
 \paragraph{Map}  Takes an incoming modulation signal and two values, \(A\) and \(B\).  If {\it Inverse} is not checked, the signal is then stretched such that what used to be 0.0 is now \(A\), and what used to be 1.0 is now B.  That is, if the incoming value is \(x\), then the outgoing value \(y = A + (B - A)x\).  If {\it Inverse} is checked, it's the opposite mapping: what used to be \(A\) (or lower) is now 0.0, and what used to be \(B\) (or higher) is now 1.0.  The point of {\it Inverse} is that you can use a Map to map a modulation value, then use another Map to {\it unmap} that modulation value back to its original range.  You also have the option of {\it Flip}ping \(x\) first, that is, setting it to \(1-x\) (if {\it Inverse} is checked, Flipping happens at the end).  Map has a final option called {\it Center}.  If this is checked, then instead of directly specifying \(A\) and \(B\) as bound for your range, you instead specify a {\it Center} and a {\it Variance} of the range, which is often more convenient.  The bounds are thus defined as \(A = \min(0,\ \text{\it Center} - \text{\it Variance})\) and \(B = \max(1,\ \text{\it Center} + \text{\it Variance})\).
 
-\paragraph{Mod Math}  This module performs a variety of operations on incoming modulation signals \(A\) and \(B\), outputting the result.  It also can do some logic on the incoming trigger.  Operations:
+\paragraph{Mod Math}  This module performs a variety of operations on incoming modulation signals \(A\) and \(B\), then bounds the result to be between 0 and 1, and finally outputs it.  It also can do some logic on the incoming trigger.  
+
+Operations can be {\it unipolar} (the default) or {\it bipolar}.   A unipolar operation treats the inputs and output (0...1) as they are.  A bipolar operation treats them as (-1/2 ... +1/2), and so the midline (1/2) is treated as if it were 0.  This is done by first subtracting 1/2 from \(A\) and \(B\), then performing the operation, then adding 1/2 to the result, and finally bounding the result to between 0 and 1 before returning it.
+
+Operations:
 
 \begin{itemize}
-\item \(\boldsymbol{+}\)\quad Does \(\min(A + B,\ 1)\)
-\item \(\boldsymbol -\)\quad Does \(\max(A - B,\ 0)\).  By setting \(A=0\), you can also use this to negate \(B\).
+\item \(\boldsymbol{+}\)\quad Does \(A + B\)
+\item \(\boldsymbol -\)\quad Does \(A - B\).  By setting \(A=0\) (when unipolar), you can also use this to negate \(B\).
 \item \(\boldsymbol \times\)\quad Does \(A \times B\)
 \item {\bf min}\quad Does \(\min(A, B)\)
 \item {\bf max}\quad Does \(\max(A, B)\)
-\item {\bf square}\quad Does \(\min(A^2 + B,\ 1)\)
-\item {\bf sqrt}\quad Does \(\min(\sqrt{A} + B,\ 1)\)
-\item {\bf cube}\quad Does \(\min(A^3 + B,\ 1)\)
-\item {\bf discretize}\quad Discretizes \(A\), using \(B\) to set the amount of discretization (from 1 to 128 chunks).
+\item {\bf square}\quad Does \(A^2 + B\)
+\item {\bf sqrt}\quad {\it Unipolar:} does \(B + \sqrt{A}\)\qquad {\it Bipolar:} if \(A \geq 0\), does \(B + 1/2 \sqrt{2 |A|}\), else \(B - 1/2 \sqrt{2 |A|}\)
+\item {\bf cube}\quad Does \(A^3 + B\)
+\item {\bf discretize}\quad Discretizes \(A\), using \(B\) to set the amount of discretization (from 1 to 128 chunks).  This operation is always unipolar.
 \item {\bf map hi}\quad Does \(A \times (1-B) + B\).  This ``inverts'' A under B.
 \item {\bf average}\quad Does \((A + B) / 2\)
 \item {\bf threshold}\quad If \(A \geq B\), returns 1, else returns 0.
@@ -771,7 +777,7 @@ At the bottom are outputs which trigger when the step sequencer reaches any sing
 
 \paragraph{Constraints}   A module which makes it easy to create more complex constraints to feed into the constraints facility of other modules (Section~\ref{constraints}). You set up three constraints definitions and lump their partials together (perform a union), then whittle down the results to only those partials which are also in a fourth constraints definitions.  The resulting output can be fed into the {\it Only} jack of a module's constraints facility.
 
-\paragraph{Draw}   Lets you draw partials, which are then output,   You can constrain the partials being drawn to a variety of subsets.  When you click on the {\it Menu} button, you can also save your scribbles and load them again, clear them, maximize, normalize, and standardize them, and (importantly) take a snapshot of partials from an incoming source.  The module can be collapsed to a smaller size if you wish.
+\paragraph{Draw}   Lets you draw partials, which are then output.   You can constrain the partials being drawn to a variety of subsets.  When you click on the {\it Menu} button, you can also save your scribbles and load them again, clear them, maximize, normalize, and standardize them, and (importantly) take a snapshot of partials from an incoming source.  The module can be collapsed to a smaller size if you wish.
 
 Draw also allows you to load {\it single-cycle waveforms}, that is, sound files which start and end at zero and represent a single cycle of a sound wave.  You can do this by choosing {\it Load Wave...} from the {\it Menu} button.  These must be WAV files, mono, and cannot be very long (presently at most 2048 samples).  After loading, Flow converts them (naturally) into harmonics.  A good source of single-cycle waves is the AdventureKid Single Cycle Waveforms collection, available at https:/\!/www.adventurekid.se/akrt/waveforms/%\quad Flow can read these.
 
@@ -793,10 +799,11 @@ See also {\bf Draw}, which allows you to load single-cycle waves: the manual sec
 %\caption{Partials Sources (2)}
 %\end{figure}
 
-\paragraph{Noise}  Random noise, hiss, etc.  This is done by creating and immediately destroying random partials independent of the pitch.  You can specify the number of partials being used (using fewer partials is less computationally costly and you can get away with surprisingly few to make a decent hiss).   To change the color of the partials: you can also specify the high and low frequency bounds for the partials; you can create a ramp in amplitude from the low to high partials; and you can specify the degree of variance in amplitude among the random partials.  You can also set the average volume (the gain) of the hiss.  Finally, if the {\it Seed} is {\it Free} (0), then the noise will be completely random and vary from note to note; if it's non-zero, then the randomness will be reset from on Note on and Reset, meaning that the pattern of randomness will be the same from note to note: the seed specifies which pattern it is.
+\paragraph{Noise}  Random noise, hiss, etc., as best as an additive synthesizer can do it.  This is done by creating and immediately destroying random partials independent of the pitch.  You can specify the number of partials being used (using fewer partials is less computationally costly and you can get away with surprisingly few to make a decent hiss).   To change the color of the partials: you can also specify the high and low frequency bounds for the partials; you can create a ramp in amplitude from the low to high partials; and you can specify the degree of variance in amplitude among the random partials.  You can also set the average volume (the gain) of the hiss.  Finally, if the {\it Seed} is {\it Free} (0), then the noise will be completely random and vary from note to note; if it's non-zero, then the randomness will be reset from on Note on and Reset, meaning that the pattern of randomness will be the same from note to note: the seed specifies which pattern it is.
 
 This module is designed to merge with other sources to add hiss to them: most commonly, you would use it as the primary source in the {\bf Fill} module.  To make this convenient, by default the partials used are the highest numbered ones: the lower ones are all set to amplitude 0 and frequency 0.  If you use this in combination with a merging option like {\bf Combine} which steals from the high partials, or other adjusters like {\bf Fatten}, you'd want the low partials to be used.  By setting {\it Top} to false, you can cause the low partials to be used for the hiss, with the remainder set to amplitude 0 and a frequency beyond the high frequency bound.  
 
+You will find that very short bursts of Noise vary in amplitude, which makes it annoying to use for (for example) percussion.  This might be a bug; but I think it's more likely due to the random number generator's interaction with Flow's output thread, which only updates partials every 32 or so samples.
 
 \paragraph{Partials}  Outputs 16 partials whose amplitude and frequency you can define independently.  You optionally can load these partials from a source.  See also {\bf Harmonics}.
 
@@ -812,7 +819,7 @@ This module is designed to merge with other sources to add hiss to them: most co
 
 Tinkle behaves differently than other modules when it comes to constraints.  Whereas in most modules the constraints {\it undo} the action of the module for certain partials, in Tinkle the constraints {\it bound} its actions.  For example, if you had 4 partials tinkling and you restricted the constraints to the low 32 harmonics, then you'd still be guaranteed to get 4 tinkles each time: they'd just be within 0...31.  Indeed, setting the constraints to bound to the low \(N\) harmonics is a useful way to guarantee that tinkles won't occur beyond Nyquist.
 
-\paragraph{Triangle}  A triangle wave.  Note that normally triangle waves include negative amplitude harmonics, that is ones with inverted phases.  As {\name} does not produce phases, these harmonics become all positive (you likely won't hear a difference).
+\paragraph{Triangle}  A triangle wave.  Note that normally triangle waves include negative amplitude harmonics, that is ones with inverted phases.  As {\name} does not shift partial phases, these harmonics become all positive (you likely won't hear a difference).
 
 \paragraph{Waves}  A collection of harmonics drawn from the single-cycle waves of several major synthesizers:
 
@@ -972,11 +979,11 @@ Partial Filter can be set to be {\it Relative}.  When relative, the partials are
 
 %\paragraph{Swap} This divides the partials into groups {\it Distance} in size, then reverses the partials in each group (swapping their frequencies).  You are given the option of not including the Fundamental among these groups.
 
-\paragraph{Switch} This module switches among four different inputs.  You select an input by sending a trigger to its corresponding dial.  Switch will then interpolate the amplitudes and frequencies between the old input and the new one until the new one has completely taken over: the rate of interpolation is given by {\it Rate}.  The purpose of non-zero Rate values is to prevent popping from sudden changes.
+\paragraph{Switch} This module switches among eight different inputs.  You select an input by sending a trigger to its corresponding dial.  Switch will then interpolate the amplitudes and frequencies between the old input and the new one until the new one has completely taken over: the rate of interpolation is given by {\it Rate}.  The purpose of non-zero Rate values is to prevent popping from sudden changes.
 
-Each input also has a corresponding modulation output: these work just like the ones in {\bf Morph}: when a sound is selected, its output will generate a trigger; and modulations also output their current interpolation value.  Initially, Switch starts at Input A.  If {\it Free} is set, then Switch doesn't reset to Input A every time you press a note\,---\,it keeps morphing from wherever it left off.  
+Initially, Switch starts at Input A.  If {\it Free} is set, then Switch doesn't reset to Input A every time you press a note\,---\,it keeps morphing from wherever it left off.  You can also send a trigger to {\it Next} instead of to one of the inputs, and it will automatically select the next input.
 
-Switch is useful for playing sequences of sounds: you can do this by attaching an envelope of some sort to it, and routing each of its individual stage triggers into Switch's trigger inputs.   When Switch switches to a new sound in the sequence, you probably will want to reset the sound as if it had been just played with Note On.  This is most easily done by feeding Switch's trigger output into the ``On Tr'' input of the sound's envelopes or LFOs; or you could just save the sound as a patch, then load it as a Macro and feed the trigger output into the ``On Tr'' input of the macro.   See also {\bf Morph}.
+Switch is useful for playing sequences of sounds: you can do this by attaching an envelope of some sort to it, and routing each of its individual stage triggers into Switch's trigger inputs (or routing its modulation output to {\it Next}).   When Switch switches to a new sound in the sequence, you probably will want to reset the sound as if it had been just played with Note On.  This is most easily done by also feeding the modulation to the ``On Tr'' input of the sound's envelopes or LFOs; or you could just save the sound as a patch, then load it as a Macro and feed the output into the ``On Tr'' input of the macro.   See also {\bf Morph}.
 
 \paragraph{VCA} This is just what it says on the tin: an amplifier (VCA is the classic term).  A VCA is very commonly used in conjunction with an envelope.  It takes an input and multiplies all of its amplitudes by a value.  This value is determined by multiplying {\it mod} (which goes 0--1) by {\it scale} (which goes 0--8), and then adding {\it add} (which goes 0--8).  The {\it mod} modulation is designed for you to attach LFOs or envelopes etc.  The {\it scale} modulation is not linear and so is just meant for you to dial in a maximum scale value.   
 
@@ -985,7 +992,7 @@ The {\it add} modulation, normally zero, shifts the overall amplification up or 
 \subsection{Special Modules}
 \label{specialmodules}
 
-There are currently five special modules: {\bf In}, {\bf Out}, {\bf Choice}, {\bf Fix}, {\bf Note}, and {\bf Macro}.  The {\bf Out} module is critical in every patch, and is discussed below in Section~\ref{outmodule}.  {\bf In} and {\bf Macro} enable {\it macros}\.---\,and {\bf Out} helps out here as well\,---\,as discussed below in Section~\ref{creatingmacros}.  Here are the others:
+There are currently six special modules: {\bf In}, {\bf Out}, {\bf Choice}, {\bf Fix}, {\bf Note}, {\bf Patch}, and {\bf Macro}.  The {\bf Out} module is critical in every patch, and is discussed below in Section~\ref{outmodule}.  {\bf In} and {\bf Macro} enable {\it macros}\.---\,and {\bf Out} helps out here as well\,---\,as discussed below in Section~\ref{creatingmacros}.  Here are the others:
 
 \paragraph{Choice}  The Choice module is an odd duck: it doesn't produce any sounds or modulation at all.  Instead, it enables you to change a module's checkboxes and comboboxes using a modulation signal.  To do this, note that Choice has a modulation input and a sound input port both called {\bf Target}.   Plug one of your target module's modulation or sound outputs into the appropriate Target port: this tells Choice what target module it should be modifying.  Don't attach to both of them, or Choice will just use the sound input port.
 
@@ -996,6 +1003,8 @@ Note that when you change the value, it's not immediately reflected (or reflecte
 \paragraph{Note} This module also doesn't process sound at all. Instead, it lets you leave a note or comment.  You can change the width of the Note panel with two arrow-like buttons at the bottom.   You can have as many Note modules as you like; they'll each save their comments independently as part of your patch.  If your goal is to document your patch for later users, Note will work great, but you ought to first edit {\bf Out}'s {\it Info} field (and fill out its other fields as well).  See also {\bf Out}.
 
 \paragraph{Fix} This module likewise doesn't process any sound.  Instead, it lets you fix the note (pitch) being played, and/or the velocity being played, to specific values.  After Fix is called, it changes the pitch and volume, and all later modules will use these values: thus you want Fix early in your modules, ideally as the very first one.  I use Fix in percussion patches to force the patches to always make the same pitched sound regardless of the note being played.
+
+\paragraph{Patch} This module is simply a patchbay: each input is routed directly to its corresponding output with no changes and that's it.  Patch is useful in a few contexts.  For one, you can use Patch to break up long connections in your patch that are hard to connect or understand given scroll restrictions. You could also use Patch to easily swap a module routed to many others.  To do this, hook the first module to a Patch input, and all the downstream modules to the corresponding Patch output: now you can change the first module without reattaching everything.
 
 \subsubsection{The \textit{Out} Module in Basic Use}  
 \label{outmodule}
@@ -1630,7 +1639,7 @@ Third: you might also change your module, which causes problems when trying to b
 \item {\it optional-subpatch-midi-channel:}\quad The MIDI note for the subpath, 0--128.  0, or missing, means ``Any note''.  Otherwise the note is the value, minus 1.
 \end{itemize}
 
-\paragraph{Cloning}  One obscure feature of {\name} is that Modulations and Units can not just be {\it moved} in the Rack, but can in fact be {\it copied}.  This is done by holding the Control key (on the Mac, Option also works) while dragging the Module.  This in turn calls the Module's {\tt clone()} method.  You need to override this method to insure that it performs a deep clone.  In many situations you'd need not implement this method at all.  But if your Modulation or Unit is holding an array or perhaps some other object which must be copied, you'll need to implement it like this:
+\paragraph{Cloning}  One obscure feature of {\name} is that Modulations and Units can not just be {\it moved} in the Rack, but can in fact be {\it copied}.  This is done by holding the Control key (on the Mac, Option also works) while dragging the Module's title bar.  This in turn calls the Module's {\tt clone()} method.  You need to override this method to insure that it performs a deep clone.  In many situations you'd need not implement this method at all.  But if your Modulation or Unit is holding an array or perhaps some other object which must be copied, you'll need to implement it like this:
 
 \vbox{\footnotesize
 \begin{verbatim}
