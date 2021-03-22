@@ -151,9 +151,14 @@ public class ModulationInput extends InputOutput implements Rebuildable
         repaint();
         }
 
-
     /** Constructor, given an owning Modulation and ModPanel, plus which unit input number we are in our owner. */
     public ModulationInput(Modulation mod, int number, ModulePanel modPanel)
+		{
+		this(mod, number, modPanel, true);
+		}
+
+    /** Constructor, given an owning Modulation and ModPanel, plus which unit input number we are in our owner. */
+    public ModulationInput(Modulation mod, int number, ModulePanel modPanel, boolean includeData)
         {
         modulation = mod;
         this.number = number;
@@ -180,13 +185,16 @@ public class ModulationInput extends InputOutput implements Rebuildable
             panel2.setLayout(new BorderLayout());
             panel2.add(title, BorderLayout.CENTER);
             panel2.add(aux, BorderLayout.EAST);
-            panel.add(panel2, BorderLayout.NORTH);
+            panel.add(panel2, (includeData ? BorderLayout.NORTH : BorderLayout.CENTER));
             }
         else
             {
-            panel.add(title, BorderLayout.NORTH);
+            panel.add(title, (includeData ? BorderLayout.NORTH : BorderLayout.CENTER));
             }
-        panel.add(data, BorderLayout.CENTER);
+        if (includeData) 
+        	{
+        	panel.add(data, BorderLayout.CENTER);
+        	}
         add(panel, BorderLayout.CENTER);
         add(dial, BorderLayout.WEST);
 
