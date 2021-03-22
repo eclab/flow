@@ -317,6 +317,15 @@ public class Prefs {
         return Boolean.parseBoolean(s); // default is FALSE
         }
 
+    public static void setShowsKeyboard(boolean val) {
+        setLastX("" + val, "ShowKeyboard");
+        }
+
+    public static boolean getShowsKeyboard() {
+        String s = getLastX("ShowKeyboard");
+        return Boolean.parseBoolean(s); // default is FALSE
+        }
+
     public static void setShowsDisplays(boolean val) {
         setLastX("" + val, "ShowDisplays");
         }
