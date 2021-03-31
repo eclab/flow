@@ -190,6 +190,10 @@ public class Rack extends JPanel
        		public void setState(int state) { } 
        		public void userPressed(int key)
        			{
+       			if (latch.isSelected())
+       				{
+       				getOutput().getInput().reset();
+       				}
        			try { getOutput().getInput().processNoteOn(new ShortMessage(ShortMessage.NOTE_ON,key,slider.getValue())); }
        			catch (InvalidMidiDataException ex) { System.err.println(ex); }
        			}
