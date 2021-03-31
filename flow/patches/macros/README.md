@@ -11,6 +11,9 @@ Flow macros are patches meant to be loaded as modules inside other patches.  Thi
 * **CC Harmonics**  
   Controls the amplitudes of harmonics 1 ... 96 independently via CC values sent from a MIDI controller.  You can use this patch to generate sounds from scratch, or use it in combination with AmpMath (using "multiply") to modify the amplitudes of harmonics from an existing sound.
 
+* **Drift**
+  Slightly randomizes the partial frequencies of a sound each Note On, creating a VCO drift kind of thing.  Also randomizes the pan position of the voice, creating a pan spread kind of thing.
+
 * **Random Fatten**  
   Fattens a sound but randomly changes the degree of fattening
 
