@@ -21,7 +21,7 @@ import java.awt.*;
         
 
 public class Map extends Modulation
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int MOD_SIGNAL = 0;
@@ -45,7 +45,7 @@ public class Map extends Modulation
     public static final int OPTION_CENTER = 2;
     
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_INVERT: return getInvert() ? 1 : 0;
@@ -53,10 +53,10 @@ public class Map extends Modulation
             case OPTION_CENTER: return getCenter() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_INVERT: setInvert(value != 0); return;
@@ -64,19 +64,19 @@ public class Map extends Modulation
             case OPTION_CENTER: setCenter(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
         
 
     public Map(Sound sound)
-        {
+    {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ONE }, 
-            new String[] { "Signal", "Bound A", "Bound B" });
+                          new String[] { "Signal", "Bound A", "Bound B" });
         defineOptions(new String[] { "Inverse", "Flip", "Center" }, new String[][] { { "Inverse" }, { "Flip" }, { "Center" } } );
-        }
+    }
 
     public void go()
-        {
+    {
         super.go();
         
         setTriggerValues(isTriggered(MOD_SIGNAL), getTriggerCount(MOD_SIGNAL), 0);
@@ -87,107 +87,107 @@ public class Map extends Modulation
         
         if (center)
             {
-            bound_b /= 2.0;             // bound_b is initially variance, bound_a is initially center
-            double lower = bound_a - bound_b;
-            double upper = bound_a + bound_b;
-            bound_a = (lower < 0 ? 0 : lower);
-            bound_b = (upper > 1 ? 1 : upper);
+                bound_b /= 2.0;             // bound_b is initially variance, bound_a is initially center
+                double lower = bound_a - bound_b;
+                double upper = bound_a + bound_b;
+                bound_a = (lower < 0 ? 0 : lower);
+                bound_b = (upper > 1 ? 1 : upper);
             }
         else if (bound_a > bound_b)                // swap
             {
-            double temp = bound_b;
-            bound_b = bound_a;
-            bound_a = temp;
+                double temp = bound_b;
+                bound_b = bound_a;
+                bound_a = temp;
             }
                 
         if (invert)
             {
-            if (bound_a == bound_b)
-                setModulationOutput(0, bound_a);
-            else
-                {
-                double d = (signal - bound_a) / (bound_b - bound_a);
-                if (d < 0) d = 0;
-                if (d > 1) d = 1;
-                                
-                if (flip)
+                if (bound_a == bound_b)
+                    setModulationOutput(0, bound_a);
+                else
                     {
-                    d = 1.0 - d;
-                    }
+                        double d = (signal - bound_a) / (bound_b - bound_a);
+                        if (d < 0) d = 0;
+                        if (d > 1) d = 1;
+                                
+                        if (flip)
+                            {
+                                d = 1.0 - d;
+                            }
 
-                setModulationOutput(0, d);
-                }
+                        setModulationOutput(0, d);
+                    }
             }
         else
             {
-            if (flip)
-                {
-                signal = 1.0 - signal;
-                }
+                if (flip)
+                    {
+                        signal = 1.0 - signal;
+                    }
                         
-            setModulationOutput(0, bound_a + (bound_b - bound_a) * signal);
+                setModulationOutput(0, bound_a + (bound_b - bound_a) * signal);
             }
-        }
+    }
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-        {
+    {
         if (isConstant)
             {
-            if (modulation == 2)  // Bound B
-                {
-                if (center)  // we're doing var
-                    return String.format("%.4f", value / 2.0);
-                }
+                if (modulation == 2)  // Bound B
+                    {
+                        if (center)  // we're doing var
+                            return String.format("%.4f", value / 2.0);
+                    }
             }
         return super.getModulationValueDescription(modulation, value, isConstant);
-        }
+    }
 
     public ModulePanel getPanel()
-        {
+    {
         return new ModulePanel(Map.this)
             {
-            public JComponent buildPanel()
+                public JComponent buildPanel()
                 { 
-                JLabel example = new JLabel("Bound B");     
-                example.setFont(Style.SMALL_FONT());
-                Box box = new Box(BoxLayout.Y_AXIS);
-                Modulation mod = (Modulation) getModulation();
-                box.add(new ModulationOutput(mod, 0, this));
+                    JLabel example = new JLabel("Bound B");     
+                    example.setFont(Style.SMALL_FONT());
+                    Box box = new Box(BoxLayout.Y_AXIS);
+                    Modulation mod = (Modulation) getModulation();
+                    box.add(new ModulationOutput(mod, 0, this));
                              
-                box.add(new ModulationInput(mod, MOD_SIGNAL, this));     // signal
-                ModulationInput a = new ModulationInput(mod, MOD_BOUND_A, this); // a
-                ModulationInput b = new ModulationInput(mod, MOD_BOUND_B, this); // b
-                a.getTitle().setMinimumSize(example.getMinimumSize());
-                b.getTitle().setMinimumSize(example.getMinimumSize());
-                box.add(a);
-                box.add(b);
+                    box.add(new ModulationInput(mod, MOD_SIGNAL, this));     // signal
+                    ModulationInput a = new ModulationInput(mod, MOD_BOUND_A, this); // a
+                    ModulationInput b = new ModulationInput(mod, MOD_BOUND_B, this); // b
+                    a.getTitle().setMinimumSize(example.getMinimumSize());
+                    b.getTitle().setMinimumSize(example.getMinimumSize());
+                    box.add(a);
+                    box.add(b);
                                 
-                box.add(new OptionsChooser(mod, 0));
-                box.add(new OptionsChooser(mod, 1));
-                box.add(new OptionsChooser(mod, 2)
-                    {
-                    public void optionChanged(int optionNumber, int value)
+                    box.add(new OptionsChooser(mod, 0));
+                    box.add(new OptionsChooser(mod, 1));
+                    box.add(new OptionsChooser(mod, 2)
                         {
-                        super.optionChanged(optionNumber, value);
-                        if (value == 0)
+                            public void optionChanged(int optionNumber, int value)
                             {
-                            a.setTitleText("Bound A");
-                            b.setTitleText("Bound B");
-                            b.updateText();  // redisplay the value
+                                super.optionChanged(optionNumber, value);
+                                if (value == 0)
+                                    {
+                                        a.setTitleText("Bound A");
+                                        b.setTitleText("Bound B");
+                                        b.updateText();  // redisplay the value
+                                    }
+                                else
+                                    {
+                                        a.setTitleText("Center");
+                                        b.setTitleText("Var");
+                                        b.updateText();  // redisplay the value
+                                    } 
                             }
-                        else
-                            {
-                            a.setTitleText("Center");
-                            b.setTitleText("Var");
-                            b.updateText();  // redisplay the value
-                            } 
-                        }
-                    });
+                        });
                     
-                return box;
+                    return box;
                 }
-            };
-        }
-
-
+        };
     }
+
+
+}

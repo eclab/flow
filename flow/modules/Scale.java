@@ -12,22 +12,22 @@ import flow.*;
 */
 
 public class Scale extends Unit
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int MOD_SCALE = 0;
 
     public Scale(Sound sound) 
-        {
+    {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.HALF }, new String[] { "Scale" });
-        }
+    }
 
     public static final double MAX_BOUND = 3.0;
         
     public void go()
-        {
+    {
         super.go();
                 
         copyFrequencies(0);
@@ -43,9 +43,9 @@ public class Scale extends Unit
                 
         for(int i = 0; i < frequencies.length; i++)
             {
-            frequencies[i] = (frequencies[i] - lowest) * mod + lowest;
+                frequencies[i] = (frequencies[i] - lowest) * mod + lowest;
             }
 
         if (constrain()) simpleSort(0, true);
-        }       
-    }
+    }       
+}

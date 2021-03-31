@@ -11,11 +11,11 @@ import flow.*;
 */
 
 public class Sawtooth extends Unit implements UnitSource
-    {
+{
     private static final long serialVersionUID = 1;
 
     public Sawtooth(Sound sound) 
-        {
+    {
         super(sound);
         
         double[] amplitudes = getAmplitudes(0);
@@ -23,8 +23,8 @@ public class Sawtooth extends Unit implements UnitSource
         setClearOnReset(false);
         for(int i = 0; i < amplitudes.length; i++)
             {
-            amplitudes[i] = (double)(1.0 / (i+1));
+                amplitudes[i] = (double)(1.0 / (i+1));
             }
         normalizeAmplitudes();
-        }
     }
+}

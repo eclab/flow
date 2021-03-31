@@ -14,7 +14,7 @@ import java.util.*;
 */
 
 public class KHarmonics extends Unit implements UnitSource
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int MAX_HARMONICS = 128;  // regardless of number of partials
@@ -46,7 +46,7 @@ public class KHarmonics extends Unit implements UnitSource
     public static final int OPTION_NORMALIZE = 2;
 
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_HARMONICS: return getHarmonics();
@@ -54,10 +54,10 @@ public class KHarmonics extends Unit implements UnitSource
             case OPTION_NORMALIZE: return getNormalize() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_HARMONICS: setHarmonics(value); return;
@@ -65,73 +65,73 @@ public class KHarmonics extends Unit implements UnitSource
             case OPTION_NORMALIZE: setNormalize(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
         
     static boolean done = false;
     public void doStatic()
-        {
+    {
         if (done) return;
         done = true;
         
         Scanner scan = new Scanner(Harmonics.class.getResourceAsStream("waves/kharmonics.out"), "US-ASCII");
         for(int i = 0; i < NUM_HARMONICS; i++)
             {
-            NAMES[i] = scan.nextLine();
-            for(int j = 0; j < MAX_HARMONICS; j++)
-                {
-                HARMONICS[i][j] = (scan.nextInt() / MAX_AMPLITUDE);
-                }
-            scan.nextLine();
+                NAMES[i] = scan.nextLine();
+                for(int j = 0; j < MAX_HARMONICS; j++)
+                    {
+                        HARMONICS[i][j] = (scan.nextInt() / MAX_AMPLITUDE);
+                    }
+                scan.nextLine();
             }
         scan.close();
-        }
+    }
 
     public void go()
-        {
+    {
         super.go();
         
         double m = modulate(0);
         if (m != mod || normalize != oldNormalize || oldHarmonics != harmonics || oldHarmonics2 != harmonics2)
             {
-            mod = m;
-            oldNormalize = normalize;
-            oldHarmonics = harmonics;
-            oldHarmonics2 = harmonics2;
+                mod = m;
+                oldNormalize = normalize;
+                oldHarmonics = harmonics;
+                oldHarmonics2 = harmonics2;
                 
-            double[] amplitudes = getAmplitudes(0);
+                double[] amplitudes = getAmplitudes(0);
                         
-            if (mod == 0)
-                {
-                System.arraycopy(HARMONICS[harmonics], 0, amplitudes, 0, Math.min(HARMONICS[harmonics].length, amplitudes.length));
-                }
-            else if (mod == 1)
-                {
-                System.arraycopy(HARMONICS[harmonics2], 0, amplitudes, 0, Math.min(HARMONICS[harmonics2].length, amplitudes.length));
-                }
-            else
-                {
-                double[] h1 = HARMONICS[harmonics];
-                double[] h2 = HARMONICS[harmonics2];
-                                
-                for(int i = 0; i < HARMONICS[harmonics].length; i++)
+                if (mod == 0)
                     {
-                    amplitudes[i] = (1 - m) * h1[i] + m * h2[i];
+                        System.arraycopy(HARMONICS[harmonics], 0, amplitudes, 0, Math.min(HARMONICS[harmonics].length, amplitudes.length));
                     }
-                }
+                else if (mod == 1)
+                    {
+                        System.arraycopy(HARMONICS[harmonics2], 0, amplitudes, 0, Math.min(HARMONICS[harmonics2].length, amplitudes.length));
+                    }
+                else
+                    {
+                        double[] h1 = HARMONICS[harmonics];
+                        double[] h2 = HARMONICS[harmonics2];
                                 
-            if (normalize) 
-                normalizeAmplitudes();
+                        for(int i = 0; i < HARMONICS[harmonics].length; i++)
+                            {
+                                amplitudes[i] = (1 - m) * h1[i] + m * h2[i];
+                            }
+                    }
+                                
+                if (normalize) 
+                    normalizeAmplitudes();
             }
-        }
+    }
                 
     public KHarmonics(Sound sound) 
-        {
+    {
         super(sound);
         doStatic();
 
         defineOptions(new String[] { "Sound" , "Sound 2", "Normalize" }, new String[][] { NAMES , NAMES, { "Normalize" } } );
         defineModulations(new Constant[] { new Constant(0) }, new String[] { "Mix" });
         setClearOnReset(false);
-        }
-                
     }
+                
+}

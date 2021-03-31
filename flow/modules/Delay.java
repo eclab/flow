@@ -17,7 +17,7 @@ import flow.*;
 
 
 public class Delay extends Unit
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int MOD_WET = 0;
@@ -27,7 +27,7 @@ public class Delay extends Unit
     public static final int MOD_LATER_CUTS = 4;
 
     public Delay(Sound sound)
-        {
+    {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { 
@@ -35,7 +35,7 @@ public class Delay extends Unit
                 Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
             new String[] { "Wet", "Initial Delay", "Later Delays", 
                            "Initial Cut", "Later Cuts" });
-        }
+    }
 
     public static final int MAX_INITIAL_DELAY_LENGTH = (int)(Output.SAMPLING_RATE / 16);
     public static final int MAX_LATER_DELAY_LENGTH = (int)(Output.SAMPLING_RATE / 16);
@@ -45,7 +45,7 @@ public class Delay extends Unit
     double[][] laterDelayBuf = new double[MAX_LATER_DELAY_LENGTH][NUM_PARTIALS];
         
     public Object clone()
-        {
+    {
         Delay obj = (Delay)(super.clone());
         obj.initialDelayBuf = (double[][])(obj.initialDelayBuf.clone());
         for(int i = 0; i < obj.initialDelayBuf.length; i++)
@@ -54,27 +54,27 @@ public class Delay extends Unit
         for(int i = 0; i < obj.laterDelayBuf.length; i++)
             obj.laterDelayBuf[i] = (double[])(obj.laterDelayBuf[i].clone());
         return obj;
-        }
+    }
     
         
     public void reset()
-        {
+    {
         for(int i = 0; i < initialDelayBuf.length; i++)
             {
-            double[] initialDelayBufP = initialDelayBuf[i];
-            for(int j = 0; j < initialDelayBufP.length; j++)
-                initialDelayBufP[j] = 0;
+                double[] initialDelayBufP = initialDelayBuf[i];
+                for(int j = 0; j < initialDelayBufP.length; j++)
+                    initialDelayBufP[j] = 0;
             }
         for(int i = 0; i < laterDelayBuf.length; i++)
             {
-            double[] laterDelayBufP = laterDelayBuf[i];
-            for(int j = 0; j < laterDelayBufP.length; j++)
-                laterDelayBufP[j] = 0;
+                double[] laterDelayBufP = laterDelayBuf[i];
+                for(int j = 0; j < laterDelayBufP.length; j++)
+                    laterDelayBufP[j] = 0;
             }
-        }
+    }
         
     public void go()
-        {
+    {
         super.go();
                 
         double[] amplitudes = getAmplitudes(0);
@@ -105,14 +105,14 @@ public class Delay extends Unit
         double[] d2 = initialDelayBuf[initialDelayPos];
         for(int i = 0; i < amps.length; i++)
             {
-            d[i] = d2[i] * initialCut + d[i] * laterCut;
+                d[i] = d2[i] * initialCut + d[i] * laterCut;
             }
 
         // next roll in the laterDelay
         d = laterDelayBuf[laterDelayPos];
         for(int i = 0; i < amplitudes.length; i++)
             {
-            amplitudes[i] = d[i] * wet + amps[i] * (1.0 - wet);
+                amplitudes[i] = d[i] * wet + amps[i] * (1.0 - wet);
             }
                 
         initialDelayPos++;
@@ -128,7 +128,7 @@ public class Delay extends Unit
             laterDelayPos = laterDelayPos % laterDelay;
 
         constrain();
-        }
+    }
 
         
-    }
+}

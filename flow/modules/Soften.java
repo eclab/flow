@@ -12,7 +12,7 @@ import flow.*;
 */
 
 public class Soften extends Modulation
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int MOD_SIGNAL = 0;
@@ -32,52 +32,52 @@ public class Soften extends Modulation
     public static final int OPTION_FREE = 0;
 
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_FREE: return getFree() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_FREE: setFree(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
 
     public Soften(Sound sound)
-        {
+    {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
-            new String[] { "Input", "Amount", "Scale" });
-        }
+                          new String[] { "Input", "Amount", "Scale" });
+    }
 
     public void reset()
-        {
+    {
         super.reset();
         current = Double.NaN;
-        }
+    }
                 
     public void gate()
-        {
+    {
         super.gate();
         if (!free) current = Double.NaN;
-        }
+    }
 
     public void go()
-        {
+    {
         super.go();
         double signal = modulate(MOD_SIGNAL);
         if (current != current)  // NaN
             current = signal;
         else
             {
-            double alpha = makeInsensitive(modulate(MOD_AMOUNT));
-            current = alpha * current + (1 - alpha) * signal;
+                double alpha = makeInsensitive(modulate(MOD_AMOUNT));
+                current = alpha * current + (1 - alpha) * signal;
             }
 
         double scale = modulate(MOD_SCALE);
@@ -87,12 +87,12 @@ public class Soften extends Modulation
         setModulationOutput(0, val);
         if (isTriggered(MOD_SIGNAL))
             updateTrigger(0);
-        }
+    }
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-        {
+    {
         if (modulation == 2 && isConstant)
             return String.format("%.4f", value * (SCALE_MAXIMUM - 1) + 1);
         else return super.getModulationValueDescription(modulation, value, isConstant);
-        }
     }
+}

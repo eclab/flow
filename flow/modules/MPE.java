@@ -31,16 +31,16 @@ import javax.swing.*;
 */
         
 public class MPE extends Modulation implements ModSource
-    {
+{
     private static final long serialVersionUID = 1;
         
     public MPE(Sound sound)
-        {
+    {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, new Constant(3.0/4.0), Constant.HALF, new Constant(3.0 / 4.0) },
-            new String[] { "Offset", "Variance", "Offset", "Variance" });
+                          new String[] { "Offset", "Variance", "Offset", "Variance" });
         defineModulationOutputs( new String[] { "Velocity", "Release", "Bend", "Pressure", "Y (CC 74)", });
-        }
+    }
 
     public static final int MOD_VELOCITY = 0;
     public static final int MOD_RELEASE_VELOCITY = 1;
@@ -54,26 +54,26 @@ public class MPE extends Modulation implements ModSource
     public static final int MOD_IN_Y_VARIANCE = 3;
 
     public String[] getPopupOptions(int modulation)
-        {
+    {
         if (modulation == MOD_IN_PRESSURE_VARIANCE || modulation == MOD_IN_Y_VARIANCE)
             {
-            return new String[] { "-2", "-1 1/2", "-1", "-1/2", "0", "1/2", "1", "1 1/2", "2" };
+                return new String[] { "-2", "-1 1/2", "-1", "-1/2", "0", "1/2", "1", "1 1/2", "2" };
             }
         else return super.getPopupOptions(modulation);
-        }
+    }
 
     public double getPopupConversion(int modulation, int index)
-        {
+    {
         if (modulation == MOD_IN_PRESSURE_VARIANCE || modulation == MOD_IN_Y_VARIANCE)
             {
-            return (index / 8.0);
+                return (index / 8.0);
             }
         else return super.getPopupConversion(modulation, index);
-        }
+    }
 
                     
     public void go()
-        {
+    {
         super.go();
 
         Sound sound = getSound();
@@ -98,48 +98,48 @@ public class MPE extends Modulation implements ModSource
         int cc = input.getCC(sound.getChannel(), 74);
         if (cc != Input.UNSPECIFIED)
             {
-            double y = (cc / 127.0) * Math.abs(yVariance) + yOffset;
-            if (y < 0) y = 0;
-            if (y > 1) y = 1;
-            if (yVariance < 0) y = 1 - y;
+                double y = (cc / 127.0) * Math.abs(yVariance) + yOffset;
+                if (y < 0) y = 0;
+                if (y > 1) y = 1;
+                if (yVariance < 0) y = 1 - y;
 
-            setModulationOutput(MOD_Y, y);
+                setModulationOutput(MOD_Y, y);
             }
-        }
+    }
 
     public ModulePanel getPanel()
-        {
+    {
         return new ModulePanel(MPE.this)
             {
-            public JComponent buildPanel()
+                public JComponent buildPanel()
                 {               
-                Modulation mod = getModulation();
+                    Modulation mod = getModulation();
 
-                Box box = new Box(BoxLayout.Y_AXIS);
+                    Box box = new Box(BoxLayout.Y_AXIS);
 
-                box.add(new ModulationOutput(mod, MOD_VELOCITY, this));
-                box.add(new ModulationOutput(mod, MOD_RELEASE_VELOCITY, this));
-                box.add(new ModulationOutput(mod, MOD_BEND, this));
-                box.add(new ModulationOutput(mod, MOD_PRESSURE, this));
-                box.add(new ModulationInput(mod, MOD_IN_PRESSURE_OFFSET, this));
-                box.add(new ModulationInput(mod, MOD_IN_PRESSURE_VARIANCE, this));
-                box.add(new ModulationOutput(mod, MOD_Y, this));
-                box.add(new ModulationInput(mod, MOD_IN_Y_OFFSET, this));
-                box.add(new ModulationInput(mod, MOD_IN_Y_VARIANCE, this));
+                    box.add(new ModulationOutput(mod, MOD_VELOCITY, this));
+                    box.add(new ModulationOutput(mod, MOD_RELEASE_VELOCITY, this));
+                    box.add(new ModulationOutput(mod, MOD_BEND, this));
+                    box.add(new ModulationOutput(mod, MOD_PRESSURE, this));
+                    box.add(new ModulationInput(mod, MOD_IN_PRESSURE_OFFSET, this));
+                    box.add(new ModulationInput(mod, MOD_IN_PRESSURE_VARIANCE, this));
+                    box.add(new ModulationOutput(mod, MOD_Y, this));
+                    box.add(new ModulationInput(mod, MOD_IN_Y_OFFSET, this));
+                    box.add(new ModulationInput(mod, MOD_IN_Y_VARIANCE, this));
 
-                return box;
+                    return box;
                 }
-            };
-        }
+        };
+    }
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-        {
+    {
         if (modulation == MOD_IN_PRESSURE_VARIANCE || modulation == MOD_IN_Y_VARIANCE)
             {
-            return String.format("%.4f", ((value - 0.5) * 4.0));
+                return String.format("%.4f", ((value - 0.5) * 4.0));
             }
         else return super.getModulationValueDescription(modulation, value, isConstant);
-        }
+    }
 
 
 
@@ -149,7 +149,7 @@ public class MPE extends Modulation implements ModSource
     public static final String[] MOD_NAMES = new String[] { "Pressure Offset", "Pressure Variance", "Y Offset", "Y Variance" };
 
     public String getKeyForModulation(int input)
-        {
+    {
         return MOD_NAMES[input];
-        }
     }
+}

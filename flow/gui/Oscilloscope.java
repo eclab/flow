@@ -17,7 +17,7 @@ import javax.swing.*;
 */
 
 public class Oscilloscope extends JComponent
-    {
+{
     public static final int WAVE_SIZE = 96;
     public static final int WAVE_HEIGHT = 96;
     public static final int BORDER = 8;
@@ -30,7 +30,7 @@ public class Oscilloscope extends JComponent
     public static final Color CLIP_COLOR = Color.RED;
     
     Output output;
-	int function;
+    int function;
     Color axisColor = DARK_GREEN;
     Stroke stroke;
 
@@ -51,75 +51,75 @@ public class Oscilloscope extends JComponent
     static final Color DARK_BLUE = new Color(0, 0, 180);
         
     public Oscilloscope(Output output, int function)
-        {
+    {
         this.function = function;
         this.output = output;
         stroke = new BasicStroke(STROKE_WIDTH);
 
         Timer timer = new Timer(50, new ActionListener()
             {
-            public void actionPerformed(ActionEvent e)
+                public void actionPerformed(ActionEvent e)
                 {
-                repaint();
-                SwingUtilities.invokeLater(new Runnable() { public void run() { } });
+                    repaint();
+                    SwingUtilities.invokeLater(new Runnable() { public void run() { } });
                 }
             });
         timer.start();
-        }
+    }
                 
     public Dimension getMinimumSize() { return new Dimension(WAVE_SIZE + BORDER * 2, WAVE_HEIGHT + BORDER * 2); }
     public Dimension getPreferredSize() { return new Dimension(WAVE_SIZE + BORDER * 2, WAVE_HEIGHT + BORDER * 2); }
     public Dimension getMaximumSize() { return new Dimension(WAVE_SIZE + BORDER * 2, WAVE_HEIGHT + BORDER * 2); }
     
     public void paintComponent(Graphics graphics)
-        {
+    {
         int p = 0;
         output.lock();
         try
             {
-            Sound sound = output.getInput().getLastPlayedSound();
-            try 
-                {
-                if (sound == null) 
-                    sound = output.getSound(0);
-                }
-            catch (Exception e)
-                {
-                sound = null;
-                }
-                        
-            if (sound != null)
-                {
-                Unit emit = sound.getEmits();
-
-                if (emit != null && emit instanceof Out)
+                Sound sound = output.getInput().getLastPlayedSound();
+                try 
                     {
-                    if (function <= FUNCTION_AUX_MOD)
-                    	{
-						Out out = (Out)emit;
-						System.arraycopy(out.getModWave(function), 0, wave, 0, wave.length);
-						p = out.getWavePos(function);
-						if (out.getAndClearWaveTriggered(function))
-							trig = !trig;
-						}
-					else
-						{
-						synchronized(output.leftSamplesOut)
-							{
-							System.arraycopy(output.leftSamplesOut, 0, wave, 0, wave.length);
-							}
-						for(int i = 0; i < wave.length; i++)
-							{
-							wave[i] *= (0.5 / 32768);
-							wave[i] += 0.5;
-							}
-						}
+                        if (sound == null) 
+                            sound = output.getSound(0);
                     }
-                }
+                catch (Exception e)
+                    {
+                        sound = null;
+                    }
+                        
+                if (sound != null)
+                    {
+                        Unit emit = sound.getEmits();
+
+                        if (emit != null && emit instanceof Out)
+                            {
+                                if (function <= FUNCTION_AUX_MOD)
+                                    {
+                                        Out out = (Out)emit;
+                                        System.arraycopy(out.getModWave(function), 0, wave, 0, wave.length);
+                                        p = out.getWavePos(function);
+                                        if (out.getAndClearWaveTriggered(function))
+                                            trig = !trig;
+                                    }
+                                else
+                                    {
+                                        synchronized(output.leftSamplesOut)
+                                            {
+                                                System.arraycopy(output.leftSamplesOut, 0, wave, 0, wave.length);
+                                            }
+                                        for(int i = 0; i < wave.length; i++)
+                                            {
+                                                wave[i] *= (0.5 / 32768);
+                                                wave[i] += 0.5;
+                                            }
+                                    }
+                            }
+                    }
             }
         finally 
             {
-            output.unlock();
+                output.unlock();
             }
         
         // fill with black regardless
@@ -140,22 +140,22 @@ public class Oscilloscope extends JComponent
         int q = 0;
         for(int i = 0; i < WAVE_SIZE - 1; i++)
             {
-            q = p + 1;
-            if (q >= WAVE_SIZE) q = 0;
-            double x = i + BORDER;
-            double y = WAVE_HEIGHT * (1 - wave[p]) + BORDER;
-            double xx = x + 1;
-            double yy = WAVE_HEIGHT * (1 - wave[q]) + BORDER;
-            g.draw(new Line2D.Double(x, y, xx, yy));
-            if (clip && (wave[p] >= (1.0 / 65536) * 65535 || wave[p] <= 0.0))
-            	{
-            	g.setColor(CLIP_COLOR);
-            	g.draw(new Line2D.Double(x, y, x, y));
-        		g.setColor(Color.WHITE);
-            	}
+                q = p + 1;
+                if (q >= WAVE_SIZE) q = 0;
+                double x = i + BORDER;
+                double y = WAVE_HEIGHT * (1 - wave[p]) + BORDER;
+                double xx = x + 1;
+                double yy = WAVE_HEIGHT * (1 - wave[q]) + BORDER;
+                g.draw(new Line2D.Double(x, y, xx, yy));
+                if (clip && (wave[p] >= (1.0 / 65536) * 65535 || wave[p] <= 0.0))
+                    {
+                        g.setColor(CLIP_COLOR);
+                        g.draw(new Line2D.Double(x, y, x, y));
+                        g.setColor(Color.WHITE);
+                    }
 
-            p++;
-            if (p >= WAVE_SIZE) p = 0;
+                p++;
+                if (p >= WAVE_SIZE) p = 0;
             }
-        }
     }
+}

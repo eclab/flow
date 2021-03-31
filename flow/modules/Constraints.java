@@ -14,18 +14,18 @@ import javax.swing.*;
 */
 
 public class Constraints extends Unit implements UnitSource
-    {
+{
     private static final long serialVersionUID = 1;
 
     public Constraints(Sound sound) 
-        {
+    {
         super(sound);
         defineOptions(new String[] {  "Not1", "Not2", "Not3", "Not4", "Harmonics1", "Harmonics2", "Harmonics3", "Harmonics4" }, 
-            new String[][] { { "Not1" }, { "Not2" }, { "Not3" }, { "Not4" }, constraintNames, constraintNames, constraintNames, constraintNames } );
+                      new String[][] { { "Not1" }, { "Not2" }, { "Not3" }, { "Not4" }, constraintNames, constraintNames, constraintNames, constraintNames } );
         setOptionValue(1, 1);           // turn on Not
         setOptionValue(2, 1);           // turn on Not
         defineInputs(new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, new String[] { "Only1", "Only2", "Only3", "Only4" });
-        }
+    }
 
     boolean not0;
     boolean not1;
@@ -63,7 +63,7 @@ public class Constraints extends Unit implements UnitSource
     public static final int OPTION_ONLY_3 = 7;
 
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_NOT_0: return getNot0() ? 1 : 0;
@@ -76,10 +76,10 @@ public class Constraints extends Unit implements UnitSource
             case OPTION_ONLY_3: return getOnly3();
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_NOT_0: setNot0(value != 0); return;
@@ -92,10 +92,10 @@ public class Constraints extends Unit implements UnitSource
             case OPTION_ONLY_3: setOnly3(value); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
 
     public void go()
-        {
+    {
         super.go();
         
         double[] amp = getAmplitudes(0);
@@ -104,24 +104,24 @@ public class Constraints extends Unit implements UnitSource
                 
         if (isInputNil(0))
             {
-            boolean not = getNot0();
-            int only = getOnly0();
-            int[] harm = (not ? ANTI_HARMONICS[only] : HARMONICS[only]);
-            for(int i = 0; i < amp.length; i++) { amp[i] = 0; }
-            for(int i = 0; i < harm.length; i++)
-                {
-                amp[harm[i]] = 1;
-                }
+                boolean not = getNot0();
+                int only = getOnly0();
+                int[] harm = (not ? ANTI_HARMONICS[only] : HARMONICS[only]);
+                for(int i = 0; i < amp.length; i++) { amp[i] = 0; }
+                for(int i = 0; i < harm.length; i++)
+                    {
+                        amp[harm[i]] = 1;
+                    }
             }
         else
             {
-            double[] in = getAmplitudesIn(0);
-            boolean not = getNot0();
-            for(int i = 0; i < amp.length; i++)
-                {
-                amp[i] = (not ? (in[i] > 0 ? 0 : 1) :
-                    (in[i] > 0 ? 1 : 0));
-                }
+                double[] in = getAmplitudesIn(0);
+                boolean not = getNot0();
+                for(int i = 0; i < amp.length; i++)
+                    {
+                        amp[i] = (not ? (in[i] > 0 ? 0 : 1) :
+                                  (in[i] > 0 ? 1 : 0));
+                    }
             }
 
 
@@ -129,23 +129,23 @@ public class Constraints extends Unit implements UnitSource
                 
         if (isInputNil(1))
             {
-            boolean not = getNot1();
-            int only = getOnly1();
-            int[] harm = (not ? ANTI_HARMONICS[only] : HARMONICS[only]);
-            for(int i = 0; i < harm.length; i++)
-                {
-                amp[harm[i]] = 1;
-                }
+                boolean not = getNot1();
+                int only = getOnly1();
+                int[] harm = (not ? ANTI_HARMONICS[only] : HARMONICS[only]);
+                for(int i = 0; i < harm.length; i++)
+                    {
+                        amp[harm[i]] = 1;
+                    }
             }
         else
             {
-            double[] in = getAmplitudesIn(1);
-            boolean not = getNot1();
-            for(int i = 0; i < amp.length; i++)
-                {
-                amp[i] = (not ? (in[i] > 0 ? amp[i] : 1) :
-                    (in[i] > 0 ? 1 : amp[i]));
-                }
+                double[] in = getAmplitudesIn(1);
+                boolean not = getNot1();
+                for(int i = 0; i < amp.length; i++)
+                    {
+                        amp[i] = (not ? (in[i] > 0 ? amp[i] : 1) :
+                                  (in[i] > 0 ? 1 : amp[i]));
+                    }
             }
 
 
@@ -153,23 +153,23 @@ public class Constraints extends Unit implements UnitSource
                 
         if (isInputNil(2))
             {
-            boolean not = getNot2();
-            int only = getOnly2();
-            int[] harm = (not ? ANTI_HARMONICS[only] : HARMONICS[only]);
-            for(int i = 0; i < harm.length; i++)
-                {
-                amp[harm[i]] = 1;
-                }
+                boolean not = getNot2();
+                int only = getOnly2();
+                int[] harm = (not ? ANTI_HARMONICS[only] : HARMONICS[only]);
+                for(int i = 0; i < harm.length; i++)
+                    {
+                        amp[harm[i]] = 1;
+                    }
             }
         else
             {
-            double[] in = getAmplitudesIn(2);
-            boolean not = getNot2();
-            for(int i = 0; i < amp.length; i++)
-                {
-                amp[i] = (not ? (in[i] > 0 ? amp[i] : 1) :
-                    (in[i] > 0 ? 1 : amp[i]));
-                }
+                double[] in = getAmplitudesIn(2);
+                boolean not = getNot2();
+                for(int i = 0; i < amp.length; i++)
+                    {
+                        amp[i] = (not ? (in[i] > 0 ? amp[i] : 1) :
+                                  (in[i] > 0 ? 1 : amp[i]));
+                    }
             }
 
 
@@ -177,101 +177,101 @@ public class Constraints extends Unit implements UnitSource
                 
         if (isInputNil(3))
             {
-            boolean not = getNot3();
-            int only = getOnly3();
-            int[] harm = (not ? HARMONICS[only] : ANTI_HARMONICS[only]);    // inverted
-            for(int i = 0; i < harm.length; i++)
-                {
-                amp[harm[i]] = 0;
-                }
+                boolean not = getNot3();
+                int only = getOnly3();
+                int[] harm = (not ? HARMONICS[only] : ANTI_HARMONICS[only]);    // inverted
+                for(int i = 0; i < harm.length; i++)
+                    {
+                        amp[harm[i]] = 0;
+                    }
             }
         else
             {
-            double[] in = getAmplitudesIn(3);
-            boolean not = getNot3();
-            for(int i = 0; i < amp.length; i++)
-                {
-                amp[i] *= (not ? (in[i] > 0 ? 0 : amp[i] ) :
-                    (in[i] > 0 ? amp[i] : 0));
-                }
+                double[] in = getAmplitudesIn(3);
+                boolean not = getNot3();
+                for(int i = 0; i < amp.length; i++)
+                    {
+                        amp[i] *= (not ? (in[i] > 0 ? 0 : amp[i] ) :
+                                   (in[i] > 0 ? amp[i] : 0));
+                    }
             }       
-        }
+    }
         
     public boolean isConstrainable() { return false; }
 
 
     public ModulePanel getPanel()
-        {
+    {
         return new ModulePanel(Constraints.this)
             {
-            public JComponent buildPanel()
+                public JComponent buildPanel()
                 {               
-                Modulation mod = getModulation();
-                Unit unit = (Unit) mod;
-                OptionsChooser only = null;
-                OptionsChooser not = null;
-                UnitInput input = null;
+                    Modulation mod = getModulation();
+                    Unit unit = (Unit) mod;
+                    OptionsChooser only = null;
+                    OptionsChooser not = null;
+                    UnitInput input = null;
                                 
-                Box box = new Box(BoxLayout.Y_AXIS);
-                box.add(new UnitOutput(unit, 0, this));                         
+                    Box box = new Box(BoxLayout.Y_AXIS);
+                    box.add(new UnitOutput(unit, 0, this));                         
                                 
-                Box box2 = null;
+                    Box box2 = null;
                                 
-                box2 = new Box(BoxLayout.X_AXIS);
-                only = new OptionsChooser(mod, 4);
-                only.setTitleText("Include...");
-                box.add(only);
-                input = new UnitInput(unit, 0, this);
-                input.setTitleText("Only", false);
-                box2.add(input);
-                not = new OptionsChooser(mod, 0);
-                not.setTitleText("Not");
-                box2.add(not);
-                box.add(box2);
-                box.add(Strut.makeVerticalStrut(10));
+                    box2 = new Box(BoxLayout.X_AXIS);
+                    only = new OptionsChooser(mod, 4);
+                    only.setTitleText("Include...");
+                    box.add(only);
+                    input = new UnitInput(unit, 0, this);
+                    input.setTitleText("Only", false);
+                    box2.add(input);
+                    not = new OptionsChooser(mod, 0);
+                    not.setTitleText("Not");
+                    box2.add(not);
+                    box.add(box2);
+                    box.add(Strut.makeVerticalStrut(10));
                                 
-                box2 = new Box(BoxLayout.X_AXIS);
-                only = new OptionsChooser(mod, 5);
-                only.setTitleText("Also Include...");
-                box.add(only);
-                input = new UnitInput(unit, 1, this);
-                input.setTitleText("Only", false);
-                box2.add(input);
-                not = new OptionsChooser(mod, 1);
-                not.setTitleText("Not");
-                box2.add(not);
-                box.add(box2);
-                box.add(Strut.makeVerticalStrut(10));
+                    box2 = new Box(BoxLayout.X_AXIS);
+                    only = new OptionsChooser(mod, 5);
+                    only.setTitleText("Also Include...");
+                    box.add(only);
+                    input = new UnitInput(unit, 1, this);
+                    input.setTitleText("Only", false);
+                    box2.add(input);
+                    not = new OptionsChooser(mod, 1);
+                    not.setTitleText("Not");
+                    box2.add(not);
+                    box.add(box2);
+                    box.add(Strut.makeVerticalStrut(10));
 
-                box2 = new Box(BoxLayout.X_AXIS);
-                only = new OptionsChooser(mod, 6);
-                only.setTitleText("Also Include...");
-                box.add(only);
-                input = new UnitInput(unit, 2, this);
-                input.setTitleText("Only", false);
-                box2.add(input);
-                not = new OptionsChooser(mod, 2);
-                not.setTitleText("Not");
-                box2.add(not);
-                box.add(box2);
-                box.add(Strut.makeVerticalStrut(10));
+                    box2 = new Box(BoxLayout.X_AXIS);
+                    only = new OptionsChooser(mod, 6);
+                    only.setTitleText("Also Include...");
+                    box.add(only);
+                    input = new UnitInput(unit, 2, this);
+                    input.setTitleText("Only", false);
+                    box2.add(input);
+                    not = new OptionsChooser(mod, 2);
+                    not.setTitleText("Not");
+                    box2.add(not);
+                    box.add(box2);
+                    box.add(Strut.makeVerticalStrut(10));
 
-                box2 = new Box(BoxLayout.X_AXIS);
-                only = new OptionsChooser(mod, 7);
-                only.setTitleText("Reduce To...");
-                box.add(only);
-                input = new UnitInput(unit, 3, this);
-                input.setTitleText("Only", false);
-                box2.add(input);
-                not = new OptionsChooser(mod, 3);
-                not.setTitleText("Not");
-                box2.add(not);
-                box.add(box2);
-                box.add(Strut.makeVerticalStrut(10));
+                    box2 = new Box(BoxLayout.X_AXIS);
+                    only = new OptionsChooser(mod, 7);
+                    only.setTitleText("Reduce To...");
+                    box.add(only);
+                    input = new UnitInput(unit, 3, this);
+                    input.setTitleText("Only", false);
+                    box2.add(input);
+                    not = new OptionsChooser(mod, 3);
+                    not.setTitleText("Not");
+                    box2.add(not);
+                    box.add(box2);
+                    box.add(Strut.makeVerticalStrut(10));
 
-                return box;
+                    return box;
                 }
-            };
-        }
-
+        };
     }
+
+}

@@ -37,7 +37,7 @@ import flow.*;
 
 
 public class AmpMath extends Unit
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int UNIT_INPUT_A = 0;
@@ -72,7 +72,7 @@ public class AmpMath extends Unit
         "+", "-", "x", "inv x", "compress", "average", "min", "max", "filter", "filternot", 
         "fill", "threshold", "scaledown", "scaleup", "scalefar", "clampdown", "clampup", 
         //"remove" 
-        }; 
+    }; 
         
     int operation = ADD;
     boolean normalize;
@@ -88,38 +88,38 @@ public class AmpMath extends Unit
     public static final int OPTION_NORMALIZE = 1;
 
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_OPERATION: return getOperation();
             case OPTION_NORMALIZE: return getNormalize() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_OPERATION: setOperation(value); return;
             case OPTION_NORMALIZE: setNormalize(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
         
 
     public AmpMath(Sound sound)
-        {
+    {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL }, new String[] { "Input A", "Input B" });
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Scale" });
         defineOptions(new String[] { "Operation", "Normalize" }, new String[][] { OPERATION_NAMES, { "Normalize"} } );
         setOperation(ADD);
         setNormalize(false);
-        }
+    }
         
     public void go()
-        {
+    {
         super.go();
 
         double[] amplitudes = getAmplitudes(0);
@@ -134,167 +134,167 @@ public class AmpMath extends Unit
             {
             case ADD:           // A + B + mod
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = inputs0amplitudes[i] + inputs1amplitudes[i] + modulation;
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = inputs0amplitudes[i] + inputs1amplitudes[i] + modulation;
+                        }
                 }
-            break;
+                break;
             case SUBTRACT:      // A - B - mod
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = inputs0amplitudes[i] - inputs1amplitudes[i] - modulation;
-                    if (amplitudes[i] < 0) amplitudes[i] = 0;
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = inputs0amplitudes[i] - inputs1amplitudes[i] - modulation;
+                            if (amplitudes[i] < 0) amplitudes[i] = 0;
+                        }
                 }
-            break;
+                break;
             case MULTIPLY:      // A * B
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = inputs0amplitudes[i] * inputs1amplitudes[i];
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = inputs0amplitudes[i] * inputs1amplitudes[i];
+                        }
                 }
-            break;
+                break;
             case INV_MULTIPLY:  // A * (1 - B)
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = inputs0amplitudes[i] * (1 - inputs1amplitudes[i]);
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = inputs0amplitudes[i] * (1 - inputs1amplitudes[i]);
+                        }
                 }
-            break;
+                break;
             case COMPRESS:   // 1 - (1 - A) * (1 - B)
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = 1 - (1 - inputs0amplitudes[i]) * (1 - inputs1amplitudes[i]);
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = 1 - (1 - inputs0amplitudes[i]) * (1 - inputs1amplitudes[i]);
+                        }
                 }
             case MEAN:  // mod * A + (1 - mod) * B
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = modulation * inputs0amplitudes[i] + (1 - modulation) * inputs1amplitudes[i];
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = modulation * inputs0amplitudes[i] + (1 - modulation) * inputs1amplitudes[i];
+                        }
                 }
-            break;
+                break;
             case MIN:   // min(A * modulation, B)
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = Math.min(inputs0amplitudes[i] * (1 - modulation), inputs1amplitudes[i]);
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = Math.min(inputs0amplitudes[i] * (1 - modulation), inputs1amplitudes[i]);
+                        }
                 }
-            break;
+                break;
             case MAX:   // max(A * modulation, B)
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = Math.max(inputs0amplitudes[i] * (1 - modulation), inputs1amplitudes[i]);
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = Math.max(inputs0amplitudes[i] * (1 - modulation), inputs1amplitudes[i]);
+                        }
                 }
-            break;
+                break;
             case FILTER: // If B < mod, then 0 else A
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = inputs1amplitudes[i] < modulation ? 0 : inputs0amplitudes[i];
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = inputs1amplitudes[i] < modulation ? 0 : inputs0amplitudes[i];
+                        }
                 }
-            break;
+                break;
             case FILTERNOT:  // If B >= mod, then 0 else A
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = inputs1amplitudes[i] >= modulation ? 0 : inputs0amplitudes[i];
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = inputs1amplitudes[i] >= modulation ? 0 : inputs0amplitudes[i];
+                        }
                 }
-            break;
+                break;
             case FILL:          // If A > mod then A else B
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = inputs0amplitudes[i] > modulation ? inputs0amplitudes[i] : inputs1amplitudes[i];
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = inputs0amplitudes[i] > modulation ? inputs0amplitudes[i] : inputs1amplitudes[i];
+                        }
                 }
-            break;
+                break;
             case THRESHOLD:     // If A > mod then 1 else 0
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = inputs0amplitudes[i] >= modulation ? 1 : 0;
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = inputs0amplitudes[i] >= modulation ? 1 : 0;
+                        }
                 }
-            break;
+                break;
             case SCALEDOWN:     // A * mod + B
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = inputs0amplitudes[i] * modulation + inputs1amplitudes[i];
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = inputs0amplitudes[i] * modulation + inputs1amplitudes[i];
+                        }
                 }
-            break;
+                break;
             case SCALEUP:       // A * (mod + 1) + B
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = inputs0amplitudes[i] * (modulation + 1.0) + inputs1amplitudes[i];
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = inputs0amplitudes[i] * (modulation + 1.0) + inputs1amplitudes[i];
+                        }
                 }
-            break;
+                break;
             case SCALEFAR:       // A * (mod * 9 + 1) + B
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = inputs0amplitudes[i] * (modulation * SCALEFAR_RANGE + 1.0) + inputs1amplitudes[i];
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = inputs0amplitudes[i] * (modulation * SCALEFAR_RANGE + 1.0) + inputs1amplitudes[i];
+                        }
                 }
-            break;
+                break;
             case CLAMPDOWN:     // If A < mod then A else mod
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = (inputs0amplitudes[i] > modulation ? modulation : inputs0amplitudes[i]) + inputs1amplitudes[1];
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = (inputs0amplitudes[i] > modulation ? modulation : inputs0amplitudes[i]) + inputs1amplitudes[1];
+                        }
                 }
-            break;
+                break;
             case CLAMPUP:     // If A > mod then A else mod
                 {
-                for(int i = 0; i < amplitudes.length; i++)
-                    {
-                    amplitudes[i] = (inputs0amplitudes[i] > modulation ? inputs0amplitudes[i] : modulation) + inputs1amplitudes[1];
-                    }
+                    for(int i = 0; i < amplitudes.length; i++)
+                        {
+                            amplitudes[i] = (inputs0amplitudes[i] > modulation ? inputs0amplitudes[i] : modulation) + inputs1amplitudes[1];
+                        }
                 }
-            break;
-            /*
-              case REMOVE:
-              {
-              int remove = (int)Math.floor(modulation * 127);
-              int x = 0;
+                break;
+                /*
+                  case REMOVE:
+                  {
+                  int remove = (int)Math.floor(modulation * 127);
+                  int x = 0;
                 
-              for(int i = 0; i < amplitudes.length; i++)
-              {
-              if (x > 0 && x - 1 < remove)
-              {
-              amplitudes[i] = inputs1amplitudes[i];
-              }
-              else
-              {
-              amplitudes[i] = inputs0amplitudes[i];
-              }
-              x++;
-              if (x >= remove) x = 0;
-              }
-              }
-              break;
-            */
+                  for(int i = 0; i < amplitudes.length; i++)
+                  {
+                  if (x > 0 && x - 1 < remove)
+                  {
+                  amplitudes[i] = inputs1amplitudes[i];
+                  }
+                  else
+                  {
+                  amplitudes[i] = inputs0amplitudes[i];
+                  }
+                  x++;
+                  if (x >= remove) x = 0;
+                  }
+                  }
+                  break;
+                */
             }
                         
         if (normalize)
             normalizeAmplitudes();
         
         constrain();
-        }
     }
+}

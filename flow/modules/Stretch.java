@@ -23,7 +23,7 @@ import flow.*;
 */
 
 public class Stretch extends Unit
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int MOD_AMOUNT = 0;
@@ -57,20 +57,20 @@ public class Stretch extends Unit
     public boolean getSquish() { return squish; }
 
     public Stretch(Sound sound) 
-        {
+    {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ZERO }, 
-            new String[] { "Amount", "Max Stretch", "Partial" });
+                          new String[] { "Amount", "Max Stretch", "Partial" });
         defineOptions(new String[] { "Style", "Largest", "Squish" }, new String[][] { STYLES, { "Largest" }, { "Squish" } } );
-        }
+    }
         
     public static final int OPTION_STYLE = 0;
     public static final int OPTION_TARGET = 1;
     public static final int OPTION_SQUISH = 2;
 
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_STYLE: return getStyle();
@@ -78,10 +78,10 @@ public class Stretch extends Unit
             case OPTION_SQUISH: return getSquish() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_STYLE: setStyle(value); return;
@@ -89,10 +89,10 @@ public class Stretch extends Unit
             case OPTION_SQUISH: setSquish(value == 1); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void go()
-        {
+    {
         super.go();
                 
         copyFrequencies(0);
@@ -108,20 +108,20 @@ public class Stretch extends Unit
 
         if (target == TARGET_PARTIAL)
             {
-            targetHarm = (frequencies.length - 1) * modulate(MOD_PARTIAL);
+                targetHarm = (frequencies.length - 1) * modulate(MOD_PARTIAL);
             }
         else // if (target == TARGET_LARGEST)
             {
-            // find maximum partial
-            double maxVal = amplitudes[0];
-            for(int i = 1; i < amplitudes.length; i++)
-                {
-                if (amplitudes[i] > maxVal)
+                // find maximum partial
+                double maxVal = amplitudes[0];
+                for(int i = 1; i < amplitudes.length; i++)
                     {
-                    targetHarm = i;
-                    maxVal = amplitudes[i];
+                        if (amplitudes[i] > maxVal)
+                            {
+                                targetHarm = i;
+                                maxVal = amplitudes[i];
+                            }
                     }
-                }
             }
 
         // move away from it
@@ -130,8 +130,8 @@ public class Stretch extends Unit
             targetFreq = frequencies[(int)targetHarm];
         else
             {
-            double alpha = targetHarm - (int)targetHarm;
-            targetFreq = (1.0 - alpha) * frequencies[(int)targetHarm] + alpha * frequencies[((int)targetHarm) + 1];
+                double alpha = targetHarm - (int)targetHarm;
+                targetFreq = (1.0 - alpha) * frequencies[(int)targetHarm] + alpha * frequencies[((int)targetHarm) + 1];
             }
         
         boolean locked = (style == STYLE_X_LOCKED || style == STYLE_X_TIMES_X_LOCKED || style == STYLE_X_TIMES_X_TIMES_X_LOCKED);
@@ -140,40 +140,40 @@ public class Stretch extends Unit
                 
         for(int i = 0; i < frequencies.length; i++)
             {
-            double m = mod;
-            switch (style)
-                {
-                case STYLE_X_LOCKED: case STYLE_X_FREE:
-                    m = m * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS)));
-                    break;
-                case STYLE_X_TIMES_X_LOCKED: case STYLE_X_TIMES_X_FREE:
-                    m = m * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS)));
-                    break;
-                case STYLE_X_TIMES_X_TIMES_X_LOCKED: case STYLE_X_TIMES_X_TIMES_X_FREE:
-                    m = m * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS)));
-                    break;
-                default: // never happens
+                double m = mod;
+                switch (style)
                     {
-                    warn("modules/Stretch.java", "default should never occur");
-                    break;
+                    case STYLE_X_LOCKED: case STYLE_X_FREE:
+                        m = m * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS)));
+                        break;
+                    case STYLE_X_TIMES_X_LOCKED: case STYLE_X_TIMES_X_FREE:
+                        m = m * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS)));
+                        break;
+                    case STYLE_X_TIMES_X_TIMES_X_LOCKED: case STYLE_X_TIMES_X_TIMES_X_FREE:
+                        m = m * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS))) * (1 - (Math.abs(i - targetHarm) / ((double)Unit.NUM_PARTIALS)));
+                        break;
+                    default: // never happens
+                        {
+                            warn("modules/Stretch.java", "default should never occur");
+                            break;
+                        }
                     }
-                }
-            if (locked)
-                {
-                double alpha = Math.min(i - 0, ((double)Unit.NUM_PARTIALS) - 1.0 - i) / (((double)Unit.NUM_PARTIALS) - 1.0 );
-                m = m * alpha;
-                }
+                if (locked)
+                    {
+                        double alpha = Math.min(i - 0, ((double)Unit.NUM_PARTIALS) - 1.0 - i) / (((double)Unit.NUM_PARTIALS) - 1.0 );
+                        m = m * alpha;
+                    }
 
-            if (squished)
-                {
-                frequencies[i] = targetFreq * m + frequencies[i] * (1.0 - m);
-                }
-            else
-                {
-                frequencies[i] = (maxStretch * frequencies[i] - targetFreq) * m + frequencies[i] * (1.0 - m);
-                }
+                if (squished)
+                    {
+                        frequencies[i] = targetFreq * m + frequencies[i] * (1.0 - m);
+                    }
+                else
+                    {
+                        frequencies[i] = (maxStretch * frequencies[i] - targetFreq) * m + frequencies[i] * (1.0 - m);
+                    }
             }
 
         if (constrain()) simpleSort(0, true);
-        }       
-    }
+    }       
+}

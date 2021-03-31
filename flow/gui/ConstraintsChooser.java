@@ -17,7 +17,7 @@ import java.awt.event.*;
 */ 
 
 public class ConstraintsChooser extends UnitInput
-    {
+{
     JComboBox combo;
     JCheckBox checkbox;
     
@@ -25,16 +25,16 @@ public class ConstraintsChooser extends UnitInput
     public static final int INDEX = -1;
     
     public ConstraintsChooser(Unit unit, ModulePanel modPanel)
-        {
+    {
         super(unit, INDEX, modPanel);
         
         title.setText(" Only");
 
         combo = new JComboBox(unit.constraintNames)
             {
-            public Dimension getMinimumSize() 
+                public Dimension getMinimumSize() 
                 {
-                return getPreferredSize(); 
+                    return getPreferredSize(); 
                 }
             };
 
@@ -49,34 +49,34 @@ public class ConstraintsChooser extends UnitInput
         /// the value of a JComboBox, it no longer sends ActionListener events.  :-(   
         combo.addItemListener(new ItemListener()
             {
-            public void itemStateChanged(ItemEvent e)
+                public void itemStateChanged(ItemEvent e)
                 {
-                int val = combo.getSelectedIndex();
+                    int val = combo.getSelectedIndex();
                                         
-                int index = unit.getSound().findRegistered(unit);
-                if (index == Sound.NOT_FOUND)  // stray mouse event, probably just closed
-                    {
-                    return;
-                    }
-                                
-                Output output = unit.getSound().getOutput();
-                output.lock();                    
-                try
-                    {
-                    int numSounds = output.getNumSounds();
-                    for(int i = 0; i < numSounds; i++)
+                    int index = unit.getSound().findRegistered(unit);
+                    if (index == Sound.NOT_FOUND)  // stray mouse event, probably just closed
                         {
-                        Sound s = output.getSound(i);
-                        if (s.getGroup() == Output.PRIMARY_GROUP)
-                            {
-                            ((Unit)(s.getRegistered(index))).setConstraint(val);
-                            }
+                            return;
                         }
-                    }
-                finally 
-                    {
-                    output.unlock();
-                    }
+                                
+                    Output output = unit.getSound().getOutput();
+                    output.lock();                    
+                    try
+                        {
+                            int numSounds = output.getNumSounds();
+                            for(int i = 0; i < numSounds; i++)
+                                {
+                                    Sound s = output.getSound(i);
+                                    if (s.getGroup() == Output.PRIMARY_GROUP)
+                                        {
+                                            ((Unit)(s.getRegistered(index))).setConstraint(val);
+                                        }
+                                }
+                        }
+                    finally 
+                        {
+                            output.unlock();
+                        }
                 }
             });
 
@@ -86,34 +86,34 @@ public class ConstraintsChooser extends UnitInput
         checkbox.setSelected(unit.getInvertConstraints());
         checkbox.addActionListener(new ActionListener()
             {
-            public void actionPerformed( ActionEvent e)
+                public void actionPerformed( ActionEvent e)
                 {
-                boolean val = checkbox.isSelected();
+                    boolean val = checkbox.isSelected();
 
-                int index = unit.getSound().findRegistered(unit);
-                if (index == Sound.NOT_FOUND)  // stray mouse event, probably just closed
-                    {
-                    return;
-                    }
-
-                Output output = unit.getSound().getOutput();
-                output.lock();                    
-                try
-                    {
-                    int numSounds = output.getNumSounds();
-                    for(int i = 0; i < numSounds; i++)
+                    int index = unit.getSound().findRegistered(unit);
+                    if (index == Sound.NOT_FOUND)  // stray mouse event, probably just closed
                         {
-                        Sound s = output.getSound(i);
-                        if (s.getGroup() == Output.PRIMARY_GROUP)
-                            {
-                            ((Unit)(s.getRegistered(index))).setInvertConstraints(val);
-                            }
+                            return;
                         }
-                    }
-                finally 
-                    {
-                    output.unlock();  
-                    }                  
+
+                    Output output = unit.getSound().getOutput();
+                    output.lock();                    
+                    try
+                        {
+                            int numSounds = output.getNumSounds();
+                            for(int i = 0; i < numSounds; i++)
+                                {
+                                    Sound s = output.getSound(i);
+                                    if (s.getGroup() == Output.PRIMARY_GROUP)
+                                        {
+                                            ((Unit)(s.getRegistered(index))).setInvertConstraints(val);
+                                        }
+                                }
+                        }
+                    finally 
+                        {
+                            output.unlock();  
+                        }                  
                 }
             });
                         
@@ -126,13 +126,13 @@ public class ConstraintsChooser extends UnitInput
         panel.add(checkbox, BorderLayout.EAST);
         add(panel, BorderLayout.NORTH);
         add(combo, BorderLayout.CENTER);
-        }
+    }
         
     public void rebuild()
-        {
+    {
         super.rebuild();
         combo.setSelectedIndex(unit.getConstraint());
         checkbox.setSelected(unit.getInvertConstraints());
-        }
-
     }
+
+}

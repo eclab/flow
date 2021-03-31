@@ -15,15 +15,15 @@ import flow.*;
 */
 
 public class Normalize extends Unit
-    {
+{
     private static final long serialVersionUID = 1;
 
     public Normalize(Sound sound)
-        {
+    {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineOptions(new String[] { "Scaling", "Standardize" }, new String[][] { {"None", "Normalize", "Maximize"}, {"Standardize"} });
-        }
+    }
 
     public static final int N_OFF = 0;
     public static final int N_NORMALIZE = 1;
@@ -41,56 +41,56 @@ public class Normalize extends Unit
     public static final int OPTION_STANDARDIZE = 1;
 
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_NORMALIZE: return getNormalize();
             case OPTION_STANDARDIZE: return getStandardize() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_NORMALIZE: setNormalize(value); return;
             case OPTION_STANDARDIZE: setStandardize(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
         
     public void go()
-        {
+    {
         super.go();
                 
         
         if (normalize == N_NORMALIZE)
             {
-            copyAmplitudes(0);
-            normalizeAmplitudes();
+                copyAmplitudes(0);
+                normalizeAmplitudes();
             }
         else if (normalize == N_MAXIMIZE)
             {
-            copyAmplitudes(0);
-            maximizeAmplitudes();
+                copyAmplitudes(0);
+                maximizeAmplitudes();
             }
         else
             {
-            pushAmplitudes(0);
+                pushAmplitudes(0);
             }
                 
         if (standardize)
             {
-            copyFrequencies(0);
-            standardizeFrequencies();
+                copyFrequencies(0);
+                standardizeFrequencies();
             }
         else
             {
-            pushFrequencies(0);
+                pushFrequencies(0);
             }
                                                 
         if (constrain() && standardize)
             simpleSort(0, normalize == N_OFF);
-        }       
-    }
+    }       
+}

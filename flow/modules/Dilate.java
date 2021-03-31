@@ -14,7 +14,7 @@ import flow.*;
 */
 
 public class Dilate extends Unit
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int MOD_CUT = 0;
@@ -30,38 +30,38 @@ public class Dilate extends Unit
     public static final int OPTION_DIRECTION = 0;
 
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_DIRECTION: return getDirection();
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_DIRECTION: setDirection(value); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
 
 
     public Dilate(Sound sound)
-        {
+    {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Boost" });
         defineOptions(new String[] { "Direction" }, new String[][] { { "Lower", "Higher", "Both" } });
-        }
+    }
         
     double[] zeros;        
     double[] upcuts_a;
     double[] downcuts_a;
 
     public void go()
-        {
+    {
         super.go();
                 
         pushFrequencies(0);
@@ -71,9 +71,9 @@ public class Dilate extends Unit
 
         if (zeros == null)
             {
-            zeros = new double[amplitudes.length];
-            upcuts_a = new double[amplitudes.length];
-            downcuts_a = new double[amplitudes.length];
+                zeros = new double[amplitudes.length];
+                upcuts_a = new double[amplitudes.length];
+                downcuts_a = new double[amplitudes.length];
             }
 
         // zero out the arrays
@@ -86,62 +86,62 @@ public class Dilate extends Unit
 
         if (direction == DIRECTION_BOTH)
             {
-            upcuts[0] = amplitudes[0];
-            for(int i = 1; i < amplitudes.length; i++)
-                {
-                if (amplitudes[i] <= upcuts[i - 1])
-                    {  upcuts[i] = cut * upcuts[i] + (1 - cut) * upcuts[i - 1]; }
-                else
-                    { upcuts[i] = amplitudes[i]; }
-                }
+                upcuts[0] = amplitudes[0];
+                for(int i = 1; i < amplitudes.length; i++)
+                    {
+                        if (amplitudes[i] <= upcuts[i - 1])
+                            {  upcuts[i] = cut * upcuts[i] + (1 - cut) * upcuts[i - 1]; }
+                        else
+                            { upcuts[i] = amplitudes[i]; }
+                    }
                 
-            downcuts[amplitudes.length - 1] = amplitudes[amplitudes.length - 1];
-            for(int i = amplitudes.length - 2; i >= 0; i--)
-                {
-                if (amplitudes[i] <= downcuts[i + 1])
-                    { downcuts[i] = cut * downcuts[i] + (1 - cut) * downcuts[i + 1]; }
-                else
-                    { downcuts[i] = amplitudes[i]; }
-                }
+                downcuts[amplitudes.length - 1] = amplitudes[amplitudes.length - 1];
+                for(int i = amplitudes.length - 2; i >= 0; i--)
+                    {
+                        if (amplitudes[i] <= downcuts[i + 1])
+                            { downcuts[i] = cut * downcuts[i] + (1 - cut) * downcuts[i + 1]; }
+                        else
+                            { downcuts[i] = amplitudes[i]; }
+                    }
                                 
-            for(int i = 0; i < amplitudes.length; i++)
-                {
-                amplitudes[i] = Math.max(upcuts[i], downcuts[i]);
-                }
+                for(int i = 0; i < amplitudes.length; i++)
+                    {
+                        amplitudes[i] = Math.max(upcuts[i], downcuts[i]);
+                    }
             }
         else if (direction == DIRECTION_RIGHT)
             {
-            upcuts[0] = amplitudes[0];
-            for(int i = 1; i < amplitudes.length; i++)
-                {
-                if (amplitudes[i] <= upcuts[i - 1])
-                    {  upcuts[i] = cut * upcuts[i] + (1 - cut) * upcuts[i - 1]; }
-                else
-                    { upcuts[i] = amplitudes[i]; }
-                }
+                upcuts[0] = amplitudes[0];
+                for(int i = 1; i < amplitudes.length; i++)
+                    {
+                        if (amplitudes[i] <= upcuts[i - 1])
+                            {  upcuts[i] = cut * upcuts[i] + (1 - cut) * upcuts[i - 1]; }
+                        else
+                            { upcuts[i] = amplitudes[i]; }
+                    }
                 
-            for(int i = 0; i < amplitudes.length; i++)
-                {
-                amplitudes[i] = upcuts[i];
-                }
+                for(int i = 0; i < amplitudes.length; i++)
+                    {
+                        amplitudes[i] = upcuts[i];
+                    }
             }
         else            // direction == DIRECTION_LEFT
             {
-            downcuts[amplitudes.length - 1] = amplitudes[amplitudes.length - 1];
-            for(int i = amplitudes.length - 2; i >= 0; i--)
-                {
-                if (amplitudes[i] <= downcuts[i + 1])
-                    { downcuts[i] = cut * downcuts[i] + (1 - cut) * downcuts[i + 1]; }
-                else
-                    { downcuts[i] = amplitudes[i]; }
-                }
+                downcuts[amplitudes.length - 1] = amplitudes[amplitudes.length - 1];
+                for(int i = amplitudes.length - 2; i >= 0; i--)
+                    {
+                        if (amplitudes[i] <= downcuts[i + 1])
+                            { downcuts[i] = cut * downcuts[i] + (1 - cut) * downcuts[i + 1]; }
+                        else
+                            { downcuts[i] = amplitudes[i]; }
+                    }
                                 
-            for(int i = 0; i < amplitudes.length; i++)
-                {
-                amplitudes[i] = downcuts[i];
-                }
+                for(int i = 0; i < amplitudes.length; i++)
+                    {
+                        amplitudes[i] = downcuts[i];
+                    }
             }
         
         constrain(); 
-        }       
-    }
+    }       
+}

@@ -15,7 +15,7 @@ import java.util.*;
 */
 
 public class Jitter extends Unit
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int FREQUENCY_VAR = 0;
@@ -43,79 +43,79 @@ public class Jitter extends Unit
     public static final int OPTION_AMP_PROPORTIONAL = 1;
 
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_NONZERO: return getNonZero() ? 1 : 0;
             case OPTION_AMP_PROPORTIONAL: return getAmpProportional() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_NONZERO: setNonZero(value != 0); return;
             case OPTION_AMP_PROPORTIONAL: setAmpProportional(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
 
 
     public Object clone()
-        {
+    {
         Jitter obj = (Jitter)(super.clone());
         if (obj.random != null)
             obj.random = new Random();  // will be reset on gate()
         obj.targets = (double[][])(obj.targets.clone());
         for(int i = 0; i < obj.targets.length; i++)
             {
-            if (obj.targets[i] != null)
-                obj.targets[i] = (double[])(obj.targets[i].clone());
+                if (obj.targets[i] != null)
+                    obj.targets[i] = (double[])(obj.targets[i].clone());
             }
         return obj;
-        }
+    }
 
     public Jitter(Sound sound)
-        {
+    {
         super(sound);
 
         defineOptions( new String[] { "Non-Zero", "Amp Ratio" }, new String[][] { { "Non-Zero" }, { "Amp Ratio"} });
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ONE }, 
-            new String[] { "Freq Var", "Amp Var", "Trigger", "Seed" });
+                          new String[] { "Freq Var", "Amp Var", "Trigger", "Seed" });
 
         targets[FREQUENCY_VAR] = new double[getFrequencies(0).length];
         targets[AMPLITUDE_VAR] = new double[getAmplitudes(0).length];
-        }
+    }
         
     public void reseed()
-        {
+    {
         double mod = modulate(MOD_SEED);
                 
         if (mod != 0)
             {
-            long seed = Double.doubleToLongBits(mod);
-            if (random == null) random = new Random(seed);
-            else random.setSeed(seed);
+                long seed = Double.doubleToLongBits(mod);
+                if (random == null) random = new Random(seed);
+                else random.setSeed(seed);
             }
         else if (random != null)
             {
-            random = null;
+                random = null;
             }
-        }
+    }
                 
     public void gate()
-        {
+    {
         super.gate();
                 
         started = false;
         reseed();
-        }
+    }
                 
     public void go()
-        {
+    {
         super.go();
                 
         double[] amplitudes = getAmplitudes(0);
@@ -133,58 +133,58 @@ public class Jitter extends Unit
                 
         if (!started || isTriggered(MOD_TRIGGER))
             {
-            for(int i = 0; i < targets[FREQUENCY_VAR].length; i++)
-                {
-                targets[FREQUENCY_VAR][i] = (rand.nextDouble() * 2.0 - 1.0) * frequencyModulation;
-                targets[AMPLITUDE_VAR][i] = (rand.nextDouble() * 2.0 - 1.0) * modulate(MOD_AMP_VAR);
-                }
-            started = true;
+                for(int i = 0; i < targets[FREQUENCY_VAR].length; i++)
+                    {
+                        targets[FREQUENCY_VAR][i] = (rand.nextDouble() * 2.0 - 1.0) * frequencyModulation;
+                        targets[AMPLITUDE_VAR][i] = (rand.nextDouble() * 2.0 - 1.0) * modulate(MOD_AMP_VAR);
+                    }
+                started = true;
             }
                         
         for(int i = 0; i < targets[FREQUENCY_VAR].length; i++)
             {
-            if (!nonZero || inputs0amplitudes[i] > 0)
-                {
-                double f = inputs0frequencies[i] + targets[FREQUENCY_VAR][i] * 20;
-                if (f >= 0) frequencies[i] = f;
-                if (ratio)
-                    amplitudes[i] = inputs0amplitudes[i] * (1.0 + targets[AMPLITUDE_VAR][i]);
+                if (!nonZero || inputs0amplitudes[i] > 0)
+                    {
+                        double f = inputs0frequencies[i] + targets[FREQUENCY_VAR][i] * 20;
+                        if (f >= 0) frequencies[i] = f;
+                        if (ratio)
+                            amplitudes[i] = inputs0amplitudes[i] * (1.0 + targets[AMPLITUDE_VAR][i]);
+                        else
+                            {
+                                double a = 0;
+                                a = inputs0amplitudes[i] + targets[AMPLITUDE_VAR][i] / 4;
+                                if (a >= 0) amplitudes[i] = a;
+                            }
+                    }
                 else
                     {
-                    double a = 0;
-                    a = inputs0amplitudes[i] + targets[AMPLITUDE_VAR][i] / 4;
-                    if (a >= 0) amplitudes[i] = a;
+                        frequencies[i] = inputs0frequencies[i];
+                        amplitudes[i] = 0;
                     }
-                }
-            else
-                {
-                frequencies[i] = inputs0frequencies[i];
-                amplitudes[i] = 0;
-                }
             }
 
         constrain();
 
         // always sort
         simpleSort(0, false);
-        }       
+    }       
 
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-        {
+    {
         if (isConstant)
             {
-            if (modulation == MOD_SEED)
-                {
-                return (value == 0.0 ? "Free" : String.format("%.4f" , value));
-                }
-            else return super.getModulationValueDescription(modulation, value, isConstant);
+                if (modulation == MOD_SEED)
+                    {
+                        return (value == 0.0 ? "Free" : String.format("%.4f" , value));
+                    }
+                else return super.getModulationValueDescription(modulation, value, isConstant);
             }
         else return "";
-        }
-
-
     }
+
+
+}
 
 
 

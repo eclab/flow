@@ -36,7 +36,7 @@ import java.lang.ref.*;
 */
 
 public class Seq extends Modulation
-    {       
+{       
     private static final long serialVersionUID = 1;
 
     public static final int MOD_STEPS = 32;
@@ -46,12 +46,12 @@ public class Seq extends Modulation
     public static final double[] PITCHES = new double[49];
     
     static
-        {
+    {
         for(int i = 0; i < PITCHES.length; i++)
             {
-            PITCHES[i] = ((i - 24)/12.0) / Shift.MAX_PITCH_BOUND + 0.5;
+                PITCHES[i] = ((i - 24)/12.0) / Shift.MAX_PITCH_BOUND + 0.5;
             }
-        };
+    };
 
     public static final int CURVE_LINEAR = 0;
     public static final int CURVE_X_2 = 1;
@@ -99,7 +99,7 @@ public class Seq extends Modulation
     public static final int OPTION_DISPLAY = 5;
 
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_CURVE: return getCurve();
@@ -110,10 +110,10 @@ public class Seq extends Modulation
             case OPTION_DISPLAY: return (getDisplay() ? 1 : 0);
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_CURVE: setCurve(value); return;
@@ -124,15 +124,15 @@ public class Seq extends Modulation
             case OPTION_DISPLAY: setDisplay(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
         
 
     public Seq(Sound sound)
-        {
+    {
         super(sound);
         defineOptions(new String[] { "Change", "Free", "Stop on Release", "Sample", "Guided", "Display" }, 
-            new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32", "Inv x^2", "Inv x^4", "Inv x^8"   }, 
-                { "Free" }, { "Stop on Release" }, { "Sample" }, { "Guided" }, { "Display" } });
+                      new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32", "Inv x^2", "Inv x^4", "Inv x^8"   }, 
+                                       { "Free" }, { "Stop on Release" }, { "Sample" }, { "Guided" }, { "Display" } });
         defineModulations(new Constant[] 
             { Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
               Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
@@ -143,17 +143,17 @@ public class Seq extends Modulation
               Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF,
               Constant.HALF, Constant.HALF, Constant.HALF, Constant.HALF, 
               Constant.ONE, Constant.ZERO, },
-            new String[] {
-                "1", "2", "3", "4", 
-                "5", "6", "7", "8",
-                "9", "10", "11", "12", 
-                "13", "14", "15", "16",
-                "17", "18", "19", "20",
-                "21", "22", "23", "24",
-                "25", "26", "27", "28",
-                "29", "30", "31", "32",
-                "Steps", "Trigger"
-                });
+                          new String[] {
+                              "1", "2", "3", "4", 
+                              "5", "6", "7", "8",
+                              "9", "10", "11", "12", 
+                              "13", "14", "15", "16",
+                              "17", "18", "19", "20",
+                              "21", "22", "23", "24",
+                              "25", "26", "27", "28",
+                              "29", "30", "31", "32",
+                              "Steps", "Trigger"
+                          });
         defineModulationOutputs(new String[] {
                 "Mod",
                 "1", "2", "3", "4", 
@@ -164,165 +164,165 @@ public class Seq extends Modulation
                 "21", "22", "23", "24",
                 "25", "26", "27", "28",
                 "29", "30", "31", "32"
-                });
-        }
+            });
+    }
         
     void resetSequencerPosition()
-        {
+    {
         int oldstate = state;
         state = 0;
         updateModulation();
-        }
+    }
         
     public void reset()
-        {
+    {
         super.reset();
         resetSequencerPosition();
         if (free)
             playing = true;
-        }
+    }
                 
     public void gate()
-        {
+    {
         super.gate();
         if (!free)
             {
-            resetSequencerPosition();
-            playing = true;
+                resetSequencerPosition();
+                playing = true;
             }
-        }
+    }
     
     public void release()
-        {
+    {
         if (!free && release)
             playing = false;
-        }
+    }
         
     volatile int _state = 0;
     void updateModulation()
-        {
+    {
         if (curve == CURVE_STEP)
             {
-            setModulationOutput(0, modulate(state));
+                setModulationOutput(0, modulate(state));
             }
         else
             {
-            double alpha = modulate(MOD_TRIGGER);
+                double alpha = modulate(MOD_TRIGGER);
                 
-            switch(curve)
-                {
-                case CURVE_LINEAR:
+                switch(curve)
                     {
-                    // no change
+                    case CURVE_LINEAR:
+                        {
+                            // no change
+                        }
+                        break;
+                    case CURVE_X_2:
+                        {
+                            alpha = alpha * alpha;
+                        }
+                        break;
+                    case CURVE_X_4:
+                        {
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                        }
+                        break;
+                    case CURVE_X_8:
+                        {
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                        }
+                        break;
+                    case CURVE_X_16:
+                        {
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                        }
+                        break;
+                    case CURVE_X_32:
+                        {
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                        }
+                        break;
+                    case CURVE_STEP:
+                        {
+                            // should never happen
+                        }
+                        break;
+                    case CURVE_X_2_X_8:
+                        {
+                            alpha = alpha * alpha;
+                            double beta = alpha;            // x^2
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;          // x^8
+                            alpha = (alpha + beta) * 0.5;
+                        }
+                        break;
+                    case CURVE_X_4_X_16:
+                        {
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                            double beta = alpha;            // x^4
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;          // x^16
+                            alpha = (alpha + beta) * 0.5;
+                        }
+                        break;
+                    case CURVE_X_8_X_32:
+                        {
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                            double beta = alpha;            // x^8
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;          // x^32
+                            alpha = (alpha + beta) * 0.5;
+                        }
+                        break;
+                    case CURVE_1_MINUS_X_2:
+                        {
+                            alpha = alpha * alpha;
+                        }
+                        break;
+                    case CURVE_1_MINUS_X_4:
+                        {
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                        }
+                        break;
+                    case CURVE_1_MINUS_X_8:
+                        {
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                            alpha = alpha * alpha;
+                        }
+                        break;
+                    default:
+                        {
+                            // should never happen
+                        }
                     }
-                break;
-                case CURVE_X_2:
-                    {
-                    alpha = alpha * alpha;
-                    }
-                break;
-                case CURVE_X_4:
-                    {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    }
-                break;
-                case CURVE_X_8:
-                    {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    }
-                break;
-                case CURVE_X_16:
-                    {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    }
-                break;
-                case CURVE_X_32:
-                    {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    }
-                break;
-                case CURVE_STEP:
-                    {
-                    // should never happen
-                    }
-                break;
-                case CURVE_X_2_X_8:
-                    {
-                    alpha = alpha * alpha;
-                    double beta = alpha;            // x^2
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;          // x^8
-                    alpha = (alpha + beta) * 0.5;
-                    }
-                break;
-                case CURVE_X_4_X_16:
-                    {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    double beta = alpha;            // x^4
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;          // x^16
-                    alpha = (alpha + beta) * 0.5;
-                    }
-                break;
-                case CURVE_X_8_X_32:
-                    {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    double beta = alpha;            // x^8
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;          // x^32
-                    alpha = (alpha + beta) * 0.5;
-                    }
-                break;
-                case CURVE_1_MINUS_X_2:
-                    {
-                    alpha = alpha * alpha;
-                    }
-                break;
-                case CURVE_1_MINUS_X_4:
-                    {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    }
-                break;
-                case CURVE_1_MINUS_X_8:
-                    {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    }
-                break;
-                default:
-                    {
-                    // should never happen
-                    }
-                }
                         
-            double currentVal = modulate(state);
-            int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
-            int nextState = state + 1;
-            if (nextState >= maxState) nextState = 0;
-            double nextVal = modulate(nextState);
-            setModulationOutput(0, (1 - alpha) * currentVal + alpha * nextVal);
+                double currentVal = modulate(state);
+                int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
+                int nextState = state + 1;
+                if (nextState >= maxState) nextState = 0;
+                double nextVal = modulate(nextState);
+                setModulationOutput(0, (1 - alpha) * currentVal + alpha * nextVal);
             }
 
         _state = state;
-        }
+    }
         
     public void go()
-        {
+    {
         super.go();
 
         if (!playing && !free) 
@@ -330,92 +330,92 @@ public class Seq extends Modulation
 
         if (isTriggered(MOD_TRIGGER))
             {
-            int oldstate = state;
-            int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
-            if (guided)
-                {
-                state = (int)(modulate(MOD_TRIGGER) * maxState);
-                if (state == maxState) state--;
-                }
-            else
-                {
-                state++;
-                if (state >= maxState) state = 0;
-                }
-            updateModulation();
-            updateTrigger(0);
-            updateTrigger(state + 1);               // Mod is 0
+                int oldstate = state;
+                int maxState = (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
+                if (guided)
+                    {
+                        state = (int)(modulate(MOD_TRIGGER) * maxState);
+                        if (state == maxState) state--;
+                    }
+                else
+                    {
+                        state++;
+                        if (state >= maxState) state = 0;
+                    }
+                updateModulation();
+                updateTrigger(0);
+                updateTrigger(state + 1);               // Mod is 0
             }
         else if (!sample)
             {
-            updateModulation();
+                updateModulation();
             }
-        }
+    }
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-        {
+    {
         if (isConstant)
             {
-            if (modulation == MOD_STEPS)
-                {
-                return "" + (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
-                }
-            else return super.getModulationValueDescription(modulation, value, isConstant);
+                if (modulation == MOD_STEPS)
+                    {
+                        return "" + (int)(modulate(MOD_STEPS) * (NUM_STATES - 1) + 1);
+                    }
+                else return super.getModulationValueDescription(modulation, value, isConstant);
             }
         else return "";
-        }
+    }
 
     static ArrayList panels = new ArrayList();
     static javax.swing.Timer timer = null;
     static void startTimer()
-        {
+    {
         if (timer == null)
             {
-            timer = new javax.swing.Timer(25, new ActionListener()
-                {
-                public void actionPerformed(ActionEvent e)
+                timer = new javax.swing.Timer(25, new ActionListener()
                     {
-                    Iterator iterator = panels.iterator();
-                    while(iterator.hasNext())
+                        public void actionPerformed(ActionEvent e)
                         {
-                        WeakReference ref = (WeakReference)(iterator.next());
-                        Object obj = ref.get();
-                        if (obj != null)
-                            {
-                            ((SeqModulePanel) obj).doRepaint();
-                            }
-                        else
-                            {
-                            iterator.remove();
-                            }
+                            Iterator iterator = panels.iterator();
+                            while(iterator.hasNext())
+                                {
+                                    WeakReference ref = (WeakReference)(iterator.next());
+                                    Object obj = ref.get();
+                                    if (obj != null)
+                                        {
+                                            ((SeqModulePanel) obj).doRepaint();
+                                        }
+                                    else
+                                        {
+                                            iterator.remove();
+                                        }
+                                }
                         }
-                    }
-                });
-            timer.start();
+                    });
+                timer.start();
             }
-        }
+    }
 
     // we need a custom module so we can make up a method in it called doRepaint(),
     // which repaints when appropriate.
         
     class SeqModulePanel extends ModulePanel
-        {
+    {
         boolean repaintOnce = true;                     // this allows us to clear things if the user turns off getDisplay
         public void doRepaint()
-            {
+        {
             if (Seq.this.getDisplay())
                 { repaint(); repaintOnce = true; }
             else if (repaintOnce)
                 { repaint(); repaintOnce = false; }
-            }
+        }
                 
         public SeqModulePanel(Seq mod)
-            {
+        {
             super(mod);
-            }
+        }
                                 
         public JComponent buildPanel()
-            {
+        {
             JLabel example = new JLabel("0.0000 ");
             example.setFont(Style.SMALL_FONT());
                 
@@ -425,73 +425,73 @@ public class Seq extends Modulation
 
             for(int i = 0; i < NUM_STATES; i+=4)
                 {
-                Box box2 = new Box(BoxLayout.X_AXIS);
-                for(int j = i; j < i + 4; j++)
-                    {
-                    final int _state = j;
-
-                    // You'll notice a lot of code here is the same as in Shift
-                    final ModulationInput[] m = new ModulationInput[1];
-                    m[0] = new ModulationInput(mod, j, this)
+                    Box box2 = new Box(BoxLayout.X_AXIS);
+                    for(int j = i; j < i + 4; j++)
                         {
-                        public JPopupMenu getPopupMenu()
-                            {
-                            final JPopupMenu pop = new JPopupMenu();
-                            KeyDisplay display = new KeyDisplay(null, Color.RED, 36, 84, 60, 0)
+                            final int _state = j;
+
+                            // You'll notice a lot of code here is the same as in Shift
+                            final ModulationInput[] m = new ModulationInput[1];
+                            m[0] = new ModulationInput(mod, j, this)
                                 {
-                                public void setState(int state)
+                                    public JPopupMenu getPopupMenu()
                                     {
-                                    pop.setVisible(false);
-                                    m[0].setState(PITCHES[state - 60 + 24]);
+                                        final JPopupMenu pop = new JPopupMenu();
+                                        KeyDisplay display = new KeyDisplay(null, Color.RED, 36, 84, 60, 0)
+                                            {
+                                                public void setState(int state)
+                                                {
+                                                    pop.setVisible(false);
+                                                    m[0].setState(PITCHES[state - 60 + 24]);
+                                                }
+                                            };
+                                        pop.add(display);
+
+                                        String[] options = getOptions();
+                                        for(int i = 0; i < options.length; i++)
+                                            {
+                                                JMenuItem menu = new JMenuItem(options[i]);
+                                                menu.setFont(Style.SMALL_FONT());
+                                                final int _i = i;
+                                                menu.addActionListener(new ActionListener()
+                                                    {
+                                                        public void actionPerformed(ActionEvent e)      
+                                                        {
+                                                            double val = convert(_i);
+                                                            if (val >= 0 && val <= 1)
+                                                                setState(val);
+                                                        }       
+                                                    });     
+                                                pop.add(menu);
+                                            }    
+                                                                
+                                        return pop;
+                                    }
+                            
+                                    public boolean getDrawsStateDot()
+                                    {
+                                        if (!Seq.this.getDisplay()) return false;
+                                
+                                        int m = sound.findRegistered(Seq.this);
+                                        Sound soundlast = sound.getOutput().getInput().getLastPlayedSound();
+                                        if (soundlast == null)
+                                            soundlast = sound.getOutput().getSoundUnsafe(0);
+                                        Seq seq0 = (Seq)(soundlast.getRegistered(m));
+
+                                        return (seq0._state == _state);
                                     }
                                 };
-                            pop.add(display);
-
-                            String[] options = getOptions();
-                            for(int i = 0; i < options.length; i++)
-                                {
-                                JMenuItem menu = new JMenuItem(options[i]);
-                                menu.setFont(Style.SMALL_FONT());
-                                final int _i = i;
-                                menu.addActionListener(new ActionListener()
-                                    {
-                                    public void actionPerformed(ActionEvent e)      
-                                        {
-                                        double val = convert(_i);
-                                        if (val >= 0 && val <= 1)
-                                            setState(val);
-                                        }       
-                                    });     
-                                pop.add(menu);
-                                }    
-                                                                
-                            return pop;
-                            }
-                            
-                        public boolean getDrawsStateDot()
-                            {
-                            if (!Seq.this.getDisplay()) return false;
-                                
-                            int m = sound.findRegistered(Seq.this);
-                            Sound soundlast = sound.getOutput().getInput().getLastPlayedSound();
-                            if (soundlast == null)
-                                soundlast = sound.getOutput().getSoundUnsafe(0);
-                            Seq seq0 = (Seq)(soundlast.getRegistered(m));
-
-                            return (seq0._state == _state);
-                            }
-                        };
-                    m[0].getData().setMinimumSize(example.getPreferredSize());
-                    box2.add(m[0]);
-                    }
-                box.add(box2);
+                            m[0].getData().setMinimumSize(example.getPreferredSize());
+                            box2.add(m[0]);
+                        }
+                    box.add(box2);
                 }
             box.add(new ModulationInput(mod, MOD_STEPS, this), BorderLayout.WEST);
             box.add(new ModulationInput(mod, MOD_TRIGGER, this), BorderLayout.EAST);
             
             for(int i = 0; i < mod.getNumOptions(); i++)
                 {
-                box.add(new OptionsChooser(mod, i));
+                    box.add(new OptionsChooser(mod, i));
                 }
                 
             box.add(Strut.makeVerticalStrut(5));
@@ -500,33 +500,33 @@ public class Seq extends Modulation
             JPanel h = null;
             for(int i = 0; i < 32; i++)
                 {
-                if (i == 0 || i == 8 || i == 16 || i == 24)
-                    {
-                    box2 = new Box(BoxLayout.X_AXIS);
-                    h = new JPanel();
-                    h.setLayout(new BorderLayout());
-                    h.add(box2, BorderLayout.EAST);
-                    box.add(h);
-                    }
-                ModulationOutput mo = new ModulationOutput(mod, i + 1, this);
-                if (i == 0 || i == 8 || i == 16 || i == 24)
-                    mo.setTitleText("" + (i + 1) + "-" + (i + 8), false);
-                else mo.setTitleText("", false);
-                box2.add(mo);
+                    if (i == 0 || i == 8 || i == 16 || i == 24)
+                        {
+                            box2 = new Box(BoxLayout.X_AXIS);
+                            h = new JPanel();
+                            h.setLayout(new BorderLayout());
+                            h.add(box2, BorderLayout.EAST);
+                            box.add(h);
+                        }
+                    ModulationOutput mo = new ModulationOutput(mod, i + 1, this);
+                    if (i == 0 || i == 8 || i == 16 || i == 24)
+                        mo.setTitleText("" + (i + 1) + "-" + (i + 8), false);
+                    else mo.setTitleText("", false);
+                    box2.add(mo);
                 }
                                     
             return box;
-            }
         }
+    }
 
     public ModulePanel getPanel()
-        {
+    {
         startTimer();
         SeqModulePanel mp = new SeqModulePanel(Seq.this);
         
         // I think this should be okay -- we're doing stuff here in the swing event thread
         panels.add(new WeakReference(mp));
         return mp;
-        }
-
     }
+
+}

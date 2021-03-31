@@ -26,7 +26,7 @@ import javax.swing.*;
 */
 
 public class User extends Modulation implements ModSource
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int NUM_MODULATIONS = 4;
@@ -35,109 +35,109 @@ public class User extends Modulation implements ModSource
     public static final String[] MODULATION_OUTPUT_NAMES =   new String[] { "A", "B", "C", "D" };
         
     public User(Sound sound) 
-        {
+    {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO}, MODULATION_NAMES);
         defineModulationOutputs(MODULATION_OUTPUT_NAMES);  // even though they're unlabeled, it's important that these have names so they save properly.
-        }
+    }
         
     boolean[] trigger = new boolean[NUM_MODULATIONS];
         
     public void go()
-        {
+    {
         super.go();
         
         for(int i = 0; i < NUM_MODULATIONS; i++)
             {
-            setModulationOutput(i, modulate(i));
-            if (isTriggered(i) || trigger[i]) updateTrigger(i);
-            trigger[i] = false;
+                setModulationOutput(i, modulate(i));
+                if (isTriggered(i) || trigger[i]) updateTrigger(i);
+                trigger[i] = false;
             }
-        }       
+    }       
 
     public ModulePanel getPanel()
-        {
+    {
         return new ModulePanel(User.this)
             {
-            public JComponent buildPanel()
+                public JComponent buildPanel()
                 {               
-                Modulation mod = getModulation();
+                    Modulation mod = getModulation();
 
-                Box box = new Box(BoxLayout.Y_AXIS);
-                for(int i = 0; i < NUM_MODULATIONS; i++)
-                    {
-                    final int _i = i;
-
-                    Box hbox = new Box(BoxLayout.X_AXIS);
-                    ModulationOutput output = new ModulationOutput(mod, i, this);
-                    output.setTitleText("", false);
-                    ModulationInput input = new ModulationInput(mod, i, this);
-                    hbox.add(input);
-                    hbox.add(output);
-                    box.add(hbox);
-                    }
-
-                for(int i = 0; i < NUM_MODULATIONS; i++)
-                    {
-                    final int _i = i;
-                    PushButton button = new PushButton("Tr " + MODULATION_NAMES[i])
+                    Box box = new Box(BoxLayout.Y_AXIS);
+                    for(int i = 0; i < NUM_MODULATIONS; i++)
                         {
-                        public void perform()
-                            {
-                            Output output = getRack().getOutput();
-                            output.lock();
-                            int numSounds = output.getNumSounds();
-                            try
-                                {
-                                if (output.getOnlyPlayFirstSound())
-                                    {
-                                    // This triggers sound 0
-                                    int index = sound.findRegistered(User.this);
+                            final int _i = i;
 
-                                    Sound s = output.getInput().getLastPlayedSound();
-                                    try 
-                                        {
-                                        if (s == null) 
-                                            s = output.getSound(0);
-                                        }
-                                    catch (Exception e)
-                                        {
-                                        s = null;
-                                        }
-                                    if (s != null)
-                                        {
-                                        if (s.getGroup() == Output.PRIMARY_GROUP)
-                                            {
-                                            User user = (User)(s.getRegistered(index));
-                                            user.trigger[_i] = true;
-                                            }
-                                        }
-                                    }
-                                else
-                                    {
-                                    // This triggers *all* the sounds.
-                                    int index = sound.findRegistered(User.this);
-                                    for(int j = 0; j < numSounds; j++)
-                                        {
-                                        Sound s = output.getSound(j);
-                                        if (s.getGroup() == Output.PRIMARY_GROUP)
-                                            {
-                                            User user = (User)(s.getRegistered(index));
-                                            user.trigger[_i] = true;
-                                            }
-                                        }
-                                    }                                
-                                }
-                            finally 
+                            Box hbox = new Box(BoxLayout.X_AXIS);
+                            ModulationOutput output = new ModulationOutput(mod, i, this);
+                            output.setTitleText("", false);
+                            ModulationInput input = new ModulationInput(mod, i, this);
+                            hbox.add(input);
+                            hbox.add(output);
+                            box.add(hbox);
+                        }
+
+                    for(int i = 0; i < NUM_MODULATIONS; i++)
+                        {
+                            final int _i = i;
+                            PushButton button = new PushButton("Tr " + MODULATION_NAMES[i])
                                 {
-                                output.unlock();
-                                }
-                            }
-                        };
-                    box.add(button);
-                    }
-                return box;
+                                    public void perform()
+                                    {
+                                        Output output = getRack().getOutput();
+                                        output.lock();
+                                        int numSounds = output.getNumSounds();
+                                        try
+                                            {
+                                                if (output.getOnlyPlayFirstSound())
+                                                    {
+                                                        // This triggers sound 0
+                                                        int index = sound.findRegistered(User.this);
+
+                                                        Sound s = output.getInput().getLastPlayedSound();
+                                                        try 
+                                                            {
+                                                                if (s == null) 
+                                                                    s = output.getSound(0);
+                                                            }
+                                                        catch (Exception e)
+                                                            {
+                                                                s = null;
+                                                            }
+                                                        if (s != null)
+                                                            {
+                                                                if (s.getGroup() == Output.PRIMARY_GROUP)
+                                                                    {
+                                                                        User user = (User)(s.getRegistered(index));
+                                                                        user.trigger[_i] = true;
+                                                                    }
+                                                            }
+                                                    }
+                                                else
+                                                    {
+                                                        // This triggers *all* the sounds.
+                                                        int index = sound.findRegistered(User.this);
+                                                        for(int j = 0; j < numSounds; j++)
+                                                            {
+                                                                Sound s = output.getSound(j);
+                                                                if (s.getGroup() == Output.PRIMARY_GROUP)
+                                                                    {
+                                                                        User user = (User)(s.getRegistered(index));
+                                                                        user.trigger[_i] = true;
+                                                                    }
+                                                            }
+                                                    }                                
+                                            }
+                                        finally 
+                                            {
+                                                output.unlock();
+                                            }
+                                    }
+                                };
+                            box.add(button);
+                        }
+                    return box;
                 }
-            };
-        }
+        };
     }
+}

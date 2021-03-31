@@ -14,7 +14,7 @@ import flow.*;
 */
 
 public class Buffer extends Unit
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int MOD_TRIGGER = 0;
@@ -28,59 +28,59 @@ public class Buffer extends Unit
     public static final int OPTION_FREE = 0;
         
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_FREE: return getFree() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_FREE: setFree(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
         
         
     public boolean getFree() { return free; }
     public void setFree(boolean free) { this.free = free; } 
     
     public Object clone()
-        {
+    {
         Buffer obj = (Buffer)(super.clone());
         obj.bufferedAmplitudes = (double[])(obj.bufferedAmplitudes.clone());
         obj.bufferedFrequencies = (double[])(obj.bufferedFrequencies.clone());
         return obj;
-        }
+    }
     
     public Buffer(Sound sound) 
-        {
+    {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ONE }, new String[] { "Trigger" });
         defineOptions(new String[] { "Free" }, new String[][] { { "Free" } } );
         setFree(false);
         start = true;
-        }
+    }
         
     public void reset()
-        {
+    {
         super.reset();
         start = true;
-        }
+    }
                 
     public void gate()
-        {
+    {
         super.gate();
         if (!free) start = true;
-        }
+    }
                 
     public void go()
-        {
+    {
         super.go();
                 
         double[] amplitudesIn = getAmplitudesIn(0);
@@ -89,19 +89,19 @@ public class Buffer extends Unit
         modulate(MOD_TRIGGER);
         if (start || isTriggered(MOD_TRIGGER))
             {
-            System.arraycopy(amplitudesIn, 0, bufferedAmplitudes, 0, amplitudesIn.length);
-            System.arraycopy(frequenciesIn, 0, bufferedFrequencies, 0, frequenciesIn.length);
-            start = false;
-            reset = true;
+                System.arraycopy(amplitudesIn, 0, bufferedAmplitudes, 0, amplitudesIn.length);
+                System.arraycopy(frequenciesIn, 0, bufferedFrequencies, 0, frequenciesIn.length);
+                start = false;
+                reset = true;
             }
             
         if (reset)
             {
-            System.arraycopy(bufferedAmplitudes, 0, getAmplitudes(0), 0, bufferedAmplitudes.length);
-            System.arraycopy(bufferedFrequencies, 0, getFrequencies(0), 0, bufferedFrequencies.length);
+                System.arraycopy(bufferedAmplitudes, 0, getAmplitudes(0), 0, bufferedAmplitudes.length);
+                System.arraycopy(bufferedFrequencies, 0, getFrequencies(0), 0, bufferedFrequencies.length);
             }
                 
         reset = constrain();
         if (reset) simpleSort(0, false);
-        }       
-    }
+    }       
+}

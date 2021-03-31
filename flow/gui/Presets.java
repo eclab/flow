@@ -18,7 +18,7 @@ import java.awt.event.*;
 
 
 public class Presets extends JPanel
-    {
+{
     JComboBox combo;
     ModulePanel modpanel;
     JLabel label;
@@ -26,14 +26,14 @@ public class Presets extends JPanel
     public static final String CHOOSE = "<html><i>Presets...</i></html>";
     
     public Presets(ModulePanel modpanel)
-        {
+    {
         setLayout(new BorderLayout());
         this.modpanel = modpanel;
         String[] presets = new String[0];
         Modulation m = modpanel.getModulation();
         if (m instanceof Presetable)
             {
-            presets = ((Presetable)m).getPresets();
+                presets = ((Presetable)m).getPresets();
             }
         combo = new JComboBox(presets);
         combo.putClientProperty("JComponent.sizeVariant", "small");
@@ -48,57 +48,57 @@ public class Presets extends JPanel
                                         
         combo.addActionListener(new ActionListener()
             {
-            public void actionPerformed(ActionEvent e)
+                public void actionPerformed(ActionEvent e)
                 {
-                final int selection = combo.getSelectedIndex();
-                if (selection >= 0)
-                	{
-					Rack rack = modpanel.getRack();
-					Output output = rack.getOutput();                        
-					int index = rack.getIndex(modpanel);
-					output.lock();
-					try
-						{
-						int numSounds = output.getNumSounds();
-						for(int i = 0; i < numSounds; i++)
-							{
-							Sound s = output.getSound(i);
-							if (s.getGroup() == Output.PRIMARY_GROUP)
-								{
-								Modulation m = s.getRegistered(index);
-								if (m instanceof Presetable)
-									{
-									Presetable p = (Presetable) m;
-									p.setPreset(selection);
-									}
-								}
-							}
-						}
-					finally 
-						{
-						output.unlock();
-						}
-					combo.setSelectedIndex(-1);
-					modpanel.rebuild();
-					rack.repaint();      // when the ModulePanel repaints we have to also redraw the wires...
-					}
-				}
+                    final int selection = combo.getSelectedIndex();
+                    if (selection >= 0)
+                        {
+                            Rack rack = modpanel.getRack();
+                            Output output = rack.getOutput();                        
+                            int index = rack.getIndex(modpanel);
+                            output.lock();
+                            try
+                                {
+                                    int numSounds = output.getNumSounds();
+                                    for(int i = 0; i < numSounds; i++)
+                                        {
+                                            Sound s = output.getSound(i);
+                                            if (s.getGroup() == Output.PRIMARY_GROUP)
+                                                {
+                                                    Modulation m = s.getRegistered(index);
+                                                    if (m instanceof Presetable)
+                                                        {
+                                                            Presetable p = (Presetable) m;
+                                                            p.setPreset(selection);
+                                                        }
+                                                }
+                                        }
+                                }
+                            finally 
+                                {
+                                    output.unlock();
+                                }
+                            combo.setSelectedIndex(-1);
+                            modpanel.rebuild();
+                            rack.repaint();      // when the ModulePanel repaints we have to also redraw the wires...
+                        }
+                }
             });
 
 
         final ListCellRenderer r = combo.getRenderer();
         ListCellRenderer r2 = new ListCellRenderer()
             {
-            public Component getListCellRendererComponent(JList list,
-                Object value,
-                int index,
-                boolean isSelected,
-                boolean cellHasFocus)
+                public Component getListCellRendererComponent(JList list,
+                                                              Object value,
+                                                              int index,
+                                                              boolean isSelected,
+                                                              boolean cellHasFocus)
                 {
-                if (index == -1)
-                    return new JLabel(CHOOSE);
-                else
-                    return r.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                    if (index == -1)
+                        return new JLabel(CHOOSE);
+                    else
+                        return r.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 }
             };
         combo.setRenderer(r2);
@@ -110,5 +110,5 @@ public class Presets extends JPanel
         combo.setSelectedItem(CHOOSE);
         
         add(combo, BorderLayout.CENTER);
-        }
     }
+}

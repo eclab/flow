@@ -30,7 +30,7 @@ import javax.swing.*;
 
 
 public class LFO extends Modulation implements ModSource
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int MOD_RATE = 0;
@@ -91,7 +91,7 @@ public class LFO extends Modulation implements ModSource
     public static final int OPTION_INIT_TRIGGER = 6;
         
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_TYPE: return getType();
@@ -103,10 +103,10 @@ public class LFO extends Modulation implements ModSource
             case OPTION_INIT_TRIGGER: return getInitTrigger() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_TYPE: setType(value); return;
@@ -118,22 +118,22 @@ public class LFO extends Modulation implements ModSource
             case OPTION_INIT_TRIGGER: setInitTrigger(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }       
+    }       
         
     void initializeRandom()     
-        {
+    {
         // first reseed
         double mod = modulate(MOD_SEED);
                 
         if (mod == 0)
             {
-            random = null;
+                random = null;
             }
         else
             {
-            long seed = Double.doubleToLongBits(mod);
-            if (random == null) random = new Random(seed);
-            else random.setSeed(seed);
+                long seed = Double.doubleToLongBits(mod);
+                if (random == null) random = new Random(seed);
+                else random.setSeed(seed);
             }
 
         // next determine the first oldRandomPos and randomPos          
@@ -142,10 +142,10 @@ public class LFO extends Modulation implements ModSource
         double shift = modulate(MOD_SHIFT);
         double variance = modulate(MOD_VARIANCE);
         modulateRandom(scale, shift, variance, true, false);  // set a new random pos
-        }
+    }
         
     void resetLFO()
-        {
+    {
         initializeRandom();
         firstTick = getSyncTick(sync);
         lastTick = firstTick;
@@ -155,37 +155,37 @@ public class LFO extends Modulation implements ModSource
         bias = 0;
         if (initTrigger) 
             nextUpdateTrigger = true;
-        }
+    }
         
     public void gate() 
-        { 
+    { 
         super.gate();
         
         if (!free && isModulationConstant(MOD_GATE_TR))
             {
-            resetLFO();
+                resetLFO();
             }
-        }
+    }
 
     public void restart()
-        {
+    {
         super.restart();
         if (sync)
             {
-            resetLFO();
+                resetLFO();
             }
-        } 
+    } 
 
     public void reset() 
-        { 
+    { 
         super.reset();
         
         resetLFO();
-        }
+    }
 
                 
     public LFO(Sound sound)
-        {
+    {
         super(sound);
         // Modulation 0: Rate.  0 = Sampling rate / 2.  0.5 = one second?  1 = 1/(sampling rate / 2)?
         // Modulation 1: Initial State
@@ -193,145 +193,145 @@ public class LFO extends Modulation implements ModSource
         // Modulation 3: Shift
         // Modulation 4: Random Seed
         defineModulations(new Constant[] { Constant.HALF, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ONE, Constant.ONE, Constant.ZERO }, 
-            new String[] { "Rate", "Phase", "Scale", "Shift", "Variance", "Seed", "On Tr" });
+                          new String[] { "Rate", "Phase", "Scale", "Shift", "Variance", "Seed", "On Tr" });
         defineOptions(new String[] { "Type", "Free", "Invert", "Half Trigger", "Linear Rate", "MIDI Sync", "Init Trigger"}, 
-            new String[][] { TYPE_NAMES, { "Free" }, { "Invert" }, { "Half Trigger" }, { "Linear Rate" }, { "MIDI Sync" }, { "Init Trigger" } } );
+                      new String[][] { TYPE_NAMES, { "Free" }, { "Invert" }, { "Half Trigger" }, { "Linear Rate" }, { "MIDI Sync" }, { "Init Trigger" } } );
 
         this.type = TRIANGLE;
         free = true;
-        }
+    }
         
     static final int MAX_TRIES = 20;
     double modulateRandom(double scale, double shift, double variance, boolean wrapped, boolean sampleAndHold)
-        {
+    {
         // do I update?
         if (wrapped)
             {
-            oldRandomPos = randomPos;
-            Random rand = (random == null ? getSound().getRandom() : random);
+                oldRandomPos = randomPos;
+                Random rand = (random == null ? getSound().getRandom() : random);
             
-            // Our strategy for picking a new target point is:
-            // 1. Choose a delta between -VARIANCE and +VARIANCE
-            // 2. Add it to the current value
-            // 3. Scale that by SCALE
-            // 4. Shift that by SHIFT
-            // 5. If the result is in bounds, we're done
-            // 6. Else go to 1
-            // 7. If all else fails, choose a random value in legal bounds
+                // Our strategy for picking a new target point is:
+                // 1. Choose a delta between -VARIANCE and +VARIANCE
+                // 2. Add it to the current value
+                // 3. Scale that by SCALE
+                // 4. Shift that by SHIFT
+                // 5. If the result is in bounds, we're done
+                // 6. Else go to 1
+                // 7. If all else fails, choose a random value in legal bounds
             
-            double newPos = 0;
-            int i = 0;
+                double newPos = 0;
+                int i = 0;
             
-            double max = Math.min(shift + scale * 0.5, 1.0);
-            double min = Math.max(shift - scale * 0.5, 0.0);
+                double max = Math.min(shift + scale * 0.5, 1.0);
+                double min = Math.max(shift - scale * 0.5, 0.0);
 
-            for(i = 0; i < MAX_TRIES; i++)
-                {
-                newPos = (rand.nextDouble() * 2.0 - 1.0) * variance * scale + randomPos;
-                if (newPos >= min && newPos <= max) 
-                    break;
-                }
-            if (i == MAX_TRIES)   // we failed, bound to a legal value and that's that
-                {
-                newPos = rand.nextDouble() * (max - min) + min; 
-                }
-            randomPos = newPos;
-            return oldRandomPos;
+                for(i = 0; i < MAX_TRIES; i++)
+                    {
+                        newPos = (rand.nextDouble() * 2.0 - 1.0) * variance * scale + randomPos;
+                        if (newPos >= min && newPos <= max) 
+                            break;
+                    }
+                if (i == MAX_TRIES)   // we failed, bound to a legal value and that's that
+                    {
+                        newPos = rand.nextDouble() * (max - min) + min; 
+                    }
+                randomPos = newPos;
+                return oldRandomPos;
             }
         else if (sampleAndHold)
             {
-            return oldRandomPos;
+                return oldRandomPos;
             }
         else
             {
-            return state * randomPos + (1 - state) * oldRandomPos;
+                return state * randomPos + (1 - state) * oldRandomPos;
             }
-        }
+    }
         
     double modulateSquare(double scale)
-        {
+    {
         if (state < 0.5)
             {
-            return 0.0
-                * scale + 0.5 - (scale * 0.5);
+                return 0.0
+                    * scale + 0.5 - (scale * 0.5);
             }
         else
             {
-            return 1.0
-                * scale + 0.5 - (scale * 0.5);
+                return 1.0
+                    * scale + 0.5 - (scale * 0.5);
             }
-        }
+    }
         
         
     double modulateTriangle(double scale)
-        {
+    {
         if (state < 0.5)
             {
-            return (state * 2) 
-                * scale + 0.5 - (scale * 0.5);
+                return (state * 2) 
+                    * scale + 0.5 - (scale * 0.5);
             }
         else
             {
-            return (1.0 - ((state - 0.5) * 2)) 
-                * scale + 0.5 - (scale * 0.5);
+                return (1.0 - ((state - 0.5) * 2)) 
+                    * scale + 0.5 - (scale * 0.5);
             }
-        }
+    }
         
     double modulateSaw(double scale)
-        {
+    {
         return state
             * scale + 0.5 - (scale * 0.5);
-        }
+    }
 
     double modulateSin(double scale)
-        {
+    {
         // Yes, it says Cos, not Sin
         return (1.0 - ((1.0 + Utility.fastCos(state * Math.PI * 2)) * 0.5))
             * scale + 0.5 - (scale * 0.5);
-        }
+    }
 
 
-//int count = 0;
-//int countTick = 0;
+    //int count = 0;
+    //int countTick = 0;
 
-/** Our logic is:
+    /** Our logic is:
 
-    STATE = 0...1   initially 0
-    BIAS = +- 
+        STATE = 0...1   initially 0
+        BIAS = +- 
 
-    If we started
-    POS = 0....             wave position at current rate
-    BIAS = 0
-    STATE = POS + BIAS, MOD 1
+        If we started
+        POS = 0....             wave position at current rate
+        BIAS = 0
+        STATE = POS + BIAS, MOD 1
 
-    If rate is unchanged
-    POS = 0....             wave position at current rate
-    STATE = POS + BIAS, MOD 1
+        If rate is unchanged
+        POS = 0....             wave position at current rate
+        STATE = POS + BIAS, MOD 1
 
-    But if new rate is different from old rate:
+        But if new rate is different from old rate:
 
-    POS = 0....             wave position at the new rate
-    PREVPOS = 0.... previous wave position at the new rate
+        POS = 0....             wave position at the new rate
+        PREVPOS = 0.... previous wave position at the new rate
 
-    What I want is: STATE = OLDSTATE + (POS - PREVPOS)                      [MOD 1]
-    Now STATE = POS + BIAS                                                  [MOD 1]
-    So POS + BIAS = OLDSTATE + (POS - PREVPOS)                              [MOD 1]
-    So BIAS = OLDSTATE + (POS - PREVPOS) - POS                              [MOD 1]
-    BIAS = OLDSTATE - PREVPOS                                               [MOD 1]
+        What I want is: STATE = OLDSTATE + (POS - PREVPOS)                      [MOD 1]
+        Now STATE = POS + BIAS                                                  [MOD 1]
+        So POS + BIAS = OLDSTATE + (POS - PREVPOS)                              [MOD 1]
+        So BIAS = OLDSTATE + (POS - PREVPOS) - POS                              [MOD 1]
+        BIAS = OLDSTATE - PREVPOS                                               [MOD 1]
                 
-    STATE = POS + BIAS, MOD 1       
-*/
+        STATE = POS + BIAS, MOD 1       
+    */
 
     boolean nextUpdateTrigger = false;
     public void go()
-        {
+    {
         super.go();
         if (nextUpdateTrigger)
             { updateTrigger(0); nextUpdateTrigger = false; }
                 
         if (isTriggered(MOD_GATE_TR))
             {
-            resetLFO();
+                resetLFO();
             }
                 
         double phase = modulate(MOD_PHASE);  // get initial state
@@ -352,11 +352,11 @@ public class LFO extends Modulation implements ModSource
         // Revise if we changed the rate
         if (rate != lastRate && (lastRate == lastRate))         // that is, lastRate has been computed, it's not NaN
             {
-            // our time interval, stretched by new rate
-            double lastPos = (modToRate(rate) * Output.INV_SAMPLING_RATE * (lastTick - firstTick));
-            bias = state - lastPos;
-            // bias could be negative I think, so we have to use floor
-            bias = bias - Math.floor(bias);
+                // our time interval, stretched by new rate
+                double lastPos = (modToRate(rate) * Output.INV_SAMPLING_RATE * (lastTick - firstTick));
+                bias = state - lastPos;
+                // bias could be negative I think, so we have to use floor
+                bias = bias - Math.floor(bias);
             }
                                 
         state = pos + bias + phase;
@@ -369,12 +369,12 @@ public class LFO extends Modulation implements ModSource
         boolean wrapped = false;
         if (lastState > state)
             {
-            updateTrigger(0);
-            wrapped = true;
+                updateTrigger(0);
+                wrapped = true;
             }
         else if (halfTrigger && (lastState < 0.5 && state >= 0.5))
             {
-            updateTrigger(0);
+                updateTrigger(0);
             }
         lastState = state;
         
@@ -390,84 +390,84 @@ public class LFO extends Modulation implements ModSource
             case RANDOM_SAMPLE_AND_HOLD: output = modulateRandom(scale, shift, modulate(MOD_VARIANCE), wrapped, true); break;
             default: // cannot happen
                 {
-                warn("modules/LFO.java", "Impossible default in switch");
-                output = 0; 
-                break;
+                    warn("modules/LFO.java", "Impossible default in switch");
+                    output = 0; 
+                    break;
                 }
             }
                 
         if (type != RANDOM && type != RANDOM_SAMPLE_AND_HOLD)
             {
-            output = output + shift - 0.5;
-            if (output > 1) output = 1;
-            if (output < 0) output = 0;
-            if (invert) output = 1.0 - output;
+                output = output + shift - 0.5;
+                if (output > 1) output = 1;
+                if (output < 0) output = 0;
+                if (invert) output = 1.0 - output;
             }
                 
         setModulationOutput(0, output);
-        }
+    }
         
     public ModulePanel getPanel()
-        {
+    {
         return new ModulePanel(LFO.this)
             {
-            public JComponent buildPanel()
+                public JComponent buildPanel()
                 {               
-                Modulation mod = getModulation();
-                Box box = new Box(BoxLayout.Y_AXIS);
-                box.add(new ModulationOutput(mod, 0, this));
+                    Modulation mod = getModulation();
+                    Box box = new Box(BoxLayout.Y_AXIS);
+                    box.add(new ModulationOutput(mod, 0, this));
 
-                ModulationInput rate = new ModulationInput(mod, MOD_RATE, this)
-                    {
-                    public String[] getOptions() { return MidiClock.CLOCK_NAMES; }
-                    public double convert(int elt) 
+                    ModulationInput rate = new ModulationInput(mod, MOD_RATE, this)
                         {
-                        if (linear)
-                            return MIDI_CLOCK_MOD_RATES[elt];
-                        else
-                            return Math.sqrt(MIDI_CLOCK_MOD_RATES[elt]);
-                        }
-                    };
+                            public String[] getOptions() { return MidiClock.CLOCK_NAMES; }
+                            public double convert(int elt) 
+                            {
+                                if (linear)
+                                    return MIDI_CLOCK_MOD_RATES[elt];
+                                else
+                                    return Math.sqrt(MIDI_CLOCK_MOD_RATES[elt]);
+                            }
+                        };
                                         
-                box.add(rate);
-                for(int i = 1; i < mod.getNumModulations(); i++)
-                    {
-                    box.add(new ModulationInput(mod, i, this));
-                    }
+                    box.add(rate);
+                    for(int i = 1; i < mod.getNumModulations(); i++)
+                        {
+                            box.add(new ModulationInput(mod, i, this));
+                        }
 
-                for(int i = 0; i < mod.getNumOptions(); i++)
-                    {
-                    box.add(new OptionsChooser(mod, i));
-                    }
+                    for(int i = 0; i < mod.getNumOptions(); i++)
+                        {
+                            box.add(new OptionsChooser(mod, i));
+                        }
                     
-                return box;
+                    return box;
                 }
-            };
-        }
+        };
+    }
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-        {
+    {
         if (isConstant)
             {
-            if (modulation == MOD_RATE)  // rate
-                {
-                if (!linear)
-                    value = makeSensitive(value);
-                double d =  1.0 / modToRate(value);
-                if (d >= 10)
-                    return String.format("%.4f", d) + " Sec";
-                return String.format("%.5f", d) + " Sec";
-                }
-            else if (modulation == MOD_SHIFT)  // shift
-                {
-                return String.format("%.4f" , value - 0.5);
-                }
-            else if (modulation == MOD_SEED)
-                {
-                return (value == 0.0 ? "Free" : String.format("%.4f" , value));
-                }
-            else return super.getModulationValueDescription(modulation, value, isConstant);
+                if (modulation == MOD_RATE)  // rate
+                    {
+                        if (!linear)
+                            value = makeSensitive(value);
+                        double d =  1.0 / modToRate(value);
+                        if (d >= 10)
+                            return String.format("%.4f", d) + " Sec";
+                        return String.format("%.5f", d) + " Sec";
+                    }
+                else if (modulation == MOD_SHIFT)  // shift
+                    {
+                        return String.format("%.4f" , value - 0.5);
+                    }
+                else if (modulation == MOD_SEED)
+                    {
+                        return (value == 0.0 ? "Free" : String.format("%.4f" , value));
+                    }
+                else return super.getModulationValueDescription(modulation, value, isConstant);
             }
         else return "";
-        }
     }
+}

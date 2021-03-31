@@ -18,30 +18,30 @@ import java.util.zip.*;
 
 
 public class Flow
-    {
+{
     // Flow Version
-    public static int VERSION = 7;
+    public static int VERSION = 8;
     
     public static void main(String[] args)
-        {
+    {
         Output output = new Output();
 
         Sound sound0 = null;
         for(int i = 0; i < Output.getNumVoices(); i++)
             {
-            Sound sound = new Sound(output);
-            if (i == 0) sound0 = sound;
-            Out out = new Out(sound);               // findBugs thinks this is a dead store.  It isn't.
-            sound.reset();
+                Sound sound = new Sound(output);
+                if (i == 0) sound0 = sound;
+                Out out = new Out(sound);               // findBugs thinks this is a dead store.  It isn't.
+                sound.reset();
             }
 
         final Rack rack = new Rack(output);
         rack.smallerOkay = true;
         for (Modulation mod : sound0.getRegistered())
             {
-            // there will be only one: Out
-            if (!(mod instanceof Constant) && !(mod instanceof Nil))
-                rack.addModulation(mod);
+                // there will be only one: Out
+                if (!(mod instanceof Constant) && !(mod instanceof Nil))
+                    rack.addModulation(mod);
             }
         rack.smallerOkay = false;
         rack.rebuild();
@@ -56,21 +56,21 @@ public class Flow
         
         if (args.length == 1)
             {
-            SwingUtilities.invokeLater(new Runnable() 
-                {
-                public void run()
+                SwingUtilities.invokeLater(new Runnable() 
                     {
-                    try
+                        public void run()
                         {
-                        File f = new File(args[0]);
-                        AppMenu.doLoad(rack, new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))), true);
-                        AppMenu.setLastFile(f);
-                        rack.setPatchFile(f);
-                        rack.setPatchName(rack.getPatchName());
+                            try
+                                {
+                                    File f = new File(args[0]);
+                                    AppMenu.doLoad(rack, new JSONObject(new JSONTokener(new GZIPInputStream(new FileInputStream(f)))), true);
+                                    AppMenu.setLastFile(f);
+                                    rack.setPatchFile(f);
+                                    rack.setPatchName(rack.getPatchName());
+                                }
+                            catch(Exception ex) { System.err.println("Couldn't load file " + args[0]);  System.err.println(ex); }
                         }
-                    catch(Exception ex) { System.err.println("Couldn't load file " + args[0]);  System.err.println(ex); }
-                    }
-                });
+                    });
             }
-        }
     }
+}

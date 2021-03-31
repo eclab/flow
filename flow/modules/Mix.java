@@ -13,7 +13,7 @@ import flow.*;
 */
         
 public class Mix extends Unit
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int MOD_GAIN_A = 0;
@@ -38,38 +38,38 @@ public class Mix extends Unit
     public static final int OPTION_MIX_TYPE = 0;
 
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_MIX_TYPE: return getMixType();
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_MIX_TYPE: setMixType(value); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
 
 
     // Mixes the harmonics of up to four units, using the frequencies of the first unit
         
     public Mix(Sound sound)
-        {
+    {
         super(sound);
         defineOptions(new String[] { "Type" }, new String[][] { { "Sum" , "Max" } });
         defineModulations(new Constant[] { Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE }, 
-            new String[] { "Gain A", "Gain B", "Gain C", "Gain D" });
+                          new String[] { "Gain A", "Gain B", "Gain C", "Gain D" });
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, 
-            new String[] { "Input A", "Input B", "Input C", "Input D" });
-        }
+                      new String[] { "Input A", "Input B", "Input C", "Input D" });
+    }
         
     public void go()
-        {
+    {
         super.go();
         
         double[] amplitudes = getAmplitudes(0);
@@ -96,26 +96,26 @@ public class Mix extends Unit
 
         if (mixType == MIX_TYPE_SUM)
             {                     
-            for(int i = 0; i < amplitudes.length; i++)
-                {
-                amplitudes[i] = gain1 * amp1[i] + gain2 * amp2[i] + gain3 * amp3[i] + gain4 * amp4[i];
-                }
+                for(int i = 0; i < amplitudes.length; i++)
+                    {
+                        amplitudes[i] = gain1 * amp1[i] + gain2 * amp2[i] + gain3 * amp3[i] + gain4 * amp4[i];
+                    }
             }
         else    // MIX_TYPE_MAX
             {
-            for(int i = 0; i < amplitudes.length; i++)
-                {
-                double d = gain1 * amp1[i];
-                double e = gain2 * amp2[i];
-                if (e > d) d = e;
-                e = gain3 * amp3[i];
-                if (e > d) d = e;
-                e = gain4 * amp4[i];
-                if (e > d) d = e;
-                amplitudes[i] = d;
-                }
+                for(int i = 0; i < amplitudes.length; i++)
+                    {
+                        double d = gain1 * amp1[i];
+                        double e = gain2 * amp2[i];
+                        if (e > d) d = e;
+                        e = gain3 * amp3[i];
+                        if (e > d) d = e;
+                        e = gain4 * amp4[i];
+                        if (e > d) d = e;
+                        amplitudes[i] = d;
+                    }
             }
                         
         constrain();
-        }
     }
+}

@@ -17,13 +17,13 @@ package flow;
 **/
 
 public class Nil extends Unit
-    {
+{
     private static final long serialVersionUID = 1;
 
     public Nil()
-        {
+    {
         super(null);
-        }
+    }
         
     public String toString() { return "<NIL>"; }
-    }
+}

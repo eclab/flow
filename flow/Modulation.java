@@ -78,7 +78,7 @@ import javax.swing.JToolTip;
 **/
 
 public abstract class Modulation implements Cloneable
-    {
+{
     private static final long serialVersionUID = 1;
 
     /** The Modulation's macro backpointer.  This is is null if the Modulation is not under a Macro. */
@@ -98,12 +98,12 @@ public abstract class Modulation implements Cloneable
     public void setSound(Sound sound) { this.sound = sound; }
         
     public Modulation(Sound sound) 
-        { 
+    { 
         this.sound = sound;
         if (sound != null)              // this is the case for constants
             sound.register(this);
         defineModulationOutputs(new String[] { "Mod" });
-        }
+    }
 
     /** Returns the version number for this Modulation.  By default this
         method returns 0. */
@@ -117,16 +117,16 @@ public abstract class Modulation implements Cloneable
     /** Returns the custom name for the given Class module, else returns
         its simple name. */
     public static String getNameForModulation(Class cls)
-        {
+    {
         try
             {
-            return (String)(cls.getDeclaredMethod("getName").invoke(null));
+                return (String)(cls.getDeclaredMethod("getName").invoke(null));
             }
         catch (Exception e)
             {
-            return cls.getSimpleName();
+                return cls.getSimpleName();
             }
-        }
+    }
         
     /** Returns a custom name for this *instance*, not class.
         By default all instances of the same class have the same
@@ -157,13 +157,13 @@ public abstract class Modulation implements Cloneable
     /** Called (many times) when the system wishes to inform the Modulation to revise itself. 
         Be sure to call super.go(); */
     public void go() 
-        { 
+    { 
         // reset all triggers
         for(int i = 0; i < triggered.length; i++)
             {
-            resetTrigger(i);
+                resetTrigger(i);
             }
-        }
+    }
                 
 
 
@@ -186,10 +186,10 @@ public abstract class Modulation implements Cloneable
     /** Defines various options by their names and arrays of names of possible (integer 0... n) values. 
         The names array can be ragged.  */
     public void defineOptions(String[] names, String[][] values)
-        {
+    {
         optionNames = names;
         optionValues = values;
-        }
+    }
         
     /** Returns the value of the given option.  */
     public int getOptionValue(int option) { return 0; }
@@ -223,7 +223,7 @@ public abstract class Modulation implements Cloneable
 
     /** Defines various INPUT modulations by their initial values (as Constants), and their names. */
     public void defineModulations(Constant[] modulations, String[] names)
-        {
+    {
         defaultModulations = modulations;
         lastModulations = new Constant[modulations.length];
         System.arraycopy(modulations, 0, lastModulations, 0, modulations.length);
@@ -232,123 +232,123 @@ public abstract class Modulation implements Cloneable
             this.modulations[i] = modulations[i];
         modulationIndexes = new int[modulations.length];  // all zero initially
         modulationNames = names;
-        }
+    }
 
     /** Returns true if the given input modulation port is set to its default Modulation. */
     public boolean isDefaultModulation(int num)
-        {
+    {
         return (defaultModulations[num] == modulations[num]) && (modulationIndexes[num] == 0);
-        }
+    }
                 
     /** Sets Input Modulation port 0 to Output Modulation port 0 of the provided modulations. */
     public void setModulation(Modulation mod) { setModulations(mod); }
 
     /** Sets Input Modulation port 0 to Output Modulation port 0 of the provided modulations. */
     public void setModulations(Modulation mod)
-        {
+    {
         setModulations(new Modulation[] { mod });
-        }
+    }
 
     /** Sets Input Modulation ports 0 and 1 to Output Modulation port 0 of the provided modulations. */
     public void setModulations(Modulation mod1, Modulation mod2)
-        {
+    {
         setModulations(new Modulation[] { mod1, mod2 });
-        }
+    }
 
     /** Sets Input Modulation ports 0, 1, and 2 to Output Modulation port 0 of the provided modulations. */
     public void setModulations(Modulation mod1, Modulation mod2, Modulation mod3)
-        {
+    {
         setModulations(new Modulation[] { mod1, mod2, mod3 });
-        }
+    }
 
     /** Sets Input Modulation ports 0 through (moulations.length - 1) to Output Modulation port 0 of the provided modulations. */
     public void setModulations(Modulation[] modulations)
-        {
+    {
         setModulations(modulations, new int[modulations.length]);
-        }
+    }
                 
     /** Sets Input Modulation ports 0 through (moulations.length - 1) to Output Modulation port indexes[0] 
         through indexes[moulations.length - 1] of the provided modulations. */
     public void setModulations(Modulation[] modulations, int[] indexes)
-        {
+    {
         for(int i = 0; i < modulations.length; i++)
             {
-            setModulation(modulations[i], i, indexes[i]);
+                setModulation(modulations[i], i, indexes[i]);
             }
-        }
+    }
                 
     /** Sets Input Modulation ports 0 through (constants.length - 1) to Constants of the given values. */
     public void setModulations(double[] constants)
-        {
+    {
         for(int i = 0; i < constants.length; i++)
             setModulation(new Constant(constants[i]), i);
-        }
+    }
                 
     /** Sets Input Modulation port NUM to the Output Modulation port 0 of the given modulation. */
     public void setModulation(Modulation mod, int num)
-        {
+    {
         setModulation(mod, num, 0);
-        }
+    }
         
     /** Sets Input Modulation port NUM to the Output Modulation port INDEX of the given modulation. */
     public void setModulation(Modulation mod, int num, int index)
-        {
+    {
         if (mod instanceof Constant)
             lastModulations[num] = (Constant)mod;
         modulations[num] = mod;
         modulationIndexes[num] = index;
-        }
+    }
         
     /** Returns Input Modulation port NUM. */
     public Modulation getModulation(int num)
-        {
+    {
         return modulations[num];
-        }
+    }
                 
     /** Returns the Output Modulation port index associated with Input Modulation port NUM. */
     public int getModulationIndex(int num)
-        {
+    {
         return modulationIndexes[num];
-        }
+    }
                 
     /** Returns name of Input Modulation port NUM. */
     public String getModulationName(int num)
-        {
+    {
         return modulationNames[num];
-        }
+    }
 
     /** Returns the name of all Input Modulation ports. */
     public String[] getModulationNames()
-        {
+    {
         return modulationNames;
-        }
+    }
 
     /** Returns Input Modulation port NUM to its default Modulation (a Constant). */
     public void clearModulation(int num)
-        {
+    {
         lastModulations[num] = defaultModulations[num];
         modulations[num] = defaultModulations[num];
         modulationIndexes[num] = 0;
-        }
+    }
                 
     /** Returns Input Modulation port NUM to its last Constant value. */
     public void restoreModulation(int num)
-        {
+    {
         modulations[num] = lastModulations[num];
         modulationIndexes[num] = 0;
-        }
+    }
                 
     /** Returns the number of Input Modulation ports. */
     public int getNumModulations()
-        {
+    {
         return modulationNames.length;
-        }
+    }
 
     /** Sets the name of Input Modulation NUM to the given string. */
     public void setModulationName(int num, String string)
-        {
+    {
         modulationNames[num] = string;
-        }
+    }
                 
     /** Returns what the CURRENT text string should be, for Input Modulation port NUM, 
         given its current numerical VALUE and whether or not the port has a CONSTANT
@@ -356,11 +356,11 @@ public abstract class Modulation implements Cloneable
         if the port doesn't have a Constant in it, you should return "".  You shouldn't 
         call modulate(num) -- instead, use the value.    */
     public String getModulationValueDescription(int num, double value, boolean isConstant)
-        {
+    {
         if (isConstant)
             return String.format("%.4f", value);
         else return "";
-        }
+    }
     
     /** Returns what the CURRENT text string should be, for Input Modulation port NUM. 
         Override this as you see fit, but you MUST also override getModulationValueDescription(num, value, isConstant).
@@ -369,50 +369,50 @@ public abstract class Modulation implements Cloneable
         the proposed update information in an JOptionPane resulting from double-clicking
         on a dial. */
     public String getModulationValueDescription(int num)
-        {
+    {
         return getModulationValueDescription(num, modulate(num), isModulationConstant(num));
-        }
+    }
 
     /** Returns the strings to appear in a Modulation Dial's popup options.
         If you return null, then the Dial will instead use its internal
         options (see ModulationInput for ways to customize those). */
     public String[] getPopupOptions(int modulation)
-        {
+    {
         return null;
-        }
+    }
 
     public static final double NO_POPUP_CONVERSION_IMPLEMENTED = -1;
     /** Returns the double value in the range (0.0 ... 1.0) corresponding to the
         Modulation Dial's popup menu index, or NO_POPUP_CONVERSION_IMPLEMENTED if
         this method is not implemented (that's the default return value). */
     public double getPopupConversion(int modulation, int index)
-        {
+    {
         return NO_POPUP_CONVERSION_IMPLEMENTED;
-        }
+    }
 
     /** Returns the modulation value for the modulation currently at Input Modulation port INDEX */
     public final double modulate(int index)
-        {
+    {
         return modulations[index].getModulationOutput(modulationIndexes[index]);
-        }
+    }
         
     /** Returns the trigger count for the modulation currently at Input Modulation port INDEX */
     public int getTriggerCount(int index)
-        {
+    {
         return modulations[index].getOutputTriggerCount(modulationIndexes[index]);
-        }
+    }
 
     /** Returns the trigger value for the modulation currently at Input Modulation port INDEX */
     public boolean isTriggered(int index)
-        {
+    {
         return modulations[index].isOutputTriggered(modulationIndexes[index]);
-        }
+    }
         
     /** Returns whether the modulation at Input Modulation port INDEX is a Constant. */
     public boolean isModulationConstant(int index)
-        {
+    {
         return modulations[index] instanceof Constant;
-        }
+    }
         
     /** Override this to provide tooltips for modulation inputs.  This array by default is null. 
         If any given String is null or empty, no tooltip is generated for it.  */
@@ -430,25 +430,25 @@ public abstract class Modulation implements Cloneable
     public static final double[] MIDI_CLOCK_LONG_MOD_RATES;
         
     static
-        {
+    {
         MIDI_CLOCK_MOD_RATES = new double[MidiClock.CLOCK_PULSES.length];
         MIDI_CLOCK_LONG_MOD_RATES = new double[MidiClock.CLOCK_PULSES.length];
         for(int i = 0; i < MidiClock.CLOCK_PULSES.length; i++)
             {
-            // Notice that MOD RATES is 1.0 / x, but LONG MOD RATES is not.
-            // This is because MOD RATES at present has low values for slower rates (like an LFO),
-            // but LONG MOD RATE is used for times like in an envelope, so low values are FASTER rates. 
-            // I don't know if this is a smart thing to do.
-            MIDI_CLOCK_MOD_RATES[i] = rateToMod(1.0 / (MidiClock.CLOCK_PULSES[i] * MidiClock.TICKS_PER_PULSE * Output.INV_SAMPLING_RATE));
-            MIDI_CLOCK_LONG_MOD_RATES[i] = longRateToMod(MidiClock.CLOCK_PULSES[i] * MidiClock.TICKS_PER_PULSE * Output.INV_SAMPLING_RATE);
+                // Notice that MOD RATES is 1.0 / x, but LONG MOD RATES is not.
+                // This is because MOD RATES at present has low values for slower rates (like an LFO),
+                // but LONG MOD RATE is used for times like in an envelope, so low values are FASTER rates. 
+                // I don't know if this is a smart thing to do.
+                MIDI_CLOCK_MOD_RATES[i] = rateToMod(1.0 / (MidiClock.CLOCK_PULSES[i] * MidiClock.TICKS_PER_PULSE * Output.INV_SAMPLING_RATE));
+                MIDI_CLOCK_LONG_MOD_RATES[i] = longRateToMod(MidiClock.CLOCK_PULSES[i] * MidiClock.TICKS_PER_PULSE * Output.INV_SAMPLING_RATE);
             }
-        } 
+    } 
 
     double modToRate_lastMod = Double.NaN;
     double modToRate_lastRate;
         
     public double modToRate(double mod)
-        {
+    {
         // Let's try: r =  2^((x * 20) - 5.57151) with a threshold at 0
         // This ranges from:                     x = 0,         r = 0           (infinity)
         //                                       x = 0.05       r = 0.042057    (about 47.5 secs)
@@ -462,126 +462,126 @@ public abstract class Modulation implements Cloneable
                                 
         if (mod != modToRate_lastMod)
             {
-            modToRate_lastRate = (mod == 0 ? 0 : Math.pow(2, (mod * 20) - 5.57151));
-            modToRate_lastMod = mod;
+                modToRate_lastRate = (mod == 0 ? 0 : Math.pow(2, (mod * 20) - 5.57151));
+                modToRate_lastMod = mod;
             }
         return modToRate_lastRate;
-        }
+    }
 
 
     /** This is the exact inverse of modToRate(mod), that is, rateToMod(modToRate(mod)) == mod */
     // This can only get down to 0.21 or so....
     public static double rateToMod(double rate)
-        {
+    {
         // if r = 2^((x * 20) - 5.57151), then
         // (x * 20) - 5.57151 = Log(r) / Log(2)
         // so x = (Log(r)/Log(2) + 5.57151) / 20
         
         if (rate == 0) return 0;
         else return (Math.log(rate) / Math.log(2.0) + 5.57151) / 20.0;
-        }
+    }
 
     /** Converts a modulation 0...1 into a long rate of 0...10, for purposes of envelopes */
     public double modToLongRate(double mod)
-        {
+    {
         return (0.0 - (mod * 0.96 / (mod * 0.96 - 1))) / 9.6 * 10.0 / 2.5 ;
-        }
+    }
         
     /** This is the exact inverse of modToLongRate(mod), that is, longRateToMod(modToLongRate(mod)) == mod */
     public static double longRateToMod(double rate)
-        {
+    {
         // if r = (0 - x*0.96 / (x * 0.96 - 1)) / 9.6 * 10.0 / 2.5
         // Then mathematica tells me x == (12.5 r) / (5 + 12 r)
 
         if (rate == 0) return 0;
         else return 12.5 * rate / (5 + 12 * rate);
-        }
+    }
 
     /** Converts a modulation 0...1 into a frequency in the range 0 ... 22050 (which is 2^14.428491035332245).  */
     // It sounds too extreme to just use mod directly, so we soften it on the low end with makeSensitive
     double modToFrequency_lastMod = Double.NaN;
     double modToFrequency_lastFreq;
     public double modToFrequency(double mod)
-        {
+    {
         if (mod != modToFrequency_lastMod)
             {
-            modToFrequency_lastFreq = Math.pow(2, makeSensitive(mod) * 14.428491035332245) - 1;
-            modToFrequency_lastMod = mod;
+                modToFrequency_lastFreq = Math.pow(2, makeSensitive(mod) * 14.428491035332245) - 1;
+                modToFrequency_lastMod = mod;
             }
         return modToFrequency_lastFreq;
-        }
+    }
 
     /** Converts a modulation 0...1 into a frequency in the range 0 ... 22050 (which is 2^14.428491035332245).  */
     public double modToInsensitiveFrequency(double mod)
-        {
+    {
         if (mod != modToFrequency_lastMod)
             {
-            modToFrequency_lastFreq = Math.pow(2, mod * 14.428491035332245) - 1;
-            modToFrequency_lastMod = mod;
+                modToFrequency_lastFreq = Math.pow(2, mod * 14.428491035332245) - 1;
+                modToFrequency_lastMod = mod;
             }
         return modToFrequency_lastFreq;
-        }
+    }
 
     /** Converts a modulation 0...1 into a frequency in the range -11025 ... 11025 (which is +/- 2^13.428491035332245).  */
     double modToSignedFrequency_lastMod = Double.NaN;
     double modToSignedFrequency_lastFreq;
     public double modToSignedFrequency(double mod)
-        {
+    {
         if (mod != modToSignedFrequency_lastMod)
             {
-            if (mod >= 0.5)
-                modToSignedFrequency_lastFreq = Math.pow(2, (mod - 0.5) * 2 * 13.428491035332245) - 1;
-            else
-                {
-                modToSignedFrequency_lastFreq = 0 - Math.pow(2, (0.5 - mod) * 2 * 13.428491035332245) - 1;
-                }
-            modToSignedFrequency_lastMod = mod;
+                if (mod >= 0.5)
+                    modToSignedFrequency_lastFreq = Math.pow(2, (mod - 0.5) * 2 * 13.428491035332245) - 1;
+                else
+                    {
+                        modToSignedFrequency_lastFreq = 0 - Math.pow(2, (0.5 - mod) * 2 * 13.428491035332245) - 1;
+                    }
+                modToSignedFrequency_lastMod = mod;
             }
         return modToSignedFrequency_lastFreq;
-        }
+    }
 
     /** Converts a modulation 0...1 into a frequency in the range -11025 ... 11025 (which is +/- 2^13.428491035332245).  */
     double modToRelativeFrequency_lastMod = Double.NaN;
     double modToRelativeFrequency_lastFreq;
     public double modToRelativeFrequency(double mod)
-        {
+    {
         if (mod != modToRelativeFrequency_lastMod)
             {
-            if (mod >= 0.5)
-                modToRelativeFrequency_lastFreq = Math.pow(2, (mod - 0.5) * 2 * 13.428491035332245) - 1;
-            else
-                {
-                modToRelativeFrequency_lastFreq = Math.pow(2, 0 - (0.5 - mod) * 2 * 13.428491035332245) - 1;
-                }
-            modToRelativeFrequency_lastMod = mod;
+                if (mod >= 0.5)
+                    modToRelativeFrequency_lastFreq = Math.pow(2, (mod - 0.5) * 2 * 13.428491035332245) - 1;
+                else
+                    {
+                        modToRelativeFrequency_lastFreq = Math.pow(2, 0 - (0.5 - mod) * 2 * 13.428491035332245) - 1;
+                    }
+                modToRelativeFrequency_lastMod = mod;
             }
         return modToRelativeFrequency_lastFreq;
-        }
+    }
                 
                 
     /** Maps the modulation value to a function more sensitive to lower values. */
     public double makeSensitive(double mod)
-        {
+    {
         return mod * mod;
-        }
+    }
 
     /** Maps the modulation value to a function MUCH more sensitive to lower values. */
     public double makeVerySensitive(double mod)
-        {
+    {
         return mod * mod * mod * mod;
-        }
+    }
 
     /** Maps the modulation value to a function more sensitive to higher values. */
     public double makeInsensitive(double mod)
-        {
+    {
         return 1 - (1 - mod) * (1 - mod);
-        }
+    }
 
     /** Maps the modulation value to a function MUCH more sensitive to higher values. */
     public double makeVeryInsensitive(double mod)
-        {
+    {
         return 1 - (1 - mod) * (1 - mod) * (1 - mod) * (1 - mod);
-        }
+    }
 
 
 
@@ -597,12 +597,12 @@ public abstract class Modulation implements Cloneable
 
     /** Defines various OUTPUT modulations ports by their names. */
     public void defineModulationOutputs(String[] names)
-        {
+    {
         modulationOutputs = new double[names.length];
         triggerCount = new int[names.length];
         triggered = new boolean[names.length];
         modulationOutputNames = names;
-        }
+    }
         
     /** Returns the name of output modulation port VAL */
     public String getModulationOutputName(int val) { return modulationOutputNames[val]; }
@@ -619,20 +619,20 @@ public abstract class Modulation implements Cloneable
     // is inlined.
     static boolean printedModulationOutputError = false;
     void printModulationOutputError(double val) 
-        { 
+    { 
         if (!printedModulationOutputError)
             {
-            printedModulationOutputError = true;
-            new RuntimeException("Modulation Ouput Set to " + val + "\n This will be printed only once.").printStackTrace();
+                printedModulationOutputError = true;
+                new RuntimeException("Modulation Ouput Set to " + val + "\n This will be printed only once.").printStackTrace();
             }
-        }
+    }
     
     /** Sets the current output value of modulation port INDEX to VAL. */
     public void setModulationOutput(int index, double val) 
-        {
+    {
         if (val < 0 || val > 1) printModulationOutputError(val);
         else modulationOutputs[index] = val; 
-        }
+    }
     
     /** Returns the current output value of modulation port INDEX to VAL. */
     public double getModulationOutput(int index) { return modulationOutputs[index]; }
@@ -646,57 +646,57 @@ public abstract class Modulation implements Cloneable
 
     /** Resets all triggers of Output Modulation ports and their trigger counts. */
     protected void resetTrigger(int num)
-        {
+    {
         setTriggerValues(false, NO_TRIGGER, num);
-        }
+    }
 
     /** Sets trigger NUM of Output Modulation port, and increments its count. */
     protected void updateTrigger(int num)
-        {
+    {
         setTriggerValues(true, triggerCount[num] + 1, num);
-        }
+    }
 
     /** Returns the trigger count for the trigger of Output Modulation port NUM. */
     public int getOutputTriggerCount(int num)
-        {
+    {
         return triggerCount[num];
-        }
+    }
 
     /** Returns whether the trigger of Output Modulation port NUM is set. */
     public boolean isOutputTriggered(int num)
-        {
+    {
         return triggered[num];
-        }
+    }
         
     /** Sets trigger NUM of Output Modulation port to the given ISTRIGGERED value, and sets its count to TRIGGERCOUNT. */
     // this is public, rather than protected, so Macro can override it
     public void setTriggerValues(boolean isTriggered, int _triggerCount, int num)
-        {
+    {
         triggered[num] = isTriggered;
         triggerCount[num] = _triggerCount;
-        }
+    }
     
     /** Returns the clock tick value.  If we are syncing to MIDI clock,
         this is returned.  Else the global wall clock is returned. */
     public int getSyncTick(boolean sync)
-        {
+    {
         Output output = sound.getOutput();
         MidiClock clock = output.getInput().getMidiClock();
         if (sync && clock.isSyncing())
             {
-            return clock.getTick();
+                return clock.getTick();
             }
         else
             {
-            return output.getTick();
+                return output.getTick();
             }
-        }
+    }
     
     /** Returns true if my sound is the first sound in the output.  This is 
         mostly used for debugging, to reduce the number of print statements
         etc. generated by modules. */
     public boolean isFirstSound() 
-        { 
+    { 
         if (sound == null) return false;
         
         Sound s = sound.getOutput().getInput().getLastPlayedSound();
@@ -704,55 +704,55 @@ public abstract class Modulation implements Cloneable
             return (sound.getOutput().getSoundUnsafe(0) == sound);
         else
             return (s == sound);
-        }
+    }
 
     /** For debugging... */
     protected void print(String str)
-        {
+    {
         if (isFirstSound()) System.err.println(str);
-        }
+    }
 
     protected void warn(String where, String what)
-        {
+    {
         print("WARNING (" + where + "): " + what);
-        }
+    }
 
     protected void warnAlways(String where, String what)
-        {
+    {
         System.err.println("WARNING (" + where + "): " + what);
-        }
+    }
                  
     /** Returns the ModulePanel associated with this Modulation.  Use the default here, or override this to create your own ModulePanel. */
     public ModulePanel getPanel()
-        {
+    {
         return new ModulePanel(this);
-        }
+    }
         
     public static final int MAX_TOOL_TIP_WIDTH = 400;
     public String[] wrapHelp(String[] help)
-        {
+    {
         if (help == null) return null;
         String[] newHelp = new String[help.length];
         JToolTip tip = new JToolTip();
         for(int i = 0; i < help.length; i++)
             {
-            if (help[i] != null)
-                {
-                tip.setTipText(help[i]);
-                int width = (int)(tip.getPreferredSize().getWidth());
-                if (width > MAX_TOOL_TIP_WIDTH)
-                    newHelp[i] = "<html><p width=" + MAX_TOOL_TIP_WIDTH + ">" +
-                        help[i] + "</p></html>";
-                else
-                    newHelp[i] = help[i];
-                }
+                if (help[i] != null)
+                    {
+                        tip.setTipText(help[i]);
+                        int width = (int)(tip.getPreferredSize().getWidth());
+                        if (width > MAX_TOOL_TIP_WIDTH)
+                            newHelp[i] = "<html><p width=" + MAX_TOOL_TIP_WIDTH + ">" +
+                                help[i] + "</p></html>";
+                        else
+                            newHelp[i] = help[i];
+                    }
             }
         return newHelp;
-        }
+    }
     
     /** Print some statistics regarding triggers and modulations. */
     public void printStats()
-        {
+    {
         System.err.println("\nELEMENT " + this);
         System.err.println("\nSOUND " + sound);
         for(int i = 0; i < modulations.length; i++)                     
@@ -763,18 +763,18 @@ public abstract class Modulation implements Cloneable
             System.err.println("" + i + " TRIGGER: " + triggerCount[i] + " TRIGGERED: " + triggered[i]);
         for(int i = 0; i < getNumOptions(); i++)
             {
-            System.err.println("" + i + " OPTION: " + getOptionName(i) + " VAL: " + 
-                    (getOptionValues(i).length == 1 ? (getOptionValue(i) == 1 ? "t" : "f") :
-                    getOptionValues(i)[getOptionValue(i)]));
+                System.err.println("" + i + " OPTION: " + getOptionName(i) + " VAL: " + 
+                                   (getOptionValues(i).length == 1 ? (getOptionValue(i) == 1 ? "t" : "f") :
+                                    getOptionValues(i)[getOptionValue(i)]));
             }
-        }
+    }
     
     public Object clone()
-        {
+    {
         Modulation obj = null;
         try
             {
-            obj = (Modulation)(super.clone());
+                obj = (Modulation)(super.clone());
             }
         catch (CloneNotSupportedException ex) { ex.printStackTrace(); }  // never happens
         
@@ -796,8 +796,8 @@ public abstract class Modulation implements Cloneable
         obj.modulations = (Modulation[])(modulations.clone());
         for(int i = 0; i < obj.modulations.length; i++)
             {
-            if (obj.modulations[i] instanceof Constant)
-                obj.modulations[i] = (Modulation)(obj.modulations[i].clone());
+                if (obj.modulations[i] instanceof Constant)
+                    obj.modulations[i] = (Modulation)(obj.modulations[i].clone());
             }
         // Modulation Indexes
         obj.modulationIndexes = (int[])(modulationIndexes.clone());     
@@ -820,7 +820,7 @@ public abstract class Modulation implements Cloneable
         obj.triggerCount = (int[])(triggerCount.clone());
 
         return obj;
-        }
+    }
 
 
     ///// JSON Serialization
@@ -855,18 +855,18 @@ public abstract class Modulation implements Cloneable
     /** Returns the modulation output number for a given JSON Key, or SERIALIZATION_NOT_FOUND if the key is not found.
         This method is the inverse of getKeyForModulationOutput(...)  */
     public int getModulationOutputForKey(String key)
-        {
+    {
         // Terribly inefficient but it'll suffice
         for(int i = 0; i < getNumModulationOutputs(); i++)
             {
-            if (getKeyForModulationOutput(i).equals(key)) return i;
+                if (getKeyForModulationOutput(i).equals(key)) return i;
             }
         return SERIALIZATION_NOT_FOUND;
-        }
+    }
 
     /** Saves the Modulation to a JSON Object. */
     public JSONObject save() throws JSONException
-        {
+    {
         JSONObject obj = new JSONObject();
                 
         // class
@@ -888,20 +888,20 @@ public abstract class Modulation implements Cloneable
         JSONObject mods = new JSONObject();
         for(int i = 0; i < getNumModulations(); i++)
             {
-            Modulation mod = getModulation(i);
-            int modIndex = getModulationIndex(i);
-            if (mod instanceof Constant)
-                {
-                Constant c = (Constant)mod;
-                mods.put(getKeyForModulation(i), c.getValue());
-                }
-            else
-                {
-                JSONObject m = new JSONObject();
-                m.put("id", mod.getID());
-                m.put("at", mod.getKeyForModulationOutput(modIndex));
-                mods.put(getKeyForModulation(i), m);
-                }
+                Modulation mod = getModulation(i);
+                int modIndex = getModulationIndex(i);
+                if (mod instanceof Constant)
+                    {
+                        Constant c = (Constant)mod;
+                        mods.put(getKeyForModulation(i), c.getValue());
+                    }
+                else
+                    {
+                        JSONObject m = new JSONObject();
+                        m.put("id", mod.getID());
+                        m.put("at", mod.getKeyForModulationOutput(modIndex));
+                        mods.put(getKeyForModulation(i), m);
+                    }
             }
         obj.put("mod", mods);
                 
@@ -910,65 +910,65 @@ public abstract class Modulation implements Cloneable
         if (data != null)
             obj.put("data", data);
         return obj;
-        }
+    }
 
     /** Loads options from the given JSON Object representing the option storage. */
     public void loadOptions(JSONObject options, int moduleVersion, int patchVersion)
-        {
+    {
         for(int i = 0; i < getNumOptions(); i++)
             {
-            int val = options.optInt(getKeyForOption(i), -1);
-            if (val == -1)
-                {
-                warn("Modulation.java", "Could not load option " + getKeyForOption(i) + " in " + this);
-                }
-            else
-                {
-                setOptionValue(i, val);
-                }
-            }
-        }
-   
-    /** Loads modulation inputs from the given JSON Object representing the modulation storage. */
-    public void loadModulations(JSONObject mods, HashMap<String, Modulation> ids, int moduleVersion, int patchVersion)
-        {
-        for(int i = 0; i < getNumModulations(); i++)
-            {
-            double v = mods.optDouble(getKeyForModulation(i), Double.NaN);
-            if (v == v)  // it's not NAN
-                {
-                setModulation(new Constant(v), i);
-                }
-            else            // It's an ID?
-                {
-                JSONObject m = mods.optJSONObject(getKeyForModulation(i));
-                if (m == null)
+                int val = options.optInt(getKeyForOption(i), -1);
+                if (val == -1)
                     {
-                    // probably a Macro, possibly something new this patch didn't know about
-                    //setModulation(new Constant(0), i);
-                    clearModulation(i);             // set it to its default constant value
+                        warn("Modulation.java", "Could not load option " + getKeyForOption(i) + " in " + this);
                     }
                 else
                     {
-                    Modulation mod = ids.get(m.getString("id"));
-                    if (mod != null)
-                        {
-                        int modOutput = mod.getModulationOutputForKey(m.getString("at"));
-                        if (modOutput >= 0 && modOutput < mod.getNumModulationOutputs())
-                            {
-                            setModulation(mod, i, modOutput);
-                            }
-                        else warn("Modulation.java", "invalid mod output (" + modOutput + ") for id " + id + " in " + this);
-                        }
-                    else warn("Modulation.java", "no modulation for id " + id + " in " + this);
+                        setOptionValue(i, val);
                     }
-                }
             }
-        }
+    }
+   
+    /** Loads modulation inputs from the given JSON Object representing the modulation storage. */
+    public void loadModulations(JSONObject mods, HashMap<String, Modulation> ids, int moduleVersion, int patchVersion)
+    {
+        for(int i = 0; i < getNumModulations(); i++)
+            {
+                double v = mods.optDouble(getKeyForModulation(i), Double.NaN);
+                if (v == v)  // it's not NAN
+                    {
+                        setModulation(new Constant(v), i);
+                    }
+                else            // It's an ID?
+                    {
+                        JSONObject m = mods.optJSONObject(getKeyForModulation(i));
+                        if (m == null)
+                            {
+                                // probably a Macro, possibly something new this patch didn't know about
+                                //setModulation(new Constant(0), i);
+                                clearModulation(i);             // set it to its default constant value
+                            }
+                        else
+                            {
+                                Modulation mod = ids.get(m.getString("id"));
+                                if (mod != null)
+                                    {
+                                        int modOutput = mod.getModulationOutputForKey(m.getString("at"));
+                                        if (modOutput >= 0 && modOutput < mod.getNumModulationOutputs())
+                                            {
+                                                setModulation(mod, i, modOutput);
+                                            }
+                                        else warn("Modulation.java", "invalid mod output (" + modOutput + ") for id " + id + " in " + this);
+                                    }
+                                else warn("Modulation.java", "no modulation for id " + id + " in " + this);
+                            }
+                    }
+            }
+    }
 
     /** Loads the Modulation from the given JSON Object. */
     public void load(JSONObject obj, HashMap<String, Modulation> ids, int patchVersion) throws Exception
-        {
+    {
         // version
         int moduleVersion = obj.getInt("v");
                 
@@ -982,15 +982,15 @@ public abstract class Modulation implements Cloneable
         // mods
         JSONObject mods = obj.getJSONObject("mod");
         loadModulations(mods, ids, moduleVersion, patchVersion);
-        }
+    }
 
     public void testDenormals(double val, String s)
-        {
+    {
         if (val > 0 && val <= 2250738585072012e-308)
             System.err.println(s + " is DENORMAL " + val);
-        }
+    }
 
-////// HELP
+    ////// HELP
 
     /** Override this to provide help text in HTML format. 
         By default this method looks for an HTML file called Foo.html, where
@@ -1004,10 +1004,10 @@ public abstract class Modulation implements Cloneable
         by Flow, will be in <h2>title</h2>.  So you shouldn't use <h2> or <h1>.
     */
     public String getHelpText() 
-        { 
+    { 
         InputStream str = this.getClass().getResourceAsStream("help/" + this.getClass().getSimpleName() + ".html");
         if (str == null) return null;
         else return StringUtilities.read(str);
-        }
-                
     }
+                
+}

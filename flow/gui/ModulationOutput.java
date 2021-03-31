@@ -18,7 +18,7 @@ import java.util.*;
 */
 
 public class ModulationOutput extends InputOutput
-    {
+{
     Jack jack;
     Modulation modulation;
 
@@ -39,17 +39,17 @@ public class ModulationOutput extends InputOutput
     
     /** Removes all wires attached to the ModulationOutput */
     public void disconnect()
-        {
+    {
         // I'm not sure if disconnecting will mess up the arraylist, so I'm not sure if I can iterate over it here.
         // so instead I'll just copy first.
         ArrayList<ModulationWire> w = new ArrayList<>(outgoing);
         for(ModulationWire wire : w)
             wire.end.disconnect();
-        }
+    }
     
     /** Constructor, given an owning modulation and ModPanel, plus which moduation output number we are in our owner. */
     public ModulationOutput(Modulation modulation, int number, final ModulePanel modPanel)
-        {
+    {
         this.modulation = modulation;
         this.number = number;
         this.modPanel = modPanel;
@@ -68,60 +68,60 @@ public class ModulationOutput extends InputOutput
         
         MouseAdapter mouseAdapter = new MouseAdapter()
             {
-            public void mousePressed(MouseEvent e)
+                public void mousePressed(MouseEvent e)
                 {
-                Rack rack = modPanel.getRack();
-                temp = new ModulationWire(rack);
-                temp.setStart(ModulationOutput.this);
-                rack.addModulationWire(temp);
-                rack.repaint();
+                    Rack rack = modPanel.getRack();
+                    temp = new ModulationWire(rack);
+                    temp.setStart(ModulationOutput.this);
+                    rack.addModulationWire(temp);
+                    rack.repaint();
 
-                if (releaseListener != null)
-                    Toolkit.getDefaultToolkit().removeAWTEventListener(releaseListener);
+                    if (releaseListener != null)
+                        Toolkit.getDefaultToolkit().removeAWTEventListener(releaseListener);
 
-                // This gunk fixes a BAD MISFEATURE in Java: mouseReleased isn't sent to the
-                // same component that received mouseClicked.  What the ... ? Asinine.
-                // So we create a global event listener which checks for mouseReleased and
-                // calls our own private function.  EVERYONE is going to do this.
+                    // This gunk fixes a BAD MISFEATURE in Java: mouseReleased isn't sent to the
+                    // same component that received mouseClicked.  What the ... ? Asinine.
+                    // So we create a global event listener which checks for mouseReleased and
+                    // calls our own private function.  EVERYONE is going to do this.
                                 
-                Toolkit.getDefaultToolkit().addAWTEventListener( releaseListener = new AWTEventListener()
-                    {
-                    public void eventDispatched(AWTEvent e)
+                    Toolkit.getDefaultToolkit().addAWTEventListener( releaseListener = new AWTEventListener()
                         {
-                        if (e instanceof MouseEvent && e.getID() == MouseEvent.MOUSE_RELEASED)
+                            public void eventDispatched(AWTEvent e)
                             {
-                            ModulationOutput.this.mouseReleased((MouseEvent)e);
+                                if (e instanceof MouseEvent && e.getID() == MouseEvent.MOUSE_RELEASED)
+                                    {
+                                        ModulationOutput.this.mouseReleased((MouseEvent)e);
+                                    }
                             }
+                        }, AWTEvent.MOUSE_EVENT_MASK);
+
+                    mouseDown = true;
+                }
+                                        
+                public void mouseDragged(MouseEvent e)
+                {
+                    if (lastModulationInput != null)
+                        lastModulationInput.highlight = false;
+                    ModulationInput input = modPanel.getRack().findModulationInputFor(e.getPoint(), jack);
+                    if (input != null)
+                        {
+                            lastModulationInput = input;
+                            input.highlight = true; 
                         }
-                    }, AWTEvent.MOUSE_EVENT_MASK);
-
-                mouseDown = true;
+                    modPanel.getRack().repaint();
                 }
                                         
-            public void mouseDragged(MouseEvent e)
+                public void mouseReleased(MouseEvent e)
                 {
-                if (lastModulationInput != null)
-                    lastModulationInput.highlight = false;
-                ModulationInput input = modPanel.getRack().findModulationInputFor(e.getPoint(), jack);
-                if (input != null)
-                    {
-                    lastModulationInput = input;
-                    input.highlight = true; 
-                    }
-                modPanel.getRack().repaint();
-                }
-                                        
-            public void mouseReleased(MouseEvent e)
-                {
-                ModulationOutput.this.mouseReleased(e);
+                    ModulationOutput.this.mouseReleased(e);
                 }
 
-            public void mouseClicked(MouseEvent e)
+                public void mouseClicked(MouseEvent e)
                 {
-                for(ModulationWire wire : outgoing)
-                    {
-                    wire.chooseColor();
-                    }
+                    for(ModulationWire wire : outgoing)
+                        {
+                            wire.chooseColor();
+                        }
                 }
             };
             
@@ -131,62 +131,62 @@ public class ModulationOutput extends InputOutput
         String[] help = modulation.wrapHelp(modulation.getModulationOutputHelp());
         if (help != null && help.length > number && help[number] != null)
             {
-            jack.setToolTipText(help[number]);
-            title.setToolTipText(help[number]);
+                jack.setToolTipText(help[number]);
+                title.setToolTipText(help[number]);
             }
-        }
+    }
 
     /** Attaches a ModulationWire connected to the given ModulationInput. */
     public void attach(ModulationInput input, ModulationWire wire)
-        {
+    {
         Output output = input.modulation.getSound().getOutput();
         output.lock();
         try
             {
-            input.disconnect();
+                input.disconnect();
                                                                                                 
-            input.modulation.setModulation(modulation, input.number, number);
+                input.modulation.setModulation(modulation, input.number, number);
 
-            // distribute to all sounds
-            int index = input.modulation.getSound().findRegistered(input.modulation);
-            if (index == Sound.NOT_FOUND)  // stray mouse event, probably just closed
-                {
-                return;
-                }
-
-            int outIndex = input.modulation.getSound().findRegistered(modulation);
-            if (outIndex == Sound.NOT_FOUND)  // stray mouse event, probably just closed
-                {
-                return;
-                }
-                
-            int numSounds = output.getNumSounds();
-            for(int i = 0; i < numSounds; i++)
-                {
-                Sound s = output.getSound(i);
-                if (s.getGroup() == Output.PRIMARY_GROUP)
+                // distribute to all sounds
+                int index = input.modulation.getSound().findRegistered(input.modulation);
+                if (index == Sound.NOT_FOUND)  // stray mouse event, probably just closed
                     {
-                    s.getRegistered(index).setModulation(
-                        s.getRegistered(outIndex), input.number, this.number);
+                        return;
                     }
-                }
 
-            wire.setEnd(input);
-            outgoing.add(wire);
-            modPanel.getRack().addModulationWire(wire);
+                int outIndex = input.modulation.getSound().findRegistered(modulation);
+                if (outIndex == Sound.NOT_FOUND)  // stray mouse event, probably just closed
+                    {
+                        return;
+                    }
+                
+                int numSounds = output.getNumSounds();
+                for(int i = 0; i < numSounds; i++)
+                    {
+                        Sound s = output.getSound(i);
+                        if (s.getGroup() == Output.PRIMARY_GROUP)
+                            {
+                                s.getRegistered(index).setModulation(
+                                                                     s.getRegistered(outIndex), input.number, this.number);
+                            }
+                    }
+
+                wire.setEnd(input);
+                outgoing.add(wire);
+                modPanel.getRack().addModulationWire(wire);
             }
         finally 
             {
-            output.unlock();
+                output.unlock();
             }
 
         input.incoming = wire;
         input.updateText();
-        }
+    }
                 
 
     public void mouseReleased(MouseEvent e)
-        {
+    {
         if (!mouseDown) return;
                 
         if (releaseListener != null)
@@ -203,18 +203,18 @@ public class ModulationOutput extends InputOutput
 
         if (input != null)
             {
-            // does the wire already exist?
-            boolean exists = false;
-            for(ModulationWire wire: outgoing)
-                {
-                if (wire.getEnd() == input)
-                    { exists = true; break; }
-                }
+                // does the wire already exist?
+                boolean exists = false;
+                for(ModulationWire wire: outgoing)
+                    {
+                        if (wire.getEnd() == input)
+                            { exists = true; break; }
+                    }
                                                 
-            if (!exists)
-                {
-                attach(input, temp);
-                }
+                if (!exists)
+                    {
+                        attach(input, temp);
+                    }
             }
         temp = null;
         if (lastModulationInput != null)
@@ -222,8 +222,8 @@ public class ModulationOutput extends InputOutput
         lastModulationInput = null;
                                                 
         rack.repaint();
-        }
+    }
         
     public boolean isInput() { return false; }
     public boolean isUnit() { return false; }
-    }
+}

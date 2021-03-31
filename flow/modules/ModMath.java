@@ -40,7 +40,7 @@ import flow.gui.*;
 */
 
 public class ModMath extends Modulation
-    {       
+{       
     private static final long serialVersionUID = 1;
 
     public static final int MOD_A = 0;
@@ -121,7 +121,7 @@ public class ModMath extends Modulation
     public static final int OPTION_BIPOLAR = 2;
 
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_OPERATION: return getOperation();
@@ -129,10 +129,10 @@ public class ModMath extends Modulation
             case OPTION_BIPOLAR: return isBipolar() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_OPERATION: setOperation(value); return;
@@ -140,27 +140,27 @@ public class ModMath extends Modulation
             case OPTION_BIPOLAR: setBipolar(value == 1); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
         
     public ModMath(Sound sound)
-        {
+    {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.ONE }, new String[] { "Signal A", "Signal B" });
         defineOptions(new String[] { "Operation", "Trigger On", "Bipolar" }, new String[][] { OPERATION_NAMES, TRIGGER_NAMES, { "Bipolar" } } );
-        }
+    }
         
     public void gate()
-    	{
-    	bTriggered = false;
-    	}
+    {
+        bTriggered = false;
+    }
 
     public void reset()
-    	{
-    	bTriggered = false;
-    	}
+    {
+        bTriggered = false;
+    }
 
     public void go()
-        {
+    {
         super.go();
         
         double mod0 = modulate(MOD_A);
@@ -168,138 +168,138 @@ public class ModMath extends Modulation
         double val = 0;
         
         if (bipolar && operation != DISCRETIZE)
-        	{
-        	mod0 -= 0.5;
-        	mod1 -= 0.5;
-        	}
+            {
+                mod0 -= 0.5;
+                mod1 -= 0.5;
+            }
                 
         switch(operation)
             {
             case ADD:
                 {
-                val = mod1 + mod0;
+                    val = mod1 + mod0;
                 }
-            break;
+                break;
             case SUBTRACT:
                 {
-                val = mod0 - mod1;
+                    val = mod0 - mod1;
                 }
-            break;
+                break;
             case MULTIPLY:
                 {
-                val = mod1 * mod0;
+                    val = mod1 * mod0;
                 }
-            break;
+                break;
             case MIN:
                 {
-                val = Math.min(mod1, mod0);
+                    val = Math.min(mod1, mod0);
                 }
-            break;
+                break;
             case MAX:
                 {
-                val = Math.max(mod1, mod0);
+                    val = Math.max(mod1, mod0);
                 }
-            break;
+                break;
             case SQUARE:
                 {
-                val = mod1 + mod0 * mod0;
+                    val = mod1 + mod0 * mod0;
                 }
-            break;
+                break;
             case SQUARE_ROOT:
                 {
-                if (bipolar)
-                	{
-                	if (mod0 > 0)
-	                	val = mod1 + Utility.fastSqrt(mod0 * 2) * 0.5;
-	                else
-	                	val = mod1 - Utility.fastSqrt(-mod0 * 2) * 0.5;
-                	}
-                else
-                	{
-	                // dunno if this could benefit from an approximation
-    	            val = mod1 + Utility.fastSqrt(mod0);
-    	            }
+                    if (bipolar)
+                        {
+                            if (mod0 > 0)
+                                val = mod1 + Utility.fastSqrt(mod0 * 2) * 0.5;
+                            else
+                                val = mod1 - Utility.fastSqrt(-mod0 * 2) * 0.5;
+                        }
+                    else
+                        {
+                            // dunno if this could benefit from an approximation
+                            val = mod1 + Utility.fastSqrt(mod0);
+                        }
                 }
-            break;
+                break;
             case CUBE:
                 {
-                val = mod1 + mod0 * mod0 * mod0;
+                    val = mod1 + mod0 * mod0 * mod0;
                 }
-            break;
+                break;
             case DISCRETIZE:
                 {
-                int d = (int)(mod1 * DISCRETIZATION);
-                if (d == 0) 
-                    {
-                    val = 0;
-                    }
-                else
-                    {
-                    int f = (int)(mod0 * (d + 1));
-                    if (f > d) f = d;
-                    val = f / (double) d;
-                    }
+                    int d = (int)(mod1 * DISCRETIZATION);
+                    if (d == 0) 
+                        {
+                            val = 0;
+                        }
+                    else
+                        {
+                            int f = (int)(mod0 * (d + 1));
+                            if (f > d) f = d;
+                            val = f / (double) d;
+                        }
                 }
-            break;
+                break;
             case MAP_HIGH:
                 {
-                val = (1.0 - mod1) * mod0 + mod1;
+                    val = (1.0 - mod1) * mod0 + mod1;
                 }
-            break;
+                break;
             case AVERAGE:
                 {
-                val = (mod1 + mod0) / 2.0;
+                    val = (mod1 + mod0) / 2.0;
                 }
-            break;
+                break;
             case THRESHOLD:
                 {
-                val = (mod0 >= mod1 ? 1.0 : 0.0);
+                    val = (mod0 >= mod1 ? 1.0 : 0.0);
                 }
-            break;
+                break;
             case ADD_SUBTRACT:
                 {
-                val = mod1 + mod0 - 0.5;
+                    val = mod1 + mod0 - 0.5;
                 }
-            break;
+                break;
             case SWITCH:
                 {
-                if (_switch)    // Currently B
-                    {
-                    if (isTriggered(MOD_A))
+                    if (_switch)    // Currently B
                         {
-                        _switch = !_switch;
-                        val = mod0;
+                            if (isTriggered(MOD_A))
+                                {
+                                    _switch = !_switch;
+                                    val = mod0;
+                                }
+                            else
+                                {
+                                    val = mod1;
+                                }
                         }
-                    else
+                    else            // Currently A
                         {
-                        val = mod1;
+                            if (isTriggered(MOD_B))
+                                {
+                                    _switch = !_switch;
+                                    val = mod1;
+                                }
+                            else
+                                {
+                                    val = mod0;
+                                }
                         }
-                    }
-                else            // Currently A
-                    {
-                    if (isTriggered(MOD_B))
-                        {
-                        _switch = !_switch;
-                        val = mod1;
-                        }
-                    else
-                        {
-                        val = mod0;
-                        }
-                    }
                 }
-            break;
+                break;
             default:
                 {
-                warn("modules/ModMath.java", "default occurred when it shouldn't be possible");
-                val = 0;
+                    warn("modules/ModMath.java", "default occurred when it shouldn't be possible");
+                    val = 0;
                 }
             }
                 
         if (bipolar && operation != DISCRETIZE)
-        	{
-        	val += 0.5;
-        	}
+            {
+                val += 0.5;
+            }
                 
         if (val > 1)
             val = 1;
@@ -354,31 +354,31 @@ public class ModMath extends Modulation
                     triggerCount++;
                 if (triggerCount >= TRIGGER_DIVIDERS[triggerOperation - TRIGGER_2_A])
                     {
-                    triggerCount = 0;
-                    updateTrigger(0);
+                        triggerCount = 0;
+                        updateTrigger(0);
                     }
                 break;
             case TRIGGER_DIR:
                 if (lastMod0 != -1 &&
                     mod0 - lastMod0 != 0)
                     {
-                    boolean dir = (lastMod0 > mod0);
-                    if (dir != lastDir)  // we changed direction
-                        {
-                        updateTrigger(0);
-                        }
+                        boolean dir = (lastMod0 > mod0);
+                        if (dir != lastDir)  // we changed direction
+                            {
+                                updateTrigger(0);
+                            }
                     }
                 break;
             case TRIGGER_CENTER:
                 if (lastMod0 != -1)
                     {
-                    if (lastMod0 >= 0.5 && mod0 < 0.5 ||
-                        lastMod0 < 0.5 && mod0 >= 0.5)          // crossed center
-                        updateTrigger(0);
+                        if (lastMod0 >= 0.5 && mod0 < 0.5 ||
+                            lastMod0 < 0.5 && mod0 >= 0.5)          // crossed center
+                            updateTrigger(0);
                     }
                 break;
             case TRIGGER_A_UNTIL_B:
-            	if (isTriggered(MOD_B)) bTriggered = true;
+                if (isTriggered(MOD_B)) bTriggered = true;
                 if (isTriggered(MOD_A) && ! bTriggered)
                     updateTrigger(0);
                 break;
@@ -389,52 +389,52 @@ public class ModMath extends Modulation
         if (lastMod0 != -1 && 
             mod0 - lastMod0 != 0)
             {
-            lastDir = (lastMod0 > mod0);
+                lastDir = (lastMod0 > mod0);
             }
                         
         lastMod0 = mod0;
-        }
+    }
 
     public void resetTrigger(int num)
-        {
+    {
         super.resetTrigger(num);        
         triggerCount = 0;
-        }
+    }
 
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-        {
+    {
         if (isConstant)
             {
-            if (modulation == 1 && operation == DISCRETIZE)  // signal b
-                {
-                return "" + (int)(value * DISCRETIZATION);
-                }
-            else return super.getModulationValueDescription(modulation, value, isConstant);
+                if (modulation == 1 && operation == DISCRETIZE)  // signal b
+                    {
+                        return "" + (int)(value * DISCRETIZATION);
+                    }
+                else return super.getModulationValueDescription(modulation, value, isConstant);
             }
         else return "";
-        }
+    }
 
 
     // all this work just to update one lousy item
     public ModulePanel getPanel()
-        {
+    {
         final ModulePanel[] m = new ModulePanel[1];
         m[0] = new ModulePanel(this)
             {
-            public OptionsChooser buildOptionsChooser(Modulation modulation, int number)
+                public OptionsChooser buildOptionsChooser(Modulation modulation, int number)
                 {
-                return new OptionsChooser(modulation, number)
-                    {
-                    public void optionChanged(int optionNumber, int value)
+                    return new OptionsChooser(modulation, number)
                         {
-                        super.optionChanged(optionNumber, value);
-                        m[0].rebuild(); 
-                        }
+                            public void optionChanged(int optionNumber, int value)
+                            {
+                                super.optionChanged(optionNumber, value);
+                                m[0].rebuild(); 
+                            }
                     };
                 }
             };
         return m[0];
-        }
-
     }
+
+}

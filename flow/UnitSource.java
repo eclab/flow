@@ -10,5 +10,5 @@ package flow;
 **/
 
 public interface UnitSource
-    {
-    }
+{
+}

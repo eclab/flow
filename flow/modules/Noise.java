@@ -35,7 +35,7 @@ import java.util.*;
 */
 
 public class Noise extends Unit implements UnitSource
-    {
+{
     private static final long serialVersionUID = 1;
 
     public static final int MOD_HIGH = 0;
@@ -49,33 +49,33 @@ public class Noise extends Unit implements UnitSource
     public Random random = null;
         
     void initializeRandom()     
-        {
+    {
         // first reseed
         double mod = modulate(MOD_SEED);
                 
         if (mod == 0)
             {
-            random = null;
+                random = null;
             }
         else
             {
-            long seed = Double.doubleToLongBits(mod);
-            if (random == null) random = new Random(seed);
-            else random.setSeed(seed);
+                long seed = Double.doubleToLongBits(mod);
+                if (random == null) random = new Random(seed);
+                else random.setSeed(seed);
             }
-        }
+    }
         
     public void reset()
-        {
+    {
         super.reset();
         initializeRandom(); 
-        }
+    }
                 
     public void gate()
-        {
+    {
         super.gate();
         initializeRandom(); 
-        }
+    }
 
     boolean top = true;
     public boolean isTop() { return top; }
@@ -84,34 +84,34 @@ public class Noise extends Unit implements UnitSource
     public static final int OPTION_TOP = 0;
         
     public int getOptionValue(int option) 
-        { 
+    { 
         switch(option)
             {
             case OPTION_TOP: return isTop() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
                 
     public void setOptionValue(int option, int value)
-        { 
+    { 
         switch(option)
             {
             case OPTION_TOP: setTop(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-        }
+    }
 
 
     public Noise(Sound sound)
-        {
+    {
         super(sound);
         defineModulations(new Constant[] { Constant.ONE, Constant.ZERO, Constant.HALF, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ZERO }, 
-            new String[] { "High", "Low", "Partials", "Amp Var", "Ramp", "Gain", "Seed" });
+                          new String[] { "High", "Low", "Partials", "Amp Var", "Ramp", "Gain", "Seed" });
         defineOptions(new String[] { "Top" }, new String[][] { { "Top" } } );
-        }
+    }
     
     public void generateRandomVals(double[] freq, int start, int n, Random random)
-        {
+    {
         /*
           for(int i = start; i < start + n; i++)
           {
@@ -126,19 +126,19 @@ public class Noise extends Unit implements UnitSource
         double sum = 0;
         for(int i = start; i < start + n; i++)
             {
-            double d = random.nextDouble();
-            sum = sum - Math.log(d);
-            freq[i] = sum;
+                double d = random.nextDouble();
+                sum = sum - Math.log(d);
+                freq[i] = sum;
             }
         double d = random.nextDouble();
         sum = sum - Math.log(d);
         double invsum = 1.0 / sum;
         for(int i = start; i < start + n; i++)
             freq[i] = freq[i] * invsum;
-        }
+    }
 
     public void go()
-        {
+    {
         int partials = (int)(modulate(MOD_PARTIALS) * Unit.NUM_PARTIALS);
         
         double _var = modulate(MOD_AMP_VAR);
@@ -156,8 +156,8 @@ public class Noise extends Unit implements UnitSource
         double[] frequencies = getFrequencies(0);
         for(int i = 0; i < amplitudes.length; i++)
             {
-            amplitudes[i] = 0.0;
-            frequencies[i] = (top ? 0 : hi * 1.1 * invpitch);
+                amplitudes[i] = 0.0;
+                frequencies[i] = (top ? 0 : hi * 1.1 * invpitch);
             }
         
         if (partials == 0) return;
@@ -172,45 +172,45 @@ public class Noise extends Unit implements UnitSource
         double max = 0;
         for(int j = start; j < end; j++)
             {
-            double pos = frequencies[j];
-            frequencies[j] = (pos * (hi - lo) + lo) * invpitch;
-            double ramping = 0;
-            if (ramp >= 0.5)
-                {
-                ramping = (1 - (ramp - 0.5) * 2) * 1 + (ramp - 0.5) * 2 * pos;
-                }
-            else
-                {
-                ramping = ramp * 2 * 1 + (1 - ramp * 2) * (1 - pos);
-                }
-            if (_var == 0.0)
-                amplitudes[j] = ramping;  
-            else
-                {
-                double d = rand.nextDouble();
-                amplitudes[j] = (1-_var) * ramping + _var * d;
-                }
-            total += amplitudes[j];
-            if (amplitudes[j] > max) max = amplitudes[j];
+                double pos = frequencies[j];
+                frequencies[j] = (pos * (hi - lo) + lo) * invpitch;
+                double ramping = 0;
+                if (ramp >= 0.5)
+                    {
+                        ramping = (1 - (ramp - 0.5) * 2) * 1 + (ramp - 0.5) * 2 * pos;
+                    }
+                else
+                    {
+                        ramping = ramp * 2 * 1 + (1 - ramp * 2) * (1 - pos);
+                    }
+                if (_var == 0.0)
+                    amplitudes[j] = ramping;  
+                else
+                    {
+                        double d = rand.nextDouble();
+                        amplitudes[j] = (1-_var) * ramping + _var * d;
+                    }
+                total += amplitudes[j];
+                if (amplitudes[j] > max) max = amplitudes[j];
             }
         
         // normalize
         for(int j = start; j < end; j++)
             {
-            amplitudes[j] = amplitudes[j] * gain;
+                amplitudes[j] = amplitudes[j] * gain;
             }
-        }
+    }
         
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-        {
+    {
         if (isConstant)
             {
-            if (modulation == MOD_SEED)
-                {
-                return (value == 0.0 ? "Free" : String.format("%.4f" , value));
-                }
-            else return super.getModulationValueDescription(modulation, value, isConstant);
+                if (modulation == MOD_SEED)
+                    {
+                        return (value == 0.0 ? "Free" : String.format("%.4f" , value));
+                    }
+                else return super.getModulationValueDescription(modulation, value, isConstant);
             }
         else return "";
-        }
     }
+}
