@@ -31,7 +31,7 @@ import java.awt.event.*;
 */
 
 public class Shift extends Unit
-{
+    {
     private static final long serialVersionUID = 1;
 
     public static final int MOD_SHIFT = 0;
@@ -53,38 +53,38 @@ public class Shift extends Unit
     public static final int OPTION_TYPE = 0;
 
     public int getOptionValue(int option) 
-    { 
+        { 
         switch(option)
             {
             case OPTION_TYPE: return getType();
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
                 
     public void setOptionValue(int option, int value)
-    { 
+        { 
         switch(option)
             {
             case OPTION_TYPE: setType(value); return;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
 
         
     public Shift(Sound sound) 
-    {
+        {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.HALF, Constant.ONE }, new String[] { "Shift", "Bound" });
         defineOptions(new String[] { "Type" }, new String[][] { { "Pitch", "Frequency", "Partials", "Vibrato" } } );
-    }
+        }
         
     public static final double MAX_PITCH_BOUND = 12.0;
     public static final double MAX_PARTIALS_BOUND = 128.0;
     public static final double MAX_VIBRATO_BOUND = 2.0 / 12.0;
         
     public void go()
-    {
+        {
         super.go();
                 
         double shift = modulate(MOD_SHIFT);
@@ -94,165 +94,165 @@ public class Shift extends Unit
             {
             case TYPE_PITCH:
                 {
-                    copyFrequencies(0);
-                    pushAmplitudes(0);
+                copyFrequencies(0);
+                pushAmplitudes(0);
 
-                    double[] frequencies = getFrequencies(0);
+                double[] frequencies = getFrequencies(0);
         
-                    // If it's not Math.pow, but hybridpow, we get weird jumps
-                    double multiplier = Math.pow(2, (shift - 0.5) * bound * MAX_PITCH_BOUND);
+                // If it's not Math.pow, but hybridpow, we get weird jumps
+                double multiplier = Math.pow(2, (shift - 0.5) * bound * MAX_PITCH_BOUND);
 
-                    for(int i = 0; i < frequencies.length; i++)
-                        {
-                            frequencies[i] = frequencies[i] * multiplier;
-                            if (frequencies[i] < 0.0001) frequencies[i] = 0.0001;               // that'd be pretty dang low, but it wouldn't be 0 so we won't have a singularity if we're recurrent
-                        }
+                for(int i = 0; i < frequencies.length; i++)
+                    {
+                    frequencies[i] = frequencies[i] * multiplier;
+                    if (frequencies[i] < 0.0001) frequencies[i] = 0.0001;               // that'd be pretty dang low, but it wouldn't be 0 so we won't have a singularity if we're recurrent
+                    }
                 }
-                break; 
+            break; 
                         
             case TYPE_FREQUENCY:
                 {
-                    copyFrequencies(0);
-                    pushAmplitudes(0);
+                copyFrequencies(0);
+                pushAmplitudes(0);
 
-                    double[] frequencies = getFrequencies(0);
+                double[] frequencies = getFrequencies(0);
         
-                    double delta = modToSignedFrequency(bound) * shift / sound.getPitch();
+                double delta = modToSignedFrequency(bound) * shift / sound.getPitch();
 
-                    for(int i = 0; i < frequencies.length; i++)
-                        {
-                            frequencies[i] = frequencies[i] + delta;
-                            if (frequencies[i] < 0) frequencies[i] = 0;
-                            if (frequencies[i] > Output.SAMPLING_RATE / 2.0) frequencies[i] = Output.SAMPLING_RATE / 2.0;
-                        }
+                for(int i = 0; i < frequencies.length; i++)
+                    {
+                    frequencies[i] = frequencies[i] + delta;
+                    if (frequencies[i] < 0) frequencies[i] = 0;
+                    if (frequencies[i] > Output.SAMPLING_RATE / 2.0) frequencies[i] = Output.SAMPLING_RATE / 2.0;
+                    }
                 }
-                break;
+            break;
                         
             case TYPE_PARTIALS:
                 {
-                    pushFrequencies(0);
-                    copyAmplitudes(0);
+                pushFrequencies(0);
+                copyAmplitudes(0);
 
-                    double[] amplitudes = getAmplitudes(0);
+                double[] amplitudes = getAmplitudes(0);
         
-                    int delta = (int)((shift - 0.5) * 2 * bound * MAX_PARTIALS_BOUND);
+                int delta = (int)((shift - 0.5) * 2 * bound * MAX_PARTIALS_BOUND);
                 
-                    if (delta > 0)
+                if (delta > 0)
+                    {
+                    for(int i = amplitudes.length - 1; i >= 0; i--)
                         {
-                            for(int i = amplitudes.length - 1; i >= 0; i--)
-                                {
-                                    int j = i - delta;
-                                    if (j < 0) amplitudes[i] = 0;
-                                    else amplitudes[i] = amplitudes[j];
-                                }
+                        int j = i - delta;
+                        if (j < 0) amplitudes[i] = 0;
+                        else amplitudes[i] = amplitudes[j];
                         }
-                    else if (delta < 0)
+                    }
+                else if (delta < 0)
+                    {
+                    for(int i = 0; i < amplitudes.length; i++)
                         {
-                            for(int i = 0; i < amplitudes.length; i++)
-                                {
-                                    int j = i - delta;
-                                    if (j >= amplitudes.length) amplitudes[i] = 0;
-                                    else amplitudes[i] = amplitudes[j];
-                                }
+                        int j = i - delta;
+                        if (j >= amplitudes.length) amplitudes[i] = 0;
+                        else amplitudes[i] = amplitudes[j];
                         }
+                    }
                         
                 }
-                break;
+            break;
 
             case TYPE_VIBRATO:
                 {
-                    copyFrequencies(0);
-                    pushAmplitudes(0);
+                copyFrequencies(0);
+                pushAmplitudes(0);
 
-                    double[] frequencies = getFrequencies(0);
+                double[] frequencies = getFrequencies(0);
         
-                    // If it's not Math.pow, but hybridpow, we get weird jumps
-                    double multiplier = Math.pow(2, (shift - 0.5) * bound * MAX_VIBRATO_BOUND);
+                // If it's not Math.pow, but hybridpow, we get weird jumps
+                double multiplier = Math.pow(2, (shift - 0.5) * bound * MAX_VIBRATO_BOUND);
 
-                    for(int i = 0; i < frequencies.length; i++)
-                        {
-                            frequencies[i] = frequencies[i] * multiplier;
-                        }
+                for(int i = 0; i < frequencies.length; i++)
+                    {
+                    frequencies[i] = frequencies[i] * multiplier;
+                    }
                 }
-                break; 
+            break; 
                         
             }
 
         if (constrain()) 
             {
-                simpleSort(0, true);
+            simpleSort(0, true);
             }
-    }       
+        }       
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-    {
+        {
         if (modulation == 0 && isConstant)
             return String.format("%.4f", 2 * (value - 0.5));
         else return super.getModulationValueDescription(modulation, value, isConstant);
-    }
+        }
         
     public ModulePanel getPanel()
-    {
+        {
         ///.... all this work, just to add a keyboard to the popup menu ...
         return new ModulePanel(Shift.this)
             {
-                public JComponent buildPanel()
+            public JComponent buildPanel()
                 {
-                    Unit unit = (Unit) getModulation();
-                    Box box = new Box(BoxLayout.Y_AXIS);
-                    box.add(new UnitOutput(unit, 0, this));
-                    box.add(new UnitInput(unit, 0, this));
+                Unit unit = (Unit) getModulation();
+                Box box = new Box(BoxLayout.Y_AXIS);
+                box.add(new UnitOutput(unit, 0, this));
+                box.add(new UnitInput(unit, 0, this));
 
-                    final ModulationInput[] m = new ModulationInput[1];
-                    m[0] = new ModulationInput(unit, MOD_SHIFT, this)
+                final ModulationInput[] m = new ModulationInput[1];
+                m[0] = new ModulationInput(unit, MOD_SHIFT, this)
+                    {
+                    public JPopupMenu getPopupMenu()
                         {
-                            public JPopupMenu getPopupMenu()
+                        final JPopupMenu pop = new JPopupMenu();
+                        KeyDisplay display = new KeyDisplay(null, Color.RED, 36, 84, 60, 0)
                             {
-                                final JPopupMenu pop = new JPopupMenu();
-                                KeyDisplay display = new KeyDisplay(null, Color.RED, 36, 84, 60, 0)
-                                    {
-                                        public void setState(int state)
-                                        {
-                                            pop.setVisible(false);
-                                            m[0].setState(Seq.PITCHES[state - 60 + 24]);
-                                        }
-                                    };
-                                pop.add(display);
+                            public void setState(int state)
+                                {
+                                pop.setVisible(false);
+                                m[0].setState(Seq.PITCHES[state - 60 + 24]);
+                                }
+                            };
+                        pop.add(display);
 
-                                String[] options = getOptions();
-                                for(int i = 0; i < options.length; i++)
+                        String[] options = getOptions();
+                        for(int i = 0; i < options.length; i++)
+                            {
+                            JMenuItem menu = new JMenuItem(options[i]);
+                            menu.setFont(Style.SMALL_FONT());
+                            final int _i = i;
+                            menu.addActionListener(new ActionListener()
+                                {
+                                public void actionPerformed(ActionEvent e)      
                                     {
-                                        JMenuItem menu = new JMenuItem(options[i]);
-                                        menu.setFont(Style.SMALL_FONT());
-                                        final int _i = i;
-                                        menu.addActionListener(new ActionListener()
-                                            {
-                                                public void actionPerformed(ActionEvent e)      
-                                                {
-                                                    double val = convert(_i);
-                                                    if (val >= 0 && val <= 1)
-                                                        setState(val);
-                                                }       
-                                            });     
-                                        pop.add(menu);
-                                    }    
+                                    double val = convert(_i);
+                                    if (val >= 0 && val <= 1)
+                                        setState(val);
+                                    }       
+                                });     
+                            pop.add(menu);
+                            }    
 
-                                return pop;
-                            }
-                        };
-                    box.add(m[0]);
-                    box.add(new ModulationInput(unit, MOD_BOUND, this));
-                                
-                    for(int i = 0; i < unit.getNumOptions(); i++)
-                        {
-                            box.add(new OptionsChooser(unit, i));
+                        return pop;
                         }
+                    };
+                box.add(m[0]);
+                box.add(new ModulationInput(unit, MOD_BOUND, this));
+                                
+                for(int i = 0; i < unit.getNumOptions(); i++)
+                    {
+                    box.add(new OptionsChooser(unit, i));
+                    }
                     
-                    box.add(new ConstraintsChooser(unit, this));
+                box.add(new ConstraintsChooser(unit, this));
 
-                    return box;
+                return box;
                 }
-        };
-    }
+            };
+        }
         
-}
+    }

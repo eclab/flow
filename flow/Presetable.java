@@ -7,7 +7,7 @@ package flow;
 /** Implement this interface to enable presets in your module. */
 
 public interface Presetable
-{    
+    {    
     public String[] getPresets();
     public void setPreset(int preset);
-}
+    }

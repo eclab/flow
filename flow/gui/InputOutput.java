@@ -21,7 +21,7 @@ import java.awt.font.*;
 */ 
 
 public abstract class InputOutput extends JPanel
-{
+    {
     JLabel title;
     int number;         // this is the index for the input/output unit/modulation
     ModulePanel modPanel;
@@ -44,13 +44,13 @@ public abstract class InputOutput extends JPanel
         
     /** Sets the text of the title JLabel, including the underlying modulation/unit input/output name */
     public void setTitleText(String val)
-    {
+        {
         setTitleText(val, true);
-    }
+        }
 
     /** Sets the text of the title JLabel.  If changeUnderlying = true, then this includes the underlying modulation/unit input/output name */
     public void setTitleText(String val, boolean changeUnderlying)
-    {
+        {
         if (isInput())
             title.setText(" " + val);
         else
@@ -58,64 +58,64 @@ public abstract class InputOutput extends JPanel
 
         if (changeUnderlying)
             {
-                // distribute
-                Modulation mod = modPanel.getModulation();
-                Output output = mod.getSound().getOutput();
-                output.lock();
-                try
+            // distribute
+            Modulation mod = modPanel.getModulation();
+            Output output = mod.getSound().getOutput();
+            output.lock();
+            try
+                {
+                int index = mod.getSound().findRegistered(mod);
+                if (index == Sound.NOT_FOUND)
+                    System.err.println("InputOutput.distributetitle: mod/unit " + mod + " not found!");
+                else
                     {
-                        int index = mod.getSound().findRegistered(mod);
-                        if (index == Sound.NOT_FOUND)
-                            System.err.println("InputOutput.distributetitle: mod/unit " + mod + " not found!");
-                        else
+                    int numSounds = output.getNumSounds();
+                    for(int i = 0; i < numSounds; i++)
+                        {
+                        Sound s = output.getSound(i);
+                        if (s.getGroup() == Output.PRIMARY_GROUP)
                             {
-                                int numSounds = output.getNumSounds();
-                                for(int i = 0; i < numSounds; i++)
+                            if (isUnit())
+                                {
+                                Unit a = (Unit)(s.getRegistered(index));
+                                if (isInput())
                                     {
-                                        Sound s = output.getSound(i);
-                                        if (s.getGroup() == Output.PRIMARY_GROUP)
-                                            {
-                                                if (isUnit())
-                                                    {
-                                                        Unit a = (Unit)(s.getRegistered(index));
-                                                        if (isInput())
-                                                            {
-                                                                a.setInputName(number, val);
-                                                            }
-                                                        else
-                                                            {
-                                                                a.setOutputName(number, val);
-                                                            }
-                                                    }
-                                                else
-                                                    {
-                                                        Modulation a = (Modulation)(s.getRegistered(index));
-                                                        if (isInput())
-                                                            {
-                                                                a.setModulationName(number, val);
-                                                            }
-                                                        else
-                                                            {
-                                                                a.setModulationOutputName(number, val);
-                                                            }
-                                                    }
-                                            }
+                                    a.setInputName(number, val);
                                     }
+                                else
+                                    {
+                                    a.setOutputName(number, val);
+                                    }
+                                }
+                            else
+                                {
+                                Modulation a = (Modulation)(s.getRegistered(index));
+                                if (isInput())
+                                    {
+                                    a.setModulationName(number, val);
+                                    }
+                                else
+                                    {
+                                    a.setModulationOutputName(number, val);
+                                    }
+                                }
                             }
+                        }
                     }
-                finally 
-                    {
-                        output.unlock();
-                    }
+                }
+            finally 
+                {
+                output.unlock();
+                }
             }
-    }
+        }
 
     /** Returns true if the title is permitted to be edited by the user.  */
     public boolean getTitleCanChange() { return titleCanChange; }
     
     /** Sets whether the title can be edited by the user. */
     public void setTitleCanChange(boolean val) 
-    { 
+        { 
         titleCanChange = val; 
         Font font = title.getFont();
         Map attributes = font.getAttributes();
@@ -124,28 +124,28 @@ public abstract class InputOutput extends JPanel
         else
             attributes.remove(TextAttribute.INPUT_METHOD_UNDERLINE);
         title.setFont(font.deriveFont(attributes));
-    }
+        }
     
     // Handles clicks on editable title JLabels
     class LabelMouseAdapter extends MouseAdapter
-    {
-        public void mouseClicked(MouseEvent e)
         {
+        public void mouseClicked(MouseEvent e)
+            {
             if (!getTitleCanChange()) return;
                                 
             String result = showTextDialog(modPanel.rack, InputOutput.this, "New Label", "Enter a Label:", title.getText().trim());
                                 
             if (result != null)
                 {
-                    setTitleText(result);
-                    modPanel.updateTitleChange(InputOutput.this, number, result);
+                setTitleText(result);
+                modPanel.updateTitleChange(InputOutput.this, number, result);
                 }
+            }
         }
-    }
 
     public static final int LABEL_MAX_LENGTH = 32;
     public static String showTextDialog(Rack rack, JComponent root, String title, String label, String originalText)
-    {
+        {
         final JTextField text = new JTextField(LABEL_MAX_LENGTH);
         text.setText(originalText);
                 
@@ -157,14 +157,14 @@ public abstract class InputOutput extends JPanel
                 
         text.addAncestorListener(new javax.swing.event.AncestorListener()
             {
-                public void ancestorAdded(javax.swing.event.AncestorEvent e)    
+            public void ancestorAdded(javax.swing.event.AncestorEvent e)    
                 { 
-                    JComponent component = e.getComponent();
-                    component.requestFocusInWindow();
-                    text.selectAll(); 
+                JComponent component = e.getComponent();
+                component.requestFocusInWindow();
+                text.selectAll(); 
                 }
-                public void ancestorMoved(javax.swing.event.AncestorEvent e) {}
-                public void ancestorRemoved(javax.swing.event.AncestorEvent e) {}
+            public void ancestorMoved(javax.swing.event.AncestorEvent e) {}
+            public void ancestorRemoved(javax.swing.event.AncestorEvent e) {}
             });
         box.add(text);
         box.add(box.createGlue());
@@ -175,10 +175,10 @@ public abstract class InputOutput extends JPanel
                 
         if (opt == JOptionPane.OK_OPTION)
             {
-                return text.getText().trim();
+            return text.getText().trim();
             }
         else return null;
-    }
+        }
 
 
 
@@ -186,7 +186,7 @@ public abstract class InputOutput extends JPanel
 
     // Defines jacks for input/output modules
     class Jack extends JPanel
-    {
+        {
         public Dimension getPreferredSize() { return new Dimension(Style.LABELLED_DIAL_WIDTH(), Style.LABELLED_DIAL_WIDTH()); }
         public Dimension getMinimumSize() { return new Dimension(Style.LABELLED_DIAL_WIDTH(), Style.LABELLED_DIAL_WIDTH()); }
                 
@@ -199,7 +199,7 @@ public abstract class InputOutput extends JPanel
         
         /** Returns the actual square within which the Jack's circle is drawn. */
         public Rectangle getDrawSquare()
-        {
+            {
             Insets insets = getInsets();
             Dimension size = getSize();
             int width = size.width - insets.left - insets.right;
@@ -208,39 +208,39 @@ public abstract class InputOutput extends JPanel
             // How big do we draw our circle?
             if (width > height)
                 {
-                    // base it on height
-                    int h = height;
-                    int w = h;
-                    int y = insets.top;
-                    int x = insets.left + (width - w) / 2;
-                    return new Rectangle(x, y, w, h);
+                // base it on height
+                int h = height;
+                int w = h;
+                int y = insets.top;
+                int x = insets.left + (width - w) / 2;
+                return new Rectangle(x, y, w, h);
                 }
             else
                 {
-                    // base it on width
-                    int w = width;
-                    int h = w;
-                    int x = insets.left;
-                    int y = insets.top + (height - h) / 2;
-                    return new Rectangle(x, y, w, h);
+                // base it on width
+                int w = width;
+                int h = w;
+                int x = insets.left;
+                int y = insets.top + (height - h) / 2;
+                return new Rectangle(x, y, w, h);
                 }
-        }
+            }
     
         /** Returns the standard fill color. */
         public Color getFillColor()
-        {
+            {
             Color c = getDrawColor();
             return new Color(c.getRed(), c.getGreen(), c.getBlue(), 64);
-        }
+            }
      
         /** Returns the standard draw color. */
         public Color getDrawColor()
-        {
+            {
             return Color.BLACK;
-        }
+            }
      
         public void paintComponent(Graphics g)
-        {
+            {
             super.paintComponent(g);
 
             Style.prepareGraphics(g);
@@ -264,15 +264,15 @@ public abstract class InputOutput extends JPanel
             
             if (isUnit)
                 {
-                    graphics.setPaint(getDrawColor());
-                    e.x += e.width / 2.5;
-                    e.y += e.height / 2.5;
-                    e.width -= e.width * 2.0 / 2.5;
-                    e.height -= e.height * 2.0 / 2.5;
-                    graphics.fill(e);
+                graphics.setPaint(getDrawColor());
+                e.x += e.width / 2.5;
+                e.y += e.height / 2.5;
+                e.width -= e.width * 2.0 / 2.5;
+                e.height -= e.height * 2.0 / 2.5;
+                graphics.fill(e);
                 }
+            }
         }
+
+
     }
-
-
-}

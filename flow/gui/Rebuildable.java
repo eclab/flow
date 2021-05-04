@@ -10,7 +10,7 @@ package flow.gui;
 */ 
 
 public interface Rebuildable
-{    
+    {    
     /** Resets the component to reflect the underlying of the synthesizer. */
     public void rebuild();
-}
+    }

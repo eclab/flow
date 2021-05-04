@@ -76,7 +76,7 @@ import java.util.*;
 /// it's already hooked up and so it'll find those initially and work right.
 
 public class Morph extends Unit
-{
+    {
     private static final long serialVersionUID = 1;
 
     public static final int MOD_INTERPOLATION = 0;
@@ -94,11 +94,11 @@ public class Morph extends Unit
     boolean shuffle = false; 
        
     public Object clone()
-    {
+        {
         Morph obj = (Morph)(super.clone());
         obj.morphTo = (int[])(obj.morphTo.clone());
         return obj;
-    }
+        }
 
     public void setMorphFrequency(boolean val) { morphFrequency = val; }
     public boolean getMorphFrequency() { lastMorph = -1; return morphFrequency; }
@@ -129,7 +129,7 @@ public class Morph extends Unit
     public static final int OPTION_RANDOM = 5;
 
     public int getOptionValue(int option) 
-    { 
+        { 
         switch(option)
             {
             case OPTION_MORPH_TYPE: return getMorph();
@@ -140,10 +140,10 @@ public class Morph extends Unit
             case OPTION_RANDOM: return getShuffle() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
                 
     public void setOptionValue(int option, int value)
-    { 
+        { 
         switch(option)
             {
             case OPTION_MORPH_TYPE: setMorph(value); return;
@@ -154,10 +154,10 @@ public class Morph extends Unit
             case OPTION_RANDOM: setShuffle(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
         
     public Morph(Sound sound)
-    {
+        {
         super(sound);
         doStatic();
         
@@ -169,62 +169,62 @@ public class Morph extends Unit
         lastRamp = -1;
         this.morph = MORPH_STANDARD;
         reset();                // this fixes a bug 
-    }
+        }
 
     public void reset()
-    {
+        {
         super.reset();
         reseed();
                 
         // we do swap morphs every reset
         if (lastMorph != morph || morph == MORPH_ALL_RANDOM)
             {
-                buildMorph();
-                lastMorph = morph;
+            buildMorph();
+            lastMorph = morph;
             }
                 
         lastRamp = Double.NaN;
         loInput = -1;
         hiInput = -1;
         direction = 0;  // unknown
-    }
+        }
 
     public void reseed()
-    {
+        {
         double mod = modulate(MOD_SEED);
                 
         if (mod != 0)
             {
-                long seed = Double.doubleToLongBits(mod);
-                if (random == null) random = new Random(seed);
-                else random.setSeed(seed);
+            long seed = Double.doubleToLongBits(mod);
+            if (random == null) random = new Random(seed);
+            else random.setSeed(seed);
             }
         else if (random != null)
             {
-                random = null;
+            random = null;
             }
-    }
+        }
                 
     public void gate()
-    {
+        {
         super.gate();
         reseed();
 
         // we do swap morphs every gate
         if (lastMorph != morph || morph == MORPH_ALL_RANDOM)
             {
-                buildMorph();
-                lastMorph = morph;
+            buildMorph();
+            lastMorph = morph;
             }
                 
         if (!free)
             {
-                lastRamp = Double.NaN;
-                loInput = -1;
-                hiInput = -1;
-                direction = 0;  // unknown
+            lastRamp = Double.NaN;
+            loInput = -1;
+            hiInput = -1;
+            direction = 0;  // unknown
             }
-    }
+        }
 
     boolean free = false;
     int loInput = 0;
@@ -233,126 +233,126 @@ public class Morph extends Unit
     double lastRamp = Double.NaN;
 
     public int findNextAndUpdate(int input, int prevInput)
-    {
+        {
         if (shuffle)
             {
-                Random rand = (random == null ? getSound().getRandom() : random);
-                int total = 0;
-                int totalWithPrev = 0;
-                for(int i = 0; i < inputs.length; i++)
+            Random rand = (random == null ? getSound().getRandom() : random);
+            int total = 0;
+            int totalWithPrev = 0;
+            for(int i = 0; i < inputs.length; i++)
+                {
+                if (!(inputs[i] instanceof Nil))
                     {
-                        if (!(inputs[i] instanceof Nil))
-                            {
-                                totalWithPrev++;
-                                if (i != prevInput)
-                                    total++;
-                            }
+                    totalWithPrev++;
+                    if (i != prevInput)
+                        total++;
                     }
-                if (totalWithPrev == 0) return 0;
-                if (total == 0) 
-                    {
-                        int in = (input == - 1 ? 0 : input);
-                        updateTrigger(in);
-                        return in;
-                    }
+                }
+            if (totalWithPrev == 0) return 0;
+            if (total == 0) 
+                {
+                int in = (input == - 1 ? 0 : input);
+                updateTrigger(in);
+                return in;
+                }
                 
-                while(true)
+            while(true)
+                {
+                int v = rand.nextInt(4);
+                if (!(inputs[v] instanceof Nil) && (v != prevInput))
                     {
-                        int v = rand.nextInt(4);
-                        if (!(inputs[v] instanceof Nil) && (v != prevInput))
-                            {
-                                updateTrigger(v);
-                                return v;
-                            }
+                    updateTrigger(v);
+                    return v;
                     }
+                }
             }
         else
             {       
-                for(int i = 0 ; i < inputs.length; i++)
+            for(int i = 0 ; i < inputs.length; i++)
+                {
+                input++;
+                if (input >= inputs.length)
+                    input = 0;
+                if (!(inputs[input] instanceof Nil) && (input != loInput) && (input != hiInput))
                     {
-                        input++;
-                        if (input >= inputs.length)
-                            input = 0;
-                        if (!(inputs[input] instanceof Nil) && (input != loInput) && (input != hiInput))
-                            {
-                                break;
-                            }
+                    break;
                     }
+                }
 
-                updateTrigger(input);
-                return input;
+            updateTrigger(input);
+            return input;
             }
-    }
+        }
 
     public void updateInputs(double ramp)
-    {
+        {
         if (hiInput == -1 && loInput == -1)
             {
-                loInput = findNextAndUpdate(-1, hiInput);
-                hiInput = findNextAndUpdate(-1, loInput);
+            loInput = findNextAndUpdate(-1, hiInput);
+            hiInput = findNextAndUpdate(-1, loInput);
             }
 
         // is this our first time?
         if (direction == 0 && lastRamp != lastRamp)  // that is, lastRamp == NaN
             {
-                lastRamp = ramp;
+            lastRamp = ramp;
             }
         // do we have one previous ramp but it's not different?
         else if (direction == 0 && lastRamp == ramp)
             {
-                // do nothing
+            // do nothing
             }
         // do we have a previous different ramp?
         else if (direction == 0 && lastRamp != ramp)
             {
-                direction = (ramp > lastRamp? 1 : -1);
+            direction = (ramp > lastRamp? 1 : -1);
             }
         else if (direction == 1 && lastRamp > ramp)  // changed direction, going down
             {
-                direction = -1;
-                // we need a new lo input
-                loInput = findNextAndUpdate(loInput, hiInput);
+            direction = -1;
+            // we need a new lo input
+            loInput = findNextAndUpdate(loInput, hiInput);
             }
         else if (direction == -1 && lastRamp < ramp)  // changed direction, going up
             {
-                direction = 1;
-                // we need a new hi input
-                hiInput = findNextAndUpdate(hiInput, loInput);
+            direction = 1;
+            // we need a new hi input
+            hiInput = findNextAndUpdate(hiInput, loInput);
             }
         else
             {
-                // do nothing
+            // do nothing
             }
 
         for(int i = 0; i < inputs.length; i++)
             {
-                if (i == loInput)
-                    {
-                        setModulationOutput(i, 1.0 - ramp);
-                    }
-                else if (i == hiInput)
-                    {
-                        setModulationOutput(i, ramp);
-                    }
-                else
-                    {
-                        setModulationOutput(i, 0.0);
-                    }
+            if (i == loInput)
+                {
+                setModulationOutput(i, 1.0 - ramp);
+                }
+            else if (i == hiInput)
+                {
+                setModulationOutput(i, ramp);
+                }
+            else
+                {
+                setModulationOutput(i, 0.0);
+                }
             }
 
         lastRamp = ramp;
-    }
+        }
 
     double lastVariance;
     public void go()
-    {
+        {
         super.go();
 
         // we do swap morphs only if they have changed (or the variance has changed)
         if (lastMorph != morph || (morph == MORPH_ALL_RANDOM && lastVariance != modulate(MOD_VARIANCE)))
             {
-                buildMorph();
-                lastMorph = morph;
+            buildMorph();
+            lastMorph = morph;
             }
                 
         double ramp = modulate(MOD_INTERPOLATION);
@@ -368,103 +368,103 @@ public class Morph extends Unit
         
         if (morphFrequency)
             {
-                for(int i = 0; i < p1frequencies.length; i++)
-                    {
-                        frequencies[i] = (p2frequencies[morphTo[i]] * ramp) + (p1frequencies[i] * (1.0 - ramp));
-                    }
+            for(int i = 0; i < p1frequencies.length; i++)
+                {
+                frequencies[i] = (p2frequencies[morphTo[i]] * ramp) + (p1frequencies[i] * (1.0 - ramp));
+                }
             }
         else 
             {
-                System.arraycopy(p1frequencies, 0, frequencies, 0, frequencies.length);
+            System.arraycopy(p1frequencies, 0, frequencies, 0, frequencies.length);
             }
                 
         if (morphAmplitude)
             {
-                for(int i = 0; i < p1amplitudes.length; i++)
-                    {
-                        amplitudes[i] = (p2amplitudes[morphTo[i]] * ramp) + (p1amplitudes[i] * (1.0 - ramp));
-                    }
+            for(int i = 0; i < p1amplitudes.length; i++)
+                {
+                amplitudes[i] = (p2amplitudes[morphTo[i]] * ramp) + (p1amplitudes[i] * (1.0 - ramp));
+                }
             }
         else 
             {
-                System.arraycopy(p1amplitudes, 0, amplitudes, 0, amplitudes.length);
+            System.arraycopy(p1amplitudes, 0, amplitudes, 0, amplitudes.length);
             }
                 
         constrain();
             
         // always sort    
         simpleSort(0, false);
-    }
+        }
                 
         
     int chooseSwap(int x, double range, double low, Random random)
-    {
+        {
         while(true)
             {
-                int r = random.nextInt((int)(range * morphTo.length + 1));
-                if ((int)range != range &&
-                    (!(random.nextFloat() <= range - (int)range)))
-                    {
-                        r++;
-                    }
-                int v = x + (random.nextBoolean() ? r : (-r));
-                if (v >= low && v < morphTo.length)
-                    return v;
+            int r = random.nextInt((int)(range * morphTo.length + 1));
+            if ((int)range != range &&
+                (!(random.nextFloat() <= range - (int)range)))
+                {
+                r++;
+                }
+            int v = x + (random.nextBoolean() ? r : (-r));
+            if (v >= low && v < morphTo.length)
+                return v;
             }
-    }
+        }
         
     public void buildMorph()
-    {
+        {
         if (morphTo == null) 
             {
-                morphTo = new int[getAmplitudes(0).length];
+            morphTo = new int[getAmplitudes(0).length];
             }
             
         if (!morphFrequency)            // just doing amplitude, so we're not morphing just crossfading
             {
-                for(int x = 0; x < morphTo.length; x++) morphTo[x]= x;
+            for(int x = 0; x < morphTo.length; x++) morphTo[x]= x;
             }        
         else if (morph == MORPH_ALL_RANDOM)
             {
-                Random rand = (random == null ? getSound().getRandom() : random);
-                lastVariance = modulate(MOD_VARIANCE);
-                double range = makeVerySensitive(lastVariance);
+            Random rand = (random == null ? getSound().getRandom() : random);
+            lastVariance = modulate(MOD_VARIANCE);
+            double range = makeVerySensitive(lastVariance);
                         
-                if (range == 0)
-                    {
-                        System.arraycopy(morphs[MORPH_STANDARD], 0, morphTo, 0, morphTo.length);
-                    }
-                else 
-                    {
-                        for(int x = 0; x < morphTo.length; x++) morphTo[x]= x;  // clear previous table
+            if (range == 0)
+                {
+                System.arraycopy(morphs[MORPH_STANDARD], 0, morphTo, 0, morphTo.length);
+                }
+            else 
+                {
+                for(int x = 0; x < morphTo.length; x++) morphTo[x]= x;  // clear previous table
                                 
-                        int end = (includesFundamental ? 0 : 1);
+                int end = (includesFundamental ? 0 : 1);
                                 
-                        for(int x = morphTo.length - 1; x >= end; x--)
-                            {
-                                int r = chooseSwap(x, range, end, rand);
+                for(int x = morphTo.length - 1; x >= end; x--)
+                    {
+                    int r = chooseSwap(x, range, end, rand);
                                         
-                                int temp = morphTo[x];
-                                morphTo[x] = morphTo[r];
-                                morphTo[r] = temp;
-                            }
+                    int temp = morphTo[x];
+                    morphTo[x] = morphTo[r];
+                    morphTo[r] = temp;
                     }
+                }
             }
         else 
             {
-                if (includesFundamental)
+            if (includesFundamental)
+                {
+                for(int i = 0; i < morphTo.length; i++)
                     {
-                        for(int i = 0; i < morphTo.length; i++)
-                            {
-                                morphTo[i] = morphs[morph][i + 1] - 1;
-                            }
+                    morphTo[i] = morphs[morph][i + 1] - 1;
                     }
-                else
-                    {
-                        System.arraycopy(morphs[morph], 0, morphTo, 0, morphTo.length);
-                    }
+                }
+            else
+                {
+                System.arraycopy(morphs[morph], 0, morphTo, 0, morphTo.length);
+                }
             }
-    }
+        }
 
         
     public static final int MORPH_STANDARD = 0;
@@ -489,13 +489,13 @@ public class Morph extends Unit
     */
                 
     public static final String[] MORPH_NAMES = new String[]
-        { "Normal", "Random", "2-Pair", "4-Pair", "8-Pair", "Increasing" }; //  "Rand 2", "Rand 3", "Rand 4", "Rand 5", "Rand 6", "Rand 8", "Rand 16", "Rand 32", "Rand 64", "Rand 128" };
+    { "Normal", "Random", "2-Pair", "4-Pair", "8-Pair", "Increasing" }; //  "Rand 2", "Rand 3", "Rand 4", "Rand 5", "Rand 6", "Rand 8", "Rand 16", "Rand 32", "Rand 64", "Rand 128" };
 
     public static final int[][] morphs = new int[MORPH_PAIRS_INCREASING + 1][NUM_PARTIALS + 1];  // yes, *129*, in case we want to include the fundamental
         
     static boolean done = false;
     public void doStatic()
-    {
+        {
         if (done) return;
         done = true;
 
@@ -504,27 +504,27 @@ public class Morph extends Unit
         // standard and INITIALIZATION
         for(int j = 0; j < MORPH_PAIRS_INCREASING + 1; j++)
             {
-                for(int i = 0; i < morphs[j].length; i++)
-                    {
-                        morphs[j][i] = i;
-                    }
+            for(int i = 0; i < morphs[j].length; i++)
+                {
+                morphs[j][i] = i;
+                }
             }
                 
         // pairs except fundamental
         for(int i = 1; i < len - 1; i+=2)
             { 
-                morphs[MORPH_PAIRS_2][i] = i + 1;  
-                morphs[MORPH_PAIRS_2][i+1] = i; 
+            morphs[MORPH_PAIRS_2][i] = i + 1;  
+            morphs[MORPH_PAIRS_2][i+1] = i; 
             }
         morphs[MORPH_PAIRS_2][len - 1] = len - 1;
                 
         // spaced pairs except fundamental
         for(int i = 1; i < len - 3; i+=4)
             {
-                morphs[MORPH_PAIRS_4][i] = i + 2;
-                morphs[MORPH_PAIRS_4][i+1] = i + 3;
-                morphs[MORPH_PAIRS_4][i+2] = i;
-                morphs[MORPH_PAIRS_4][i+3] = i + 1;
+            morphs[MORPH_PAIRS_4][i] = i + 2;
+            morphs[MORPH_PAIRS_4][i+1] = i + 3;
+            morphs[MORPH_PAIRS_4][i+2] = i;
+            morphs[MORPH_PAIRS_4][i+3] = i + 1;
             }
         morphs[MORPH_PAIRS_4][len - 1] = len - 3;
         morphs[MORPH_PAIRS_4][len - 2] = len - 2;
@@ -533,14 +533,14 @@ public class Morph extends Unit
         // big spaced pairs except fundamental
         for(int i = 1; i < len - 7; i+=8)
             {
-                morphs[MORPH_PAIRS_8][i] = i + 4;
-                morphs[MORPH_PAIRS_8][i+1] = i + 5;
-                morphs[MORPH_PAIRS_8][i+2] = i + 6;
-                morphs[MORPH_PAIRS_8][i+3] = i + 7;
-                morphs[MORPH_PAIRS_8][i+4] = i;
-                morphs[MORPH_PAIRS_8][i+5] = i + 1;
-                morphs[MORPH_PAIRS_8][i+6] = i + 2;
-                morphs[MORPH_PAIRS_8][i+7] = i + 3;
+            morphs[MORPH_PAIRS_8][i] = i + 4;
+            morphs[MORPH_PAIRS_8][i+1] = i + 5;
+            morphs[MORPH_PAIRS_8][i+2] = i + 6;
+            morphs[MORPH_PAIRS_8][i+3] = i + 7;
+            morphs[MORPH_PAIRS_8][i+4] = i;
+            morphs[MORPH_PAIRS_8][i+5] = i + 1;
+            morphs[MORPH_PAIRS_8][i+6] = i + 2;
+            morphs[MORPH_PAIRS_8][i+7] = i + 3;
             }
         morphs[MORPH_PAIRS_8][len - 1] = len - 5;
         morphs[MORPH_PAIRS_8][len - 2] = len - 6;
@@ -554,18 +554,18 @@ public class Morph extends Unit
         int current = 0;
         for(int i = 1; i < NUM_MORPH_PAIRS; i *= 2)
             {
-                int j;
-                for(j = current; j < current + i; j++)
+            int j;
+            for(j = current; j < current + i; j++)
+                {
+                if (j + i / 2 >= morphs[MORPH_PAIRS_INCREASING].length)
+                    break;
+                if (j < current + i / 2)
                     {
-                        if (j + i / 2 >= morphs[MORPH_PAIRS_INCREASING].length)
-                            break;
-                        if (j < current + i / 2)
-                            {
-                                morphs[MORPH_PAIRS_INCREASING][j] = j + i / 2;
-                                morphs[MORPH_PAIRS_INCREASING][j + i / 2] = j;
-                            }
+                    morphs[MORPH_PAIRS_INCREASING][j] = j + i / 2;
+                    morphs[MORPH_PAIRS_INCREASING][j + i / 2] = j;
                     }
-                current = j;
+                }
+            current = j;
             }
         morphs[MORPH_PAIRS_INCREASING][len - 1] = len - 1;
 
@@ -602,75 +602,75 @@ public class Morph extends Unit
         // 128
         morphs[MORPH_RANDOM_128] = new int[] { 0, 67, 119, 97, 120, 107, 46, 20, 41, 63, 106, 77, 113, 40, 76, 102, 103, 81, 115, 44, 7, 61, 80, 42, 104, 108, 86, 28, 27, 92, 87, 60, 116, 95, 88, 112, 37, 36, 75, 93, 13, 8, 23, 122, 19, 94, 6, 114, 70, 85, 125, 111, 117, 82, 126, 79, 109, 110, 121, 100, 31, 21, 98, 9, 96, 74, 90, 1, 71, 89, 48, 68, 73, 72, 65, 38, 14, 11, 99, 55, 22, 17, 53, 118, 101, 49, 26, 30, 34, 69, 66, 124, 29, 39, 45, 33, 64, 3, 62, 78, 59, 84, 15, 16, 24, 123, 10, 5, 25, 56, 57, 51, 35, 12, 47, 18, 32, 52, 83, 2, 4, 58, 43, 105, 91, 50, 54, 127, 128 };
         */
-    }
+        }
 
     public ModulePanel getPanel()
-    {
+        {
         return new ModulePanel(Morph.this)
             {
-                public JComponent buildPanel()
+            public JComponent buildPanel()
                 {               
-                    Box box = new Box(BoxLayout.Y_AXIS);
-                    Unit unit = (Unit) getModulation();
-                    box.add(new UnitOutput(unit, 0, this));
+                Box box = new Box(BoxLayout.Y_AXIS);
+                Unit unit = (Unit) getModulation();
+                box.add(new UnitOutput(unit, 0, this));
                                 
-                    Box box2 = new Box(BoxLayout.X_AXIS);
-                    Box box3 = new Box(BoxLayout.Y_AXIS);
-                    for(int i = 0; i < unit.getNumInputs(); i++)
-                        {
-                            box3.add(new UnitInput(unit, i, this));
-                        }
-                    box2.add(box3);
+                Box box2 = new Box(BoxLayout.X_AXIS);
+                Box box3 = new Box(BoxLayout.Y_AXIS);
+                for(int i = 0; i < unit.getNumInputs(); i++)
+                    {
+                    box3.add(new UnitInput(unit, i, this));
+                    }
+                box2.add(box3);
                                 
-                    box3 = new Box(BoxLayout.Y_AXIS);
+                box3 = new Box(BoxLayout.Y_AXIS);
 
-                    for(int i = 0; i < unit.getNumModulationOutputs(); i++)
-                        {
-                            ModulationOutput m = new ModulationOutput(unit, i, this);
-                            m.setTitleText("Trig", false);
-                            box3.add(m);
-                        }
-                    box2.add(box3);
-                    box.add(box2);
+                for(int i = 0; i < unit.getNumModulationOutputs(); i++)
+                    {
+                    ModulationOutput m = new ModulationOutput(unit, i, this);
+                    m.setTitleText("Trig", false);
+                    box3.add(m);
+                    }
+                box2.add(box3);
+                box.add(box2);
 
-                    for(int i = 0; i < unit.getNumModulations(); i++)
-                        {
-                            box.add(new ModulationInput(unit, i, this));
-                        }
+                for(int i = 0; i < unit.getNumModulations(); i++)
+                    {
+                    box.add(new ModulationInput(unit, i, this));
+                    }
                         
-                    for(int i = 0; i < unit.getNumOptions(); i++)
-                        {
-                            box.add(new OptionsChooser(unit, i));
-                        }
+                for(int i = 0; i < unit.getNumOptions(); i++)
+                    {
+                    box.add(new OptionsChooser(unit, i));
+                    }
                         
-                    box.add(new ConstraintsChooser(unit, this));
+                box.add(new ConstraintsChooser(unit, this));
 
-                    return box;
+                return box;
                 }
-        };
-    }
+            };
+        }
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-    {
+        {
         if (isConstant)
             {
-                if (modulation == MOD_VARIANCE)  // Variance
-                    {
-                        double range = makeVerySensitive(value);
-                        int f = (int)(range * NUM_PARTIALS + 1);
-                        if (f == 1) return "1 Partial";
-                        else return "" + f + " Partials";
-                    }
-                else if (modulation == MOD_SEED)
-                    {
-                        return (value == 0.0 ? "Free" : String.format("%.4f" , value));
-                    }
-                else return super.getModulationValueDescription(modulation, value, isConstant);
+            if (modulation == MOD_VARIANCE)  // Variance
+                {
+                double range = makeVerySensitive(value);
+                int f = (int)(range * NUM_PARTIALS + 1);
+                if (f == 1) return "1 Partial";
+                else return "" + f + " Partials";
+                }
+            else if (modulation == MOD_SEED)
+                {
+                return (value == 0.0 ? "Free" : String.format("%.4f" , value));
+                }
+            else return super.getModulationValueDescription(modulation, value, isConstant);
             }
         else return "";
-    }
+        }
 
-}
+    }
 
 
 /*   How I generate the random arrays

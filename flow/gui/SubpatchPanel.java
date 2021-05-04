@@ -20,7 +20,7 @@ import java.awt.dnd.*;
 import java.awt.datatransfer.*;
 
 public class SubpatchPanel extends JPanel implements Transferable
-{
+    {
     Rack rack;
     JComponent title;
     JLabel titleLabel;
@@ -44,83 +44,83 @@ public class SubpatchPanel extends JPanel implements Transferable
     public static final int STRUT_WIDTH = 4;
         
     public SubpatchPanel(Rack rack, int group)
-    {
+        {
         buildSubpatchPanel(rack, group);
-    }
+        }
         
     void buildSubpatchPanel(Rack rack, int group)
-    {
+        {
         rack.getOutput().lock();
         try
             {
-                this.group = group;
-                this.rack = rack;
+            this.group = group;
+            this.rack = rack;
                 
-                setLayout(new BorderLayout());
-                title = buildTitle();
-                add(title, BorderLayout.WEST);
-                title.addMouseListener(new MouseAdapter()
+            setLayout(new BorderLayout());
+            title = buildTitle();
+            add(title, BorderLayout.WEST);
+            title.addMouseListener(new MouseAdapter()
+                {
+                public void mousePressed(MouseEvent e)
                     {
-                        public void mousePressed(MouseEvent e)
-                        {
-                            getTransferHandler().exportAsDrag(SubpatchPanel.this, e, TransferHandler.MOVE);
-                        }
-                    });
+                    getTransferHandler().exportAsDrag(SubpatchPanel.this, e, TransferHandler.MOVE);
+                    }
+                });
                                                 
-                body = buildPanel();
-                add(body, BorderLayout.CENTER);
+            body = buildPanel();
+            add(body, BorderLayout.CENTER);
                                 
-                Border border = BorderFactory.createLineBorder(Color.GRAY);
-                setBorder(border);
+            Border border = BorderFactory.createLineBorder(Color.GRAY);
+            setBorder(border);
 
-                this.setTransferHandler(new ModulePanelTransferHandler());
-                this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener()));
+            this.setTransferHandler(new ModulePanelTransferHandler());
+            this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener()));
                 
-                Output out = rack.getOutput();
-                titleLabel.setText(" " + out.getGroup(group).getPatchName());
-                gain.setValue((int)(out.getGroup(group).getGain() * GAIN_RESOLUTION * Out.MAX_GAIN));
-                double val = gain.getValue() / (double) GAIN_RESOLUTION;
-                gainLabel.setText(String.format("%1.2f", val));
+            Output out = rack.getOutput();
+            titleLabel.setText(" " + out.getGroup(group).getPatchName());
+            gain.setValue((int)(out.getGroup(group).getGain() * GAIN_RESOLUTION * Out.MAX_GAIN));
+            double val = gain.getValue() / (double) GAIN_RESOLUTION;
+            gainLabel.setText(String.format("%1.2f", val));
 
-                pan.setValue((int)(out.getGroup(group).getPan() * 200));
-                val = pan.getValue();
-                panLabel.setText(val == 100 ? "--" : (val < 100 ? ("< " + (int)(100 - val)) : ("" + (int)(val - 100) + " >")));
+            pan.setValue((int)(out.getGroup(group).getPan() * 200));
+            val = pan.getValue();
+            panLabel.setText(val == 100 ? "--" : (val < 100 ? ("< " + (int)(100 - val)) : ("" + (int)(val - 100) + " >")));
 
-                sounds.setValue(out.getGroup(group).getNumRequestedSounds());
-                soundsLabel.setText(sounds.getValue() == 0 ? "Off" : "" + sounds.getValue());
+            sounds.setValue(out.getGroup(group).getNumRequestedSounds());
+            soundsLabel.setText(sounds.getValue() == 0 ? "Off" : "" + sounds.getValue());
                                 
-                midi.setValue(out.getGroup(group).getChannel() + 1);
-                int min = out.getGroup(group).getMinNote();
-                int max = out.getGroup(group).getMaxNote();
-                if (min != max)             // FIXME: we assume that this means they're full range for now.
-                    {
-                        note.setValue(0);
-                    }
-                else
-                    {
-                        note.setValue(min + 1);
-                    }
-                updateSoundAllocation();
+            midi.setValue(out.getGroup(group).getChannel() + 1);
+            int min = out.getGroup(group).getMinNote();
+            int max = out.getGroup(group).getMaxNote();
+            if (min != max)             // FIXME: we assume that this means they're full range for now.
+                {
+                note.setValue(0);
+                }
+            else
+                {
+                note.setValue(min + 1);
+                }
+            updateSoundAllocation();
             }
         finally     
             {
-                rack.getOutput().unlock();
+            rack.getOutput().unlock();
             }
-    }
+        }
     
     public SubpatchPanel(Rack rack, JSONObject obj)
-    {
+        {
         rack.getOutput().lock();
         try
             {
-                obj.remove("sub");  // strip out subgroups
-                buildSubpatchPanel(rack, rack.getOutput().addGroup(obj));
+            obj.remove("sub");  // strip out subgroups
+            buildSubpatchPanel(rack, rack.getOutput().addGroup(obj));
             }
         finally     
             {
-                rack.getOutput().unlock();
+            rack.getOutput().unlock();
             }
-    }
+        }
     
     // close box
     static final ImageIcon I_CLOSE = iconFor("BellyButton.png");
@@ -128,9 +128,9 @@ public class SubpatchPanel extends JPanel implements Transferable
     public static final String[] notes = new String[] { "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B" };
 
     static ImageIcon iconFor(String name)
-    {
+        {
         return new ImageIcon(ModulePanel.class.getResource(name));
-    }
+        }
 
     /** Sets the Rack of the ModulePanel. */
     public void setRack(Rack rack) { this.rack = rack; }
@@ -144,38 +144,38 @@ public class SubpatchPanel extends JPanel implements Transferable
     /** Returns the background color of the title bar.  Override this
         to customize the title bar to something different than the standards. */
     protected Color getTitleBackground()
-    {
+        {
         return new Color(128, 128, 128);
-    }
+        }
         
     /** Returns the foreground color of the title bar.  Override this
         to customize the title bar to something different than the standards. */
     protected Color getTitleForeground()
-    {
+        {
         return Color.WHITE;
-    }
+        }
 
     /** Returns the ModPanel's outer title component. */
     public JComponent getTitle()
-    {
+        {
         return title;
-    }
+        }
 
     /** Returns the ModPanel's inner title component (which is colored). */
     public JComponent getTitlePanel()
-    {
+        {
         return titlePanel;
-    }
+        }
 
     /** Returns the ModPanel's title JLabel. */
     public JLabel getTitleLabel()
-    {
+        {
         return titleLabel;
-    }
+        }
 
     // Builds the title bar for the ModulePanel
     JComponent buildTitle()
-    {
+        {
         JLabel sacrificialLabel = new JLabel(" 88888888888888888888 ");
         sacrificialLabel.setFont(Style.SMALL_FONT());
         final int titleWidth = (int)sacrificialLabel.getPreferredSize().getWidth();
@@ -190,8 +190,8 @@ public class SubpatchPanel extends JPanel implements Transferable
                 
         titleLabel = new JLabel(" Yo ")
             {
-                public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
-                public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
                 
         titleLabel.setForeground(getTitleForeground());
@@ -205,9 +205,9 @@ public class SubpatchPanel extends JPanel implements Transferable
         removeButton.setContentAreaFilled(false);
         removeButton.addActionListener(new ActionListener()
             {
-                public void actionPerformed ( ActionEvent e )
+            public void actionPerformed ( ActionEvent e )
                 {
-                    close();
+                close();
                 }
             });
         titlePanel.add(removeButton, BorderLayout.WEST);                 
@@ -216,7 +216,7 @@ public class SubpatchPanel extends JPanel implements Transferable
         outer.add(Strut.makeVerticalStrut(4), BorderLayout.EAST);
         outer.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
         return outer;
-    }
+        }
 
 
     public static final int GAIN_RESOLUTION = 25;
@@ -224,7 +224,7 @@ public class SubpatchPanel extends JPanel implements Transferable
         ModulePanel.  Override this to customize as you see fit, by creating UnitInputs,
         UnitOutputs, ModulationInputs, ModulationOutputs, OptionsChoosers, and ConstraintsChoosers. */
     protected JComponent buildPanel()
-    {        
+        {        
         JPanel pane = new JPanel();
                 
         pane.setLayout(new GridBagLayout());
@@ -245,8 +245,8 @@ public class SubpatchPanel extends JPanel implements Transferable
         allocatedTitle.setFont(Style.SMALL_FONT());
         allocatedLabel = new JLabel("")
             {
-                public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
-                public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         allocatedLabel.setFont(Style.SMALL_FONT());
 
@@ -254,8 +254,8 @@ public class SubpatchPanel extends JPanel implements Transferable
         soundsTitle.setFont(Style.SMALL_FONT());
         soundsLabel = new JLabel("")
             {
-                public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
-                public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         soundsLabel.setFont(Style.SMALL_FONT());
         sounds = new JSlider(0, rack.getOutput().getNumSounds() - 1);           // we need to leave one sound for the primary
@@ -264,36 +264,36 @@ public class SubpatchPanel extends JPanel implements Transferable
         sounds.putClientProperty( "JComponent.sizeVariant", "small" );
         sounds.addChangeListener(new ChangeListener()
             {
-                public void stateChanged(ChangeEvent e) 
+            public void stateChanged(ChangeEvent e) 
                 {
-                    if (sounds.getValue() == 0)
-                        {
-                            soundsLabel.setText("Off");
-                        }
-                    else
-                        {
-                            soundsLabel.setText("" + sounds.getValue());
-                        }
+                if (sounds.getValue() == 0)
+                    {
+                    soundsLabel.setText("Off");
+                    }
+                else
+                    {
+                    soundsLabel.setText("" + sounds.getValue());
+                    }
                                 
-                    if (!sounds.getValueIsAdjusting())
+                if (!sounds.getValueIsAdjusting())
+                    {
+                    Output out = rack.getOutput();
+                    out.lock();
+                    try
                         {
-                            Output out = rack.getOutput();
-                            out.lock();
-                            try
-                                {
-                                    out.getGroup(group).setNumRequestedSounds(sounds.getValue());
-                                    out.assignGroupsToSounds();
-                                    SubpatchPanel[] sub = rack.getSubpatches();
-                                    for(int i = 0; i < sub.length; i++)
-                                        sub[i].updateSoundAllocation();
-                                }
-                            finally 
-                                {
-                                    out.unlock();
-                                }
+                        out.getGroup(group).setNumRequestedSounds(sounds.getValue());
+                        out.assignGroupsToSounds();
+                        SubpatchPanel[] sub = rack.getSubpatches();
+                        for(int i = 0; i < sub.length; i++)
+                            sub[i].updateSoundAllocation();
                         }
+                    finally 
+                        {
+                        out.unlock();
+                        }
+                    }
                 
-                    buildSummary();
+                buildSummary();
                 }
             });
         Dimension d = sounds.getPreferredSize();
@@ -324,7 +324,7 @@ public class SubpatchPanel extends JPanel implements Transferable
         gainTitle.setFont(Style.SMALL_FONT());
         gainLabel = new JLabel("")
             {
-                public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         gainLabel.setFont(Style.SMALL_FONT());
         //double g = rack.getOutput().getGroup(group).getGain();
@@ -335,24 +335,24 @@ public class SubpatchPanel extends JPanel implements Transferable
         gain.putClientProperty( "JComponent.sizeVariant", "small" );
         gain.addChangeListener(new ChangeListener()
             {
-                public void stateChanged(ChangeEvent e) 
+            public void stateChanged(ChangeEvent e) 
                 {
-                    double val = gain.getValue() / (double) GAIN_RESOLUTION;
-                    gainLabel.setText(String.format("%1.2f", val));
+                double val = gain.getValue() / (double) GAIN_RESOLUTION;
+                gainLabel.setText(String.format("%1.2f", val));
 
-                    // this one is real-time
-                    rack.getOutput().lock();
-                    try
-                        {
-                            rack.getOutput().getGroup(group).setGain(val / Out.MAX_GAIN);           // so we go from 0...1
-                            rack.getOutput().redistributeGains();
-                        }
-                    finally
-                        {
-                            rack.getOutput().unlock();
-                        }
+                // this one is real-time
+                rack.getOutput().lock();
+                try
+                    {
+                    rack.getOutput().getGroup(group).setGain(val / Out.MAX_GAIN);           // so we go from 0...1
+                    rack.getOutput().redistributeGains();
+                    }
+                finally
+                    {
+                    rack.getOutput().unlock();
+                    }
 
-                    buildSummary();
+                buildSummary();
                 }
             });
 
@@ -360,7 +360,7 @@ public class SubpatchPanel extends JPanel implements Transferable
         panTitle.setFont(Style.SMALL_FONT());
         panLabel = new JLabel("")
             {
-                public Dimension getPreferredSize() { return new Dimension(titleWidth2, titleHeight2); }
+            public Dimension getPreferredSize() { return new Dimension(titleWidth2, titleHeight2); }
             };
         panLabel.setFont(Style.SMALL_FONT());
         //double g = rack.getOutput().getGroup(group).getGain();
@@ -371,24 +371,24 @@ public class SubpatchPanel extends JPanel implements Transferable
         pan.putClientProperty( "JComponent.sizeVariant", "small" );
         pan.addChangeListener(new ChangeListener()
             {
-                public void stateChanged(ChangeEvent e) 
+            public void stateChanged(ChangeEvent e) 
                 {
-                    double val = pan.getValue();
-                    panLabel.setText(val == 100 ? "--" : (val < 100 ? ("< " + (int)(100 - val)) : ("" + (int)(val - 100) + " >")));
+                double val = pan.getValue();
+                panLabel.setText(val == 100 ? "--" : (val < 100 ? ("< " + (int)(100 - val)) : ("" + (int)(val - 100) + " >")));
                 
-                    // this one is real-time
-                    rack.getOutput().lock();
-                    try
-                        {
-                            rack.getOutput().getGroup(group).setPan(val / 200.0);           // so we go from 0...1
-                            rack.getOutput().redistributePans();
-                        }
-                    finally
-                        {
-                            rack.getOutput().unlock();
-                        }
+                // this one is real-time
+                rack.getOutput().lock();
+                try
+                    {
+                    rack.getOutput().getGroup(group).setPan(val / 200.0);           // so we go from 0...1
+                    rack.getOutput().redistributePans();
+                    }
+                finally
+                    {
+                    rack.getOutput().unlock();
+                    }
 
-                    buildSummary();
+                buildSummary();
                 }
             });
 
@@ -416,8 +416,8 @@ public class SubpatchPanel extends JPanel implements Transferable
         midiTitle.setFont(Style.SMALL_FONT());
         midiLabel = new JLabel("")
             {
-                public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
-                public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
         midiLabel.setFont(Style.SMALL_FONT());
         midi = new JSlider(0, Input.NUM_MIDI_CHANNELS);
@@ -426,38 +426,38 @@ public class SubpatchPanel extends JPanel implements Transferable
         midi.putClientProperty( "JComponent.sizeVariant", "small" );
         midi.addChangeListener(new ChangeListener()
             {
-                public void stateChanged(ChangeEvent e) 
+            public void stateChanged(ChangeEvent e) 
                 {
-                    if (midi.getValue() == 0)
-                        {
-                            midiLabel.setText("Off");
-                        }
-                    else
-                        {
-                            midiLabel.setText("" + midi.getValue());
-                        }
+                if (midi.getValue() == 0)
+                    {
+                    midiLabel.setText("Off");
+                    }
+                else
+                    {
+                    midiLabel.setText("" + midi.getValue());
+                    }
 
-                    if (!midi.getValueIsAdjusting())
+                if (!midi.getValueIsAdjusting())
+                    {
+                    Output out = rack.getOutput();
+                    out.lock();
+                    try
                         {
-                            Output out = rack.getOutput();
-                            out.lock();
-                            try
-                                {
-                                    if (midi.getValue() == 0)
-                                        {
-                                            out.getGroup(group).setChannel(Input.CHANNEL_NONE);
-                                        }
-                                    else
-                                        {
-                                            out.getGroup(group).setChannel(midi.getValue() - 1);
-                                        }
-                                }
-                            finally 
-                                {
-                                    out.unlock();
-                                }
+                        if (midi.getValue() == 0)
+                            {
+                            out.getGroup(group).setChannel(Input.CHANNEL_NONE);
+                            }
+                        else
+                            {
+                            out.getGroup(group).setChannel(midi.getValue() - 1);
+                            }
                         }
-                    buildSummary();
+                    finally 
+                        {
+                        out.unlock();
+                        }
+                    }
+                buildSummary();
                 }
             });
         d = midi.getPreferredSize();
@@ -480,24 +480,24 @@ public class SubpatchPanel extends JPanel implements Transferable
                 
         PushButton rename = new PushButton("Rename")
             {
-                public void perform()
+            public void perform()
                 {
-                    rack.getOutput().lock();
-                    try
+                rack.getOutput().lock();
+                try
+                    {
+                    String result = AppMenu.showSimpleInput("Rename", "Provide a name for this patch.", 
+                        rack.getOutput().getGroup(group).getPatchName(), rack);
+                    if (result != null)
                         {
-                            String result = AppMenu.showSimpleInput("Rename", "Provide a name for this patch.", 
-                                                                    rack.getOutput().getGroup(group).getPatchName(), rack);
-                            if (result != null)
-                                {
-                                    rack.getOutput().getGroup(group).setPatchName(result);
-                                    titleLabel.setText(" " + result);
-                                    // I don't think we need to distribute this to the sounds
-                                }
+                        rack.getOutput().getGroup(group).setPatchName(result);
+                        titleLabel.setText(" " + result);
+                        // I don't think we need to distribute this to the sounds
                         }
-                    finally
-                        {
-                            rack.getOutput().unlock();
-                        }
+                    }
+                finally
+                    {
+                    rack.getOutput().unlock();
+                    }
                 }
             };
 
@@ -513,8 +513,8 @@ public class SubpatchPanel extends JPanel implements Transferable
         noteTitle.setFont(Style.SMALL_FONT());
         noteLabel = new JLabel("")
             {
-                public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
-                public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getMinimumSize() { return new Dimension(titleWidth, titleHeight); }
+            public Dimension getPreferredSize() { return new Dimension(titleWidth, titleHeight); }
             };
             
         noteLabel.setFont(Style.SMALL_FONT());
@@ -524,39 +524,39 @@ public class SubpatchPanel extends JPanel implements Transferable
         note.putClientProperty( "JComponent.sizeVariant", "small" );
         note.addChangeListener(new ChangeListener()
             {
-                public void stateChanged(ChangeEvent e) 
+            public void stateChanged(ChangeEvent e) 
                 {
-                    int v = note.getValue() - 1;
-                    if (v < 0)
-                        {
-                            noteLabel.setText("Any");
-                        }
-                    else
-                        {
-                            noteLabel.setText("" + notes[v % 12] + (v / 12));
-                        }
+                int v = note.getValue() - 1;
+                if (v < 0)
+                    {
+                    noteLabel.setText("Any");
+                    }
+                else
+                    {
+                    noteLabel.setText("" + notes[v % 12] + (v / 12));
+                    }
 
-                    if (!note.getValueIsAdjusting())
+                if (!note.getValueIsAdjusting())
+                    {
+                    Output out = rack.getOutput();
+                    out.lock();
+                    try
                         {
-                            Output out = rack.getOutput();
-                            out.lock();
-                            try
-                                {
-                                    if (v < 0)
-                                        {
-                                            out.getGroup(group).setBothNotes(0, 127);
-                                        }
-                                    else
-                                        {
-                                            out.getGroup(group).setBothNotes(v);
-                                        }
-                                }
-                            finally 
-                                {
-                                    out.unlock();
-                                }
+                        if (v < 0)
+                            {
+                            out.getGroup(group).setBothNotes(0, 127);
+                            }
+                        else
+                            {
+                            out.getGroup(group).setBothNotes(v);
+                            }
                         }
-                    buildSummary();
+                    finally 
+                        {
+                        out.unlock();
+                        }
+                    }
+                buildSummary();
                 }
             });
         d = note.getPreferredSize();
@@ -586,64 +586,64 @@ public class SubpatchPanel extends JPanel implements Transferable
         buildSummary();
 
         return new DisclosurePanel(summary, pp);
-    }
+        }
         
     public void buildSummary()
-    {
+        {
         summary.setText("Voices: " + allocatedLabel.getText() + " / " + soundsLabel.getText() +
-                        "     Midi: " + midiLabel.getText() +
-                        "     Note: " + noteLabel.getText() +
-                        "     Gain: " + gainLabel.getText() +
-                        "     Pan: " + panLabel.getText());
-    }
+            "     Midi: " + midiLabel.getText() +
+            "     Note: " + noteLabel.getText() +
+            "     Gain: " + gainLabel.getText() +
+            "     Pan: " + panLabel.getText());
+        }
     
     public void updateSoundAllocation()
-    {
+        {
         Output out = rack.getOutput();
         out.lock();
         try
             {
-                if (out.getOnlyPlayFirstSound())
-                    {
-                        allocatedLabel.setText("[M]");
-                    }
-                else
-                    {
-                        allocatedLabel.setText("" + out.getNumSounds(group));
-                    }
+            if (out.getOnlyPlayFirstSound())
+                {
+                allocatedLabel.setText("[M]");
+                }
+            else
+                {
+                allocatedLabel.setText("" + out.getNumSounds(group));
+                }
             }
         finally 
             {
-                out.unlock();
+            out.unlock();
             }
         buildSummary();
-    }
+        }
                 
     public void close()
-    {
+        {
         rack.remove(this);
         rack.getOutput().removeGroup(group);
         rack.rebuildSubpatches();
-    }
+        }
 
     ////// DRAG AND DROP JUNK
 
                 
     public Object getTransferData(DataFlavor flavor) 
-    {
+        {
         if (flavor.equals(Rack.moduleflavor))
             return this;
         else
             return null;
-    }
+        }
                 
     public DataFlavor[] getTransferDataFlavors() 
-    {
+        {
         return new DataFlavor[] { Rack.moduleflavor };
-    }
+        }
 
     public boolean isDataFlavorSupported(DataFlavor flavor) 
-    {
+        {
         return (flavor.equals(Rack.moduleflavor));
+        }
     }
-}

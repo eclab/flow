@@ -51,7 +51,7 @@ import java.io.*;
 
 
 public class Output
-{
+    {
     /** Sampling rate of sound */
     public static final float SAMPLING_RATE = 44100.0f;
     public static final double NYQUIST = SAMPLING_RATE / 2.0;
@@ -65,7 +65,14 @@ public class Output
     */
     public static final int DEFAULT_BUFFER_SIZE = 1152;                     
     static int bufferSize = -1;                     
+
     
+    public static final int SIN_QUALITY_LOW = 0;
+    public static final int SIN_QUALITY_MEDIUM = 1;
+    public static final int SIN_QUALITY_HIGH = 2;
+    public static final int SIN_QUALITY_DEFAULT = SIN_QUALITY_LOW;
+    static int sinQuality = SIN_QUALITY_DEFAULT;
+
     /** Number of samples emitted before reading the next partials output.
         Ideally this is 1; but it uses more juice.  If this is a large number
         then it contributes to lag because we interpolate from the previous partials
@@ -134,7 +141,7 @@ public class Output
     volatile int numSounds = 0;   
     
     static
-    {
+        {
         // Load preferences
         numVoices = Prefs.getLastNumVoices();
         numVoicesPerThread = Prefs.getLastNumVoicesPerThread();
@@ -143,13 +150,14 @@ public class Output
         masterGain = Prefs.getLastMasterGain();
         stereo = Prefs.getLastStereo();
         skip = Prefs.getLastSkip();   
-    }
+        sinQuality = Prefs.getLastSinQuality();   
+        }
     
     public Output()
-    {
+        {
         for(int i = 0; i < MAX_GROUPS; i++)
             {
-                group[i] = new Group();
+            group[i] = new Group();
             }
                 
         // We do NOT set this here because it confuse people doing Output programmatically.
@@ -168,11 +176,11 @@ public class Output
         boolean found = false;
         for (int i = 0; i < mixers.length; i++)
             {
-                if (mixers[i].getName().equals(mix))
-                    {
-                        found = true;
-                        setMixer(mixers[i]);
-                    }
+            if (mixers[i].getName().equals(mix))
+                {
+                found = true;
+                setMixer(mixers[i]);
+                }
             }
         if (!found) setMixer(null); // sets to the first one, which is the default normally
 
@@ -185,64 +193,64 @@ public class Output
             standardOrders[i] = (byte)i;
             
         audioInput = new AudioInput(this);
-    }
+        }
 
     /** Returns the currently used Mixer */
     public Mixer.Info getMixer()
-    {
+        {
         return mixer;
-    }
+        }
                 
     /** Sets the currently used Mixer */
     public void setMixer(Mixer.Info mixer)
-    {
+        {
         try
             {
-                if (sdl != null)
-                    sdl.stop();
-                if (mixer == null)
-                    {
-                        Mixer.Info[] m = getSupportedMixers();
-                        if (m.length > 0)
-                            mixer = m[0];
-                    }
-                if (mixer == null)
-                    sdl = AudioSystem.getSourceDataLine( audioFormat );
-                else
-                    sdl = AudioSystem.getSourceDataLine( audioFormat, mixer );
-                sdl.open(audioFormat, bufferSize * (isStereo() ? 2 : 1));
-                sdl.start();
+            if (sdl != null)
+                sdl.stop();
+            if (mixer == null)
+                {
+                Mixer.Info[] m = getSupportedMixers();
+                if (m.length > 0)
+                    mixer = m[0];
+                }
+            if (mixer == null)
+                sdl = AudioSystem.getSourceDataLine( audioFormat );
+            else
+                sdl = AudioSystem.getSourceDataLine( audioFormat, mixer );
+            sdl.open(audioFormat, bufferSize * (isStereo() ? 2 : 1));
+            sdl.start();
 
-                this.mixer = mixer;
+            this.mixer = mixer;
             }
         catch (LineUnavailableException ex) { throw new RuntimeException(ex); }
-    }
+        }
 
     /** Returns the available mixers which support the given audio format. */
     public Mixer.Info[] getSupportedMixers()
-    {
+        {
         DataLine.Info lineInfo = new DataLine.Info(SourceDataLine.class, audioFormat);
         Mixer.Info[] info = AudioSystem.getMixerInfo();
         int count = 0;
         for (int i = 0; i < info.length; i++) 
             {
-                Mixer m = AudioSystem.getMixer(info[i]);
-                if (m.isLineSupported(lineInfo)) 
-                    {
-                        count++;
-                    }
+            Mixer m = AudioSystem.getMixer(info[i]);
+            if (m.isLineSupported(lineInfo)) 
+                {
+                count++;
+                }
             }
 
         Mixer.Info[] options = new Mixer.Info[count];
         count = 0;
         for (int i = 0; i < info.length; i++) 
             {
-                Mixer m = AudioSystem.getMixer(info[i]);
-                if (m.isLineSupported(lineInfo)) 
-                    options[count++] = info[i];
+            Mixer m = AudioSystem.getMixer(info[i]);
+            if (m.isLineSupported(lineInfo)) 
+                options[count++] = info[i];
             }
         return options;
-    }
+        }
 
     
     /* 
@@ -254,20 +262,20 @@ public class Output
     Object randomLock = new Object[0];
     long randomSeed;
     Random getNewRandom() 
-    { 
+        { 
         synchronized(randomLock)
             {
-                randomSeed += 10729347;  // or whatever
-                return new Random(randomSeed);
+            randomSeed += 10729347;  // or whatever
+            return new Random(randomSeed);
             }
-    }
+        }
 
 
     /** Returns the Input */
     public Input getInput()
-    {
+        {
         return input;
-    }
+        }
                 
 
     /// Current Tick
@@ -320,9 +328,9 @@ public class Output
         threads which tried to acquire after it (so-called "barging").
     */
     public void lock() 
-    { 
+        { 
         soundLock.lock(); 
-    }
+        }
     
     
     
@@ -346,58 +354,58 @@ public class Output
         If you do not have this lock, calling unlock() does nothing.
     */
     public void unlock() 
-    {
+        {
         soundLock.unlock();
-    }
+        }
     
     // Sounds register themselves with the Output using this method.
     void register(Sound sound) 
-    { 
+        { 
         lock();
         try
             {
-                sound.index = numSounds; 
-                sounds[numSounds++] = sound; 
-                sound.setGroup(Output.PRIMARY_GROUP);
-                sound.setChannel(Input.CHANNEL_OMNI);
-                input.addSound(sound);
+            sound.index = numSounds; 
+            sounds[numSounds++] = sound; 
+            sound.setGroup(Output.PRIMARY_GROUP);
+            sound.setChannel(Input.CHANNEL_OMNI);
+            input.addSound(sound);
             }
         finally
             {
-                unlock();
+            unlock();
             }
-    }
+        }
     
     /** Returns the given Sound */  
     public Sound getSound(int i)
-    {
+        {
         Sound s = null;
         lock();
         try
             {
-                s = sounds[i];
+            s = sounds[i];
             }
         finally
             {
-                unlock();
+            unlock();
             }
         return s;
-    }
+        }
     
     /** Returns the given Sound without first locking on the sound lock.  This allows certain modules to
         test to see if their sound is (for example) Sound #0 without acquiring the sound lock, which they
         cannot do because in their go() methods it's owned by the main voice thread.  You should not play
         with this unless you know precisely what you are doing. */
     public Sound getSoundUnsafe(int i)
-    {
+        {
         return sounds[i];
-    }
+        }
 
     /** Returns the total number of Sounds */
     public int getNumSounds()
-    {
+        {
         return numSounds;
-    }
+        }
     
         
      
@@ -479,7 +487,7 @@ public class Output
 
     // Contains the latest partials for the Output Thread to emit.  
     static class Swap
-    {
+        {
         double[] pan;
         double[][] amplitudes;
         double[][] frequencies;
@@ -493,7 +501,7 @@ public class Output
         boolean reset[];
               
         public Swap()
-        {
+            {
             pan = new double[numVoices];
             amplitudes = new double[numVoices][Unit.NUM_PARTIALS];
             frequencies = new double[numVoices][Unit.NUM_PARTIALS];
@@ -502,8 +510,8 @@ public class Output
             velocities = new double[numVoices];
             dephase = new boolean[numVoices];
             reset = new boolean[numVoices];
+            }
         }
-    }
     
     // The primary voice thread sets these
     Swap swap;
@@ -517,7 +525,7 @@ public class Output
     // Called by the Output Thread to check to see if new partials are
     // waiting, and if so, to swap and use them.    
     void checkAndSwap()
-    {
+        {
         // notice that we're effectively spin-waiting here.  
         //while(!emitsReady)
         //    {
@@ -526,16 +534,16 @@ public class Output
 
         if (emitsReady)
             {
-                Swap temp = swap;
-                swap = with;
-                with = temp;
-                emitsReady = false;
+            Swap temp = swap;
+            swap = with;
+            with = temp;
+            emitsReady = false;
             }
         else
             {
-                //Thread.currentThread().yield();           // we don't want the output thread to yield...
+            //Thread.currentThread().yield();           // we don't want the output thread to yield...
             }
-    }
+        }
       
     float[][] freeverbInput = new float[2][1];
     float[][] freeverbOutput = new float[2][1];
@@ -546,9 +554,9 @@ public class Output
     static final double[] blankPositions = new double[Unit.NUM_PARTIALS];  // for zeroing out
 
     void resetPositions(int voice)
-    {
+        {
         System.arraycopy(blankPositions, 0, positions[voice], 0, blankPositions.length);
-    }
+        }
 
 
     // 0.05 is about 3 32-sample periods before we get to near to 100%
@@ -568,29 +576,29 @@ public class Output
     public static final double PI2 = Math.PI * 2.0;
     
     public static double undenormalize(double val)              // assumes only positive values
-    {
+        {
         if (val > 0 && val <= WELL_ABOVE_SUBNORMALS)           // really it's 2250738585072012e-308, but I'm giving breathing room for multiplication
             val = 0;
         return val;
-    }
+        }
         
     // can't quite squeeze this into 35 bytes :-(   It's 37, so not inlined
     public static void undenormalize(double[] val)              // assumes only positive values
-    {
+        {
         for(int i = 0; i < val.length; i++)
             {
-                if (val[i] > 0 && val[i] <= WELL_ABOVE_SUBNORMALS)             // really it's 2250738585072012e-308, but I'm giving breathing room for multiplication
-                    val[i] = 0;
+            if (val[i] > 0 && val[i] <= WELL_ABOVE_SUBNORMALS)             // really it's 2250738585072012e-308, but I'm giving breathing room for multiplication
+                val[i] = 0;
             }
-    }
+        }
         
 
     public static double printDenormal(double val, String s)
-    {
+        {
         if (val > 0 && val <= 2250738585072012e-308)
             System.err.println("Output.printDenormal() WARNING: " + s + " is DENORMAL " + val);
         return val;
-    }
+        }
     
     
     /*
@@ -600,10 +608,11 @@ public class Output
       }
     */
 
+
     // Builds a single sample from the partials.  ALPHA is the current interpolation
     // factor (from 0...1) 
     double buildSample(int s, double[][] currentAmplitudes)
-    {        
+        {        
         // build the sample
         double sample = 0;
         Swap _with = with;
@@ -615,79 +624,102 @@ public class Output
         double v = _with.velocities[s];
         double pitch = _with.pitches[s];
         double tr = pitch * INV_SAMPLING_RATE;
+        int sinQuality = this.sinQuality;
         
         if (_with.dephase[s])                    // this is a manual hoist
             {
-                for (int i = 0; i < pos.length; i++)
-                    {
-                        double frequency = freq[i];
+            for (int i = 0; i < pos.length; i++)
+                {
+                double frequency = freq[i];
                                                                 
-                        // Because we're mixing, we can just ignore the higher frequency stuff, which gives us a speed boost.
-                        // However if the user wants to switch back to non-mixing, it might produce a pop because we have
-                        // reset everything.
-                        if (frequency * pitch > NYQUIST)
-                            {
-                                break;
-                            }
-
-                        int oi = orders[i] & 0xFF;           // if we're using 256 partials, they need to be all positive
-                                        
-                        // incoming amplitudes are pre-denormalized by the voice threads.
-                        // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
-                        // get denormalized.  So we undenormalize here.  When summing the two (non-denormal))
-                        // partials below, we can get a denormalled number -- try the IComeInPeace patch
-                        // after commenting out     if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0; 
-                        double amplitude = (currentAmp[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA) +
-                            (amp[i] * PARTIALS_INTERPOLATION_ALPHA);
-                        if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0;          // undenormalize prior to next go-around
-                        currentAmp[oi] = amplitude;
-
-                        if (amplitude > MINIMUM_VOLUME)
-                            {                               
-                                double position = pos[oi] + frequency * tr;
-                                position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
-                                pos[oi] = position;
-                                
-                                sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude;
-                            }
+                // Because we're mixing, we can just ignore the higher frequency stuff, which gives us a speed boost.
+                // However if the user wants to switch back to non-mixing, it might produce a pop because we have
+                // reset everything.
+                if (frequency * pitch > NYQUIST)
+                    {
+                    break;
                     }
+
+                int oi = orders[i] & 0xFF;           // if we're using 256 partials, they need to be all positive
+                                        
+                // incoming amplitudes are pre-denormalized by the voice threads.
+                // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
+                // get denormalized.  So we undenormalize here.  When summing the two (non-denormal))
+                // partials below, we can get a denormalled number -- try the IComeInPeace patch
+                // after commenting out     if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0; 
+                double amplitude = (currentAmp[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA) +
+                    (amp[i] * PARTIALS_INTERPOLATION_ALPHA);
+                if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0;          // undenormalize prior to next go-around
+                currentAmp[oi] = amplitude;
+
+                if (amplitude > MINIMUM_VOLUME)
+                    {                               
+                    double position = pos[oi] + frequency * tr;
+                    position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
+                    pos[oi] = position;
+                    
+                    if (sinQuality == SIN_QUALITY_LOW)
+                        {
+                        sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude;
+                        }
+                    else if (sinQuality == SIN_QUALITY_MEDIUM)
+                        {
+                        sample += Utility.fastIntSin(position * PI2 + MIXING[oi]) * amplitude;
+                        }
+                    else
+                        {
+                        sample += Math.sin(position * PI2 + MIXING[oi]) * amplitude;
+                        }                    
+                    }
+                }
             }
         else
             {
-                for (int i = 0; i < pos.length; i++)
-                    {
-                        double frequency = freq[i];
-                        int oi = orders[i] & 0xFF;           // if we're using 256 partials, they need to be all positive
+            for (int i = 0; i < pos.length; i++)
+                {
+                double frequency = freq[i];
+                int oi = orders[i] & 0xFF;           // if we're using 256 partials, they need to be all positive
                                                         
-                        // incoming amplitudes are pre-denormalized by the voice threads.
-                        // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
-                        // get denormalized.  So we undenormalize here.  When summing the two (non-denormal))
-                        // partials below, we can get a denormalled number -- try the IComeInPeace patch
-                        // after commenting out     if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0; 
-                        double amplitude = (currentAmp[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA) +
-                            (amp[i] * PARTIALS_INTERPOLATION_ALPHA);
-                        if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0;          // undenormalize prior to next go-around
-                        currentAmp[oi] = amplitude;
+                // incoming amplitudes are pre-denormalized by the voice threads.
+                // However when we multiply by ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA we can still
+                // get denormalized.  So we undenormalize here.  When summing the two (non-denormal))
+                // partials below, we can get a denormalled number -- try the IComeInPeace patch
+                // after commenting out     if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0; 
+                double amplitude = (currentAmp[oi] * ONE_MINUS_PARTIALS_INTERPOLATION_ALPHA) +
+                    (amp[i] * PARTIALS_INTERPOLATION_ALPHA);
+                if (amplitude < WELL_ABOVE_SUBNORMALS) amplitude = 0;          // undenormalize prior to next go-around
+                currentAmp[oi] = amplitude;
                                 
-                        // Unlike the dephase situation, we MUST update the position for all partials            
+                // Unlike the dephase situation, we MUST update the position for all partials            
                 
-                        //if (amplitude != 0)
-                        //      System.err.println("-->" + i + " " + frequency + " " + oi);
-                        double position = pos[oi] + frequency * tr;
-                        position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
-                        pos[oi] = position;
+                //if (amplitude != 0)
+                //      System.err.println("-->" + i + " " + frequency + " " + oi);
+                double position = pos[oi] + frequency * tr;
+                position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
+                pos[oi] = position;
                         
-                        // only here can we avoid doing the fastSin.  But in truth this is just an array lookup at this point.
+                // only here can we avoid doing the fastSin.  But in truth this is just an array lookup at this point.
                 
-                        if (frequency * pitch <= NYQUIST && amplitude > MINIMUM_VOLUME)
-                            {
-                                sample += Utility.fastSin(position * PI2) * amplitude;
-                            }
+                if (frequency * pitch <= NYQUIST && amplitude > MINIMUM_VOLUME)
+                    {
+                    if (sinQuality == SIN_QUALITY_LOW)
+                        {
+                        sample += Utility.fastSin(position * PI2) * amplitude;
+                        }
+                    else if (sinQuality == SIN_QUALITY_MEDIUM)
+                        {
+                        sample += Utility.fastIntSin(position * PI2) * amplitude;
+                        }
+                    else
+                        {
+                        sample += Math.sin(position * PI2) * amplitude;
+                        }                    
                     }
+                }
             }
 
         return sample * v;
-    }
+        }
         
     volatile boolean clipped = false;
     // Obviously this is not atomic, but it's not a big deal as we're just
@@ -717,24 +749,24 @@ public class Output
     //// The reverse is true for the per-output threads.
     
     void blockOutputUntil(int output, boolean val)
-    {
+        {
         synchronized(outputLocks[output])
             {
-                while(lightweightOutputSemaphores[output] != val)
-                    {
-                        try { outputLocks[output].wait(); } catch (Exception e) { }
-                    }
+            while(lightweightOutputSemaphores[output] != val)
+                {
+                try { outputLocks[output].wait(); } catch (Exception e) { }
+                }
             }
-    }
+        }
                 
     void signalOutput(int output, boolean val)
-    {
+        {
         synchronized(outputLocks[output])
             {
-                lightweightOutputSemaphores[output] = val;
-                outputLocks[output].notify();
+            lightweightOutputSemaphores[output] = val;
+            outputLocks[output].notify();
             }
-    }
+        }
 
 
 
@@ -742,271 +774,271 @@ public class Output
 
     // Starts the output thread.  Called from the constructor.
     void startOutputThread()
-    {
+        {
         Thread thread = new Thread(new Runnable()
             {
-                public void run()
+            public void run()
                 {
-                    /// The last amplitudes (used for interpolation between the past partials and new ones)
-                    /// Note that these are indexed by ORDER, not by actual index position
-                    final double[][] currentAmplitudes = new double[numVoices][Unit.NUM_PARTIALS];
+                /// The last amplitudes (used for interpolation between the past partials and new ones)
+                /// Note that these are indexed by ORDER, not by actual index position
+                final double[][] currentAmplitudes = new double[numVoices][Unit.NUM_PARTIALS];
   
-                    lightweightOutputSemaphores = new boolean[numVoices];
-                    outputLocks = new Object[numVoices];
-                    for (int i = 0; i < numVoices; i++) 
-                        {
-                            outputLocks[i] = new Object[0];
-                            lightweightOutputSemaphores[i] = true;
-                        }
+                lightweightOutputSemaphores = new boolean[numVoices];
+                outputLocks = new Object[numVoices];
+                for (int i = 0; i < numVoices; i++) 
+                    {
+                    outputLocks[i] = new Object[0];
+                    lightweightOutputSemaphores[i] = true;
+                    }
 
-                    for(int i = 0; i < numVoices; i += numOutputsPerThread)
+                for(int i = 0; i < numVoices; i += numOutputsPerThread)
+                    {
+                    final int _i = i;
+                    Thread thread = new Thread(new Runnable()
                         {
-                            final int _i = i;
-                            Thread thread = new Thread(new Runnable()
+                        public void run()
+                            {
+                            while(true) 
                                 {
-                                    public void run()
+                                blockOutputUntil(_i, true); 
+                                
+                                if (with.reset[_i])
                                     {
-                                        while(true) 
-                                            {
-                                                blockOutputUntil(_i, true); 
-                                
-                                                if (with.reset[_i])
-                                                    {
-                                                        resetPositions(_i);
-                                                        with.reset[_i] = false;
-                                                    }
-
-                                                int n = numVoices;
-                                                if (n >  _i + numOutputsPerThread)
-                                                    n =  _i + numOutputsPerThread;
-                                        
-                                                for(int j = _i; j < n; j++)
-                                                    {
-                                                        if (j < samples.length)         // voice hasn't been loaded yet, hang tight
-                                                            {
-                                                                double[] samplessnd = samples[j];
-                                                                for (int samp = 0; samp < skip; samp++)
-                                                                    {
-                                                                        samplessnd[samp] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
-                                                                    }
-                                                            }
-                                                    }
-                                                        
-                                                signalOutput(_i, false);
-                                            }
+                                    resetPositions(_i);
+                                    with.reset[_i] = false;
                                     }
-                                });
-                            thread.setName("Output " + _i);
-                            thread.setDaemon(true);
-                            thread.start();
-                        }
-            
-                    boolean stereo = Output.isStereo();
-                                
-                    while(true)
-                        {
-                            if (numSounds == 0) // nothing allocated yet
-                                { 
-                                    try { Thread.currentThread().sleep(25); } catch (InterruptedException ex) { }
-                                    continue;
-                                }
-                    
-                            int solo = -1;
-                    
-                            int available = sdl.available();
-                            if (available >= ((bufferSize - 128) * (stereo ? 2 : 1)))
-                                {
-                                    glitched = true;
-                                }
-                        
-                            if (samples.length != numSounds)
-                                {
-                                    samples = new double[numSounds][skip];
-                                }
-                        
-                            checkAndSwap();
-                    
-                            if (onlyPlayFirstSound)
-                                {
-                                    Sound sound = input.getLastPlayedSound();
-                                    if (sound == null)
-                                        solo = 0;
-                                    else
-                                        solo = sound.getIndex();
-                        
-                                    if (with.reset[solo])
+
+                                int n = numVoices;
+                                if (n >  _i + numOutputsPerThread)
+                                    n =  _i + numOutputsPerThread;
+                                        
+                                for(int j = _i; j < n; j++)
+                                    {
+                                    if (j < samples.length)         // voice hasn't been loaded yet, hang tight
                                         {
-                                            resetPositions(solo);
-                                            with.reset[solo] = false;
+                                        double[] samplessnd = samples[j];
+                                        for (int samp = 0; samp < skip; samp++)
+                                            {
+                                            samplessnd[samp] = buildSample(j, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+                                            }
                                         }
+                                    }
                                                         
-                                    //                        for(int i = 0; i < currentAmplitudes[0].length; i++)
-                                    //                              System.err.println("" + i + " " + currentAmplitudes[0][i]);
-                                    double[] samplessnd = samples[solo];
-                                    for (int samp = 0; samp < skip; samp++)
-                                        {
-                                            samplessnd[samp] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
-                                            //                            System.err.println(samplessnd[samp]);
-                                        }
+                                signalOutput(_i, false);
+                                }
+                            }
+                        });
+                    thread.setName("Output " + _i);
+                    thread.setDaemon(true);
+                    thread.start();
+                    }
+            
+                boolean stereo = Output.isStereo();
+                                
+                while(true)
+                    {
+                    if (numSounds == 0) // nothing allocated yet
+                        { 
+                        try { Thread.currentThread().sleep(25); } catch (InterruptedException ex) { }
+                        continue;
+                        }
+                    
+                    int solo = -1;
+                    
+                    int available = sdl.available();
+                    if (available >= ((bufferSize - 128) * (stereo ? 2 : 1)))
+                        {
+                        glitched = true;
+                        }
+                        
+                    if (samples.length != numSounds)
+                        {
+                        samples = new double[numSounds][skip];
+                        }
+                        
+                    checkAndSwap();
+                    
+                    if (onlyPlayFirstSound)
+                        {
+                        Sound sound = input.getLastPlayedSound();
+                        if (sound == null)
+                            solo = 0;
+                        else
+                            solo = sound.getIndex();
+                        
+                        if (with.reset[solo])
+                            {
+                            resetPositions(solo);
+                            with.reset[solo] = false;
+                            }
+                                                        
+                        //                        for(int i = 0; i < currentAmplitudes[0].length; i++)
+                        //                              System.err.println("" + i + " " + currentAmplitudes[0][i]);
+                        double[] samplessnd = samples[solo];
+                        for (int samp = 0; samp < skip; samp++)
+                            {
+                            samplessnd[samp] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
+                            //                            System.err.println(samplessnd[samp]);
+                            }
+                        }
+                    else
+                        {
+                        // Fire up output threads
+                        for(int snd = 0; snd < numSounds; snd += numOutputsPerThread)
+                            {
+                            signalOutput(snd, true);
+                            }
+                        for(int snd = 0; snd < numSounds; snd += numOutputsPerThread)
+                            {
+                            blockOutputUntil(snd, false);
+                            }
+                        }
+                        
+                    if (with.reverbWet > 0.0f)
+                        {        
+                        freeverb.setWet(with.reverbWet);
+                        freeverb.setRoomSize(with.reverbRoomSize);
+                        freeverb.setDamp(with.reverbDamp);
+                        }
+                        
+                    double gain = masterGain;           // so we're not reading a volatile variable!
+                                 
+                    int j = 0;       
+                    for (int samp = 0; samp < skip; samp++)
+                        {
+                        double left = 0;
+                        double right = 0;
+                        if (solo != -1)
+                            {
+                            if (stereo)
+                                {
+                                left += samples[solo][samp] * (1.0 - with.pan[solo]);
+                                right += samples[solo][samp] * with.pan[solo];
                                 }
                             else
                                 {
-                                    // Fire up output threads
-                                    for(int snd = 0; snd < numSounds; snd += numOutputsPerThread)
-                                        {
-                                            signalOutput(snd, true);
-                                        }
-                                    for(int snd = 0; snd < numSounds; snd += numOutputsPerThread)
-                                        {
-                                            blockOutputUntil(snd, false);
-                                        }
+                                left += samples[solo][samp];
                                 }
-                        
-                            if (with.reverbWet > 0.0f)
-                                {        
-                                    freeverb.setWet(with.reverbWet);
-                                    freeverb.setRoomSize(with.reverbRoomSize);
-                                    freeverb.setDamp(with.reverbDamp);
-                                }
-                        
-                            double gain = masterGain;           // so we're not reading a volatile variable!
-                                 
-                            int j = 0;       
-                            for (int samp = 0; samp < skip; samp++)
+                            }
+                        else
+                            {
+                            if (stereo)
                                 {
-                                    double left = 0;
-                                    double right = 0;
-                                    if (solo != -1)
-                                        {
-                                            if (stereo)
-                                                {
-                                                    left += samples[solo][samp] * (1.0 - with.pan[solo]);
-                                                    right += samples[solo][samp] * with.pan[solo];
-                                                }
-                                            else
-                                                {
-                                                    left += samples[solo][samp];
-                                                }
-                                        }
-                                    else
-                                        {
-                                            if (stereo)
-                                                {
-                                                    for(int snd = 0; snd < samples.length; snd++)
-                                                        {
-                                                            left += samples[snd][samp] * (1.0 - with.pan[snd]);
-                                                            right += samples[snd][samp] * with.pan[snd];
-                                                        }
-                                                }
-                                            else
-                                                {
-                                                    for(int snd = 0; snd < samples.length; snd++)
-                                                        {
-                                                            left += samples[snd][samp];
-                                                        }
-                                                }
-                                        }
-                            
-                                    // add reverb?
-                                    if (with.reverbWet > 0.0f)
-                                        {
-                                            // I think freeverb sounds better going in both channels and taking
-                                            // both channel results.  But you may have a different opinion, in
-                                            // which I think you do: 
-                                            //
-                                            //freeverbInput[0][0] = (float)d;
-                                            //freeverb.compute(1, freeverbInput, freeverbOutput);
-                                            //d = freeverbOutput[0][0]; 
-                                
-                                            if (stereo)
-                                                {
-                                                    freeverbInput[0][0] = (float)left;
-                                                    freeverbInput[1][0] = (float)right;
-                                                    freeverb.compute(1, freeverbInput, freeverbOutput);
-                                                    left = freeverbOutput[0][0];
-                                                    right = freeverbOutput[1][0];
-                                                }
-                                            else
-                                                {
-                                                    freeverbInput[0][0] = (float)left;
-                                                    freeverbInput[1][0] = (float)left;
-                                                    freeverb.compute(1, freeverbInput, freeverbOutput);
-                                                    left = (freeverbOutput[0][0] + freeverbOutput[1][0]) * 0.5;
-                                                }
-                                        }
-                                                    
-                                    left *= gain;
-                                                            
-                                    if (left > 32767)
-                                        {
-                                            left = 32767;
-                                            clipped = true;
-                                        }
-                                    else if (left < -32768)
-                                        {
-                                            left = -32768;
-                                            clipped = true;
-                                        }
-
-                                    if (stereo)
-                                        {
-                                            right *= gain;
-                                            if (right > 32767)
-                                                {
-                                                    right = 32767;
-                                                    clipped = true;
-                                                }
-                                            else if (right < -32768)
-                                                {
-                                                    right = -32768;
-                                                    clipped = true;
-                                                }
-                                        }
-                        
-                                    if (stereo)
-                                        {
-                                            int val = (int)(left);
-                                            audioBuffer[samp * 2 * 2 + 0] = (byte)(val & 255);
-                                            audioBuffer[samp * 2 * 2 + 1] = (byte)((val >> 8) & 255);
-                                            val = (int)(right);
-                                            audioBuffer[samp * 2 * 2 + 2] = (byte)(val & 255);
-                                            audioBuffer[samp * 2 * 2 + 3] = (byte)((val >> 8) & 255);
-                                        }
-                                    else
-                                        {
-                                            int val = (int)(left);
-                                            audioBuffer[samp * 2 + 0] = (byte)(val & 255);
-                                            audioBuffer[samp * 2 + 1] = (byte)((val >> 8) & 255);
-                                        }
-                                    j++;
-                                    if (j >= 4)
-                                        {
-                                            leftSamples[sampleCounter] = left;
-                                            if (stereo)
-                                                {
-                                                    rightSamples[sampleCounter] = right;
-                                                }
-                                            else
-                                                {
-                                                    rightSamples[sampleCounter] = left;
-                                                }
-                                            sampleCounter++;
-                                            j = 0;
-                                        }
-                                    tick++;                                 /// See documentation elsewhere about threadsafe nature of tick
+                                for(int snd = 0; snd < samples.length; snd++)
+                                    {
+                                    left += samples[snd][samp] * (1.0 - with.pan[snd]);
+                                    right += samples[snd][samp] * with.pan[snd];
+                                    }
                                 }
-                    
-                            sdl.write(audioBuffer, 0, audioBuffer.length);
-                            if (sampleCounter >= leftSamples.length)
-                                updateOutputOscilloscope();
+                            else
+                                {
+                                for(int snd = 0; snd < samples.length; snd++)
+                                    {
+                                    left += samples[snd][samp];
+                                    }
+                                }
+                            }
+                            
+                        // add reverb?
+                        if (with.reverbWet > 0.0f)
+                            {
+                            // I think freeverb sounds better going in both channels and taking
+                            // both channel results.  But you may have a different opinion, in
+                            // which I think you do: 
+                            //
+                            //freeverbInput[0][0] = (float)d;
+                            //freeverb.compute(1, freeverbInput, freeverbOutput);
+                            //d = freeverbOutput[0][0]; 
+                                
+                            if (stereo)
+                                {
+                                freeverbInput[0][0] = (float)left;
+                                freeverbInput[1][0] = (float)right;
+                                freeverb.compute(1, freeverbInput, freeverbOutput);
+                                left = freeverbOutput[0][0];
+                                right = freeverbOutput[1][0];
+                                }
+                            else
+                                {
+                                freeverbInput[0][0] = (float)left;
+                                freeverbInput[1][0] = (float)left;
+                                freeverb.compute(1, freeverbInput, freeverbOutput);
+                                left = (freeverbOutput[0][0] + freeverbOutput[1][0]) * 0.5;
+                                }
+                            }
+                                                    
+                        left *= gain;
+                                                            
+                        if (left > 32767)
+                            {
+                            left = 32767;
+                            clipped = true;
+                            }
+                        else if (left < -32768)
+                            {
+                            left = -32768;
+                            clipped = true;
+                            }
+
+                        if (stereo)
+                            {
+                            right *= gain;
+                            if (right > 32767)
+                                {
+                                right = 32767;
+                                clipped = true;
+                                }
+                            else if (right < -32768)
+                                {
+                                right = -32768;
+                                clipped = true;
+                                }
+                            }
+                        
+                        if (stereo)
+                            {
+                            int val = (int)(left);
+                            audioBuffer[samp * 2 * 2 + 0] = (byte)(val & 255);
+                            audioBuffer[samp * 2 * 2 + 1] = (byte)((val >> 8) & 255);
+                            val = (int)(right);
+                            audioBuffer[samp * 2 * 2 + 2] = (byte)(val & 255);
+                            audioBuffer[samp * 2 * 2 + 3] = (byte)((val >> 8) & 255);
+                            }
+                        else
+                            {
+                            int val = (int)(left);
+                            audioBuffer[samp * 2 + 0] = (byte)(val & 255);
+                            audioBuffer[samp * 2 + 1] = (byte)((val >> 8) & 255);
+                            }
+                        j++;
+                        if (j >= 4)
+                            {
+                            leftSamples[sampleCounter] = left;
+                            if (stereo)
+                                {
+                                rightSamples[sampleCounter] = right;
+                                }
+                            else
+                                {
+                                rightSamples[sampleCounter] = left;
+                                }
+                            sampleCounter++;
+                            j = 0;
+                            }
+                        tick++;                                 /// See documentation elsewhere about threadsafe nature of tick
                         }
+                    
+                    sdl.write(audioBuffer, 0, audioBuffer.length);
+                    if (sampleCounter >= leftSamples.length)
+                        updateOutputOscilloscope();
+                    }
                 }
             });
         
         thread.setName("Sound Output");
         thread.setDaemon(true);
         thread.start();
-    }
+        }
         
     int sampleCounter = 0;
     double leftSamples[] = new double[96];
@@ -1015,63 +1047,63 @@ public class Output
     double rightSamplesOut[] = new double[96];
     
     public void updateOutputOscilloscope()
-    {
+        {
         sampleCounter = 0;
         synchronized(leftSamplesOut)
             {
-                System.arraycopy(leftSamples, 0, leftSamplesOut, 0, leftSamplesOut.length);
-                System.arraycopy(rightSamples, 0, rightSamplesOut, 0, rightSamplesOut.length);
+            System.arraycopy(leftSamples, 0, leftSamplesOut, 0, leftSamplesOut.length);
+            System.arraycopy(rightSamples, 0, rightSamplesOut, 0, rightSamplesOut.length);
             }
-    }
+        }
     
 
 
 
     // Starts the per-voice threads.  Called from primary voice thread if it needs to.
     void startPerVoiceThreads(int numThreads)
-    {
+        {
         // build the sound threads
         lightweightSemaphores = new boolean[numThreads];
         voiceLocks = new Object[numThreads];
         for (int i = 0; i < numThreads; i++) 
             {
-                voiceLocks[i] = new Object[0];
-                lightweightSemaphores[i] = true;
+            voiceLocks[i] = new Object[0];
+            lightweightSemaphores[i] = true;
             }
                                                 
         for (int i = 0; i < numThreads; i++)
             {
-                final int _i = i;
-                Thread thread = new Thread(new Runnable()
+            final int _i = i;
+            Thread thread = new Thread(new Runnable()
+                {
+                public void run()
                     {
-                        public void run()
-                        {
-                            long lastTick = -1;
-                            int tickCount = 0;
-                            double tickAvg = 0;
+                    long lastTick = -1;
+                    int tickCount = 0;
+                    double tickAvg = 0;
                                                 
-                            while(true) 
+                    while(true) 
+                        {
+                        blockVoiceUntil(_i, true); 
+                        for (int j = 0; j < numVoicesPerThread; j++)
+                            {
+                            int voice = _i * numVoicesPerThread + j;
+                            if (voice >= numSounds) 
+                                break;
+                            else
                                 {
-                                    blockVoiceUntil(_i, true); 
-                                    for (int j = 0; j < numVoicesPerThread; j++)
-                                        {
-                                            int voice = _i * numVoicesPerThread + j;
-                                            if (voice >= numSounds) 
-                                                break;
-                                            else
-                                                {
-                                                    sounds[voice].go(); 
-                                                }
-                                        }
-                                    signalVoice(_i, false);
+                                sounds[voice].go(); 
                                 }
+                            }
+                        signalVoice(_i, false);
                         }
-                    });
-                thread.setName("Voice " + _i);
-                thread.setDaemon(true);
-                thread.start();
+                    }
+                });
+            thread.setName("Voice " + _i);
+            thread.setDaemon(true);
+            thread.start();
             }       
-    }
+        }
                 
                 
     /**
@@ -1085,21 +1117,21 @@ public class Output
        building the GUI and/or setting up the sounds.
     */
     public void startPrimaryVoiceThread()
-    {
+        {
         Thread thread = new Thread(new Runnable()
             {
-                public void run()
+            public void run()
                 {
-                    while(true)
-                        {
-                            go();
-                        }
+                while(true)
+                    {
+                    go();
+                    }
                 }
             });
         thread.setName("Voice Management");
         thread.setDaemon(true);
         thread.start();
-    }
+        }
         
         
     //// When the semaphore is FALSE, the per-voice thread is in charge of its Sound.
@@ -1109,24 +1141,24 @@ public class Output
     //// The reverse is true for the per-voice threads.
     
     void blockVoiceUntil(int thread, boolean val)
-    {
+        {
         synchronized(voiceLocks[thread])
             {
-                while(lightweightSemaphores[thread] != val)
-                    {
-                        try { voiceLocks[thread].wait(); } catch (Exception e) { }
-                    }
+            while(lightweightSemaphores[thread] != val)
+                {
+                try { voiceLocks[thread].wait(); } catch (Exception e) { }
+                }
             }
-    }
+        }
                 
     void signalVoice(int thread, boolean val)
-    {
+        {
         synchronized(voiceLocks[thread])
             {
-                lightweightSemaphores[thread] = val;
-                voiceLocks[thread].notify();
+            lightweightSemaphores[thread] = val;
+            voiceLocks[thread].notify();
             }
-    }
+        }
 
     volatile int count = 0;
 
@@ -1142,7 +1174,7 @@ public class Output
         convert into sound.   This method should be called in a while-loop from your main thread
         or via calling startPrimaryVoiceThread(). */ 
     public void go()
-    {
+        {
         // reduce the number of sounds to 1 if monophonic
         int ns = numSounds;
         if (onlyPlayFirstSound) ns = 1;
@@ -1153,110 +1185,110 @@ public class Output
         lock();
         try
             {
-                if (!soundThreadsStarted)
-                    for (int i = 0; i < ns; i++)
-                        {
-                            sounds[i].reset();
-                        }
-                if (ns <= numVoicesPerThread)
-                    {                
-                        for (int i = 0; i < ns; i++)
-                            {
-                                sounds[i].go();
-                            }
-                        soundThreadsStarted = true;
-                    }
-                else
+            if (!soundThreadsStarted)
+                for (int i = 0; i < ns; i++)
                     {
-                        int numThreads = (int)(Math.ceil(ns / (double)numVoicesPerThread));
-                        if (voiceLocks == null)
-                            {
-                                startPerVoiceThreads(numThreads);
-
-                                for (int i = 0; i < numThreads; i++)
-                                    {
-                                        blockVoiceUntil(i, false);
-                                    }
-                            }
-
-                        for (int i = 0; i < numThreads; i++)
-                            {
-                                signalVoice(i, true);
-                            }
-                        for (int i = 0; i < numThreads; i++)
-                            {
-                                blockVoiceUntil(i, false);
-                            }
-                        soundThreadsStarted = true;
+                    sounds[i].reset();
                     }
+            if (ns <= numVoicesPerThread)
+                {                
+                for (int i = 0; i < ns; i++)
+                    {
+                    sounds[i].go();
+                    }
+                soundThreadsStarted = true;
+                }
+            else
+                {
+                int numThreads = (int)(Math.ceil(ns / (double)numVoicesPerThread));
+                if (voiceLocks == null)
+                    {
+                    startPerVoiceThreads(numThreads);
+
+                    for (int i = 0; i < numThreads; i++)
+                        {
+                        blockVoiceUntil(i, false);
+                        }
+                    }
+
+                for (int i = 0; i < numThreads; i++)
+                    {
+                    signalVoice(i, true);
+                    }
+                for (int i = 0; i < numThreads; i++)
+                    {
+                    blockVoiceUntil(i, false);
+                    }
+                soundThreadsStarted = true;
+                }
             }
         finally 
             {
-                unlock();
+            unlock();
             }
 
         // Spin-wait.  It's both faster and more efficient than a mutex in this case, but it eats up cycles
         while(emitsReady)
             {
-                Thread.currentThread().yield();
+            Thread.currentThread().yield();
             }
                 
         lock();
         try
             {
-                Unit e = sounds[0].getEmits();
-                for (int i = 0 ; i < ns; i++)
+            Unit e = sounds[0].getEmits();
+            for (int i = 0 ; i < ns; i++)
+                {
+                swap.reset[i] = sounds[i].requestReset;
+                sounds[i].requestReset = false;
+                Unit emits = sounds[i].getEmits();
+                if (emits != null)
                     {
-                        swap.reset[i] = sounds[i].requestReset;
-                        sounds[i].requestReset = false;
-                        Unit emits = sounds[i].getEmits();
-                        if (emits != null)
-                            {
-                                System.arraycopy(emits.amplitudes[0], 0, swap.amplitudes[i], 0, emits.amplitudes[0].length); 
-                                undenormalize(swap.amplitudes[i]);
-                                System.arraycopy(emits.frequencies[0], 0, swap.frequencies[i], 0, emits.frequencies[0].length);
-                                System.arraycopy(emits.orders[0], 0, swap.orders[i], 0, emits.orders[0].length);
-                            }
-                        else
-                            {
-                                System.arraycopy(zeroAmplitudes, 0, swap.amplitudes[i], 0, zeroAmplitudes.length); 
-                                System.arraycopy(zeroFrequencies, 0, swap.frequencies[i], 0, zeroFrequencies.length); 
-                                System.arraycopy(standardOrders, 0, swap.orders[i], 0, standardOrders.length); 
-                            }
+                    System.arraycopy(emits.amplitudes[0], 0, swap.amplitudes[i], 0, emits.amplitudes[0].length); 
+                    undenormalize(swap.amplitudes[i]);
+                    System.arraycopy(emits.frequencies[0], 0, swap.frequencies[i], 0, emits.frequencies[0].length);
+                    System.arraycopy(emits.orders[0], 0, swap.orders[i], 0, emits.orders[0].length);
+                    }
+                else
+                    {
+                    System.arraycopy(zeroAmplitudes, 0, swap.amplitudes[i], 0, zeroAmplitudes.length); 
+                    System.arraycopy(zeroFrequencies, 0, swap.frequencies[i], 0, zeroFrequencies.length); 
+                    System.arraycopy(standardOrders, 0, swap.orders[i], 0, standardOrders.length); 
+                    }
 
-                        //for(int q = 0; q < emits.amplitudes[0].length; q++)
-                        //    if (emits.amplitudes[0][q] != 0)
-                        //      System.err.println("++>" + q + " " + emits.frequencies[0][q] + " " + emits.orders[0][q]);
+                //for(int q = 0; q < emits.amplitudes[0].length; q++)
+                //    if (emits.amplitudes[0][q] != 0)
+                //      System.err.println("++>" + q + " " + emits.frequencies[0][q] + " " + emits.orders[0][q]);
                     
-                        swap.pitches[i] = sounds[i].getPitch();
-                        swap.velocities[i] = (velocitySensitive ? sounds[i].getVelocity() : Sound.DEFAULT_VELOCITY);
-                        if (emits instanceof Out)
-                            {
-                                Out _out = (Out)emits;
-                                swap.dephase[i] = _out.getDephase();
-                                swap.pan[i] = _out.getPan();
-                            }
-                        else
-                            {
-                                System.err.println("Output.go() WARNING, emits isn't an Out!");
-                            }
-                    }
-                
-                if (e instanceof Out)       // we're only doing this for ONE sound, namely sounds[0]
+                swap.pitches[i] = sounds[i].getPitch();
+                swap.velocities[i] = (velocitySensitive ? sounds[i].getVelocity() : Sound.DEFAULT_VELOCITY);
+                if (emits instanceof Out)
                     {
-                        Out out = (Out)e;
-                        swap.reverbWet = (float)(out.modulate(out.MOD_REVERB_WET));
-                        swap.reverbDamp = (float)(out.modulate(out.MOD_REVERB_DAMP));
-                        swap.reverbRoomSize = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE));
+                    Out _out = (Out)emits;
+                    swap.dephase[i] = _out.getDephase();
+                    swap.pan[i] = _out.getPan();
                     }
+                else
+                    {
+                    System.err.println("Output.go() WARNING, emits isn't an Out!");
+                    }
+                }
+                
+            if (e instanceof Out)       // we're only doing this for ONE sound, namely sounds[0]
+                {
+                Out out = (Out)e;
+                swap.reverbWet = (float)(out.modulate(out.MOD_REVERB_WET));
+                swap.reverbDamp = (float)(out.modulate(out.MOD_REVERB_DAMP));
+                swap.reverbRoomSize = (float)(out.modulate(out.MOD_REVERB_ROOM_SIZE));
+                }
             }
         finally 
             {
-                unlock();
+            unlock();
             }
         
         emitsReady = true;
-    }  
+        }  
 
 
 
@@ -1291,191 +1323,191 @@ public class Output
     public int getNumGroups() { return numGroups; }
 
     public int getGroupOverridingPrimaryGroupInMIDI()
-    {
+        {
         lock();
         try
             {
-                for(int i = 1; i < numGroups; i++)
-                    {
-                        if (group[i].channel >= 0 &&
-                            group[i].channel == group[0].channel)
-                            return i;
-                    }
-                return Output.PRIMARY_GROUP;
+            for(int i = 1; i < numGroups; i++)
+                {
+                if (group[i].channel >= 0 &&
+                    group[i].channel == group[0].channel)
+                    return i;
+                }
+            return Output.PRIMARY_GROUP;
             }
         finally
             {
-                unlock();
+            unlock();
             }
-    }
+        }
 
     /** Moves group index i to JUST ABOVE current index j */ 
     public void moveGroup(int i, int j)
-    {
+        {
         if (i == j)
             {
-                return;  // nothing will change, so why bother
+            return;  // nothing will change, so why bother
             }
         else if (i == j + 1)
             {
-                return;  // nothing will change, so why bother
+            return;  // nothing will change, so why bother
             }
         else if (i == 0)
             {
-                System.err.println("Output.moveGroup() WARNING: group is 0, cannot be moved");
+            System.err.println("Output.moveGroup() WARNING: group is 0, cannot be moved");
             }
         else if (i >= numGroups)
             {
-                System.err.println("Output.removeGroup() WARNING: group >= numGroups, should not exist");
+            System.err.println("Output.removeGroup() WARNING: group >= numGroups, should not exist");
             }
         else if (j < 0)
             {
-                System.err.println("Output.moveGroup() WARNING: location is < 0, cannot be moved to");
+            System.err.println("Output.moveGroup() WARNING: location is < 0, cannot be moved to");
             }
         else if (j >= numGroups)
             {
-                System.err.println("Output.removeGroup() WARNING: location >= numGroups - 1, should not exist");
+            System.err.println("Output.removeGroup() WARNING: location >= numGroups - 1, should not exist");
             }
         else
             {
-                lock();
-                try
-                    {
-                        // grab and remove the group we're moving
-                        Group g = group[i];
-                        removeGroup(i);
+            lock();
+            try
+                {
+                // grab and remove the group we're moving
+                Group g = group[i];
+                removeGroup(i);
                 
-                        // adjust the insertion location
-                        if (i < j)
-                            j--;                    // it was shifted in removal
+                // adjust the insertion location
+                if (i < j)
+                    j--;                    // it was shifted in removal
                                 
-                        // make space
-                        setNumGroups(getNumGroups() + 1);
-                        for(int q = numGroups - 1; q > j + 1; q--)
-                            {
-                                group[q] = group[q - 1];
-                            }
-                                
-                        // insert
-                        group[j + 1] = g;
-                        assignGroupsToSounds();
-                    }
-                finally 
+                // make space
+                setNumGroups(getNumGroups() + 1);
+                for(int q = numGroups - 1; q > j + 1; q--)
                     {
-                        unlock();
+                    group[q] = group[q - 1];
                     }
+                                
+                // insert
+                group[j + 1] = g;
+                assignGroupsToSounds();
+                }
+            finally 
+                {
+                unlock();
+                }
             }
-    }
+        }
 
     /** Sets the number of groups currently allocated, does not clear new ones */
     public void setNumGroupsUnsafe(int num) 
-    {
+        {
         if (num < 1) num = 1; 
         
         // reset ABOVE num
         int minNum = num;
         for(int i = minNum; i < MAX_GROUPS; i++)
             {
-                group[i] = new Group();
+            group[i] = new Group();
             }
 
         numGroups = num; 
-    }
+        }
 
     /** Sets the number of groups currently allocated */
     public void setNumGroups(int num) 
-    {
+        {
         if (num < 1) num = 1; 
         
         // reset requested sounds
         int minNum = (num > numGroups ? numGroups : num);
         for(int i = minNum; i < MAX_GROUPS; i++)
             {
-                group[i] = new Group();
+            group[i] = new Group();
             }
 
         numGroups = num; 
-    }
+        }
     
     /** Redistribute the gain for all groups except the primary group. */
     public void redistributeGains()
-    {
+        {
         lock();
         try
             {
-                for(int g = 1; g < numGroups; g++)
+            for(int g = 1; g < numGroups; g++)
+                {
+                double val = group[g].getGain();
+                // distribute to the gain of all the Out modules involved
+                for(int i = 0; i < numSounds; i++)
                     {
-                        double val = group[g].getGain();
-                        // distribute to the gain of all the Out modules involved
-                        for(int i = 0; i < numSounds; i++)
-                            {
-                                Sound s = getSound(i);
-                                if (s.getGroup() == g)
-                                    {
-                                        ((Out)(s.getEmits())).setModulation(new Constant(val), Out.MOD_GAIN);
-                                    }
-                            }
+                    Sound s = getSound(i);
+                    if (s.getGroup() == g)
+                        {
+                        ((Out)(s.getEmits())).setModulation(new Constant(val), Out.MOD_GAIN);
+                        }
                     }
+                }
             }
         finally
             {
-                unlock();
+            unlock();
             }
-    }
+        }
         
     /** Redistribute the pan for all groups except the primary group. */
     public void redistributePans()
-    {
+        {
         lock();
         try
             {
-                for(int g = 1; g < numGroups; g++)
+            for(int g = 1; g < numGroups; g++)
+                {
+                double val = group[g].getPan();
+                // distribute to the gain of all the Out modules involved
+                for(int i = 0; i < numSounds; i++)
                     {
-                        double val = group[g].getPan();
-                        // distribute to the gain of all the Out modules involved
-                        for(int i = 0; i < numSounds; i++)
-                            {
-                                Sound s = getSound(i);
-                                if (s.getGroup() == g)
-                                    {
-                                        ((Out)(s.getEmits())).setModulation(new Constant(val), Out.MOD_PAN);
-                                    }
-                            }
+                    Sound s = getSound(i);
+                    if (s.getGroup() == g)
+                        {
+                        ((Out)(s.getEmits())).setModulation(new Constant(val), Out.MOD_PAN);
+                        }
                     }
+                }
             }
         finally
             {
-                unlock();
+            unlock();
             }
-    }
+        }
         
     /** Returns the number of allocated sounds for the given group. */
     public int getNumSounds(int group) 
-    { 
+        { 
         int counter = 0;
         lock();
         try
             {
-                for(int j = 0; j < numSounds; j++)
-                    {
-                        if (sounds[j].getGroup() == group)
-                            counter++;
-                    }
+            for(int j = 0; j < numSounds; j++)
+                {
+                if (sounds[j].getGroup() == group)
+                    counter++;
+                }
             }
         catch (Exception ex) 
             {
-                ex.printStackTrace(); 
+            ex.printStackTrace(); 
             }
         finally
             {
-                unlock();
+            unlock();
             }
         return counter; 
-    }
+        }
 
     /** Reassign sounds to groups */    
     public void assignGroupsToSounds()
-    {
+        {
         lock();
         
         // This is an opportunity to cancel the audio input
@@ -1483,552 +1515,552 @@ public class Output
                 
         try
             {
-                // by default we're the primary group
-                for(int j = 0; j < numSounds; j++)
-                    {
-                        sounds[j].setGroup(Output.PRIMARY_GROUP);
-                        sounds[j].setChannel(Input.CHANNEL_OMNI);
-                    }
+            // by default we're the primary group
+            for(int j = 0; j < numSounds; j++)
+                {
+                sounds[j].setGroup(Output.PRIMARY_GROUP);
+                sounds[j].setChannel(Input.CHANNEL_OMNI);
+                }
             
-                // override by sub-patches
-                int snd = 1;                                                        // because sound 0 always belongs to the primary group
-                for(int i = 1; i < numGroups; i++)              // note 1, we skip the primary group
+            // override by sub-patches
+            int snd = 1;                                                        // because sound 0 always belongs to the primary group
+            for(int i = 1; i < numGroups; i++)              // note 1, we skip the primary group
+                {
+                for(int j = 0; j < group[i].getNumRequestedSounds(); j++)
                     {
-                        for(int j = 0; j < group[i].getNumRequestedSounds(); j++)
-                            {
-                                if (snd < numSounds)                            // we still have space
-                                    {
-                                        sounds[snd].setGroup(i);
-                                        sounds[snd].setChannel(Input.CHANNEL_OMNI);
-                                        snd++;
-                                    }
-                            }
+                    if (snd < numSounds)                            // we still have space
+                        {
+                        sounds[snd].setGroup(i);
+                        sounds[snd].setChannel(Input.CHANNEL_OMNI);
+                        snd++;
+                        }
                     }
+                }
                                 
-                /// FIXME -- this won't save out the subpatches will it?
-                sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
+            /// FIXME -- this won't save out the subpatches will it?
+            sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
                                 
-                // reload patches.  We assume we have the correct patches in each group, and the latest and greatest in group 0
-                for(int i = 1; i < numSounds; i++)          // the first sound is already assigned to group 0 and doesn't change, else we'd have to update the GUI module panels
-                    {
-                        int g = sounds[i].getGroup();
-                        Modulation[] mods = new Modulation[0];
-                        try 
-                            { 
-                                // load modules into an array to prepare to load into the sound
-                                mods = Sound.loadModules(group[g].getPatch(), Sound.loadFlowVersion(group[g].getPatch()));
-                            }
-                        catch (Exception ex) { ex.printStackTrace(); }
-                        // version
+            // reload patches.  We assume we have the correct patches in each group, and the latest and greatest in group 0
+            for(int i = 1; i < numSounds; i++)          // the first sound is already assigned to group 0 and doesn't change, else we'd have to update the GUI module panels
+                {
+                int g = sounds[i].getGroup();
+                Modulation[] mods = new Modulation[0];
+                try 
+                    { 
+                    // load modules into an array to prepare to load into the sound
+                    mods = Sound.loadModules(group[g].getPatch(), Sound.loadFlowVersion(group[g].getPatch()));
+                    }
+                catch (Exception ex) { ex.printStackTrace(); }
+                // version
                                         
-                        // remove any old modules from sound
-                        int numRegistered = sounds[i].getNumRegistered();
-                        for(int j = 0; j < numRegistered; j++)
-                            sounds[i].removeRegistered(0);
+                // remove any old modules from sound
+                int numRegistered = sounds[i].getNumRegistered();
+                for(int j = 0; j < numRegistered; j++)
+                    sounds[i].removeRegistered(0);
                                                 
-                        // Add new modules from the array
-                        for(int j = 0; j < mods.length; j++)
-                            {
-                                sounds[i].register(mods[j]);
-                                mods[j].setSound(sounds[i]);
-                                if (mods[j] instanceof Out)
-                                    {
-                                        sounds[i].setEmits((Out)(mods[j]));
-                                    }
-                                mods[j].reset();
-                            }
+                // Add new modules from the array
+                for(int j = 0; j < mods.length; j++)
+                    {
+                    sounds[i].register(mods[j]);
+                    mods[j].setSound(sounds[i]);
+                    if (mods[j] instanceof Out)
+                        {
+                        sounds[i].setEmits((Out)(mods[j]));
+                        }
+                    mods[j].reset();
                     }
-                redistributeGains();
+                }
+            redistributeGains();
             }
         finally
             {
-                unlock();
+            unlock();
             }
-    }
+        }
 
     public void removeGroup(int g)
-    {
+        {
         if (g == 0) // can't remove that one
             {
-                System.err.println("Output.removeGroup() WARNING: group is 0, cannot be removed");
+            System.err.println("Output.removeGroup() WARNING: group is 0, cannot be removed");
             }
         else if (g >= numGroups)
             {
-                System.err.println("Output.removeGroup() WARNING: group >= numGroups, should not exist");
+            System.err.println("Output.removeGroup() WARNING: group >= numGroups, should not exist");
             }
         else
             {
-                lock();
-                try
+            lock();
+            try
+                {
+                Group ret = group[g];
+                for(int i = g; i < numGroups - 1; i++)
                     {
-                        Group ret = group[g];
-                        for(int i = g; i < numGroups - 1; i++)
-                            {
-                                group[i] = group[i + 1];
-                            }
-                        setNumGroups(getNumGroups() - 1);
-                        assignGroupsToSounds();
+                    group[i] = group[i + 1];
                     }
-                finally 
-                    {
-                        unlock();
-                    }
+                setNumGroups(getNumGroups() - 1);
+                assignGroupsToSounds();
+                }
+            finally 
+                {
+                unlock();
+                }
             }
-    }
+        }
 
     public void swapWithPrimaryGroup(int g)
-    {
+        {
         lock();
         try
             {
-                // save patch info
-                sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
-                Group primary = group[0];
-                group[0] = group[g];
-                group[g] = primary;
-                assignGroupsToSounds();
+            // save patch info
+            sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
+            Group primary = group[0];
+            group[0] = group[g];
+            group[g] = primary;
+            assignGroupsToSounds();
             }
         finally 
             {
-                unlock();
+            unlock();
             }
-    }
+        }
 
 
     public boolean copyPrimaryGroup(int to, boolean resetMIDI)
-    {
+        {
         lock();
         try
             {
-                // save patch info
-                sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
-                group[to] = new Group(group[0]);
+            // save patch info
+            sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
+            group[to] = new Group(group[0]);
+            if (resetMIDI)
+                {
+                group[to].setChannel(Input.CHANNEL_NONE);
+                }
+                                                        
+            // rebuild
+            assignGroupsToSounds();
+            }
+        finally 
+            {
+            unlock();
+            }
+        return true;
+        }
+
+    public boolean copyPrimaryGroup(boolean resetMIDI)
+        {
+        lock();
+        try
+            {
+            // save patch info
+            sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
+            if (addGroup(new Group(group[0])))
+                {
                 if (resetMIDI)
-                    {
-                        group[to].setChannel(Input.CHANNEL_NONE);
-                    }
+                    group[numGroups - 1].setChannel(Input.CHANNEL_NONE);
                                                         
                 // rebuild
                 assignGroupsToSounds();
+                }
+            else
+                {
+                return false;
+                }
             }
         finally 
             {
-                unlock();
+            unlock();
             }
         return true;
-    }
-
-    public boolean copyPrimaryGroup(boolean resetMIDI)
-    {
-        lock();
-        try
-            {
-                // save patch info
-                sounds[0].saveModules(group[0].getPatch());                // so we have the latest when we reload them
-                if (addGroup(new Group(group[0])))
-                    {
-                        if (resetMIDI)
-                            group[numGroups - 1].setChannel(Input.CHANNEL_NONE);
-                                                        
-                        // rebuild
-                        assignGroupsToSounds();
-                    }
-                else
-                    {
-                        return false;
-                    }
-            }
-        finally 
-            {
-                unlock();
-            }
-        return true;
-    }
+        }
         
     public boolean addGroup(Group g)
-    {
+        {
         if (numGroups >= MAX_GROUPS - 1)
             {
-                System.err.println("Output.addGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");
-                return false;
+            System.err.println("Output.addGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");
+            return false;
             }
         else
             {
-                lock();
-                try
-                    {
-                        // increment group
-                        setNumGroups(getNumGroups() + 1);
-                        group[getNumGroups() - 1] = g;
-                    }
-                finally
-                    {
-                        unlock();
-                    } 
-                return true;
+            lock();
+            try
+                {
+                // increment group
+                setNumGroups(getNumGroups() + 1);
+                group[getNumGroups() - 1] = g;
+                }
+            finally
+                {
+                unlock();
+                } 
+            return true;
             }
-    }
+        }
                 
     public int addGroup(JSONObject obj)
-    {
+        {
         // copy the patch so it can be modified by others
         obj = new JSONObject(obj, JSONObject.getNames(obj));
                 
         if (numGroups >= MAX_GROUPS - 1)
             {
-                System.err.println("Output.removeGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");
-                return -1;
+            System.err.println("Output.removeGroup() WARNING: numGroups >= MAX_GROUP - 1, cannot increase");
+            return -1;
             }
         else
             {
-                lock();
-                try
-                    {
-                        // increment group
-                        setNumGroups(getNumGroups() + 1);
-                        Group g = group[getNumGroups() - 1];
+            lock();
+            try
+                {
+                // increment group
+                setNumGroups(getNumGroups() + 1);
+                Group g = group[getNumGroups() - 1];
                                 
-                        try 
-                            { 
-                                // determine gain.  This will be costly.
-                                // we have to build a patch to find Out.
-                                // We could do this by searching through the patch JSON, but this is simpler and stupider
+                try 
+                    { 
+                    // determine gain.  This will be costly.
+                    // we have to build a patch to find Out.
+                    // We could do this by searching through the patch JSON, but this is simpler and stupider
                     
-                                g.setGain(Group.DEFAULT_GAIN);
-                                Modulation[] mods = Sound.loadModules(obj, Sound.loadFlowVersion(obj));
-                                for(int i = 0; i < mods.length; i++)
-                                    {
-                                        if (mods[i] instanceof Out)  // got it
-                                            {
-                                                g.setGain(((Out)mods[i]).modulate(Out.MOD_GAIN));
-                                                break;
-                                            }
-                                    }                    
-                                g.setNumRequestedSounds(2);
-                                g.setPatch(obj); 
-                                g.setChannel(Input.CHANNEL_NONE);
+                    g.setGain(Group.DEFAULT_GAIN);
+                    Modulation[] mods = Sound.loadModules(obj, Sound.loadFlowVersion(obj));
+                    for(int i = 0; i < mods.length; i++)
+                        {
+                        if (mods[i] instanceof Out)  // got it
+                            {
+                            g.setGain(((Out)mods[i]).modulate(Out.MOD_GAIN));
+                            break;
                             }
-                        catch (Exception ex) { ex.printStackTrace(); }
-                        assignGroupsToSounds();
+                        }                    
+                    g.setNumRequestedSounds(2);
+                    g.setPatch(obj); 
+                    g.setChannel(Input.CHANNEL_NONE);
                     }
-                finally 
-                    {
-                        unlock();
-                    }
-                return getNumGroups() - 1;
+                catch (Exception ex) { ex.printStackTrace(); }
+                assignGroupsToSounds();
+                }
+            finally 
+                {
+                unlock();
+                }
+            return getNumGroups() - 1;
             }
-    }
+        }
     
     public void reset()
-    {
+        {
         lock();
         try
             {
-                int len = getNumSounds();
+            int len = getNumSounds();
             
-                // Clear all notes
-                for(int i = 0; i < len; i++)
-                    {
-                        getSound(i).release();
-                    }
+            // Clear all notes
+            for(int i = 0; i < len; i++)
+                {
+                getSound(i).release();
+                }
             
-                // Perform reset
-                for(int i = 0; i < len; i++)
-                    {
-                        getSound(i).reset();
-                    }
+            // Perform reset
+            for(int i = 0; i < len; i++)
+                {
+                getSound(i).reset();
+                }
                 
-                // Reset phases for good measure
-                for(int i = 0; i < len; i++)
-                    {
-                        getSound(i).resetPartialPhases();
-                    }
+            // Reset phases for good measure
+            for(int i = 0; i < len; i++)
+                {
+                getSound(i).resetPartialPhases();
+                }
                 
-                // Reset stuck notes
-                getInput().reset();
+            // Reset stuck notes
+            getInput().reset();
             }
         finally 
             {
-                unlock();
+            unlock();
             }
-    }
+        }
 
     static volatile double masterGain = 1.0;
     
     public double getMasterGain() 
-    { 
+        { 
         return masterGain;
-    }      
+        }      
                 
     public void setMasterGain(double val) 
-    { 
+        { 
         masterGain = val;
         Prefs.setLastMasterGain(val);
-    }      
+        }      
 
     public static final double MAX_MASTER_GAIN = 4.0;
 
     final static double[] MIXING = new double[]
-        {
-            4.3930522285718725, 
-            2.0980074779050573, 
-            5.911617141284784, 
-            3.302416782999798, 
-            0.532648003019616, 
-            3.864552401356139, 
-            0.6828907136007456, 
-            3.309690303702759, 
-            3.78626929045274, 
-            2.880490449092737, 
-            0.6412955842415297, 
-            4.210561997218116, 
-            1.329093445651415, 
-            4.423635829349905, 
-            0.9697059483036133, 
-            3.3800872309232752, 
-            5.190082241176484, 
-            4.179658018481378, 
-            3.1761418769465792, 
-            1.8514888920948884, 
-            5.672079791211344, 
-            2.80457371107737, 
-            5.752510144539967, 
-            2.0542370131054426, 
-            4.059706623677195, 
-            5.059878289798797, 
-            3.2535931944316436, 
-            1.251760344228206, 
-            1.1697673184395325, 
-            5.499988425488455, 
-            2.5487075166480784, 
-            5.671174843247418, 
-            1.5889337469209264, 
-            3.4966660573449286, 
-            4.1128697586043845, 
-            1.32223042596809, 
-            3.634874408433536, 
-            5.4727212070712845, 
-            4.050330922059182, 
-            1.329430792144477, 
-            4.347179582872594, 
-            0.49531926549671, 
-            1.9981399038451473, 
-            2.2024506973065567, 
-            5.422728478571278, 
-            4.342491898622478, 
-            2.340585893867574, 
-            1.595375474206211, 
-            5.534647380650129, 
-            2.1854360354552314, 
-            4.407323953511916, 
-            5.875238413239378, 
-            5.807281013442006, 
-            2.611730008727033, 
-            2.404221048946509, 
-            4.5142628863423, 
-            4.585857046489191, 
-            2.7585550894249278, 
-            6.034609601973635, 
-            1.784818848275311, 
-            2.9385777003341786, 
-            2.7379768217657237, 
-            5.204281144711419, 
-            2.5743565427801682, 
-            5.633773284292306, 
-            0.37163019591190505, 
-            5.4767684684458136, 
-            2.469637673803118, 
-            4.796244127749591, 
-            6.131515108692101, 
-            5.442227729315259, 
-            1.6393092165445262, 
-            2.905279921897077, 
-            5.887610452331277, 
-            2.231151580725118, 
-            1.311410267937173, 
-            5.1320011670472665, 
-            1.0637225421542722, 
-            2.161631508466618, 
-            1.542156486372099, 
-            3.7292113803036364, 
-            1.7137086767243934, 
-            5.4642677550381755, 
-            3.0853750211403574, 
-            3.0173444667823857, 
-            0.6315436517090349, 
-            3.3421180705036546, 
-            4.209646257875283, 
-            3.7926270717945605, 
-            5.819113544074465, 
-            1.904641568725281, 
-            3.909964870239804, 
-            3.5835554395539133, 
-            3.8436429642943346, 
-            2.197853136078777, 
-            4.866540140523055, 
-            6.18086741431614, 
-            5.4147864419797465, 
-            1.123181428416226, 
-            5.767777606674638, 
-            1.2247017979747263, 
-            3.2021001566014204, 
-            4.509373040115699, 
-            3.7362376775556543, 
-            0.08683319620390151, 
-            1.2405920482832018, 
-            0.8724415122969259, 
-            2.961759106078713, 
-            2.0771434354580864, 
-            2.923727915641903, 
-            2.7159263377789484, 
-            5.20302805883522, 
-            3.8574313667909914, 
-            0.9620003437805832, 
-            2.758032882552134, 
-            2.110632917575416, 
-            4.423350054567123, 
-            4.6696945714405045, 
-            3.366131602771689, 
-            1.4757790606175893, 
-            4.423642339560315, 
-            4.92807311466011, 
-            2.067548270280224, 
-            3.772824744655635, 
-            2.84617535065996, 
-            4.6283185725205, 
-            0.092443463110639, 
-            6.154303648109571, 
-            5.764843632300961, 
-            3.7978438062146234, 
-            4.581524010352971, 
-            2.6704472245847883, 
-            4.28496763451278, 
-            3.079068811519279, 
-            6.215571764084275, 
-            1.6727154189264666, 
-            1.5702907676316764, 
-            3.0167494385334965, 
-            3.5141258234246533, 
-            4.5840366922727425, 
-            2.7706972066454743, 
-            4.294461552185262, 
-            3.807630008844287, 
-            0.2630172179015329, 
-            2.115045951553029, 
-            3.423269843873172, 
-            5.7978670935946, 
-            1.6945359810872747, 
-            3.0436962789661797, 
-            2.368298216504867, 
-            4.8554730921226374, 
-            4.159204477042065, 
-            0.21666124977089396, 
-            3.381162299738797, 
-            0.1441628078280086, 
-            1.541825983163458, 
-            5.529820230628496, 
-            3.0811151395049796, 
-            1.463250254179737, 
-            3.9225001868930343, 
-            4.133792216068891, 
-            0.9242787399407808, 
-            4.52161640487037, 
-            3.9304320982687724, 
-            1.6630928269575334, 
-            3.6124930881561648, 
-            1.5756809048093188, 
-            1.2284009214428435, 
-            3.6667071469745096, 
-            3.731393225939248, 
-            1.3805717439790721, 
-            4.3356357222344934, 
-            2.808892673945348, 
-            2.1194589855109074, 
-            1.1925169734369456, 
-            5.850783005068567, 
-            5.6640714433910375, 
-            3.0339273779002425, 
-            4.201648701469412, 
-            0.3289178314175416, 
-            5.161934219713718, 
-            5.932017725015613, 
-            5.54990471757801, 
-            3.2685298202768385, 
-            3.3400508259054345, 
-            4.61241753082556, 
-            2.024160879689441, 
-            3.108107374510848, 
-            0.21973074174871066, 
-            4.536135686410281, 
-            3.023281955038178, 
-            0.35146993875006327, 
-            6.06360994679823, 
-            1.6810294052530046, 
-            3.1837768890758444, 
-            0.6374076523146917, 
-            1.6375793184645058, 
-            6.142404473157965, 
-            5.048278576240986, 
-            3.8565616882630644, 
-            3.781988825321103, 
-            0.6626461774182255, 
-            4.511015710407045, 
-            1.3781495182202912, 
-            0.3048210194240344, 
-            1.2281990925819724, 
-            5.530568411276023, 
-            3.9826621922332768, 
-            6.148919688034672, 
-            0.3849323271843632, 
-            2.3895972379985033, 
-            2.0351897098873533, 
-            5.478720725311914, 
-            4.5101107624565735, 
-            0.5674943806341197, 
-            4.667407863259131, 
-            4.180649474473559, 
-            0.761845235610469, 
-            1.0511013301219272, 
-            2.078027466814059, 
-            3.922709192162581, 
-            2.9191198961157077, 
-            3.6120440358146144, 
-            5.938650489751697, 
-            3.5529228291672803, 
-            4.252974513646061, 
-            0.07321558074413037, 
-            4.606624069065216, 
-            1.1381464803518826, 
-            0.6300786117796688, 
-            6.265717644929687, 
-            0.8430061348604436, 
-            3.1486688816017, 
-            2.187113308963469, 
-            2.55904691435907, 
-            0.9064953139550527, 
-            5.37692637169442, 
-            5.853139585850388, 
-            1.575131271143313, 
-            2.952143357394929, 
-            5.66264462166993, 
-            1.6711595897952538, 
-            0.5699793026370283, 
-            2.3172163459061377, 
-            1.7397750472133227, 
-            0.40865290826939393, 
-            1.9322709447427506, 
-            3.7488814181123082, 
-            0.999910036276269, 
-            2.202464383904762, 
-            6.225511119055286, 
-            0.4607922129972568, 
-            0.18347089591674237, 
-            0.7998209062335242, 
-            5.0746310546021345, 
-            1.75341780686486
-        };
+    {
+    4.3930522285718725, 
+    2.0980074779050573, 
+    5.911617141284784, 
+    3.302416782999798, 
+    0.532648003019616, 
+    3.864552401356139, 
+    0.6828907136007456, 
+    3.309690303702759, 
+    3.78626929045274, 
+    2.880490449092737, 
+    0.6412955842415297, 
+    4.210561997218116, 
+    1.329093445651415, 
+    4.423635829349905, 
+    0.9697059483036133, 
+    3.3800872309232752, 
+    5.190082241176484, 
+    4.179658018481378, 
+    3.1761418769465792, 
+    1.8514888920948884, 
+    5.672079791211344, 
+    2.80457371107737, 
+    5.752510144539967, 
+    2.0542370131054426, 
+    4.059706623677195, 
+    5.059878289798797, 
+    3.2535931944316436, 
+    1.251760344228206, 
+    1.1697673184395325, 
+    5.499988425488455, 
+    2.5487075166480784, 
+    5.671174843247418, 
+    1.5889337469209264, 
+    3.4966660573449286, 
+    4.1128697586043845, 
+    1.32223042596809, 
+    3.634874408433536, 
+    5.4727212070712845, 
+    4.050330922059182, 
+    1.329430792144477, 
+    4.347179582872594, 
+    0.49531926549671, 
+    1.9981399038451473, 
+    2.2024506973065567, 
+    5.422728478571278, 
+    4.342491898622478, 
+    2.340585893867574, 
+    1.595375474206211, 
+    5.534647380650129, 
+    2.1854360354552314, 
+    4.407323953511916, 
+    5.875238413239378, 
+    5.807281013442006, 
+    2.611730008727033, 
+    2.404221048946509, 
+    4.5142628863423, 
+    4.585857046489191, 
+    2.7585550894249278, 
+    6.034609601973635, 
+    1.784818848275311, 
+    2.9385777003341786, 
+    2.7379768217657237, 
+    5.204281144711419, 
+    2.5743565427801682, 
+    5.633773284292306, 
+    0.37163019591190505, 
+    5.4767684684458136, 
+    2.469637673803118, 
+    4.796244127749591, 
+    6.131515108692101, 
+    5.442227729315259, 
+    1.6393092165445262, 
+    2.905279921897077, 
+    5.887610452331277, 
+    2.231151580725118, 
+    1.311410267937173, 
+    5.1320011670472665, 
+    1.0637225421542722, 
+    2.161631508466618, 
+    1.542156486372099, 
+    3.7292113803036364, 
+    1.7137086767243934, 
+    5.4642677550381755, 
+    3.0853750211403574, 
+    3.0173444667823857, 
+    0.6315436517090349, 
+    3.3421180705036546, 
+    4.209646257875283, 
+    3.7926270717945605, 
+    5.819113544074465, 
+    1.904641568725281, 
+    3.909964870239804, 
+    3.5835554395539133, 
+    3.8436429642943346, 
+    2.197853136078777, 
+    4.866540140523055, 
+    6.18086741431614, 
+    5.4147864419797465, 
+    1.123181428416226, 
+    5.767777606674638, 
+    1.2247017979747263, 
+    3.2021001566014204, 
+    4.509373040115699, 
+    3.7362376775556543, 
+    0.08683319620390151, 
+    1.2405920482832018, 
+    0.8724415122969259, 
+    2.961759106078713, 
+    2.0771434354580864, 
+    2.923727915641903, 
+    2.7159263377789484, 
+    5.20302805883522, 
+    3.8574313667909914, 
+    0.9620003437805832, 
+    2.758032882552134, 
+    2.110632917575416, 
+    4.423350054567123, 
+    4.6696945714405045, 
+    3.366131602771689, 
+    1.4757790606175893, 
+    4.423642339560315, 
+    4.92807311466011, 
+    2.067548270280224, 
+    3.772824744655635, 
+    2.84617535065996, 
+    4.6283185725205, 
+    0.092443463110639, 
+    6.154303648109571, 
+    5.764843632300961, 
+    3.7978438062146234, 
+    4.581524010352971, 
+    2.6704472245847883, 
+    4.28496763451278, 
+    3.079068811519279, 
+    6.215571764084275, 
+    1.6727154189264666, 
+    1.5702907676316764, 
+    3.0167494385334965, 
+    3.5141258234246533, 
+    4.5840366922727425, 
+    2.7706972066454743, 
+    4.294461552185262, 
+    3.807630008844287, 
+    0.2630172179015329, 
+    2.115045951553029, 
+    3.423269843873172, 
+    5.7978670935946, 
+    1.6945359810872747, 
+    3.0436962789661797, 
+    2.368298216504867, 
+    4.8554730921226374, 
+    4.159204477042065, 
+    0.21666124977089396, 
+    3.381162299738797, 
+    0.1441628078280086, 
+    1.541825983163458, 
+    5.529820230628496, 
+    3.0811151395049796, 
+    1.463250254179737, 
+    3.9225001868930343, 
+    4.133792216068891, 
+    0.9242787399407808, 
+    4.52161640487037, 
+    3.9304320982687724, 
+    1.6630928269575334, 
+    3.6124930881561648, 
+    1.5756809048093188, 
+    1.2284009214428435, 
+    3.6667071469745096, 
+    3.731393225939248, 
+    1.3805717439790721, 
+    4.3356357222344934, 
+    2.808892673945348, 
+    2.1194589855109074, 
+    1.1925169734369456, 
+    5.850783005068567, 
+    5.6640714433910375, 
+    3.0339273779002425, 
+    4.201648701469412, 
+    0.3289178314175416, 
+    5.161934219713718, 
+    5.932017725015613, 
+    5.54990471757801, 
+    3.2685298202768385, 
+    3.3400508259054345, 
+    4.61241753082556, 
+    2.024160879689441, 
+    3.108107374510848, 
+    0.21973074174871066, 
+    4.536135686410281, 
+    3.023281955038178, 
+    0.35146993875006327, 
+    6.06360994679823, 
+    1.6810294052530046, 
+    3.1837768890758444, 
+    0.6374076523146917, 
+    1.6375793184645058, 
+    6.142404473157965, 
+    5.048278576240986, 
+    3.8565616882630644, 
+    3.781988825321103, 
+    0.6626461774182255, 
+    4.511015710407045, 
+    1.3781495182202912, 
+    0.3048210194240344, 
+    1.2281990925819724, 
+    5.530568411276023, 
+    3.9826621922332768, 
+    6.148919688034672, 
+    0.3849323271843632, 
+    2.3895972379985033, 
+    2.0351897098873533, 
+    5.478720725311914, 
+    4.5101107624565735, 
+    0.5674943806341197, 
+    4.667407863259131, 
+    4.180649474473559, 
+    0.761845235610469, 
+    1.0511013301219272, 
+    2.078027466814059, 
+    3.922709192162581, 
+    2.9191198961157077, 
+    3.6120440358146144, 
+    5.938650489751697, 
+    3.5529228291672803, 
+    4.252974513646061, 
+    0.07321558074413037, 
+    4.606624069065216, 
+    1.1381464803518826, 
+    0.6300786117796688, 
+    6.265717644929687, 
+    0.8430061348604436, 
+    3.1486688816017, 
+    2.187113308963469, 
+    2.55904691435907, 
+    0.9064953139550527, 
+    5.37692637169442, 
+    5.853139585850388, 
+    1.575131271143313, 
+    2.952143357394929, 
+    5.66264462166993, 
+    1.6711595897952538, 
+    0.5699793026370283, 
+    2.3172163459061377, 
+    1.7397750472133227, 
+    0.40865290826939393, 
+    1.9322709447427506, 
+    3.7488814181123082, 
+    0.999910036276269, 
+    2.202464383904762, 
+    6.225511119055286, 
+    0.4607922129972568, 
+    0.18347089591674237, 
+    0.7998209062335242, 
+    5.0746310546021345, 
+    1.75341780686486
+    };
 
         
 
 
-}
+    }

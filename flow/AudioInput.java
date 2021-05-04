@@ -16,7 +16,7 @@ import java.io.*;
 */
 
 public class AudioInput
-{
+    {
     Mixer.Info mixer;
     TargetDataLine tdl;
     Thread audioInputThread = null;
@@ -27,7 +27,7 @@ public class AudioInput
 
     /** Creates an AudioInput, initially in STOPPED state. */
     public AudioInput(Output output)
-    {
+        {
         this.output = output;
 
         Mixer.Info[] mixers = getSupportedMixers();
@@ -35,55 +35,55 @@ public class AudioInput
         boolean found = false;
         for (int i = 0; i < mixers.length; i++)
             {
-                if (mixers[i].getName().equals(mix))
-                    {
-                        found = true;
-                        setMixer(mixers[i]);
-                    }
+            if (mixers[i].getName().equals(mix))
+                {
+                found = true;
+                setMixer(mixers[i]);
+                }
             }
         if (!found) setMixer(null); // sets to the first one, which is the default normally
 
 
         audioInputThread = new Thread(new Runnable()
             {
-                public void run()
+            public void run()
                 {
-                    while(true)
+                while(true)
+                    {
+                    synchronized(lock)
                         {
-                            synchronized(lock)
+                        if (tdl == null || !running)
+                            {
+                            try
                                 {
-                                    if (tdl == null || !running)
-                                        {
-                                            try
-                                                {
-                                                    lock.wait();
-                                                }
-                                            catch (InterruptedException ex) { } // never happens
-                                        }
-                                    else
-                                        {
-                                            if (amplitudes == null || amplitudes.length != Unit.NUM_PARTIALS)
-                                                {
-                                                    amplitudes = new double[Unit.NUM_PARTIALS];
-                                                }
-                                        }
+                                lock.wait();
                                 }
-                                        
-                            // process will have is own internal lock
-                            if (amplitudes != null)
-                                process();
+                            catch (InterruptedException ex) { } // never happens
+                            }
+                        else
+                            {
+                            if (amplitudes == null || amplitudes.length != Unit.NUM_PARTIALS)
+                                {
+                                amplitudes = new double[Unit.NUM_PARTIALS];
+                                }
+                            }
                         }
+                                        
+                    // process will have is own internal lock
+                    if (amplitudes != null)
+                        process();
+                    }
                 }
             });
         audioInputThread.setDaemon(true);
         audioInputThread.start();
-    }
+        }
     
     
     // These are copies of Wavetable's constants.  Maybe we might want to tweak them.
     
-    static final int RESAMPLING = 4;
-    static final int WAVETABLE_SIZE = 256;
+    static final int RESAMPLING = 8;
+    static final int WAVETABLE_SIZE = 512;
     static final double MINIMUM_AMPLITUDE = 0.001;
     int sampleSize = WAVETABLE_SIZE * RESAMPLING;
     double[] b = new double[sampleSize];
@@ -91,190 +91,183 @@ public class AudioInput
     byte[] sampleBuffer = new byte[WAVETABLE_SIZE * 2];
         
     void process()
-    {
+        {
         TargetDataLine tdl_ = null;
 
         synchronized(lock)
             {
-                if (tdl == null || !running)
-                    return;  // just in case
-                tdl_ = tdl;
+            if (tdl == null || !running)
+                return;  // just in case
+            tdl_ = tdl;
             }
                 
         if (tdl.read(sampleBuffer, 0, sampleBuffer.length) == sampleBuffer.length)
             {
-                // Read frames into buffer
-                for(int i = 0, j = 0; i < sampleBuffer.length; i+=2, j++)
-                    {
-                        // I am converting to a short to make sure it converts to an int in signed form (negatives get sign-extended).  Is this right?
-                        int sample = (sampleBuffer[i] & 255) | (sampleBuffer[i + 1] << 8);
-                        buffer[j] = sample / 32768.0;
-                    }
+            // Read frames into buffer
+            for(int i = 0, j = 0; i < sampleBuffer.length; i+=2, j++)
+                {
+                // I am converting to a short to make sure it converts to an int in signed form (negatives get sign-extended).  Is this right?
+                int sample = (short)((sampleBuffer[i] & 255) | ((sampleBuffer[i + 1] & 255) << 8));
+                buffer[j] = sample / 32768.0;
+                }
                 
-                /*
-                  synchronized(lock)
-                  {
-                  robot.process(buffer, amplitudes);
-                  }
-                */
-                
-                System.arraycopy(b, WAVETABLE_SIZE, b, 0, sampleSize - WAVETABLE_SIZE);
-                System.arraycopy(buffer, 0, b, sampleSize - WAVETABLE_SIZE, WAVETABLE_SIZE);
-                //System.arraycopy(b, 0, a, 0, sampleSize);             // maybe a is unnecessarty as applyHanningWindow already clones
+            System.arraycopy(b, WAVETABLE_SIZE, b, 0, sampleSize - WAVETABLE_SIZE);
+            System.arraycopy(buffer, 0, b, sampleSize - WAVETABLE_SIZE, WAVETABLE_SIZE);
+            //System.arraycopy(b, 0, a, 0, sampleSize);             // maybe a is unnecessarty as applyHanningWindow already clones
           
-                // is Hanning COLA?     
-                double[] a = FFT.applyHanningWindow(b);
-                // we need options here for not allocating buffers over and over again
-                double[] harmonics = FFT.getHarmonics(a);
+            // is Hanning COLA?     
+            double[] a = FFT.applyHanningWindow(b);
+            // we need options here for not allocating buffers over and over again
+            double[] harmonics = FFT.getHarmonics(a);
 
-                synchronized(lock)
+            synchronized(lock)
+                {
+                if (running)
                     {
-                        if (running)
+                    // is this the right size?
+                    for (int s=1 ; s < harmonics.length / 2 / RESAMPLING + 1; s++)
+                        {
+                        if ( s > amplitudes.length)  // note >
                             {
-                                // is this the right size?
-                                for (int s=1 ; s < harmonics.length / 2 / RESAMPLING + 1; s++)
-                                    {
-                                        if ( s > amplitudes.length)  // note >
-                                            {
-                                                break;
-                                            }
-                                        amplitudes[s - 1] = (harmonics[s * RESAMPLING - 1] >= MINIMUM_AMPLITUDE ? harmonics[s * RESAMPLING - 1]  : 0 );
-                                    }
+                            break;
                             }
+                        amplitudes[s - 1] = (harmonics[s * RESAMPLING - 1] >= MINIMUM_AMPLITUDE ? harmonics[s * RESAMPLING - 1]  : 0 );
+                        }
                     }
+                }
             }
-    }
+        }
     
     double[] zeroAmplitudes;
     /** Returns the latest amplitudes of harmonics sampled from the audio input source.  If the facility
         is currently stopped, then start() is called.  If there
         are no amplitudes yet (perhaps because AudioInput is warming up), then zeros will be returned.  */
     public void getAmplitudes(double[] putHere)
-    {
+        {
         synchronized(lock)
             {
-                start();
+            start();
                 
-                if (!running || amplitudes == null)
+            if (!running || amplitudes == null)
+                {
+                if (zeroAmplitudes == null || zeroAmplitudes.length != Unit.NUM_PARTIALS)
                     {
-                        if (zeroAmplitudes == null || zeroAmplitudes.length != Unit.NUM_PARTIALS)
-                            {
-                                zeroAmplitudes = new double[Unit.NUM_PARTIALS];
-                            }
-                        System.arraycopy(zeroAmplitudes, 0, putHere, 0, putHere.length);
+                    zeroAmplitudes = new double[Unit.NUM_PARTIALS];
                     }
-                else
-                    {
-                        System.arraycopy(amplitudes, 0, putHere, 0, putHere.length);
-                    }
+                System.arraycopy(zeroAmplitudes, 0, putHere, 0, putHere.length);
+                }
+            else
+                {
+                System.arraycopy(amplitudes, 0, putHere, 0, putHere.length);
+                }
             }
-    }
+        }
     
     /** Starts (or restarts) the audio facility. */
     public void start()
-    {
+        {
         synchronized(lock)
             {
-                if (tdl == null)
-                    {
-                        System.err.println("AudioInput.start() WARNING: Cannot Start: No Audio Input.");
-                    }
-                else if (running)
-                    {
-                        // no need
-                    }
-                else
-                    {
-                        // clear buffers
-                        b = new double[sampleSize];
-                        running = true;
-                        lock.notify();
-                    }
+            if (tdl == null)
+                {
+                System.err.println("AudioInput.start() WARNING: Cannot Start: No Audio Input.");
+                }
+            else if (running)
+                {
+                // no need
+                }
+            else
+                {
+                // clear buffers
+                b = new double[sampleSize];
+                running = true;
+                lock.notify();
+                }
             }
-    }
+        }
                 
     /** Stops (pauses) the AudioInput facility, reducing CPU load. */
     public void stop()
-    {
+        {
         synchronized(lock)
             {
-                running = false;
+            running = false;
             }
-    }
+        }
                 
     /** Sets the currently used Mixer for the AudioInput. */
     public void setMixer(Mixer.Info mixer)
-    {
+        {
         synchronized(lock)
             {
-                try
+            try
+                {
+                if (tdl != null)
                     {
-                        if (tdl != null)
-                            {
-                                tdl.close();
-                            }                               
-                        if (mixer == null)
-                            {
-                                Mixer.Info[] m = getSupportedMixers();
-                                if (m.length > 0)
-                                    mixer = m[0];
-                            }
-                        if (mixer == null)
-                            {
-                                // nothing available
-                                System.err.println("AudioInput.setMixer() WARNING: No available audio input");
-                                return;
-                            }
-                        else
-                            {
-                                tdl = AudioSystem.getTargetDataLine( output.audioFormat, mixer );
-                            }
-                        try { tdl.open(output.audioFormat, output.bufferSize); }                        // is this wise? Should we do something smaller?
-                        catch (Exception ex) 
-                            { 
-                                ex.printStackTrace(); 
-                            }
-                        tdl.start();
-                        this.mixer = mixer;
+                    tdl.close();
+                    }                               
+                if (mixer == null)
+                    {
+                    Mixer.Info[] m = getSupportedMixers();
+                    if (m.length > 0)
+                        mixer = m[0];
                     }
-                catch (LineUnavailableException ex) { ex.printStackTrace(); throw new RuntimeException(ex); }
+                if (mixer == null)
+                    {
+                    // nothing available
+                    System.err.println("AudioInput.setMixer() WARNING: No available audio input");
+                    return;
+                    }
+                else
+                    {
+                    tdl = AudioSystem.getTargetDataLine( output.audioFormat, mixer );
+                    }
+                try { tdl.open(output.audioFormat, output.bufferSize); }                        // is this wise? Should we do something smaller?
+                catch (Exception ex) 
+                    { 
+                    ex.printStackTrace(); 
+                    }
+                tdl.start();
+                this.mixer = mixer;
+                }
+            catch (LineUnavailableException ex) { ex.printStackTrace(); throw new RuntimeException(ex); }
             }
-    }
+        }
 
 
     /** Returns the currently used Mixer for the AudioInput */
     public Mixer.Info getMixer()
-    {
+        {
         return mixer;
-    }
+        }
                 
 
     /** Returns the available mixers which support the given audio format.  The audio format
         is the same as the one used by Output.  */
     public Mixer.Info[] getSupportedMixers()
-    {
+        {
         DataLine.Info lineInfo = new DataLine.Info(TargetDataLine.class, output.audioFormat);
         Mixer.Info[] info = AudioSystem.getMixerInfo();
         int count = 0;
         for (int i = 0; i < info.length; i++) 
             {
-                Mixer m = AudioSystem.getMixer(info[i]);
-                if (m.isLineSupported(lineInfo)) 
-                    {
-                        count++;
-                    }
+            Mixer m = AudioSystem.getMixer(info[i]);
+            if (m.isLineSupported(lineInfo)) 
+                {
+                count++;
+                }
             }
 
         Mixer.Info[] options = new Mixer.Info[count];
         count = 0;
         for (int i = 0; i < info.length; i++) 
             {
-                Mixer m = AudioSystem.getMixer(info[i]);
-                if (m.isLineSupported(lineInfo)) 
-                    options[count++] = info[i];
+            Mixer m = AudioSystem.getMixer(info[i]);
+            if (m.isLineSupported(lineInfo)) 
+                options[count++] = info[i];
             }
         return options;
+        }
+
+
     }
-
-
-}

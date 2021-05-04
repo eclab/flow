@@ -31,19 +31,19 @@ import javax.swing.*;
 */
         
 public class MIDIIn extends Modulation implements ModSource
-{
+    {
     private static final long serialVersionUID = 1;
         
     public MIDIIn(Sound sound)
-    {
+        {
         super(sound);
         defineModulations(new Constant[] { new Constant(74/127.0), new Constant(1/127.0), Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO},
-                          new String[] { "CC", "CC", "CC", "CC", "CC", "CC", "CC", "CC" });
+            new String[] { "CC", "CC", "CC", "CC", "CC", "CC", "CC", "CC" });
         defineModulationOutputs( new String[] { "Gate", "Note", "Velocity", "Release", "Pressure", "Clock", "Bend", "", "", "", "", "", "", "", "" });
 
         for(int i = 0; i < lastCC.length; i++)
             lastCC[i] = Double.NaN;
-    }
+        }
 
     public static final int MOD_GATE = 0;
     public static final int MOD_NOTE = 1;
@@ -59,11 +59,11 @@ public class MIDIIn extends Modulation implements ModSource
 
 
     public Object clone()
-    {
+        {
         MIDIIn obj = (MIDIIn)(super.clone());
         obj.lastCC = (double[])(obj.lastCC.clone());
         return obj;
-    }
+        }
 
 
     boolean gated;
@@ -72,21 +72,21 @@ public class MIDIIn extends Modulation implements ModSource
         
                 
     public void gate()
-    {
+        {
         super.gate();
         gated = true;
         noteOnTrigger = true;
-    }
+        }
                 
     public void release()
-    {
+        {
         super.release();
         gated = false;
         noteOffTrigger = true;
-    }
+        }
 
     public void go()
-    {
+        {
         super.go();
 
         Sound sound = getSound();
@@ -102,98 +102,98 @@ public class MIDIIn extends Modulation implements ModSource
 
         if (noteOnTrigger)
             {
-                updateTrigger(MOD_GATE);
-                updateTrigger(MOD_NOTE);
-                updateTrigger(MOD_VELOCITY);
-                noteOnTrigger = false;
+            updateTrigger(MOD_GATE);
+            updateTrigger(MOD_NOTE);
+            updateTrigger(MOD_VELOCITY);
+            noteOnTrigger = false;
             }
         else if (noteOffTrigger)
             {
-                updateTrigger(MOD_RELEASE_VELOCITY);
-                noteOffTrigger = false;
+            updateTrigger(MOD_RELEASE_VELOCITY);
+            noteOffTrigger = false;
             }
 
         if (input.getMidiClock().getClockPulseTrigger())
             { 
-                updateTrigger(MOD_CLOCK); 
-                setModulationOutput(MOD_CLOCK, 1.0); 
+            updateTrigger(MOD_CLOCK); 
+            setModulationOutput(MOD_CLOCK, 1.0); 
             }
         else setModulationOutput(MOD_CLOCK, 0.0);
 
         if (input.getMidiClock().getClockStartTrigger())
             { 
-                resetTrigger(MOD_CLOCK); 
-                setModulationOutput(MOD_CLOCK, 0.0);
+            resetTrigger(MOD_CLOCK); 
+            setModulationOutput(MOD_CLOCK, 0.0);
             }
         
         for(int i = 0; i < NUM_CC; i++)
             {
-                Input in = sound.getOutput().getInput();
-                int cc = in.getCC(sound.getChannel(), (int)(modulate(i) * 127));
-                if (cc != Input.UNSPECIFIED)
+            Input in = sound.getOutput().getInput();
+            int cc = in.getCC(sound.getChannel(), (int)(modulate(i) * 127));
+            if (cc != Input.UNSPECIFIED)
+                {
+                double d = cc/127.0;
+                if (d != lastCC[i])
                     {
-                        double d = cc/127.0;
-                        if (d != lastCC[i])
-                            {
-                                updateTrigger(MOD_CC + i);
-                                setModulationOutput(MOD_CC + i, d);
-                                lastCC[i] = d;
-                            }
+                    updateTrigger(MOD_CC + i);
+                    setModulationOutput(MOD_CC + i, d);
+                    lastCC[i] = d;
                     }
+                }
             }
-    }
+        }
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-    {
+        {
         return "" + ((int)(value * 127));
-    }
+        }
 
     public static String[] OPTIONS = new String[] { "Learn Most Recent CC", "00 Bank Select", "01 Mod Wheel", "02 Breath Controller", "04 Foot Controller", "05 Portamento Time", "07 Volume", "10 Pan", "11 Expression Controller", "32 Bank Select LSB", "33 Mod Wheel LSB", "34 Breath Controller LSB", "36 Foot Controller LSB", "37 Portamento Time LSB", "39 Volume LSB", "42 Pan LSB", "43 Expression Controller LSB", "64 Sustain", "65 Portamento On/Off", "66 Sostenuto on/Off", "67 Soft Pedal On/Off", "68 Legato On/Off", "74 Y Axis", "84 Portamento Amount" };
     public static int[] CCS = new int[] { -1, 0, 1, 2, 4, 5, 7, 10, 11, 32, 33, 34, 36, 37, 39, 42, 43, 64, 65, 66, 67, 68, 74, 84 };
 
     public ModulePanel getPanel()
-    {
+        {
         return new ModulePanel(MIDIIn.this)
             {
-                public JComponent buildPanel()
+            public JComponent buildPanel()
                 {               
-                    Modulation mod = getModulation();
+                Modulation mod = getModulation();
 
-                    Box box = new Box(BoxLayout.Y_AXIS);
-                    for(int i = 0; i < MOD_CC; i++)
-                        {
-                            box.add(new ModulationOutput(mod, i, this));
-                        }
+                Box box = new Box(BoxLayout.Y_AXIS);
+                for(int i = 0; i < MOD_CC; i++)
+                    {
+                    box.add(new ModulationOutput(mod, i, this));
+                    }
                 
-                    for(int i = 0; i < NUM_CC; i++)
+                for(int i = 0; i < NUM_CC; i++)
+                    {
+                    final int _i = i;
+                    Box hbox = new Box(BoxLayout.X_AXIS);
+                    hbox.add(new ModulationInput(mod, i, this)
                         {
-                            final int _i = i;
-                            Box hbox = new Box(BoxLayout.X_AXIS);
-                            hbox.add(new ModulationInput(mod, i, this)
+                        public String[] getOptions() { return OPTIONS; }
+                        public double convert(int elt) 
+                            {
+                            if (elt == 0)  // "Learn"
                                 {
-                                    public String[] getOptions() { return OPTIONS; }
-                                    public double convert(int elt) 
+                                int last = MIDIIn.this.sound.getOutput().getInput().getLastCCNumber();
+                                if (last == Input.UNSPECIFIED)
                                     {
-                                        if (elt == 0)  // "Learn"
-                                            {
-                                                int last = MIDIIn.this.sound.getOutput().getInput().getLastCCNumber();
-                                                if (last == Input.UNSPECIFIED)
-                                                    {
-                                                        AppMenu.showSimpleError("No CCs Received", "Cannot set this CC parameter because no CC has been received.", getRack());
-                                                        return 0;
-                                                    }
-                                                else return last / 127.0;
-                                            } 
-                                        return CCS[elt] / 127.0; 
+                                    AppMenu.showSimpleError("No CCs Received", "Cannot set this CC parameter because no CC has been received.", getRack());
+                                    return 0;
                                     }
-                                });
-                            hbox.add(new ModulationOutput(mod, i + MOD_CC, this));
-                            box.add(hbox);
-                        }
-                    return box;
+                                else return last / 127.0;
+                                } 
+                            return CCS[elt] / 127.0; 
+                            }
+                        });
+                    hbox.add(new ModulationOutput(mod, i + MOD_CC, this));
+                    box.add(hbox);
+                    }
+                return box;
                 }
-        };
-    }
+            };
+        }
 
     //// SERIALIZATION STUFF
 
@@ -202,12 +202,12 @@ public class MIDIIn extends Modulation implements ModSource
     public static final String[] MOD_OUT_NAMES = new String[] { "Gate", "Note", "Velocity", "Release", "Pressure", "Clock", "Bend", "Out_A", "Out_B", "Out_C", "Out_D", "Out_E", "Out_F", "Out_G", "Out_H" };
 
     public String getKeyForModulation(int input)
-    {
+        {
         return MOD_NAMES[input];
-    }
+        }
          
     public String getKeyForModulationOutput(int output)
-    {
+        {
         return MOD_OUT_NAMES[output];
+        }
     }
-}

@@ -19,13 +19,13 @@ import javax.swing.*;
 
 
 public class Midi
-{
+    {
     Input input;
     
     public Midi(Input input)
-    {
+        {
         this.input = input;
-    }
+        }
     
     ///////// DEVICES
     
@@ -35,18 +35,18 @@ public class Midi
         useful format for the user, and which can set its receiver  */
                 
     public static class MidiDeviceWrapper
-    {
+        {
         MidiDevice device;
         
         MidiDeviceWrapper(MidiDevice device)
-        {
+            {
             this.device = device;
-        }
+            }
             
         public MidiDevice getDevice() { return device; }
         
         public String toLongString()
-        {
+            {
             if (device == null)
                 return "No Device";
             return "Desc: " + device.getDeviceInfo().getDescription() +
@@ -54,11 +54,11 @@ public class Midi
                 "\nVend: " + device.getDeviceInfo().getVendor() + 
                 "\nVers: " + device.getDeviceInfo().getVersion() +
                 "\nStri: " + device.getDeviceInfo().toString();
-        }
+            }
         
         /** Returns a useful name to display to represent the MIDI Device in question. */        
         public String toString() 
-        { 
+            { 
             if (device == null)
                 return "No Device";
 
@@ -79,22 +79,22 @@ public class Midi
                 return desc.trim(); 
             else 
                 return name;
-        }
+            }
         
         // Attaches the Receiver as a receiver for the given MIDI Device
         void setReceiver(Receiver receiver) 
-        {
+            {
             if (device == null)
                 return;
             try
                 {
-                    if (!device.isOpen()) 
-                        device.open();
-                    device.getTransmitter().setReceiver(receiver);
+                if (!device.isOpen()) 
+                    device.open();
+                device.getTransmitter().setReceiver(receiver);
                 }
             catch(Exception e) { e.printStackTrace(); }
+            }
         }
-    }
 
 
     // A list of all MIDI Devices
@@ -108,58 +108,58 @@ public class Midi
 
     // updates the current MIDI devices registered
     static void updateDevices()
-    {
+        {
         MidiDevice.Info[] midiDevices;
         try
             {
-                midiDevices = uk.co.xfactorylibrarians.coremidi4j.CoreMidiDeviceProvider.getMidiDeviceInfo();
+            midiDevices = uk.co.xfactorylibrarians.coremidi4j.CoreMidiDeviceProvider.getMidiDeviceInfo();
             }
         catch (Exception ex)
             {
-                midiDevices = MidiSystem.getMidiDeviceInfo();
+            midiDevices = MidiSystem.getMidiDeviceInfo();
             }
 
         ArrayList allDevices = new ArrayList();
         for(int i = 0; i < midiDevices.length; i++)
             {
-                try
+            try
+                {
+                MidiDevice d = MidiSystem.getMidiDevice(midiDevices[i]);
+                // get rid of java devices
+                if (d instanceof javax.sound.midi.Sequencer ||
+                    d instanceof javax.sound.midi.Synthesizer)
+                    continue;
+                if (d.getMaxTransmitters() != 0 || d.getMaxReceivers() != 0)
                     {
-                        MidiDevice d = MidiSystem.getMidiDevice(midiDevices[i]);
-                        // get rid of java devices
-                        if (d instanceof javax.sound.midi.Sequencer ||
-                            d instanceof javax.sound.midi.Synthesizer)
-                            continue;
-                        if (d.getMaxTransmitters() != 0 || d.getMaxReceivers() != 0)
-                            {
-                                allDevices.add(new MidiDeviceWrapper(d));
-                            }
+                    allDevices.add(new MidiDeviceWrapper(d));
                     }
-                catch(Exception e) { }
+                }
+            catch(Exception e) { }
             }
             
         // Do they hold the same exact devices?
         if (Midi.allDevices != null && Midi.allDevices.size() == allDevices.size())
             {
-                Set set = new HashSet();
-                for(int i = 0; i < Midi.allDevices.size(); i++)
-                    {
-                        set.add(((MidiDeviceWrapper)(Midi.allDevices.get(i))).device);
-                    }
+            Set set = new HashSet();
+            for(int i = 0; i < Midi.allDevices.size(); i++)
+                {
+                set.add(((MidiDeviceWrapper)(Midi.allDevices.get(i))).device);
+                }
                 
-                boolean same = true;
-                for(int i = 0; i < allDevices.size(); i++)
+            boolean same = true;
+            for(int i = 0; i < allDevices.size(); i++)
+                {
+                if (!set.contains(((MidiDeviceWrapper)(allDevices.get(i))).device))
                     {
-                        if (!set.contains(((MidiDeviceWrapper)(allDevices.get(i))).device))
-                            {
-                                same = false;  // something's different
-                                break;
-                            }
+                    same = false;  // something's different
+                    break;
                     }
+                }
                 
-                if (same)
-                    {
-                        return;  // they're identical
-                    }
+            if (same)
+                {
+                return;  // they're identical
+                }
             }
                 
         // at this point allDevices isn't the same as Midi.allDevices, so set it and update
@@ -168,50 +168,50 @@ public class Midi
         inDevices = new ArrayList();
         for(int i = 0; i < allDevices.size(); i++)
             {
-                try
+            try
+                {
+                MidiDeviceWrapper mdn = (MidiDeviceWrapper)(allDevices.get(i));
+                if (mdn.device.getMaxTransmitters() != 0)
                     {
-                        MidiDeviceWrapper mdn = (MidiDeviceWrapper)(allDevices.get(i));
-                        if (mdn.device.getMaxTransmitters() != 0)
-                            {
-                                inDevices.add(mdn);
-                            }
+                    inDevices.add(mdn);
                     }
-                catch(Exception e) { }
+                }
+            catch(Exception e) { }
             }
 
         outDevices = new ArrayList();
         for(int i = 0; i < allDevices.size(); i++)
             {
-                try
+            try
+                {
+                MidiDeviceWrapper mdn = (MidiDeviceWrapper)(allDevices.get(i));
+                if (mdn.device.getMaxReceivers() != 0)
                     {
-                        MidiDeviceWrapper mdn = (MidiDeviceWrapper)(allDevices.get(i));
-                        if (mdn.device.getMaxReceivers() != 0)
-                            {
-                                outDevices.add(mdn);
-                            }
+                    outDevices.add(mdn);
                     }
-                catch(Exception e) { }
+                }
+            catch(Exception e) { }
             }
-    }
+        }
         
     static
-    {
+        {
         updateDevices();
-    }
+        }
     
     /** Returns all incoming MIDI Devices */
     public ArrayList<MidiDeviceWrapper> getInDevices()
-    {
+        {
         updateDevices();
         return inDevices;
-    }
+        }
 
     // Returns all MIDI Devices period, incoming or outgoing */
     ArrayList<MidiDeviceWrapper> getAllDevices()
-    {
+        {
         updateDevices();
         return allDevices;
-    }
+        }
         
     //Object lock = new Object[0];
     java.util.concurrent.locks.ReentrantLock lock = new java.util.concurrent.locks.ReentrantLock(true);
@@ -225,88 +225,88 @@ public class Midi
     /** Returns all MIDI Messages, in order, that have not yet been processed.  By calling this,
         the messages are processed and removed from this queue. */    
     public MidiMessage[] getNextMessages()
-    {
+        {
         try
             {
-                boolean result = lock.tryLock(0L, java.util.concurrent.TimeUnit.MILLISECONDS);
-                if (result)
+            boolean result = lock.tryLock(0L, java.util.concurrent.TimeUnit.MILLISECONDS);
+            if (result)
+                {
+                try
                     {
-                        try
-                            {
-                                // This is a little faster than just doing toArray()
-                                int size = nextMessages.size();
-                                if (size == 0) return empty;
-                                else if (size == 1)
-                                    {
-                                        one[0] = nextMessages.get(0);
-                                        nextMessages.clear();
-                                        return one;
-                                    }
-                                else if (size == 2)
-                                    {
-                                        two[0] = nextMessages.get(0);
-                                        two[1] = nextMessages.get(1);
-                                        nextMessages.clear();
-                                        return two;
-                                    }
-                                else
-                                    {
-                                        MidiMessage[] ret = (MidiMessage[]) nextMessages.toArray(new MidiMessage[size]);
-                                        nextMessages.clear();
-                                        return ret;
-                                    }
-                            }
-                        finally
-                            {
-                                lock.unlock();
-                            }
+                    // This is a little faster than just doing toArray()
+                    int size = nextMessages.size();
+                    if (size == 0) return empty;
+                    else if (size == 1)
+                        {
+                        one[0] = nextMessages.get(0);
+                        nextMessages.clear();
+                        return one;
+                        }
+                    else if (size == 2)
+                        {
+                        two[0] = nextMessages.get(0);
+                        two[1] = nextMessages.get(1);
+                        nextMessages.clear();
+                        return two;
+                        }
+                    else
+                        {
+                        MidiMessage[] ret = (MidiMessage[]) nextMessages.toArray(new MidiMessage[size]);
+                        nextMessages.clear();
+                        return ret;
+                        }
                     }
+                finally
+                    {
+                    lock.unlock();
+                    }
+                }
             }
         catch (InterruptedException ex) { }
         return empty;   // not reachable
-    }
+        }
         
     // Our special kind of receiver.
     class InReceiver implements Receiver
-    {
+        {
         boolean live = true;
 
         // these have to be public because the superclass has them public         
         public void close() 
-        { 
+            { 
             lock.lock();
             try
                 {
-                    live = false;
+                live = false;
                 }
             finally
                 {
-                    lock.unlock();
+                lock.unlock();
                 }
-        }
+            }
                
         // these have to be public because the superclass has them public         
         public void send(MidiMessage message, long timeStamp)
-        {
+            {
             boolean l = false;
             int command = message.getStatus();              // Note NOT getCommand().  getCommand() only works for channel messages.
 
             lock.lock();
             try
                 {
-                    // first things first, get out of the lock as fast as we can.
-                    // We do that by adding the message if we need to.
+                // first things first, get out of the lock as fast as we can.
+                // We do that by adding the message if we need to.
 
-                    l = live;
-                    if (live && (command < ShortMessage.TIMING_CLOCK || command > ShortMessage.STOP))
-                        {
-                            nextMessages.add(message);
-                            return;
-                        }
+                l = live;
+                if (live && (command < ShortMessage.TIMING_CLOCK || command > ShortMessage.STOP))
+                    {
+                    nextMessages.add(message);
+                    return;
+                    }
                 }
             finally
                 {
-                    lock.unlock();
+                lock.unlock();
                 }           
                 
             // Now we can pulse the clock -- it has its own separate lock.
@@ -319,66 +319,66 @@ public class Midi
             
             if (l)
                 {
-                    if (command == ShortMessage.TIMING_CLOCK)
-                        {
-                            input.getMidiClock().pulseClock();
-                        }
-                    else if (command == ShortMessage.START)
-                        {
-                            input.getMidiClock().startClock();
-                        }
-                    else if (command == ShortMessage.STOP)
-                        {
-                            input.getMidiClock().stopClock();
-                        }
-                    else if (command == ShortMessage.CONTINUE)
-                        {
-                            input.getMidiClock().continueClock();
-                        }
+                if (command == ShortMessage.TIMING_CLOCK)
+                    {
+                    input.getMidiClock().pulseClock();
+                    }
+                else if (command == ShortMessage.START)
+                    {
+                    input.getMidiClock().startClock();
+                    }
+                else if (command == ShortMessage.STOP)
+                    {
+                    input.getMidiClock().stopClock();
+                    }
+                else if (command == ShortMessage.CONTINUE)
+                    {
+                    input.getMidiClock().continueClock();
+                    }
                 }
+            }
         }
-    }
                         
     InReceiver inReceiver = null;
     InReceiver inReceiver2 = null;
         
     /** Sets the In Reciever to receive from the device in the given wrapper */
     public void setInReceiver(MidiDeviceWrapper wrapper)
-    {
+        {
         lock.lock();
         try
             {
-                if (inReceiver != null)
-                    {
-                        inReceiver.close();
-                    }
-                inReceiver = new InReceiver();
-                wrapper.setReceiver(inReceiver);
+            if (inReceiver != null)
+                {
+                inReceiver.close();
+                }
+            inReceiver = new InReceiver();
+            wrapper.setReceiver(inReceiver);
             }
         finally
             {
-                lock.unlock();
+            lock.unlock();
             }
-    }
+        }
         
     /** Sets the In Reciever to receive from the device in the given wrapper */
     public void setInReceiver2(MidiDeviceWrapper wrapper)
-    {
+        {
         lock.lock();
         try
             {
-                if (inReceiver2 != null)
-                    {
-                        inReceiver2.close();
-                    }
-                inReceiver2 = new InReceiver();
-                wrapper.setReceiver(inReceiver2);
+            if (inReceiver2 != null)
+                {
+                inReceiver2.close();
+                }
+            inReceiver2 = new InReceiver();
+            wrapper.setReceiver(inReceiver2);
             }
         finally
             {
-                lock.unlock();
+            lock.unlock();
             }
-    }
+        }
         
                 
     /// UTILITIES FOR PARSING        
@@ -386,7 +386,7 @@ public class Midi
     /** Data returned by the parser indicating the type of parsed message,
         its number and value and channel, and whether or not the data was increment or decrement. */
     public static class CCData
-    {
+        {
         /** Data type CC */
         public static final int TYPE_RAW_CC = 0;
              
@@ -423,15 +423,15 @@ public class Midi
         public boolean increment;
         
         public CCData(int type, int number, int value, int channel, boolean increment)
-        { this.type = type; this.number = number; this.value = value; this.increment = increment; this.channel = channel; }
+            { this.type = type; this.number = number; this.value = value; this.increment = increment; this.channel = channel; }
 
         public String toString() { return "CCData[" + (type == TYPE_RAW_CC ? "CC" : (type == TYPE_NRPN ? "NRPN" : (type == TYPE_RPN ? "RPN" : type)))
                 + ", " + number + ", " + value + ", " + channel + ", " + increment + "]"; }
-    }
+        }
         
         
     public static class Parser
-    {
+        {
         ///// INTRODUCTION TO THE CC/RPN/NRPN PARSER
         ///// The parser is located in handleGeneralControlChange(...), which
         ///// can be set up to be the handler for CC messages by the MIDI library.
@@ -563,135 +563,135 @@ public class Midi
 
         // we presume that the channel never changes
         CCData parseCC(int channel, int number, int value, boolean requireLSB, boolean requireMSB)
-        {
+            {
             // BEGIN PARSER
 
             // Start of NRPN
             if (number == 99)
                 {
-                    status[channel] = NRPN_START;
-                    controllerNumberMSB[channel] = value;
-                    return null;
+                status[channel] = NRPN_START;
+                controllerNumberMSB[channel] = value;
+                return null;
                 }
 
             // End of NRPN
             else if (number == 98)
                 {
-                    controllerValueMSB[channel] = 0;
-                    if (status[channel] == NRPN_START)
-                        {
-                            status[channel] = NRPN_END;
-                            controllerNumberLSB[channel] = value;
-                            controllerValueLSB[channel]  = -1;
-                            controllerValueMSB[channel]  = -1;
-                        }
-                    else status[channel] = INVALID;
-                    return null;
+                controllerValueMSB[channel] = 0;
+                if (status[channel] == NRPN_START)
+                    {
+                    status[channel] = NRPN_END;
+                    controllerNumberLSB[channel] = value;
+                    controllerValueLSB[channel]  = -1;
+                    controllerValueMSB[channel]  = -1;
+                    }
+                else status[channel] = INVALID;
+                return null;
                 }
                 
             // Start of RPN or NULL
             else if (number == 101)
                 {
-                    if (value == 127)  // this is the NULL termination tradition, see for example http://www.philrees.co.uk/nrpnq.htm
-                        {
-                            status[channel] = INVALID;
-                        }
-                    else
-                        {
-                            status[channel] = RPN_START;
-                            controllerNumberMSB[channel] = value;
-                        }
-                    return null;
+                if (value == 127)  // this is the NULL termination tradition, see for example http://www.philrees.co.uk/nrpnq.htm
+                    {
+                    status[channel] = INVALID;
+                    }
+                else
+                    {
+                    status[channel] = RPN_START;
+                    controllerNumberMSB[channel] = value;
+                    }
+                return null;
                 }
 
             // End of RPN or NULL
             else if (number == 100)
                 {
-                    controllerValueMSB[channel] = 0;
-                    if (value == 127)  // this is the NULL termination tradition, see for example http://www.philrees.co.uk/nrpnq.htm
-                        {
-                            status[channel] = INVALID;
-                        }
-                    else if (status[channel] == RPN_START)
-                        {
-                            status[channel] = RPN_END;
-                            controllerNumberLSB[channel] = value;
-                            controllerValueLSB[channel]  = -1;
-                            controllerValueMSB[channel]  = -1;
-                        }
-                    return null;
+                controllerValueMSB[channel] = 0;
+                if (value == 127)  // this is the NULL termination tradition, see for example http://www.philrees.co.uk/nrpnq.htm
+                    {
+                    status[channel] = INVALID;
+                    }
+                else if (status[channel] == RPN_START)
+                    {
+                    status[channel] = RPN_END;
+                    controllerNumberLSB[channel] = value;
+                    controllerValueLSB[channel]  = -1;
+                    controllerValueMSB[channel]  = -1;
+                    }
+                return null;
                 }
 
             else if ((number == 6 || number == 38 || number == 96 || number == 97) && (status[channel] == NRPN_END || status[channel] == RPN_END))  // we're currently parsing NRPN or RPN
                 {
-                    int controllerNumber =  (((int) controllerNumberMSB[channel]) << 7) | controllerNumberLSB[channel] ;
+                int controllerNumber =  (((int) controllerNumberMSB[channel]) << 7) | controllerNumberLSB[channel] ;
                         
-                    if (number == 6)
-                        {
-                            controllerValueMSB[channel] = value;
-                            if (requireLSB && controllerValueLSB[channel] == -1)
-                                return null;
-                            if (status[channel] == NRPN_END)
-                                return handleNRPN(channel, controllerNumber, controllerValueLSB[channel] == -1 ? 0 : controllerValueLSB[channel], controllerValueMSB[channel], controllerValueLSB[channel] != -1, controllerValueMSB[channel] != -1, true );
-                            else
-                                return handleRPN(channel, controllerNumber, controllerValueLSB[channel] == -1 ? 0 : controllerValueLSB[channel], controllerValueMSB[channel], controllerValueLSB[channel] != -1, controllerValueMSB[channel] != -1, true );
-                        }
+                if (number == 6)
+                    {
+                    controllerValueMSB[channel] = value;
+                    if (requireLSB && controllerValueLSB[channel] == -1)
+                        return null;
+                    if (status[channel] == NRPN_END)
+                        return handleNRPN(channel, controllerNumber, controllerValueLSB[channel] == -1 ? 0 : controllerValueLSB[channel], controllerValueMSB[channel], controllerValueLSB[channel] != -1, controllerValueMSB[channel] != -1, true );
+                    else
+                        return handleRPN(channel, controllerNumber, controllerValueLSB[channel] == -1 ? 0 : controllerValueLSB[channel], controllerValueMSB[channel], controllerValueLSB[channel] != -1, controllerValueMSB[channel] != -1, true );
+                    }
                                                                                                                         
-                    // Data Entry LSB for RPN, NRPN
-                    else if (number == 38)
-                        {
-                            controllerValueLSB[channel] = value;
-                            if (requireMSB && controllerValueMSB[channel] == -1)
-                                return null;          
-                            if (status[channel] == NRPN_END)
-                                return handleNRPN(channel, controllerNumber, controllerValueLSB[channel], controllerValueMSB[channel] == -1 ? 0 : controllerValueMSB[channel], controllerValueLSB[channel] != -1 , controllerValueMSB[channel] != -1, false );
-                            else
-                                return handleRPN(channel, controllerNumber, controllerValueLSB[channel], controllerValueMSB[channel] == -1 ? 0 : controllerValueMSB[channel], controllerValueLSB[channel] != -1 , controllerValueMSB[channel] != -1, false );
-                        }
+                // Data Entry LSB for RPN, NRPN
+                else if (number == 38)
+                    {
+                    controllerValueLSB[channel] = value;
+                    if (requireMSB && controllerValueMSB[channel] == -1)
+                        return null;          
+                    if (status[channel] == NRPN_END)
+                        return handleNRPN(channel, controllerNumber, controllerValueLSB[channel], controllerValueMSB[channel] == -1 ? 0 : controllerValueMSB[channel], controllerValueLSB[channel] != -1 , controllerValueMSB[channel] != -1, false );
+                    else
+                        return handleRPN(channel, controllerNumber, controllerValueLSB[channel], controllerValueMSB[channel] == -1 ? 0 : controllerValueMSB[channel], controllerValueLSB[channel] != -1 , controllerValueMSB[channel] != -1, false );
+                    }
                                                                                                                         
-                    // Data Increment for RPN, NRPN
-                    else if (number == 96)
-                        {
-                            if (value == 0)
-                                value = 1;
-                            if (status[channel] == NRPN_END)
-                                return handleNRPNIncrement(channel, controllerNumber, value);
-                            else
-                                return handleRPNIncrement(channel, controllerNumber, value);
-                        }
+                // Data Increment for RPN, NRPN
+                else if (number == 96)
+                    {
+                    if (value == 0)
+                        value = 1;
+                    if (status[channel] == NRPN_END)
+                        return handleNRPNIncrement(channel, controllerNumber, value);
+                    else
+                        return handleRPNIncrement(channel, controllerNumber, value);
+                    }
 
-                    // Data Decrement for RPN, NRPN
-                    else // if (number == 97)
-                        {
-                            if (value == 0)
-                                value = -1;
-                            if (status[channel] == NRPN_END)
-                                return handleNRPNIncrement(channel, controllerNumber, -value);
-                            else
-                                return handleRPNIncrement(channel, controllerNumber, -value);
-                        }
+                // Data Decrement for RPN, NRPN
+                else // if (number == 97)
+                    {
+                    if (value == 0)
+                        value = -1;
+                    if (status[channel] == NRPN_END)
+                        return handleNRPNIncrement(channel, controllerNumber, -value);
+                    else
+                        return handleRPNIncrement(channel, controllerNumber, -value);
+                    }
                                 
                 }
                         
             else  // Some other CC
                 {
-                    // status[channel] = INVALID;           // I think it's fine to send other CC in the middle of NRPN or RPN
-                    return handleRawCC(channel, number, value);
+                // status[channel] = INVALID;           // I think it's fine to send other CC in the middle of NRPN or RPN
+                return handleRawCC(channel, number, value);
                 }
-        }
+            }
         
         /** Top-level method to start the processor on a given CC message.  */
         public CCData processCC(ShortMessage message, boolean requireLSB, boolean requireMSB)
-        {
+            {
             int num = message.getData1();
             int val = message.getData2();
             int channel = message.getChannel();
             return parseCC(channel, num, val, requireLSB, requireMSB);
-        }
+            }
         
         /** Parses an NRPN message */
         public CCData handleNRPN(int channel, int controllerNumber, int _controllerValueLSB, int _controllerValueMSB, boolean validLSB, boolean validMSB, boolean msbSentLast)
-        {
+            {
             if (_controllerValueLSB < 0 || _controllerValueMSB < 0)
                 System.err.println("WARNING(Midi.java): LSB or MSB < 0.  NRPN: " + controllerNumber + "   LSB: " + _controllerValueLSB + "  MSB: " + _controllerValueMSB);
             CCData data =  new CCData(CCData.TYPE_NRPN, controllerNumber, _controllerValueLSB | (_controllerValueMSB << 7), channel, false);
@@ -699,17 +699,17 @@ public class Midi
             data.validLSB = validLSB;
             data.msbSentLast = msbSentLast;
             return data;
-        }
+            }
         
         /** Parses an NRPN increment message */
         public CCData handleNRPNIncrement(int channel, int controllerNumber, int delta)
-        {
+            {
             return new CCData(CCData.TYPE_NRPN, controllerNumber, delta, channel, true);
-        }
+            }
 
         /** Parses an RPN message */
         public CCData handleRPN(int channel, int controllerNumber, int _controllerValueLSB, int _controllerValueMSB, boolean validLSB, boolean validMSB, boolean msbSentLast)
-        {
+            {
             if (_controllerValueLSB < 0 || _controllerValueMSB < 0)
                 System.err.println("WARNING(Midi.java): LSB or MSB < 0.  RPN: " + controllerNumber + "   LSB: " + _controllerValueLSB + "  MSB: " + _controllerValueMSB);
             CCData data =  new CCData(CCData.TYPE_RPN, controllerNumber, _controllerValueLSB | (_controllerValueMSB << 7), channel, false);
@@ -717,20 +717,20 @@ public class Midi
             data.validLSB = validLSB;
             data.msbSentLast = msbSentLast;
             return data;
-        }
+            }
         
         /** Parses an RPN increment message */
         public CCData handleRPNIncrement(int channel, int controllerNumber, int delta)
-        {
+            {
             return new CCData(CCData.TYPE_RPN, controllerNumber, delta, channel, true);
-        }
+            }
 
         /** Parses a CC message */
         public CCData handleRawCC(int channel, int controllerNumber, int value)
-        {
+            {
             return new CCData(CCData.TYPE_RAW_CC, controllerNumber, value, channel, false);
+            }
         }
-    }
                 
     Parser parser = new Parser();
     
@@ -739,48 +739,48 @@ public class Midi
             
     /** Returns a useful string describing the given MidiMessage */
     public static String format(MidiMessage message)
-    {
+        {
         if (message instanceof MetaMessage)
             {
-                return "A MIDI File MetaMessage (shouldn't happen)";
+            return "A MIDI File MetaMessage (shouldn't happen)";
             }
         else if (message instanceof SysexMessage)
             {
-                return "Sysex (" + getManufacturerForSysex(((SysexMessage)message).getData()) + ")";
+            return "Sysex (" + getManufacturerForSysex(((SysexMessage)message).getData()) + ")";
             }
         else // ShortMessage
             {
-                ShortMessage s = (ShortMessage) message;
-                int c = s.getChannel();
-                String type = "Unknown";
-                switch(s.getStatus())
+            ShortMessage s = (ShortMessage) message;
+            int c = s.getChannel();
+            String type = "Unknown";
+            switch(s.getStatus())
+                {
+                case ShortMessage.ACTIVE_SENSING: type = "Active Sensing"; c = -1; break;
+                case ShortMessage.CHANNEL_PRESSURE: type = "Channel Pressure"; break;
+                case ShortMessage.CONTINUE: type = "Continue"; c = -1; break;
+                case ShortMessage.CONTROL_CHANGE: type = "Control Change"; break;
+                case ShortMessage.END_OF_EXCLUSIVE: type = "End of Sysex Marker"; c = -1; break;
+                case ShortMessage.MIDI_TIME_CODE: type = "Midi Time Code"; c = -1; break;
+                case ShortMessage.NOTE_OFF: type = "Note Off"; break;
+                case ShortMessage.NOTE_ON: type = "Note On"; break;
+                case ShortMessage.PITCH_BEND: type = "Pitch Bend"; break;
+                case ShortMessage.POLY_PRESSURE: type = "Poly Pressure"; break;
+                case ShortMessage.PROGRAM_CHANGE: type = "Program Change"; break;
+                case ShortMessage.SONG_POSITION_POINTER: type = "Song Position Pointer"; c = -1; break;
+                case ShortMessage.SONG_SELECT: type = "Song Select"; c = -1; break;
+                case ShortMessage.START: type = "Start"; c = -1; break;
+                case ShortMessage.STOP: type = "Stop"; c = -1; break;
+                case ShortMessage.SYSTEM_RESET: type = "System Reset"; c = -1; break;
+                case ShortMessage.TIMING_CLOCK: type = "Timing Clock"; c = -1; break;
+                case ShortMessage.TUNE_REQUEST: type = "Tune Request"; c = -1; break;
+                default:        // should not happen
                     {
-                    case ShortMessage.ACTIVE_SENSING: type = "Active Sensing"; c = -1; break;
-                    case ShortMessage.CHANNEL_PRESSURE: type = "Channel Pressure"; break;
-                    case ShortMessage.CONTINUE: type = "Continue"; c = -1; break;
-                    case ShortMessage.CONTROL_CHANGE: type = "Control Change"; break;
-                    case ShortMessage.END_OF_EXCLUSIVE: type = "End of Sysex Marker"; c = -1; break;
-                    case ShortMessage.MIDI_TIME_CODE: type = "Midi Time Code"; c = -1; break;
-                    case ShortMessage.NOTE_OFF: type = "Note Off"; break;
-                    case ShortMessage.NOTE_ON: type = "Note On"; break;
-                    case ShortMessage.PITCH_BEND: type = "Pitch Bend"; break;
-                    case ShortMessage.POLY_PRESSURE: type = "Poly Pressure"; break;
-                    case ShortMessage.PROGRAM_CHANGE: type = "Program Change"; break;
-                    case ShortMessage.SONG_POSITION_POINTER: type = "Song Position Pointer"; c = -1; break;
-                    case ShortMessage.SONG_SELECT: type = "Song Select"; c = -1; break;
-                    case ShortMessage.START: type = "Start"; c = -1; break;
-                    case ShortMessage.STOP: type = "Stop"; c = -1; break;
-                    case ShortMessage.SYSTEM_RESET: type = "System Reset"; c = -1; break;
-                    case ShortMessage.TIMING_CLOCK: type = "Timing Clock"; c = -1; break;
-                    case ShortMessage.TUNE_REQUEST: type = "Tune Request"; c = -1; break;
-                    default:        // should not happen
-                        {
-                            System.err.println("WARNING(Midi.java): unknown message status " + s.getStatus());
-                        }
+                    System.err.println("WARNING(Midi.java): unknown message status " + s.getStatus());
                     }
-                return type + (c == -1 ? "" : (" (Channel " + c + ")"));
+                }
+            return type + (c == -1 ? "" : (" (Channel " + c + ")"));
             }
-    }
+        }
 
 
     
@@ -789,7 +789,7 @@ public class Midi
     
     // Builds (if necessary) and returns a list of all current manufacturers hashed by sysex ID
     static HashMap getManufacturers()
-    {
+        {
         if (manufacturers != null)
             return manufacturers;
                         
@@ -797,52 +797,52 @@ public class Midi
         Scanner scan = new Scanner(Midi.class.getResourceAsStream("Manufacturers.txt"), "US-ASCII");
         while(scan.hasNextLine())
             {
-                String nextLine = scan.nextLine().trim();
-                if (nextLine.equals("")) continue;
-                if (nextLine.startsWith("#")) continue;
+            String nextLine = scan.nextLine().trim();
+            if (nextLine.equals("")) continue;
+            if (nextLine.startsWith("#")) continue;
                         
-                int id = 0;
-                Scanner scan2 = new Scanner(nextLine);
-                int one = scan2.nextInt(16);  // in hex
-                if (one == 0x00)  // there are two more to read
-                    {
-                        id = id + (scan2.nextInt(16) << 8) + (scan2.nextInt(16) << 16);
-                    }
-                else
-                    {
-                        id = one;
-                    }
-                manufacturers.put(Integer.valueOf(id), scan.nextLine().trim());
+            int id = 0;
+            Scanner scan2 = new Scanner(nextLine);
+            int one = scan2.nextInt(16);  // in hex
+            if (one == 0x00)  // there are two more to read
+                {
+                id = id + (scan2.nextInt(16) << 8) + (scan2.nextInt(16) << 16);
+                }
+            else
+                {
+                id = one;
+                }
+            manufacturers.put(Integer.valueOf(id), scan.nextLine().trim());
             }
         return manufacturers;
-    }
+        }
 
     /** Returns the manufacturer for a given sysex string. This works with or without F0 as the first data byte */
     public static String getManufacturerForSysex(byte[] data)
-    {
+        {
         int offset = 0;
         if (data[0] == (byte)0xF0)
             offset = 1;
         HashMap map = getManufacturers();
         if (data[0 + offset] == (byte)0x7D)             // educational use
             {
-                return (String)(map.get(Integer.valueOf(data[0 + offset]))) + 
-                    "\n\nNote that unregistered manufacturers or developers typically\n use this system exclusive region.";
+            return (String)(map.get(Integer.valueOf(data[0 + offset]))) + 
+                "\n\nNote that unregistered manufacturers or developers typically\n use this system exclusive region.";
             }
         else if (data[0 + offset] == (byte)0x00)
             {
-                return (String)(map.get(Integer.valueOf(
-                                                        0x00 + 
-                                                        ((data[1 + offset] < 0 ? data[1 + offset] + 256 : data[1 + offset]) << 8) + 
-                                                        ((data[2 + offset] < 0 ? data[2 + offset] + 256 : data[2 + offset]) << 16))));
+            return (String)(map.get(Integer.valueOf(
+                        0x00 + 
+                        ((data[1 + offset] < 0 ? data[1 + offset] + 256 : data[1 + offset]) << 8) + 
+                        ((data[2 + offset] < 0 ? data[2 + offset] + 256 : data[2 + offset]) << 16))));
             }
         else
             {
-                return (String)(map.get(Integer.valueOf(data[0 + offset])));
+            return (String)(map.get(Integer.valueOf(data[0 + offset])));
             }
-    }
+        }
 
             
         
 
-}
+    }

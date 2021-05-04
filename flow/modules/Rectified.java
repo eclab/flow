@@ -12,12 +12,12 @@ import flow.*;
 */
 
 public class Rectified extends Unit implements UnitSource
-{
+    {
     private static final long serialVersionUID = 1;
 
     // A rectified Sine Wave, that is, Abs(Sin(x))
     public Rectified(Sound sound) 
-    {
+        {
         super(sound);
 
         double[] amplitudes = getAmplitudes(0);
@@ -31,9 +31,9 @@ public class Rectified extends Unit implements UnitSource
                 
         for(int i = 0; i < amplitudes.length; i++)
             {
-                amplitudes[i] = 1.0 / (4 * (i + 1) * (i + 1) - 1);
+            amplitudes[i] = 1.0 / (4 * (i + 1) * (i + 1) - 1);
             }
                         
         normalizeAmplitudes();
+        }
     }
-}

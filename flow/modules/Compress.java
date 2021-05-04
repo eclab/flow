@@ -15,7 +15,7 @@ import flow.*;
 
 
 public class Compress extends Unit
-{
+    {
     private static final long serialVersionUID = 1;
 
     double lastModulation = Double.NaN;
@@ -24,22 +24,22 @@ public class Compress extends Unit
     public static final int MOD_SCALE = 0;
 
     public Object clone()
-    {
+        {
         Compress obj = (Compress)(super.clone());
         obj.lastAmps = (double[])(obj.lastAmps.clone());
         return obj;
-    }
+        }
     
     public Compress(Sound sound)
-    {
+        {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.HALF }, new String[] { "Scale" });
         lastAmps = new double[NUM_PARTIALS];
-    }
+        }
                 
     public void go()
-    {
+        {
         super.gate();
 
         // we don't copy the amplitudes
@@ -57,16 +57,16 @@ public class Compress extends Unit
                 
         for(int i = 0; i < amplitudes.length; i++)
             {
-                if (lastModulation != mod || amps[i] != lastAmps[i])
-                    {
-                        amplitudes[i] = Utility.hybridpow(amps[i], mod);
-                        lastAmps[i] = amplitudes[i];
-                    }
-                else
-                    amplitudes[i] = lastAmps[i];
+            if (lastModulation != mod || amps[i] != lastAmps[i])
+                {
+                amplitudes[i] = Utility.hybridpow(amps[i], mod);
+                lastAmps[i] = amplitudes[i];
+                }
+            else
+                amplitudes[i] = lastAmps[i];
             }
         lastModulation = mod;
                         
         constrain();
+        }
     }
-}

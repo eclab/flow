@@ -49,7 +49,7 @@ import java.util.*;
 */
 
 public class Unit extends Modulation
-{
+    {
     private static final long serialVersionUID = 1;
 
     /** Number of partials processed by Units -- the size of their amplitudes and frequencies arrays. */
@@ -66,7 +66,7 @@ public class Unit extends Modulation
     public static final String DEFAULT_UNIT_OUT_NAME = "Out";
         
     public Unit(Sound sound)
-    {
+        {
         super(sound);
 
         defineModulationOutputs(new String[] { } );  // no modulation outputs in a Unit by default
@@ -81,7 +81,7 @@ public class Unit extends Modulation
         invertConstraints = false;
         standardizeFrequencies();
         setOrders();
-    }
+        }
         
     ////// OPERATION
         
@@ -102,15 +102,15 @@ public class Unit extends Modulation
         standardizes frequencies, unless setClearOnReset(false) has been called first. */
                 
     public void reset()
-    {
+        {
         super.reset();
         if (clearOnReset)
             {
-                amplitudes = new double[numOutputs][NUM_PARTIALS];
-                frequencies = new double[numOutputs][NUM_PARTIALS];
-                standardizeFrequencies();
+            amplitudes = new double[numOutputs][NUM_PARTIALS];
+            frequencies = new double[numOutputs][NUM_PARTIALS];
+            standardizeFrequencies();
             }
-    }
+        }
                 
 
     boolean pushOrders = true;
@@ -121,31 +121,31 @@ public class Unit extends Modulation
        you should first call setPushOrders(false).
     */
     public void setPushOrders(boolean val)
-    {
+        {
         pushOrders = val;
-    }
+        }
         
     /**
        Returns the value of pushOrders.  If pushOrders is TRUE (the default), then go() pushes orders from input 0
        (assuming there is an input 0).
     */
     public boolean getPushOrders()
-    {
+        {
         return pushOrders;
-    }
+        }
              
     /** Called to update the Unit.  Override this as you see fit, but be sure to call super.go().
         By default this method clears all triggers.   It also pushes orders from input 0, unless 
         setPushOrders(false) has been called. */    
     public void go()
-    {
+        {
         super.go();
         if (pushOrders && inputs.length > 0)
             {
-                for(int i = 0; i < orders.length; i++)
-                    pushOrders(0, i);
+            for(int i = 0; i < orders.length; i++)
+                pushOrders(0, i);
             }
-    }
+        }
         
         
         
@@ -177,14 +177,14 @@ public class Unit extends Modulation
     
     /** Defines the UNIT OUTPUT ports by their names. */
     public void defineOutputs(String[] names)
-    {
+        {
         numOutputs = names.length;
         outputNames = names;
         amplitudes = new double[numOutputs][NUM_PARTIALS];
         frequencies = new double[numOutputs][NUM_PARTIALS];
         orders = new byte[numOutputs][NUM_PARTIALS];
         standardizeFrequencies();
-    }
+        }
     
     /** Returns the name of a given unit output port. */
     public String getOutputName(int num) { return outputNames[num]; }
@@ -239,18 +239,18 @@ public class Unit extends Modulation
 
     /** Returns TRUE if the default Unit for this Input Unit port is presently the Unit being used. */
     public boolean isDefaultInput(int num)
-    {
+        {
         return defaultInputs[num] == inputs[num];
-    }
+        }
                 
     /** Returns TRUE if the default Unit for this Input Unit port is presently the Unit being used. */
     public void defineInputs(Unit[] inputs, String[] names)
-    {
+        {
         this.inputs = inputs;
         defaultInputs = (Unit[])(inputs.clone());
         inputIndexes = new int[inputs.length];
         inputNames = names;
-    }
+        }
     
     public boolean isInputNil(int num) { return getInput(num) instanceof Nil; }
     
@@ -259,136 +259,136 @@ public class Unit extends Modulation
         
     /** Sets Input Unit port 0. */
     public void setInputs(Unit input)
-    {
+        {
         setInputs(new Unit[] { input });
-    }
+        }
         
     /** Sets Input Unit ports 0 and 1. */
     public void setInputs(Unit input0, Unit input1)
-    {
+        {
         setInputs(new Unit[] { input0, input1 });
-    }
+        }
         
     /** Sets Input Unit ports 0, 1, and 2 */
     public void setInputs(Unit input0, Unit input1, Unit input2)
-    {
+        {
         setInputs(new Unit[] { input0, input1, input2 });
-    }
+        }
         
     /** Sets the first N Input Unit ports. */
     public void setInputs(Unit[] inputs)
-    {
+        {
         for(int i = 0; i < inputs.length; i++)
             setInput(inputs[i], i, 0);
-    }
+        }
         
     /** Sets Input Unit port NUM to the provide Unit, with its output port index set to 0. */
     public void setInput(Unit in, int num)
-    {
+        {
         setInput(in, num, 0);
-    }
+        }
                 
 
     /** Sets Input Unit port NUM to the provide Unit, with its output port index set to INDEX. */
     public void setInput(Unit in, int num, int index)
-    {
+        {
         inputs[num] = in;
         inputIndexes[num] = index;
-    }
+        }
                 
     /** Returns the unit attached to Unit Input Port NUM. */
     public Unit getInput(int num)
-    {
+        {
         return inputs[num];
-    }
+        }
 
     /** Returns the output port index of the Unit attached to Unit Input Port NUM. */
     public int getInputIndex(int num)
-    {
+        {
         return inputIndexes[num];
-    }
+        }
 
     /** Returns the name of the given Unit Input Port. */
     public String getInputName(int num) 
-    { 
+        { 
         return inputNames[num];
-    }
+        }
 
     /** Sets the name of the given Unit Input Port. */
     public void setInputName(int num, String string)
-    { 
+        { 
         inputNames[num] = string; 
-    }
+        }
 
     /** Returns the names of all Unit Input Ports. */
     public String[] getInputNames() 
-    { 
+        { 
         return inputNames;
-    }
+        }
                                 
     /** Resets the Unit Input Port to its default Unit (typically Unit.NIL). */
     public void clearInput(int num)
-    {
+        {
         inputs[num] = defaultInputs[num];
         inputIndexes[num] = 0;
-    }
+        }
                 
     /** Returns the number of unit input ports. */
     public int getNumInputs() 
-    {
+        {
         return inputNames.length;
-    }
+        }
 
     /** Gets the frequencies array of the partials provided by the Unit attached to Unit Input Port INPUT.
         This array should be treated as read-only. */
     public double[] getFrequenciesIn(int input)
-    {
+        {
         return inputs[input].frequencies[inputIndexes[input]];
-    }
+        }
                 
     /** Gets the amplitudes array of the partials provided by the Unit attached to Unit Input Port INPUT.
         This array should be treated as read-only. */
     public double[] getAmplitudesIn(int input)
-    {
+        {
         return inputs[input].amplitudes[inputIndexes[input]];
-    }
+        }
 
     /** Gets the orders array of the partials provided by the Unit attached to Unit Input Port INPUT.
         This array should be treated as read-only. */
     public byte[] getOrdersIn(int input)
-    {
+        {
         return inputs[input].orders[inputIndexes[input]];
-    }
+        }
 
     /** Sets the frequencies array of Unit Output Port OUTPUT to 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array should then be treated as read-only. */
     public void pushFrequencies(int input, int output)
-    {
+        {
         frequencies[output] = inputs[input].frequencies[inputIndexes[input]];
-    }
+        }
                 
     /** Sets the amplitudes array of Unit Output Port OUTPUT to 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array should then be treated as read-only. */
     public void pushAmplitudes(int input, int output)
-    {
+        {
         amplitudes[output] = inputs[input].amplitudes[inputIndexes[input]];
-    }
+        }
 
     /** Sets the orders array of Unit Output Port OUTPUT to 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array should then be treated as read-only. */
     public void pushOrders(int input, int output)
-    {
+        {
         orders[output] = inputs[input].orders[inputIndexes[input]];
-    }
+        }
                 
     /** Copies the frequencies array of Unit Output Port OUTPUT from 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array may then be written to. */
     public void copyFrequencies(int input, int output)
-    {
+        {
         double[] f1 = inputs[input].frequencies[inputIndexes[input]];
         double[] f2 = frequencies[output];
         if (f1 == f2) 
@@ -396,13 +396,13 @@ public class Unit extends Modulation
         else
             System.arraycopy(f1, 0, f2, 0, f2.length);
         //testDenormals(f2,  "" + this);                
-    }
+        }
 
     /** Copies the amplitudes array of Unit Output Port OUTPUT from 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array may then be written to. */
     public void copyAmplitudes(int input, int output)
-    {
+        {
         double[] f1 = inputs[input].amplitudes[inputIndexes[input]];
         double[] f2 = amplitudes[output];
         if (f1 == f2) 
@@ -410,68 +410,68 @@ public class Unit extends Modulation
         else
             System.arraycopy(f1, 0, f2, 0, f2.length);
         //testDenormals(f2, "" + this);         
-    }
+        }
                 
     /** Copies the orders array of Unit Output Port OUTPUT from 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array may then be written to. */
     public void copyOrders(int input, int output)
-    {
+        {
         byte[] f1 = inputs[input].orders[inputIndexes[input]];
         byte[] f2 = orders[output];
         if (f1 == f2) 
             orders[output] = (byte[])(f1.clone());
         else
             System.arraycopy(f1, 0, f2, 0, f2.length);
-    }
+        }
 
     /** Sets the frequencies array of Unit Output Port #0 to 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array may then be written to. */
     public void pushFrequencies(int input)
-    {
+        {
         pushFrequencies(input, 0);
-    }
+        }
                 
     /** Sets the amplitudes array of Unit Output Port #0 to 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array may then be written to. */
     public void pushAmplitudes(int input)
-    {
+        {
         pushAmplitudes(input, 0);
-    }
+        }
 
     /** Sets the orders array of Unit Output Port #0 to 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array may then be written to. */
     public void pushOrders(int input)
-    {
+        {
         pushOrders(input, 0);
-    }
+        }
                 
     /** Copies the frequencies array of Unit Output Port #0 from 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array may then be written to. */
     public void copyFrequencies(int input)
-    {
+        {
         copyFrequencies(input, 0);
-    }
+        }
 
     /** Copies the amplitudes array of Unit Output Port #0 from 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array may then be written to. */
     public void copyAmplitudes(int input)
-    {
+        {
         copyAmplitudes(input, 0);
-    }
+        }
 
     /** Copies the orders array of Unit Output Port #0 from 
         the partials provided by the Unit attached to Unit Input Port INPUT.
         The output array may then be written to. */
     public void copyOrders(int input)
-    {
+        {
         copyOrders(input, 0);
-    }
+        }
 
     /** Override this to provide tooltips for unit inputs.  This array by default is null. 
         If any given String is null or empty, no tooltip is generated for it.  */
@@ -483,127 +483,127 @@ public class Unit extends Modulation
                 
     /** Sets the orders of the partials of all unit output ports such that order[i] = i. */
     public void setOrders()
-    {
+        {
         for(int j = 0; j < orders.length; j++)
             {
-                byte[] o = orders[j];
-                for(int i = 0; i < o.length; i++)
-                    o[i] = (byte)i;
+            byte[] o = orders[j];
+            for(int i = 0; i < o.length; i++)
+                o[i] = (byte)i;
             }
-    }
+        }
     
     /** Sets the frequencies of the partials of all unit output ports such that
         frequency[i] is equal to i + 1.    */    
     public void standardizeFrequencies()
-    {
+        {
         for(int i = 0; i < frequencies.length; i++)
             standardizeFrequencies(i);
-    }
+        }
 
     /** Sets the frequencies of the partials of unit output port J such that
         frequency[i] is equal to i + 1.    */    
     public void standardizeFrequencies(int j)
-    {
+        {
         double[] f = frequencies[j];
         for(int i = 0; i < f.length; i++)
             f[i] = i + 1;
-    }
+        }
         
     /** Maximizes the amplitudes of the partials of all unit output ports, that is, scales them
         so that the largest one is 1.  If the amplitudes are all zero, they are left as zero. */
     public void maximizeAmplitudes()
-    {
+        {
         for(int i = 0; i < amplitudes.length; i++)
             maximizeAmplitudes(i);
-    }
+        }
 
     /** Maximizes the amplitudes of the partials of unit output port J, that is, scales them
         so that the largest one is 1.  If the amplitudes are all zero, they are left as zero. */
     public void maximizeAmplitudes(int j)
-    {
+        {
         double[] a = amplitudes[j];
         double max = Math.abs(a[j]);
                 
         for(int i = 1; i < a.length; i++)
             {
-                if (a[i] > max)
-                    {
-                        max = a[i];
-                    }
+            if (a[i] > max)
+                {
+                max = a[i];
+                }
             }
             
         if (max > 0)
             {
-                double scale = 1.0 / max;
-                for(int i = 0; i < a.length; i++)
-                    {
-                        a[i] *= scale;
-                    }
+            double scale = 1.0 / max;
+            for(int i = 0; i < a.length; i++)
+                {
+                a[i] *= scale;
+                }
             }
-    }
+        }
 
     /** Normalizes the amplitudes of the partials of all unit output ports, that is, scales them
         so that they sum to 1.  If the amplitudes are all zero, they are left as zero. */
     public void normalizeAmplitudes()
-    {
+        {
         for(int i = 0; i < amplitudes.length; i++)
             normalizeAmplitudes(i);
-    }
+        }
 
     /** Normalizes the amplitudes of the partials of unit output port J, that is, scales them
         so that they sum to 1.  If the amplitudes are all zero, they are left as zero. */
     public void normalizeAmplitudes(int j)
-    {
+        {
         double total = 0;
         double[] a = amplitudes[j];
         for(int i = 0; i < a.length; i++)
             {
-                total += Math.abs(a[i]);
+            total += Math.abs(a[i]);
             }
         if (total != 0)
             {
-                double invTotal = 1.0 / total;
-                for(int i = 0; i < a.length; i++)
-                    {
-                        a[i] *= invTotal;
-                    }
+            double invTotal = 1.0 / total;
+            for(int i = 0; i < a.length; i++)
+                {
+                a[i] *= invTotal;
+                }
             }
-    }
+        }
 
     /** Returns the partial from output unit port J whose frequency is lowest. */
     public int getLowestPartial(int j)
-    {
+        {
         double[] f = frequencies[j];
         double minimum = f[0];
         int val = 0;
         for(int i = 1; i < f.length; i++)
             if (f[i] < minimum)
                 {
-                    minimum = f[i];
-                    val = i;
+                minimum = f[i];
+                val = i;
                 }
         return val;
-    }
+        }
 
     /** Returns the partial from output unit port J whose amplitude is highest. */
     public int getLoudestPartial(int j)
-    {
+        {
         double[] a = amplitudes[j];
         double maximum = a[0];
         int val = 0;
         for(int i = 1; i < a.length; i++)
             if (a[i] > maximum)
                 {
-                    maximum = a[i];
-                    val = i;
+                maximum = a[i];
+                val = i;
                 }
         return val;
-    }
+        }
 
 
     // Swaps partials i and j
     void swap(int i, int j, double[] f, double[] a, byte[] o)
-    {
+        {
         double d = f[i];
         f[i] = f[j];
         f[j] = d;
@@ -613,43 +613,43 @@ public class Unit extends Modulation
         byte e = o[i];
         o[i] = o[j];
         o[j] = e;
-    }
+        }
 
     // standard insertion sort
     void insertionSort(double freq[], double[] amp, byte[] order) 
-    {
+        {
         for (int i=1; i<freq.length; i++) // Insert i'th record
             for (int j=i; (j>0) && (freq[j] < freq[j-1]); j--)
                 {
-                    swap(j, j-1, freq, amp, order);
+                swap(j, j-1, freq, amp, order);
                 }
-    }
+        }
     
     // quicksort partition
     int quicksortPartition(double freq[], double[] amp, byte[] order, int low, int high)
-    {
+        {
         double pivot = freq[high];
          
         // index of smaller element
         int i = (low-1); 
         for (int j = low; j <= high-1; j++)
             {
-                // If current element is smaller than or
-                // equal to pivot
-                if (freq[j] <= pivot)
-                    {
-                        i++;
-                        swap(i, j, freq, amp, order);
-                    }
+            // If current element is smaller than or
+            // equal to pivot
+            if (freq[j] <= pivot)
+                {
+                i++;
+                swap(i, j, freq, amp, order);
+                }
             }
  
         swap(i+1, high, freq, amp, order); 
         return i+1;
-    }
+        }
 
     int[] quickSortStack = null;
     void quickSort (double freq[], double[] amp, byte[] order, int l, int h)
-    {
+        {
         // Create an auxiliary stack
         if (quickSortStack == null) quickSortStack = new int[h-l+1];
   
@@ -663,37 +663,37 @@ public class Unit extends Modulation
         // Keep popping from stack while is not empty
         while (top >= 0)
             {
-                // Pop h and l
-                h = quickSortStack[top--];
-                l = quickSortStack[top--];
+            // Pop h and l
+            h = quickSortStack[top--];
+            l = quickSortStack[top--];
   
-                // Set pivot element at its correct position
-                // in sorted array
-                int p = quicksortPartition(freq, amp, order, l, h);
+            // Set pivot element at its correct position
+            // in sorted array
+            int p = quicksortPartition(freq, amp, order, l, h);
   
-                // If there are elements on left side of pivot,
-                // then push left side to stack
-                if (p-1 > l)
-                    {
-                        quickSortStack[++top] = l;
-                        quickSortStack[++top] = p - 1;
-                    }
+            // If there are elements on left side of pivot,
+            // then push left side to stack
+            if (p-1 > l)
+                {
+                quickSortStack[++top] = l;
+                quickSortStack[++top] = p - 1;
+                }
   
-                // If there are elements on right side of pivot,
-                // then push right side to stack
-                if (p+1 < h)
-                    {
-                        quickSortStack[++top] = p + 1;
-                        quickSortStack[++top] = h;
-                    }
+            // If there are elements on right side of pivot,
+            // then push right side to stack
+            if (p+1 < h)
+                {
+                quickSortStack[++top] = p + 1;
+                quickSortStack[++top] = h;
+                }
             }
-    }
+        }
 
     // standard quicksort
     void quickSort(double freq[], double amp[], byte order[])
-    {
+        {
         quickSort(freq, amp, order, 0, freq.length - 1);
-    }
+        }
 
     /** Sorts the partials of Unit Output port by frequency. Returns TRUE if any elements potentially changed positions. 
     
@@ -702,10 +702,10 @@ public class Unit extends Modulation
         method doesn't copy them again.  However, orders are always copied.  Amplitudes are
         only copied if indicated: you should pass in TRUE if you have not already copied the amplitudes, else FALSE.  */
     public boolean bigSort(int j, boolean copyAmplitudes)
-    {
+        {
         if (copyAmplitudes)
             {
-                this.amplitudes[j] = this.amplitudes[j].clone();
+            this.amplitudes[j] = this.amplitudes[j].clone();
             }
 
         this.orders[j] = this.orders[j].clone();
@@ -716,7 +716,7 @@ public class Unit extends Modulation
         
         quickSort(frequencies, amplitudes, orders);
         return true;
-    }
+        }
 
 
 
@@ -737,13 +737,13 @@ public class Unit extends Modulation
         method doesn't copy them again.  However, orders are always copied.  Amplitudes are
         only copied if indicated: you should pass in TRUE if you have not already copied the amplitudes, else FALSE.  */
     public boolean simpleSort(int j, boolean copyAmplitudes) 
-    {
+        {
         boolean swapped = true;
         boolean everSwapped = false;
         
         if (copyAmplitudes)
             {
-                this.amplitudes[j] = this.amplitudes[j].clone();
+            this.amplitudes[j] = this.amplitudes[j].clone();
             }
         
         this.orders[j] = this.orders[j].clone();
@@ -757,54 +757,54 @@ public class Unit extends Modulation
  
         while (swapped==true)
             {
-                // reset the swapped flag on entering the 
-                // loop, because it might be true from a 
-                // previous iteration.
-                swapped = false;
+            // reset the swapped flag on entering the 
+            // loop, because it might be true from a 
+            // previous iteration.
+            swapped = false;
  
-                // loop from bottom to top same as
-                // the bubble sort
-                for (int i = start; i < end-1; ++i)
+            // loop from bottom to top same as
+            // the bubble sort
+            for (int i = start; i < end-1; ++i)
+                {
+                if (frequencies[i] > frequencies[i + 1])
                     {
-                        if (frequencies[i] > frequencies[i + 1])
-                            {
-                                swap(i, i+1, frequencies, amplitudes, orders);
-                                swapped = true;
-                            }
+                    swap(i, i+1, frequencies, amplitudes, orders);
+                    swapped = true;
                     }
+                }
  
-                // if nothing moved, then array is sorted.
-                if (swapped==false)
-                    break;
+            // if nothing moved, then array is sorted.
+            if (swapped==false)
+                break;
  
-                // otherwise, reset the swapped flag so that it
-                // can be used in the next stage
-                swapped = false;
+            // otherwise, reset the swapped flag so that it
+            // can be used in the next stage
+            swapped = false;
  
-                // move the end point back by one, because
-                // item at the end is in its rightful spot
-                end = end-1;
+            // move the end point back by one, because
+            // item at the end is in its rightful spot
+            end = end-1;
  
-                // from top to bottom, doing the
-                // same comparison as in the previous stage
-                for (int i = end-1; i >=start; i--)
+            // from top to bottom, doing the
+            // same comparison as in the previous stage
+            for (int i = end-1; i >=start; i--)
+                {
+                if (frequencies[i] > frequencies[i+1])
                     {
-                        if (frequencies[i] > frequencies[i+1])
-                            {
-                                swap(i, i+1, frequencies, amplitudes, orders);
-                                swapped = true;
-                            }
+                    swap(i, i+1, frequencies, amplitudes, orders);
+                    swapped = true;
                     }
+                }
  
-                // increase the starting point, because
-                // the last stage would have moved the next
-                // smallest number to its rightful spot.
-                start = start+1;
+            // increase the starting point, because
+            // the last stage would have moved the next
+            // smallest number to its rightful spot.
+            start = start+1;
         
-                everSwapped = everSwapped || swapped;
+            everSwapped = everSwapped || swapped;
             }
         return everSwapped;
-    }
+        }
     
     /*
     // OrderStatistics [Cormen, p. 187]:
@@ -892,11 +892,11 @@ public class Unit extends Modulation
     public static final int CONSTRAINT_FIRST_SIXTY_FOUR = 21;
         
     public static final String[] constraintNames = new String[]
-        { "None", "Fund", "Even", "Odd", "1st 3rd",
-          "2nd 3rd", "3rd 3rd", "Octaves", "Fifths",
-          "M. 3rds", "m. 7ths", "M. 2nds", "M. 7ths",
-          "m. 2nds", "m. 3rds", "M. 6ths", "Low 2", "Low 4", "Low 8",
-          "Low 16", "Low 32", "Low 64"};
+    { "None", "Fund", "Even", "Odd", "1st 3rd",
+      "2nd 3rd", "3rd 3rd", "Octaves", "Fifths",
+      "M. 3rds", "m. 7ths", "M. 2nds", "M. 7ths",
+      "m. 2nds", "m. 3rds", "M. 6ths", "Low 2", "Low 4", "Low 8",
+      "Low 16", "Low 32", "Low 64"};
         
     // Notice this is all 1-based here, but they'll get converted to 0-based
     static final int[] NONE_HARMONICS = new int[NUM_PARTIALS];
@@ -957,72 +957,72 @@ public class Unit extends Modulation
 
     /** Return a list of harmonic constraints.   This list consists of indexes into the frequencies, amplitudes, and orders arrays. */
     public int[] getConstrainedPartials()
-    {
+        {
         // pick a partial
         if (invertConstraints)
             {
-                if (!(constraintIn instanceof Nil))
+            if (!(constraintIn instanceof Nil))
+                {
+                // costly...
+                                
+                double[] c = getConstraintIn().amplitudes[getConstraintIndex()];
+                int count = 0;
+                for(int i = 0; i < c.length; i++)
                     {
-                        // costly...
-                                
-                        double[] c = getConstraintIn().amplitudes[getConstraintIndex()];
-                        int count = 0;
-                        for(int i = 0; i < c.length; i++)
-                            {
-                                if (c[i] == 0)
-                                    count++;
-                            }
-                                        
-                        if (constraintInPartials == null || constraintInPartials.length != count)
-                            constraintInPartials = new int[count];
-
-                        count = 0;
-                        for(int i = 0; i < c.length; i++)
-                            {
-                                if (c[i] == 0)
-                                    constraintInPartials[count++] = i;
-                            }
-                        return constraintInPartials;
+                    if (c[i] == 0)
+                        count++;
                     }
+                                        
+                if (constraintInPartials == null || constraintInPartials.length != count)
+                    constraintInPartials = new int[count];
+
+                count = 0;
+                for(int i = 0; i < c.length; i++)
+                    {
+                    if (c[i] == 0)
+                        constraintInPartials[count++] = i;
+                    }
+                return constraintInPartials;
+                }
                                 
-                else return ANTI_HARMONICS[constraint];
+            else return ANTI_HARMONICS[constraint];
             }
         else
             {
-                if (!(constraintIn instanceof Nil))
-                    {
-                        // costly...
+            if (!(constraintIn instanceof Nil))
+                {
+                // costly...
                                 
-                        double[] c = getConstraintIn().amplitudes[getConstraintIndex()];
-                        int count = 0;
-                        for(int i = 0; i < c.length; i++)
-                            {
-                                if (c[i] != 0)
-                                    count++;
-                            }
-                                        
-                        if (constraintInPartials == null || constraintInPartials.length != count)
-                            constraintInPartials = new int[count];
-
-                        count = 0;
-                        for(int i = 0; i < c.length; i++)
-                            {
-                                if (c[i] > 0)
-                                    constraintInPartials[count++] = i;
-                            }
-                        return constraintInPartials;
+                double[] c = getConstraintIn().amplitudes[getConstraintIndex()];
+                int count = 0;
+                for(int i = 0; i < c.length; i++)
+                    {
+                    if (c[i] != 0)
+                        count++;
                     }
+                                        
+                if (constraintInPartials == null || constraintInPartials.length != count)
+                    constraintInPartials = new int[count];
 
-                else return HARMONICS[constraint];
+                count = 0;
+                for(int i = 0; i < c.length; i++)
+                    {
+                    if (c[i] > 0)
+                        constraintInPartials[count++] = i;
+                    }
+                return constraintInPartials;
+                }
+
+            else return HARMONICS[constraint];
             }
-    }
+        }
                 
                 
 
     /** Resets (to partials from the Unit attached to Unit Input port 0) those partials that are not part of the constraint. 
         Returns true if something was (or was likely) reset. */
     public boolean constrain()
-    {
+        {
         double[] frequencies = getFrequencies(0);
         double[] amplitudes = getAmplitudes(0);
         byte[] orders = getOrders(0);
@@ -1036,91 +1036,91 @@ public class Unit extends Modulation
                 
         if (invertConstraints)
             {
-                // We want to constrain to only the partials NOT given.  So here we're resetting
-                // if the partials ARE part of the constraint
+            // We want to constrain to only the partials NOT given.  So here we're resetting
+            // if the partials ARE part of the constraint
                 
-                if (!(getConstraintIn() instanceof Nil))
+            if (!(getConstraintIn() instanceof Nil))
+                {
+                double[] constraintAmplitudes = getConstraintIn().amplitudes[getConstraintIndex()];
+                for(int i = 0; i < frequencies.length; i++)
                     {
-                        double[] constraintAmplitudes = getConstraintIn().amplitudes[getConstraintIndex()];
-                        for(int i = 0; i < frequencies.length; i++)
-                            {
-                                if (constraintAmplitudes[i] != 0)
-                                    {
-                                        frequencies[i] = sourcefrequencies[i];
-                                        amplitudes[i] = sourceamplitudes[i];
-                                        orders[i] = sourceorders[i];
-                                    }
-                            }
+                    if (constraintAmplitudes[i] != 0)
+                        {
+                        frequencies[i] = sourcefrequencies[i];
+                        amplitudes[i] = sourceamplitudes[i];
+                        orders[i] = sourceorders[i];
+                        }
                     }
-                else 
+                }
+            else 
+                {
+                int[] harmonics = HARMONICS[constraint];
+                for(int i = 0; i < harmonics.length; i++)
                     {
-                        int[] harmonics = HARMONICS[constraint];
-                        for(int i = 0; i < harmonics.length; i++)
-                            {
-                                frequencies[harmonics[i]] = sourcefrequencies[harmonics[i]];
-                                amplitudes[harmonics[i]] = sourceamplitudes[harmonics[i]];
-                                orders[harmonics[i]] = sourceorders[harmonics[i]];
-                            }
+                    frequencies[harmonics[i]] = sourcefrequencies[harmonics[i]];
+                    amplitudes[harmonics[i]] = sourceamplitudes[harmonics[i]];
+                    orders[harmonics[i]] = sourceorders[harmonics[i]];
                     }
+                }
             }
         else
             {
-                if (constraint == CONSTRAINT_NONE) return false;
+            if (constraint == CONSTRAINT_NONE) return false;
 
-                // We want to constrain to only the given partials.  So here we're resetting
-                // if the partials are NOT part of the constraint, that, is, if the "anti-partials"
-                // ARE part of the constraint
+            // We want to constrain to only the given partials.  So here we're resetting
+            // if the partials are NOT part of the constraint, that, is, if the "anti-partials"
+            // ARE part of the constraint
 
-                if (!(getConstraintIn() instanceof Nil))
+            if (!(getConstraintIn() instanceof Nil))
+                {
+                double[] constraintAmplitudes = getConstraintIn().amplitudes[getConstraintIndex()];
+                for(int i = 0; i < frequencies.length; i++)
                     {
-                        double[] constraintAmplitudes = getConstraintIn().amplitudes[getConstraintIndex()];
-                        for(int i = 0; i < frequencies.length; i++)
-                            {
-                                if (constraintAmplitudes[i] == 0)
-                                    {
-                                        frequencies[i] = sourcefrequencies[i];
-                                        amplitudes[i] = sourceamplitudes[i];
-                                        orders[i] = sourceorders[i];
-                                    }
-                            }
+                    if (constraintAmplitudes[i] == 0)
+                        {
+                        frequencies[i] = sourcefrequencies[i];
+                        amplitudes[i] = sourceamplitudes[i];
+                        orders[i] = sourceorders[i];
+                        }
                     }
-                else 
+                }
+            else 
+                {
+                int[] antiharmonics = ANTI_HARMONICS[constraint];
+                for(int i = 0; i < antiharmonics.length; i++)
                     {
-                        int[] antiharmonics = ANTI_HARMONICS[constraint];
-                        for(int i = 0; i < antiharmonics.length; i++)
-                            {
-                                frequencies[antiharmonics[i]] = sourcefrequencies[antiharmonics[i]];
-                                amplitudes[antiharmonics[i]] = sourceamplitudes[antiharmonics[i]];
-                                orders[antiharmonics[i]] = sourceorders[antiharmonics[i]];
-                            }
+                    frequencies[antiharmonics[i]] = sourcefrequencies[antiharmonics[i]];
+                    amplitudes[antiharmonics[i]] = sourceamplitudes[antiharmonics[i]];
+                    orders[antiharmonics[i]] = sourceorders[antiharmonics[i]];
                     }
+                }
             }
             
         return true;
-    }
+        }
 
 
     ////// CONSTRAINTS
         
     static int[] buildHarmonics(int initial)
-    {
+        {
         int count = 0;
         for(int i = initial; i < NUM_PARTIALS; i*=2)
             {
-                count++;
+            count++;
             }
         int[] harmonics = new int[count];
         count = 0;
         for(int i = initial; i < NUM_PARTIALS; i*=2)
             {
-                harmonics[count++] = i;
+            harmonics[count++] = i;
             }
         return harmonics;
-    }
+        }
 
 
     static
-    {
+        {
         //// We need to build the harmonics.  First things first, let's allocate
         //// the right amount for the unalocated EVEN, ODD, FIRST ... THIRD_THIRD harmonics
         
@@ -1169,15 +1169,15 @@ public class Unit extends Modulation
             FIRST_SIXTEEN_HARMONICS, 
             FIRST_THIRTY_TWO_HARMONICS,
             FIRST_SIXTY_FOUR_HARMONICS 
-        };
+            };
 
         ANTI_HARMONICS = new int[HARMONICS.length][];
 
         // All the harmonics are 1-based in the constants, but we need them to be 0-based:
         for(int j = 0; j < HARMONICS.length; j++)       
             {
-                for (int i = 0; i < HARMONICS[j].length; i++)
-                    --HARMONICS[j][i];
+            for (int i = 0; i < HARMONICS[j].length; i++)
+                --HARMONICS[j][i];
             }
 
 
@@ -1185,65 +1185,65 @@ public class Unit extends Modulation
 
         for(int i = 0; i < NONE_HARMONICS.length; i++)
             {
-                NONE_HARMONICS[i] = i;
+            NONE_HARMONICS[i] = i;
             }
                         
         for(int i = 0; i < FIRST_SIXTY_FOUR_HARMONICS.length; i++)
             {
-                FIRST_SIXTY_FOUR_HARMONICS[i] = i;
+            FIRST_SIXTY_FOUR_HARMONICS[i] = i;
             }
                         
         for(int i = 0; i < NUM_PARTIALS; i += 2)
             {
-                EVEN_HARMONICS[i / 2] = i;
-                ODD_HARMONICS[i / 2] = i + 1;
+            EVEN_HARMONICS[i / 2] = i;
+            ODD_HARMONICS[i / 2] = i + 1;
             }
                         
         for(int i = 0; i < NUM_PARTIALS; i += 3)
             {
-                FIRST_THIRD_HARMONICS[i / 3] = i;
-                if ((i / 3) < SECOND_THIRD_HARMONICS.length)
-                    SECOND_THIRD_HARMONICS[i / 3] = i + 1;
-                if ((i / 3) < THIRD_THIRD_HARMONICS.length)
-                    THIRD_THIRD_HARMONICS[i / 3] = i + 2;
+            FIRST_THIRD_HARMONICS[i / 3] = i;
+            if ((i / 3) < SECOND_THIRD_HARMONICS.length)
+                SECOND_THIRD_HARMONICS[i / 3] = i + 1;
+            if ((i / 3) < THIRD_THIRD_HARMONICS.length)
+                THIRD_THIRD_HARMONICS[i / 3] = i + 2;
             }
                         
         // build anti-harmonics
         
         for(int j = 0; j < HARMONICS.length; j++)
             {
-                ANTI_HARMONICS[j] = new int[NUM_PARTIALS - HARMONICS[j].length];
-                int index = 0;
-                int antiIndex = 0;
-                for(int i = 0; i < NUM_PARTIALS; i++)
-                    {
-                        if (index >= HARMONICS[j].length || HARMONICS[j][index] != i)
-                            { 
-                                ANTI_HARMONICS[j][antiIndex] = i;
-                                antiIndex++; 
-                            }
-                        else
-                            {
-                                index++;
-                            }
+            ANTI_HARMONICS[j] = new int[NUM_PARTIALS - HARMONICS[j].length];
+            int index = 0;
+            int antiIndex = 0;
+            for(int i = 0; i < NUM_PARTIALS; i++)
+                {
+                if (index >= HARMONICS[j].length || HARMONICS[j][index] != i)
+                    { 
+                    ANTI_HARMONICS[j][antiIndex] = i;
+                    antiIndex++; 
                     }
+                else
+                    {
+                    index++;
+                    }
+                }
             }
-    }
+        }
         
     public void printStats()
-    {
+        {
         super.printStats();
         for(int i = 0; i < getNumInputs(); i++)                 
             System.err.println("" + i + " INPUT: " + getInput(i));
         for(int i = 0; i < getNumOutputs(); i++)                 
             System.err.println("" + i + " OUTPUT: " + getOutputName(i));
         System.err.println("CONSTRAINT: " + constraintIn + " " + constraint + " " + invertConstraints);
-    }
+        }
 
     public static String getName() { return "Unit"; }
 
     public Object clone()
-    {
+        {
         Unit obj = (Unit)(super.clone());
         
         // ---- Copy over unit inputs.  We retain pointers to the old inputs. ----
@@ -1282,7 +1282,7 @@ public class Unit extends Modulation
             obj.constraintInPartials = (int[])(obj.constraintInPartials.clone());
 
         return obj;
-    }
+        }
 
 
 
@@ -1297,32 +1297,32 @@ public class Unit extends Modulation
     /** Returns the unit output number for a given JSON Key, or SERIALIZATION_NOT_FOUND if the key is not found.
         This method is the inverse of getKeyForOutput(...)  */
     public int getOutputForKey(String key)
-    {
+        {
         // Terribly inefficient but it'll suffice
         for(int i = 0; i < getNumOutputs(); i++)
             {
-                if (getKeyForOutput(i).equals(key)) return i;
+            if (getKeyForOutput(i).equals(key)) return i;
             }
         return SERIALIZATION_NOT_FOUND;
-    }
+        }
         
     public JSONObject save() throws JSONException
-    {
+        {
         JSONObject obj = super.save();
                                 
         // inputs
         JSONObject inputs = new JSONObject();
         for(int i = 0; i < getNumInputs(); i++)
             {
-                Unit input = getInput(i);
-                if (!(input instanceof Nil))
-                    {
-                        int inputIndex = getInputIndex(i);
-                        JSONObject m = new JSONObject();
-                        m.put("id", input.getID());
-                        m.put("at", input.getKeyForOutput(inputIndex));
-                        inputs.put(getKeyForInput(i), m);
-                    }
+            Unit input = getInput(i);
+            if (!(input instanceof Nil))
+                {
+                int inputIndex = getInputIndex(i);
+                JSONObject m = new JSONObject();
+                m.put("id", input.getID());
+                m.put("at", input.getKeyForOutput(inputIndex));
+                inputs.put(getKeyForInput(i), m);
+                }
             }
         obj.put("unit", inputs);
 
@@ -1331,65 +1331,65 @@ public class Unit extends Modulation
         if (!(getConstraintIn() instanceof Nil) ||
             getConstraint() != CONSTRAINT_NONE)
             {
-                JSONObject constraints = new JSONObject();
-                Unit unit = getConstraintIn();
+            JSONObject constraints = new JSONObject();
+            Unit unit = getConstraintIn();
                 
-                // optionally write out "id"= ...., "at"= ...
-                if (!(unit instanceof Nil))
-                    {
-                        constraints.put("id", unit.getID());
-                        constraints.put("at", unit.getKeyForOutput(getConstraintIndex()));
-                    }
+            // optionally write out "id"= ...., "at"= ...
+            if (!(unit instanceof Nil))
+                {
+                constraints.put("id", unit.getID());
+                constraints.put("at", unit.getKeyForOutput(getConstraintIndex()));
+                }
                 
-                // optionally write out "type"=....
-                if (getConstraint() != CONSTRAINT_NONE)
-                    {
-                        constraints.put("type", getConstraint());
-                    }
+            // optionally write out "type"=....
+            if (getConstraint() != CONSTRAINT_NONE)
+                {
+                constraints.put("type", getConstraint());
+                }
                 
-                // optionally write out "not"=....
-                if (getInvertConstraints())
-                    {
-                        constraints.put("not", getInvertConstraints());
-                    }
-                obj.put("constrain", constraints);
+            // optionally write out "not"=....
+            if (getInvertConstraints())
+                {
+                constraints.put("not", getInvertConstraints());
+                }
+            obj.put("constrain", constraints);
             }
         return obj;
-    }
+        }
 
     /** Loads unit inputs from the given JSON Object representing the modulation storage. */
     public void loadUnits(JSONObject inputs, HashMap<String, Modulation> ids, int moduleVersion, int patchVersion)
-    {
+        {
         for(int i = 0; i < getNumInputs(); i++)
             {
-                JSONObject m = inputs.optJSONObject(getKeyForInput(i));
-                if (m == null)
+            JSONObject m = inputs.optJSONObject(getKeyForInput(i));
+            if (m == null)
+                {
+                setInput(Unit.NIL, i, 0);
+                }
+            else if (m.optString("id") == null || m.getString("id").equals("null"))
+                {
+                setInput(Unit.NIL, i, 0);
+                } 
+            else
+                {
+                Unit unit = (Unit)(ids.get(m.getString("id")));
+                if (unit != null)
                     {
-                        setInput(Unit.NIL, i, 0);
+                    int unitOutput = unit.getOutputForKey(m.getString("at"));
+                    if (unitOutput >= 0 && unitOutput < unit.getNumOutputs())
+                        {
+                        setInput(unit, i, unitOutput);
+                        }
+                    else warn("Unit.java", "invalid unit output (" + unitOutput + ") for id " + id + " in " + this);
                     }
-                else if (m.optString("id") == null || m.getString("id").equals("null"))
-                    {
-                        setInput(Unit.NIL, i, 0);
-                    } 
-                else
-                    {
-                        Unit unit = (Unit)(ids.get(m.getString("id")));
-                        if (unit != null)
-                            {
-                                int unitOutput = unit.getOutputForKey(m.getString("at"));
-                                if (unitOutput >= 0 && unitOutput < unit.getNumOutputs())
-                                    {
-                                        setInput(unit, i, unitOutput);
-                                    }
-                                else warn("Unit.java", "invalid unit output (" + unitOutput + ") for id " + id + " in " + this);
-                            }
-                        else warn("Unit.java", "no unit for id " + id + " in " + this);
-                    }
+                else warn("Unit.java", "no unit for id " + id + " in " + this);
+                }
             }       
-    }
+        }
 
     public void load(JSONObject obj, HashMap<String, Modulation> ids, int patchVersion) throws Exception
-    {
+        {
         super.load(obj, ids, patchVersion);
 
         // version
@@ -1403,28 +1403,28 @@ public class Unit extends Modulation
         JSONObject constraints = obj.optJSONObject("constrain");
         if (constraints != null)
             {
-                // first get the unit input  "id" = ... , "at" = ...
-                String str = constraints.optString("id");
-                if (str != null && !str.equals("null") && !str.equals(""))
-                    {
-                        Unit unit = (Unit)(ids.get(str));
-                        setConstraintIn(unit, unit.getOutputForKey(constraints.getString("at")));
-                    }
+            // first get the unit input  "id" = ... , "at" = ...
+            String str = constraints.optString("id");
+            if (str != null && !str.equals("null") && !str.equals(""))
+                {
+                Unit unit = (Unit)(ids.get(str));
+                setConstraintIn(unit, unit.getOutputForKey(constraints.getString("at")));
+                }
                 
-                // next get the constraint type "type" = ...
-                int val = constraints.optInt("type", -1);
-                if (val != -1)
-                    {
-                        setConstraint(val);
-                    }
+            // next get the constraint type "type" = ...
+            int val = constraints.optInt("type", -1);
+            if (val != -1)
+                {
+                setConstraint(val);
+                }
                 
-                // finally get the inversion "not" = ...
-                if (constraints.opt("not") != null)
-                    {
-                        setInvertConstraints(constraints.getBoolean("not"));
-                    }
+            // finally get the inversion "not" = ...
+            if (constraints.opt("not") != null)
+                {
+                setInvertConstraints(constraints.getBoolean("not"));
+                }
             }
-    }
+        }
         
     /*
       public void testDenormals(double[] vals, String s)
@@ -1437,4 +1437,4 @@ public class Unit extends Modulation
       }
       }
     */
-}
+    }

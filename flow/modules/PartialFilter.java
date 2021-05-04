@@ -33,7 +33,7 @@ import flow.gui.*;
 
 
 public class PartialFilter extends Unit
-{
+    {
     private static final long serialVersionUID = 1;
 
     public static final int UNIT_INPUT = 0;
@@ -52,33 +52,33 @@ public class PartialFilter extends Unit
     public static final int OPTION_FREQ = 0;
     
     public int getOptionValue(int option) 
-    { 
+        { 
         switch(option)
             {
             case OPTION_FREQ: return getFreq();
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
                 
     public void setOptionValue(int option, int value)
-    { 
+        { 
         switch(option)
             {
             case OPTION_FREQ: setFreq(value); return;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
         
     public PartialFilter(Sound sound) 
-    { 
+        { 
         super(sound);
                 
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL }, new String[] { "Input", "Partials" });
         defineOptions( new String[] { "Frequencies" }, new String[][] { { "Relative", "Fixed", "Double" } });
-    }
+        }
     
     public void go()
-    {
+        {
         super.go();
                 
         pushFrequencies(0);
@@ -95,58 +95,58 @@ public class PartialFilter extends Unit
         
         if (freq == FREQ_FIXED)
             {
-                pitch = sound.getPitch();
-                scale = 100.0;                          // 100Hz per frequency integer
+            pitch = sound.getPitch();
+            scale = 100.0;                          // 100Hz per frequency integer
             }
         else if (freq == FREQ_DOUBLE)
             {
-                pitch = sound.getPitch();
-                scale = 200.0;                          // 200Hz per frequency integer
+            pitch = sound.getPitch();
+            scale = 200.0;                          // 200Hz per frequency integer
             }
         
         int node = 0;
         for(int i = 0; i < amplitudes.length; i++)
             {
-                // First consider the situation where the frequency is lower than the minimum node
-                if (node == 0 && frequencies[i] * pitch <= nodeFreq[0] * scale)
+            // First consider the situation where the frequency is lower than the minimum node
+            if (node == 0 && frequencies[i] * pitch <= nodeFreq[0] * scale)
+                {
+                amplitudes[i] *= nodeGain[0];
+                }
+            else 
+                {
+                // Find the pair.  We do this by identifying the larger node which is >= the frequency in question
+                while (node + 1 < (NUM_PARTIALS - 1) && frequencies[i] * pitch >= (nodeFreq[node + 1] - 1)  * scale)
                     {
-                        amplitudes[i] *= nodeGain[0];
+                    node++;
                     }
-                else 
+                
+                // next consider the situation where the frequency is higher than the maximum node
+                if (node + 1 == (NUM_PARTIALS - 1) && frequencies[i] * pitch >= (nodeFreq[node + 1] - 1) * scale)
                     {
-                        // Find the pair.  We do this by identifying the larger node which is >= the frequency in question
-                        while (node + 1 < (NUM_PARTIALS - 1) && frequencies[i] * pitch >= (nodeFreq[node + 1] - 1)  * scale)
-                            {
-                                node++;
-                            }
+                    double d = nodeGain[node + 1];
+                    for(int j = i; j < amplitudes.length; j++)
+                        {
+                        amplitudes[j] *= d;
+                        }
+                    break;  // all done
+                    }
                 
-                        // next consider the situation where the frequency is higher than the maximum node
-                        if (node + 1 == (NUM_PARTIALS - 1) && frequencies[i] * pitch >= (nodeFreq[node + 1] - 1) * scale)
-                            {
-                                double d = nodeGain[node + 1];
-                                for(int j = i; j < amplitudes.length; j++)
-                                    {
-                                        amplitudes[j] *= d;
-                                    }
-                                break;  // all done
-                            }
-                
-                        // don't want to divide by zero...
-                        else if (nodeFreq[node] == nodeFreq[node + 1])
-                            {
-                                amplitudes[i] *= nodeGain[node];
-                            }
+                // don't want to divide by zero...
+                else if (nodeFreq[node] == nodeFreq[node + 1])
+                    {
+                    amplitudes[i] *= nodeGain[node];
+                    }
                         
-                        // finally interpolate between the node and the next node
-                        else
-                            {
-                                double pos = (frequencies[i] * pitch - (nodeFreq[node] - 1) * scale) / ((nodeFreq[node + 1] - 1) * scale - (nodeFreq[node] - 1) * scale);
-                                double gain = (1 - pos) * nodeGain[node] + pos * nodeGain[node + 1];
-                                amplitudes[i] *= gain;
-                            }
+                // finally interpolate between the node and the next node
+                else
+                    {
+                    double pos = (frequencies[i] * pitch - (nodeFreq[node] - 1) * scale) / ((nodeFreq[node + 1] - 1) * scale - (nodeFreq[node] - 1) * scale);
+                    double gain = (1 - pos) * nodeGain[node] + pos * nodeGain[node + 1];
+                    amplitudes[i] *= gain;
                     }
+                }
             }
 
         constrain();
-    }       
-}
+        }       
+    }

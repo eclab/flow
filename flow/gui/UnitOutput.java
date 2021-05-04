@@ -19,7 +19,7 @@ import java.util.*;
 */
 
 public class UnitOutput extends InputOutput
-{
+    {
     Jack jack;
     Unit unit;
     
@@ -40,17 +40,17 @@ public class UnitOutput extends InputOutput
     
     /** Removes all wires attached to the UnitOutput */
     public void disconnect()
-    {
+        {
         // I'm not sure if disconnecting will mess up the arraylist, so I'm not sure if I can iterate over it here.
         // so instead I'll just copy first.
         ArrayList<UnitWire> w = new ArrayList<>(outgoing);
         for(UnitWire wire : w)
             wire.end.disconnect();
-    }
+        }
     
     /** Constructor, given an owning unit and ModPanel, plus which unit output number we are in our owner. */
     public UnitOutput(Unit unit, int number, final ModulePanel modPanel)
-    {
+        {
         this.unit = unit;
         this.number = number;
         this.modPanel = modPanel;
@@ -67,60 +67,60 @@ public class UnitOutput extends InputOutput
         
         MouseAdapter mouseAdapter = new MouseAdapter()
             {
-                public void mousePressed(MouseEvent e)
+            public void mousePressed(MouseEvent e)
                 {
-                    Rack rack = modPanel.getRack();
-                    temp = new UnitWire(rack);
-                    temp.setStart(UnitOutput.this);
-                    rack.addUnitWire(temp);
-                    rack.repaint();
+                Rack rack = modPanel.getRack();
+                temp = new UnitWire(rack);
+                temp.setStart(UnitOutput.this);
+                rack.addUnitWire(temp);
+                rack.repaint();
 
-                    if (releaseListener != null)
-                        Toolkit.getDefaultToolkit().removeAWTEventListener(releaseListener);
+                if (releaseListener != null)
+                    Toolkit.getDefaultToolkit().removeAWTEventListener(releaseListener);
 
-                    // This gunk fixes a BAD MISFEATURE in Java: mouseReleased isn't sent to the
-                    // same component that received mouseClicked.  What the ... ? Asinine.
-                    // So we create a global event listener which checks for mouseReleased and
-                    // calls our own private function.  EVERYONE is going to do this.
+                // This gunk fixes a BAD MISFEATURE in Java: mouseReleased isn't sent to the
+                // same component that received mouseClicked.  What the ... ? Asinine.
+                // So we create a global event listener which checks for mouseReleased and
+                // calls our own private function.  EVERYONE is going to do this.
                                 
-                    Toolkit.getDefaultToolkit().addAWTEventListener( releaseListener = new AWTEventListener()
+                Toolkit.getDefaultToolkit().addAWTEventListener( releaseListener = new AWTEventListener()
+                    {
+                    public void eventDispatched(AWTEvent e)
                         {
-                            public void eventDispatched(AWTEvent e)
+                        if (e instanceof MouseEvent && e.getID() == MouseEvent.MOUSE_RELEASED)
                             {
-                                if (e instanceof MouseEvent && e.getID() == MouseEvent.MOUSE_RELEASED)
-                                    {
-                                        UnitOutput.this.mouseReleased((MouseEvent)e);
-                                    }
+                            UnitOutput.this.mouseReleased((MouseEvent)e);
                             }
-                        }, AWTEvent.MOUSE_EVENT_MASK);
-
-                    mouseDown = true;
-                }
-                                        
-                public void mouseDragged(MouseEvent e)
-                {
-                    if (lastUnitInput != null)
-                        lastUnitInput.highlight = false;
-                    UnitInput input = modPanel.getRack().findUnitInputFor(e.getPoint(), jack);
-                    if (input != null)
-                        {
-                            lastUnitInput = input;
-                            input.highlight = true; 
                         }
-                    modPanel.getRack().repaint();
+                    }, AWTEvent.MOUSE_EVENT_MASK);
+
+                mouseDown = true;
                 }
                                         
-                public void mouseReleased(MouseEvent e)
+            public void mouseDragged(MouseEvent e)
                 {
-                    UnitOutput.this.mouseReleased(e);
+                if (lastUnitInput != null)
+                    lastUnitInput.highlight = false;
+                UnitInput input = modPanel.getRack().findUnitInputFor(e.getPoint(), jack);
+                if (input != null)
+                    {
+                    lastUnitInput = input;
+                    input.highlight = true; 
+                    }
+                modPanel.getRack().repaint();
+                }
+                                        
+            public void mouseReleased(MouseEvent e)
+                {
+                UnitOutput.this.mouseReleased(e);
                 }
                 
-                public void mouseClicked(MouseEvent e)
+            public void mouseClicked(MouseEvent e)
                 {
-                    for(UnitWire wire : outgoing)
-                        {
-                            wire.chooseColor();
-                        }
+                for(UnitWire wire : outgoing)
+                    {
+                    wire.chooseColor();
+                    }
                 }
             };
             
@@ -130,74 +130,74 @@ public class UnitOutput extends InputOutput
         String[] help = unit.wrapHelp(unit.getUnitOutputHelp());
         if (help != null && help.length > number && help[number] != null)
             {
-                jack.setToolTipText(help[number]);
-                title.setToolTipText(help[number]);
+            jack.setToolTipText(help[number]);
+            title.setToolTipText(help[number]);
             }
-    }
+        }
 
 
     /** Attaches a UnitWire connected to the given UnitInput. */
     public void attach(UnitInput input, UnitWire wire)
-    {
+        {
         Output output = input.unit.getSound().getOutput();
         output.lock();
         try
             {
-                input.disconnect();
-                wire.setEnd(input);
-                outgoing.add(wire);
-                modPanel.getRack().addUnitWire(wire);
+            input.disconnect();
+            wire.setEnd(input);
+            outgoing.add(wire);
+            modPanel.getRack().addUnitWire(wire);
                                     
-                int index = input.unit.getSound().findRegistered(input.unit);
-                if (index == Sound.NOT_FOUND)  // stray mouse event, probably just closed
-                    {
-                        return;
-                    }
+            int index = input.unit.getSound().findRegistered(input.unit);
+            if (index == Sound.NOT_FOUND)  // stray mouse event, probably just closed
+                {
+                return;
+                }
 
-                int outIndex = input.unit.getSound().findRegistered(unit);
-                if (outIndex == Sound.NOT_FOUND)  // stray mouse event, probably just closed
-                    {
-                        return;
-                    }
+            int outIndex = input.unit.getSound().findRegistered(unit);
+            if (outIndex == Sound.NOT_FOUND)  // stray mouse event, probably just closed
+                {
+                return;
+                }
                 
-                int numSounds = output.getNumSounds();
+            int numSounds = output.getNumSounds();
 
-                if (input.number == ConstraintsChooser.INDEX)
+            if (input.number == ConstraintsChooser.INDEX)
+                {
+                // distribute to all sounds
+                for(int i = 0; i < numSounds; i++)
                     {
-                        // distribute to all sounds
-                        for(int i = 0; i < numSounds; i++)
-                            {
-                                Sound s = output.getSound(i);
-                                if (s.getGroup() == Output.PRIMARY_GROUP)
-                                    {
-                                        ((Unit)(s.getRegistered(index))).setConstraintIn(
-                                                                                         ((Unit)(s.getRegistered(outIndex))), number);
-                                    }
-                            }
+                    Sound s = output.getSound(i);
+                    if (s.getGroup() == Output.PRIMARY_GROUP)
+                        {
+                        ((Unit)(s.getRegistered(index))).setConstraintIn(
+                            ((Unit)(s.getRegistered(outIndex))), number);
+                        }
                     }
-                else
+                }
+            else
+                {
+                // distribute to all sounds
+                for(int i = 0; i < numSounds; i++)
                     {
-                        // distribute to all sounds
-                        for(int i = 0; i < numSounds; i++)
-                            {
-                                Sound s = output.getSound(i);
-                                if (s.getGroup() == Output.PRIMARY_GROUP)
-                                    {
-                                        ((Unit)(s.getRegistered(index))).setInput(
-                                                                                  ((Unit)(s.getRegistered(outIndex))), input.number, number);
-                                    }
-                            }
+                    Sound s = output.getSound(i);
+                    if (s.getGroup() == Output.PRIMARY_GROUP)
+                        {
+                        ((Unit)(s.getRegistered(index))).setInput(
+                            ((Unit)(s.getRegistered(outIndex))), input.number, number);
+                        }
                     }
-                input.incoming = wire;
+                }
+            input.incoming = wire;
             }
         finally 
             {
-                output.unlock();
+            output.unlock();
             }
-    }
+        }
                 
     public void mouseReleased(MouseEvent e)
-    {
+        {
         if (!mouseDown) return;
                 
         if (releaseListener != null)
@@ -214,18 +214,18 @@ public class UnitOutput extends InputOutput
 
         if (input != null)
             {
-                // does the wire already exist?
-                boolean exists = false;
-                for(UnitWire wire: outgoing)
-                    {
-                        if (wire.getEnd() == input)
-                            { exists = true; break; }
-                    }
+            // does the wire already exist?
+            boolean exists = false;
+            for(UnitWire wire: outgoing)
+                {
+                if (wire.getEnd() == input)
+                    { exists = true; break; }
+                }
                                                 
-                if (!exists)
-                    {
-                        attach(input, temp);
-                    }
+            if (!exists)
+                {
+                attach(input, temp);
+                }
             }
         temp = null;
         if (lastUnitInput != null)
@@ -233,13 +233,13 @@ public class UnitOutput extends InputOutput
         lastUnitInput = null;
                                                 
         rack.repaint();
-    }
+        }
         
     public String toString()
-    {
+        {
         return "UnitOutput[name=" + title.getText() + ", number=" + number + ", panel=" + modPanel + "]"; 
-    }
+        }
 
     public boolean isInput() { return false; }
     public boolean isUnit() { return true; }
-}
+    }

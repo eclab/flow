@@ -15,7 +15,7 @@ import org.json.*;
 */
 
 public class Sound
-{
+    {
     /** Default note setting (220Hz) returned by getNote() */
     public static final double DEFAULT_NOTE = 220;
     /** Default bend setting (1.0 -- none) returned by getBend() */
@@ -74,11 +74,11 @@ public class Sound
     volatile boolean requestReset = false;
 
     public Sound(Output output)
-    {
+        {
         this.output = output;
         random = output.getNewRandom();
         output.register(this);
-    }
+        }
         
     public int getChannel() { return channel; }
     
@@ -118,12 +118,12 @@ public class Sound
     
     /** Returns the index of a Modulation or Unit in the registry, else NOT_FOUND */
     public int findRegistered(Modulation m)
-    {
+        {
         for(int i = 0; i < elements.size(); i++)
             if (elements.get(i) == m)
                 return i;
         return NOT_FOUND;
-    }
+        }
         
     /** Sets the Pitch Bend.  The Bend is multiplied against the current note to determine the current pitch. */ 
     public void setBend(double bend) { this.bend = bend; if (output.getInput().getRespondsToBend()) this.pitch = note * bend; }
@@ -165,55 +165,55 @@ public class Sound
     
     /** Causes all Modulations / Units to have their go() methods called, in order. */
     public void go()
-    {
+        {
         int len = elements.size();
         for(int i = 0; i < len; i++)
             {
-                elements.get(i).go();
+            elements.get(i).go();
             }
-    }
+        }
 
     /** Causes all Modulations / Units to have their gate() methods called, in order.
         gate() informs a Modulation / Unit that the user has pressed the key. */
     public void gate()
-    {
+        {
         int len = elements.size();
         for(int i = 0; i < len; i++)
             elements.get(i).gate();
         requestReset = true;
-    }
+        }
 
     /** Causes all Modulations / Units to have their release() methods called, in order.
         release() informs a Modulation / Unit that the user has released the key. */
     public void release()
-    { 
+        { 
         int len = elements.size();
         for(int i = 0; i < len; i++)
             elements.get(i).release();
-    }
+        }
 
     /** Resets all Modulations / Units to their initial positions. */
     public void reset()
-    {
+        {
         int len = elements.size();
         for(int i = 0; i < len; i++)
             elements.get(i).reset();
         requestReset = true;
-    }
+        }
 
     /** Resets all Modulations / Units to their initial positions. */
     public void resetPartialPhases()
-    {
+        {
         output.positions[index] = new double[Unit.NUM_PARTIALS];        // FIXME: maybe we should bzero
-    }
+        }
 
     /** Informs all Modulations / Units that a clock reset, or MIDI CLOCK START, occurred. */
     public void restart()
-    {
+        {
         int len = elements.size();
         for(int i = 0; i < len; i++)
             elements.get(i).restart();
-    }
+        }
 
 
 
@@ -224,7 +224,7 @@ public class Sound
 
     /** Stores all the modules to a JSONArray, stored in the given object. */
     public void saveModules(JSONObject obj) throws JSONException
-    {
+        {
         JSONArray array = new JSONArray();
 
         int id = 0;             
@@ -236,12 +236,12 @@ public class Sound
             array.put(elements.get(i).save());
                 
         obj.put("modules", array);
-    }
+        }
         
     /** Loads all the modules from the given JSONObject, and returns them.
         Does not register the modules: they are created with a null Sound. */
     public static Modulation[] loadModules(JSONObject obj, int patchVersion) throws Exception
-    {
+        {
         JSONArray array = obj.getJSONArray("modules");
         HashMap<String, Modulation> ids = new HashMap<>();
         int len = array.length();
@@ -249,118 +249,118 @@ public class Sound
 
         for(int i = 0; i < len; i++)
             {
-                JSONObject modobj = array.getJSONObject(i);
-                Modulation mod = (Modulation)(Class.forName(modobj.getString("class")).getConstructor(Sound.class).newInstance((Sound)null));
-                mod.setID(modobj.getString("id"));
-                ids.put(mod.getID(), mod);
-                result[i] = mod;
+            JSONObject modobj = array.getJSONObject(i);
+            Modulation mod = (Modulation)(Class.forName(modobj.getString("class")).getConstructor(Sound.class).newInstance((Sound)null));
+            mod.setID(modobj.getString("id"));
+            ids.put(mod.getID(), mod);
+            result[i] = mod;
             }
 
         for(int i = 0; i < len; i++)
             {
-                JSONObject modobj = array.getJSONObject(i);
-                result[i].preprocessLoad(modobj.getInt("v"), patchVersion);
+            JSONObject modobj = array.getJSONObject(i);
+            result[i].preprocessLoad(modobj.getInt("v"), patchVersion);
             }
                         
         for(int i = 0; i < len; i++)
             {
-                result[i].load(array.getJSONObject(i), ids, patchVersion);
+            result[i].load(array.getJSONObject(i), ids, patchVersion);
             }
 
         for(int i = 0; i < len; i++)
             {
-                JSONObject modobj = array.getJSONObject(i);
-                result[i].postprocessLoad(modobj.getInt("v"), patchVersion);
+            JSONObject modobj = array.getJSONObject(i);
+            result[i].postprocessLoad(modobj.getInt("v"), patchVersion);
             }
                         
         return result;
-    }
+        }
 
     /** Stores the patch name to the given object. */
     public static void saveName(String name, JSONObject obj) throws JSONException
-    {
+        {
         if (name == null) name = "";
         obj.put("name", name);
-    }
+        }
         
     public static final String UNTITLED_PATCH_NAME = "Untitled";
            
     /** Loads the patch name from the given object. */
     public static String loadName(JSONObject obj) throws JSONException
-    {
+        {
         return obj.optString("name", UNTITLED_PATCH_NAME);
-    }
+        }
                 
     /** Stores the patch version to the given object. */
     public static void savePatchVersion(String name, JSONObject obj) throws JSONException
-    {
+        {
         if (name == null) name = "";
         obj.put("v", name);
-    }
+        }
                 
     /** Loads the patch version from the given object. */
     public static String loadPatchVersion(JSONObject obj) throws JSONException
-    {
+        {
         return obj.optString("v", "");
-    }
+        }
                 
     /** Stores the patch version to the given object. */
     public static void savePatchDate(String name, JSONObject obj) throws JSONException
-    {
+        {
         if (name == null) name = "";
         obj.put("on", name);
-    }
+        }
                 
     /** Loads the patch version from the given object. */
     public static String loadPatchDate(JSONObject obj) throws JSONException
-    {
+        {
         return obj.optString("on", "");
-    }
+        }
                 
     /** Stores the patch version to the given object. */
     public static void savePatchAuthor(String name, JSONObject obj) throws JSONException
-    {
+        {
         if (name == null) name = "";
         obj.put("by", name);
-    }
+        }
                 
     /** Loads the patch version from the given object. */
     public static String loadPatchAuthor(JSONObject obj) throws JSONException
-    {
+        {
         return obj.optString("by", "");
-    }
+        }
                 
     /** Stores the patch version to the given object. */
     public static void savePatchInfo(String name, JSONObject obj) throws JSONException
-    {
+        {
         if (name == null) name = "";
         obj.put("info", name);
-    }
+        }
                 
     /** Loads the patch version from the given object. */
     public static String loadPatchInfo(JSONObject obj) throws JSONException
-    {
+        {
         return obj.optString("info", "");
-    }
+        }
                 
     /** Stores the patch version to the given object. */
     public static void saveFlowVersion(JSONObject obj) throws JSONException
-    {
+        {
         obj.put("flow", Flow.VERSION);
-    }
+        }
         
     /** Loads the patch version from the given object. */
     public static int loadFlowVersion(JSONObject obj) throws JSONException
-    {
+        {
         int version = obj.optInt("flow", -1);
         if (version == -1)      // it's old
             return obj.getInt("v");
         else return version;
-    }
+        }
                 
     /** Loads all the groups EXCEPT THE FIRST GROUP, if any, from a JSONObject, and returns the number of NEW groups. */
     public static int loadGroups(Group[] groups, JSONObject obj) throws JSONException
-    {
+        {
         JSONArray array = null;
         
         try { array = obj.getJSONArray("sub"); }                // no groups at all
@@ -370,59 +370,59 @@ public class Sound
         int i;
         for( i = 0 ; i < len; i++)              // we load all but the #0
             {
-                JSONObject patch = array.getJSONObject(i);
-                try { groups[i + 1].setPatch(patch); }
-                catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch " + (i + 1)); break; };
-                // try { groups[i + 1].setPatchName(Sound.loadName(patch)); }
-                // catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch name " + (i + 1)); break; };
-                try { groups[i + 1].setGain(patch.getDouble("gain")); }
-                catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid gain " + (i + 1)); break; };
-                try { groups[i + 1].setPan(patch.getDouble("pan")); }
-                catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid pan " + (i + 1)); break; };
-                try { groups[i + 1].setNumRequestedSounds(patch.getInt("voices")); }
-                catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid numRequestedSounds " + (i + 1)); break; };
-                try { groups[i + 1].setChannel(patch.getInt("midi") - 1); }
-                catch (org.json.JSONException e) { groups[i + 1].setChannel(Input.CHANNEL_NONE); }                  // this isn't in the documentation
-                catch (NullPointerException e) { groups[i + 1].setChannel(Input.CHANNEL_NONE); }            // this might not exist if there's no current midi channel
-                catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
-                try {  groups[i + 1].setBothNotes(patch.getInt("note")); }
-                catch (org.json.JSONException e) { groups[i + 1].setBothNotes(0, 127); }    // this isn't in the documentation
-                catch (NullPointerException e) { groups[i + 1].setBothNotes(0, 127); }              // this might not exist if there's no current midi channel
-                catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
+            JSONObject patch = array.getJSONObject(i);
+            try { groups[i + 1].setPatch(patch); }
+            catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch " + (i + 1)); break; };
+            // try { groups[i + 1].setPatchName(Sound.loadName(patch)); }
+            // catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid patch name " + (i + 1)); break; };
+            try { groups[i + 1].setGain(patch.getDouble("gain")); }
+            catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid gain " + (i + 1)); break; };
+            try { groups[i + 1].setPan(patch.getDouble("pan")); }
+            catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid pan " + (i + 1)); break; };
+            try { groups[i + 1].setNumRequestedSounds(patch.getInt("voices")); }
+            catch (Exception e) { System.err.println("Output.loadGroups() WARNING: missing or invalid numRequestedSounds " + (i + 1)); break; };
+            try { groups[i + 1].setChannel(patch.getInt("midi") - 1); }
+            catch (org.json.JSONException e) { groups[i + 1].setChannel(Input.CHANNEL_NONE); }                  // this isn't in the documentation
+            catch (NullPointerException e) { groups[i + 1].setChannel(Input.CHANNEL_NONE); }            // this might not exist if there's no current midi channel
+            catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
+            try {  groups[i + 1].setBothNotes(patch.getInt("note")); }
+            catch (org.json.JSONException e) { groups[i + 1].setBothNotes(0, 127); }    // this isn't in the documentation
+            catch (NullPointerException e) { groups[i + 1].setBothNotes(0, 127); }              // this might not exist if there's no current midi channel
+            catch (ClassCastException e) {System.err.println("Output.loadGroups() WARNING: invalid midi " + (i + 1)); break; }
             }
         return i;
-    }
+        }
 
     /** Stores all the groups EXCEPT THE FIRST GROUP, if any, to a JSONArray, stored in the given object. */
     public static void saveGroups(Group[] group, int numPatches, JSONObject obj) throws JSONException
-    {
+        {
         if (numPatches > 1)
             {
-                JSONArray array = new JSONArray();
+            JSONArray array = new JSONArray();
 
-                for(int i = 1; i < numPatches; i++)             // note 1
-                    {
-                        JSONObject patch = group[i].getPatch();
-                        if (group[i].getChannel() >= 0) 
-                            { 
-                                patch.put("midi", group[i].getChannel() + 1);
-                            };
-                        if (group[i].getMinNote() == group[i].getMaxNote() )            // for now we assume that != means full range
-                            { 
-                                patch.put("note", group[i].getMinNote());
-                            };
-                        patch.put("voices", group[i].getNumRequestedSounds());
-                        patch.put("gain", group[i].getGain());
-                        patch.put("pan", group[i].getPan());
-                        array.put(patch);
-                    }
+            for(int i = 1; i < numPatches; i++)             // note 1
+                {
+                JSONObject patch = group[i].getPatch();
+                if (group[i].getChannel() >= 0) 
+                    { 
+                    patch.put("midi", group[i].getChannel() + 1);
+                    };
+                if (group[i].getMinNote() == group[i].getMaxNote() )            // for now we assume that != means full range
+                    { 
+                    patch.put("note", group[i].getMinNote());
+                    };
+                patch.put("voices", group[i].getNumRequestedSounds());
+                patch.put("gain", group[i].getGain());
+                patch.put("pan", group[i].getPan());
+                array.put(patch);
+                }
                                 
-                obj.put("sub", array);
+            obj.put("sub", array);
             }
         else
             {
-                // System.err.println("Sound.saveGroups() WARNING: there aren't any groups to save");
+            // System.err.println("Sound.saveGroups() WARNING: there aren't any groups to save");
             }
-    }
+        }
         
-}
+    }

@@ -41,7 +41,7 @@ import java.util.*;
 */
 
 public class Switch extends Unit
-{
+    {
     private static final long serialVersionUID = 1;
 
     public static final int NUM_INPUTS = 8;
@@ -56,51 +56,51 @@ public class Switch extends Unit
     public static final int OPTION_FREE = 0;
 
     public int getOptionValue(int option) 
-    { 
+        { 
         switch(option)
             {
             case OPTION_FREE: return getFree() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
                 
     public void setOptionValue(int option, int value)
-    { 
+        { 
         switch(option)
             {
             case OPTION_FREE: setFree(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
         
     public Switch(Sound sound)
-    {
+        {
         super(sound);
         
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, new String[] { "Input A", "Input B", "Input C", "Input D", "Input E", "Input F", "Input G", "Input H"  });
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.HALF }, new String[] { "A", "B", "C", "D", "E", "F", "G", "H", "Next", "Rate" });
         defineOptions(new String[] { "Free" }, new String[][] { { "Frequency" }, { "Amplitude" }, { "Free" } });
-    }
+        }
 
     public void reset()
-    {
+        {
         super.reset();
         currentInput = 0;
         lastInput = 0;
         alpha = 0.0;
-    }
+        }
 
     public void gate()
-    {
+        {
         super.gate();
 
         if (!free)
             {
-                currentInput = 0;
-                lastInput = 0;
-                alpha = 0.0;
+            currentInput = 0;
+            lastInput = 0;
+            alpha = 0.0;
             }
-    }
+        }
 
     int currentInput = 0;
     int lastInput = 0;
@@ -108,29 +108,29 @@ public class Switch extends Unit
     public static final double MINIMUM_ALPHA = 0.0001;      // slightly less than 1/8192, for 16-bit
         
     public void go()
-    {
+        {
         super.go();
         
         if (isTriggered(MOD_NEXT))
             {
-                lastInput = currentInput;
-                currentInput = currentInput + 1;
-                if (currentInput >= NUM_INPUTS)
-                    currentInput = 0;
-                alpha = 1.0;
+            lastInput = currentInput;
+            currentInput = currentInput + 1;
+            if (currentInput >= NUM_INPUTS)
+                currentInput = 0;
+            alpha = 1.0;
             }
         else
             {
-                for(int i = 0; i < getNumModulations() - 1; i++)                        // No
+            for(int i = 0; i < getNumModulations() - 1; i++)                        // No
+                {
+                if (i != currentInput && isTriggered(i))
                     {
-                        if (i != currentInput && isTriggered(i))
-                            {
-                                lastInput = currentInput;
-                                currentInput = i;
-                                alpha = 1.0;
-                                break;
-                            }
+                    lastInput = currentInput;
+                    currentInput = i;
+                    alpha = 1.0;
+                    break;
                     }
+                }
             }
 
         double[] p1frequencies = getFrequenciesIn(lastInput);
@@ -144,12 +144,12 @@ public class Switch extends Unit
         
         for(int i = 0; i < p1frequencies.length; i++)
             {
-                frequencies[i] = (p1frequencies[i] * alpha) + (p2frequencies[i] * (1.0 - alpha));
+            frequencies[i] = (p1frequencies[i] * alpha) + (p2frequencies[i] * (1.0 - alpha));
             }
 
         for(int i = 0; i < p1amplitudes.length; i++)
             {
-                amplitudes[i] = (p1amplitudes[i] * alpha) + (p2amplitudes[i] * (1.0 - alpha));
+            amplitudes[i] = (p1amplitudes[i] * alpha) + (p2amplitudes[i] * (1.0 - alpha));
             }
 
         // always sort    
@@ -159,66 +159,66 @@ public class Switch extends Unit
             alpha = alpha * makeVeryInsensitive(modulate(MOD_ALPHA));
         else
             alpha = 0.0;
-    }
+        }
 
     public ModulePanel getPanel()
-    {
+        {
         return new ModulePanel(Switch.this)
             {
-                public JComponent buildPanel()
+            public JComponent buildPanel()
                 {
-                    Unit unit =  (Unit) getModulation();
+                Unit unit =  (Unit) getModulation();
     
-                    Box outer = new Box(BoxLayout.Y_AXIS);
-                    outer.add(new UnitOutput(unit, 0, this));
+                Box outer = new Box(BoxLayout.Y_AXIS);
+                outer.add(new UnitOutput(unit, 0, this));
                  
-                    Box box = new Box(BoxLayout.X_AXIS);
+                Box box = new Box(BoxLayout.X_AXIS);
                 
-                    Box box2 = new Box(BoxLayout.Y_AXIS);
-                    for(int i = 0; i < NUM_INPUTS; i++)
-                        {
-                            box2.add(new UnitInput(unit, i, this));
-                        }
-                    box.add(box2);
+                Box box2 = new Box(BoxLayout.Y_AXIS);
+                for(int i = 0; i < NUM_INPUTS; i++)
+                    {
+                    box2.add(new UnitInput(unit, i, this));
+                    }
+                box.add(box2);
 
-                    box.add(Strut.makeHorizontalStrut(5));
+                box.add(Strut.makeHorizontalStrut(5));
 
-                    box2 = new Box(BoxLayout.Y_AXIS);
-                    for(int i = 0; i < NUM_INPUTS; i++)
-                        {
-                            ModulationInput m = new ModulationInput(unit, i, this);
-                            m.setTitleText("", false);
-                            box2.add(m);
-                        }
+                box2 = new Box(BoxLayout.Y_AXIS);
+                for(int i = 0; i < NUM_INPUTS; i++)
+                    {
+                    ModulationInput m = new ModulationInput(unit, i, this);
+                    m.setTitleText("", false);
+                    box2.add(m);
+                    }
                 
-                    box.add(box2);
+                box.add(box2);
 
-                    outer.add(box);
+                outer.add(box);
                                 
-                    outer.add(new ModulationInput(unit, MOD_NEXT, this));
-                    outer.add(new ModulationInput(unit, MOD_ALPHA, this));
+                outer.add(new ModulationInput(unit, MOD_NEXT, this));
+                outer.add(new ModulationInput(unit, MOD_ALPHA, this));
                 
-                    for(int i = 0; i < unit.getNumOptions(); i++)
-                        {
-                            outer.add(new OptionsChooser(unit, i));
-                        }
+                for(int i = 0; i < unit.getNumOptions(); i++)
+                    {
+                    outer.add(new OptionsChooser(unit, i));
+                    }
 
-                    return outer;
+                return outer;
                 }
-        };
-    }
+            };
+        }
         
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-    {
+        {
         if (isConstant)
             {
-                if (modulation < NUM_INPUTS)
-                    {
-                        return "";      // So Trigger modulation values aren't displayed
-                    }
-                else return super.getModulationValueDescription(modulation, value, isConstant);
+            if (modulation < NUM_INPUTS)
+                {
+                return "";      // So Trigger modulation values aren't displayed
+                }
+            else return super.getModulationValueDescription(modulation, value, isConstant);
             }
         else return "";
-    }
+        }
 
-}
+    }

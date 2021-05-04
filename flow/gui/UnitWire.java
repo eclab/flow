@@ -18,7 +18,7 @@ import java.awt.event.*;
 */
 
 public class UnitWire
-{
+    {
     UnitOutput start = null;
     UnitInput end = null;
     Rack rack;
@@ -32,18 +32,18 @@ public class UnitWire
     public UnitInput getEnd() { return end; }
     
     public void chooseColor() 
-    {
+        {
         color = new Color((int)(Math.random() * 220), (int)(Math.random() * 220), (int)(Math.random() * 220), 175);
-    }
+        }
         
     public UnitWire(Rack rack) 
-    { 
+        { 
         this.rack = rack; 
         chooseColor();
-    }
+        }
         
     public void draw(Graphics2D g)
-    {
+        {
         if (start == null) {System.err.println("UnitWire: Null Start"); return; }
         if (start.jack == null) {System.err.println("UnitWire: Null StartJack"); return; }
                 
@@ -54,14 +54,14 @@ public class UnitWire
         Point end_p = null;
         if (end == null)
             {
-                end_p = MouseInfo.getPointerInfo().getLocation();
-                SwingUtilities.convertPointFromScreen(end_p, start.jack);
+            end_p = MouseInfo.getPointerInfo().getLocation();
+            SwingUtilities.convertPointFromScreen(end_p, start.jack);
             }
         else
             {
-                bounds = end.jack.getBounds();
-                end_p = new Point(bounds.width/2, bounds.height/2);
-                end_p = SwingUtilities.convertPoint(end.jack, end_p, start.jack);
+            bounds = end.jack.getBounds();
+            end_p = new Point(bounds.width/2, bounds.height/2);
+            end_p = SwingUtilities.convertPoint(end.jack, end_p, start.jack);
             }
             
         end_p = SwingUtilities.convertPoint(start.jack, end_p, rack.getWirePaintComponent());                
@@ -74,10 +74,10 @@ public class UnitWire
         double midx = (start_p.getX() + end_p.getX()) / 2;
         double midY = (start_p.getY() + end_p.getY()) / 2;
         path.curveTo(midx, midY + diff / 4,
-                     midx,midY + diff / 4, end_p.getX(), end_p.getY());
+            midx,midY + diff / 4, end_p.getX(), end_p.getY());
         g.draw(path);
-    }
+        }
         
     public String toString() { return "UnitWire [from=" + start + ", to=" + end + "]"; }
     
-}
+    }

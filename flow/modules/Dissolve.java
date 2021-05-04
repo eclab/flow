@@ -32,7 +32,7 @@ import java.util.*;
 */
 
 public class Dissolve extends Unit
-{
+    {
     private static final long serialVersionUID = 1;
 
     public static final int MOD_DISSOLVE = 0;
@@ -41,65 +41,65 @@ public class Dissolve extends Unit
     public static String getName() { return "Dissolve"; }
 
     public Dissolve(Sound sound) 
-    {
+        {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL, Unit.NIL }, new String[] { "A", "B" });
         defineModulations(new Constant[] { Constant.ZERO, Constant.ONE }, new String[] { "Dissolve", "Seed" });
-    }
+        }
         
     double lastMod = -1;
     byte[] dissolveMap = new byte[Unit.NUM_PARTIALS];
     
     public void buildDissolveMap()
-    {
+        {
         Random random = getSound().getRandom();
 
         // first build Random from seed
         double mod = modulate(MOD_SEED);
         if (mod > 0)
             {
-                long seed = Double.doubleToLongBits(mod);
-                if (random == null) random = new Random(seed);
-                else random.setSeed(seed);
+            long seed = Double.doubleToLongBits(mod);
+            if (random == null) random = new Random(seed);
+            else random.setSeed(seed);
             }
 
         // load the dissolveMap
         for(int i = 0; i < dissolveMap.length; i++)
             {
-                dissolveMap[i] = (byte) i;
+            dissolveMap[i] = (byte) i;
             }
 
         // Next shuffle dissolveMap using Fisher-Yates
         for (int i = 0; i < dissolveMap.length; i++) 
             {
-                int randomValue = i + random.nextInt(dissolveMap.length - i);
-                byte temp = dissolveMap[randomValue];
-                dissolveMap[randomValue] = dissolveMap[i];
-                dissolveMap[i] = temp;
+            int randomValue = i + random.nextInt(dissolveMap.length - i);
+            byte temp = dissolveMap[randomValue];
+            dissolveMap[randomValue] = dissolveMap[i];
+            dissolveMap[i] = temp;
             }
             
         // set lastMod
         lastMod = mod;
-    }
+        }
         
     public void gate()
-    {
+        {
         if (lastMod == 0) lastMod = -1; // force it to reset
-    }
+        }
 
     public void reset()
-    {
+        {
         if (lastMod == 0) lastMod = -1; // force it to reset
-    }
+        }
 
     public void go()
-    {
+        {
         super.go();
                 
         double mod = modulate(MOD_SEED);
         if (mod != lastMod)             // gotta rebuild the map
             {
-                buildDissolveMap();
+            buildDissolveMap();
             }
                 
         // Perform interpolation
@@ -121,27 +121,27 @@ public class Dissolve extends Unit
         
         for(int i = 0; i < dissolveMap.length; i++)
             {
-                if (i < pivotpartial)
-                    {
-                        int p = dissolveMap[i] & 0xFF;
-                        amplitudes[p] = a1[p];
-                        frequencies[p] = f1[p];
-                    }
-                else if (i > pivotpartial)
-                    {
-                        int p = dissolveMap[i] & 0xFF;
-                        amplitudes[p] = a0[p];
-                        frequencies[p] = f0[p];
-                    }
-                else    // i == pivotpartial, use alpha to cross-fade
-                    {
-                        int p = dissolveMap[i] & 0xFF;
-                        amplitudes[p] = alpha * a1[p] + (1-alpha) * a0[p];
-                        frequencies[p] = alpha * f1[p] + (1-alpha) * f0[p];
-                    }
+            if (i < pivotpartial)
+                {
+                int p = dissolveMap[i] & 0xFF;
+                amplitudes[p] = a1[p];
+                frequencies[p] = f1[p];
+                }
+            else if (i > pivotpartial)
+                {
+                int p = dissolveMap[i] & 0xFF;
+                amplitudes[p] = a0[p];
+                frequencies[p] = f0[p];
+                }
+            else    // i == pivotpartial, use alpha to cross-fade
+                {
+                int p = dissolveMap[i] & 0xFF;
+                amplitudes[p] = alpha * a1[p] + (1-alpha) * a0[p];
+                frequencies[p] = alpha * f1[p] + (1-alpha) * f0[p];
+                }
             }
 
         constrain();
         simpleSort(0, true);
-    }               
-}
+        }               
+    }

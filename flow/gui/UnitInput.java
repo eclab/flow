@@ -17,7 +17,7 @@ import java.awt.event.*;
 */
 
 public class UnitInput extends InputOutput implements Rebuildable
-{
+    {
     Jack jack;
     Unit unit;
     
@@ -28,136 +28,136 @@ public class UnitInput extends InputOutput implements Rebuildable
     UnitWire incoming;
      
     public void rebuild()
-    {
+        {
         Output output = unit.getSound().getOutput();
         Rack rack = modPanel.getRack();
         output.lock();
         try
             {
-                Unit connection;
+            Unit connection;
                         
-                // What connection do we have?
-                if (number == ConstraintsChooser.INDEX)
-                    {
-                        connection = unit.getConstraintIn();
-                    }
-                else
-                    {
-                        connection = unit.getInput(number);
-                    }
+            // What connection do we have?
+            if (number == ConstraintsChooser.INDEX)
+                {
+                connection = unit.getConstraintIn();
+                }
+            else
+                {
+                connection = unit.getInput(number);
+                }
                                 
-                int outUnitNumber = 0;
-                if (number == ConstraintsChooser.INDEX)
-                    {
-                        outUnitNumber = unit.getConstraintIndex();
-                    }
-                else
-                    {
-                        outUnitNumber = unit.getInputIndex(number);
-                    }
+            int outUnitNumber = 0;
+            if (number == ConstraintsChooser.INDEX)
+                {
+                outUnitNumber = unit.getConstraintIndex();
+                }
+            else
+                {
+                outUnitNumber = unit.getInputIndex(number);
+                }
 
-                disconnect();
+            disconnect();
                         
-                // now reconnect
+            // now reconnect
                         
-                if (connection instanceof Nil)
-                    {
-                        return;  // we're done
-                    }
+            if (connection instanceof Nil)
+                {
+                return;  // we're done
+                }
                                 
-                // find output
-                int index = unit.getSound().findRegistered(connection);
-                if (index == Sound.NOT_FOUND)
-                    {
-                        System.err.println("UnitInput: Can't find connection!");
-                    }
-                else
-                    {
-                        ModulePanel connectionPanel = rack.getModulePanel(index);
-                        UnitWire wire = new UnitWire(rack);
+            // find output
+            int index = unit.getSound().findRegistered(connection);
+            if (index == Sound.NOT_FOUND)
+                {
+                System.err.println("UnitInput: Can't find connection!");
+                }
+            else
+                {
+                ModulePanel connectionPanel = rack.getModulePanel(index);
+                UnitWire wire = new UnitWire(rack);
 
-                        UnitOutput outputUnit = connectionPanel.findUnitOutputForIndex(outUnitNumber);
-                        wire.setStart(outputUnit);
-                        wire.setEnd(this);
-                        outputUnit.attach(this, wire);
-                    }
+                UnitOutput outputUnit = connectionPanel.findUnitOutputForIndex(outUnitNumber);
+                wire.setStart(outputUnit);
+                wire.setEnd(this);
+                outputUnit.attach(this, wire);
+                }
             }
         finally 
             {
-                output.unlock();
+            output.unlock();
             }
-    }
+        }
     
     /** Removes the wire attached to this UnitInput. */
     public void disconnect()
-    {
+        {
         if (incoming != null)
             {
-                // delete wire from arraylists
+            // delete wire from arraylists
             
-                incoming.getStart().outgoing.remove(incoming);
-                modPanel.getRack().removeUnitWire(incoming);
-                Output output = unit.getSound().getOutput();
+            incoming.getStart().outgoing.remove(incoming);
+            modPanel.getRack().removeUnitWire(incoming);
+            Output output = unit.getSound().getOutput();
             
-                // disconnect from all sounds
-                output.lock();
-                try
+            // disconnect from all sounds
+            output.lock();
+            try
+                {
+                int index = unit.getSound().findRegistered(unit);
+                if (index == Sound.NOT_FOUND)
+                    System.err.println("UnitInput.disconnect: unit " + unit + " not found!");
+                else
                     {
-                        int index = unit.getSound().findRegistered(unit);
-                        if (index == Sound.NOT_FOUND)
-                            System.err.println("UnitInput.disconnect: unit " + unit + " not found!");
-                        else
+                    int numSounds = output.getNumSounds();
+                    for(int i = 0; i < numSounds; i++)
+                        {
+                        Sound s = output.getSound(i);
+                        if (s.getGroup() == Output.PRIMARY_GROUP)
                             {
-                                int numSounds = output.getNumSounds();
-                                for(int i = 0; i < numSounds; i++)
-                                    {
-                                        Sound s = output.getSound(i);
-                                        if (s.getGroup() == Output.PRIMARY_GROUP)
-                                            {
-                                                Unit a = (Unit)(s.getRegistered(index));
-                                                if (number == ConstraintsChooser.INDEX)
-                                                    a.setConstraintIn(Unit.NIL, 0);
-                                                else
-                                                    a.clearInput(number);
-                                            }
-                                    }
+                            Unit a = (Unit)(s.getRegistered(index));
+                            if (number == ConstraintsChooser.INDEX)
+                                a.setConstraintIn(Unit.NIL, 0);
+                            else
+                                a.clearInput(number);
                             }
+                        }
                     }
-                finally 
-                    {
-                        output.unlock();
-                    }                       
-                // eliminate
-                incoming = null;
-                modPanel.getRack().repaint();
+                }
+            finally 
+                {
+                output.unlock();
+                }                       
+            // eliminate
+            incoming = null;
+            modPanel.getRack().repaint();
             }            
-    }
+        }
 
     /** Constructor, given an owning unit and ModPanel, plus which unit input number we are in our owner. 
         If number is ConstraintsChooser.INDEX, then we draw somewhat differently.  */
     public UnitInput(final Unit unit, final int number, ModulePanel modPanel)
-    {
+        {
         this.unit = unit;
         this.number = number;
         this.modPanel = modPanel;
         
         jack = new Jack(true)
             {
-                public Color getFillColor()
+            public Color getFillColor()
                 {
-                    if (highlight)
-                        {
-                            return Color.RED;
-                        }
-                    else if ((number == ConstraintsChooser.INDEX && !(unit.getConstraintIn() instanceof Nil)) ||
-                             (number != ConstraintsChooser.INDEX && !unit.isDefaultInput(number)))
-                        {
-                            return Color.YELLOW;
-                        }
-                    else
-                        {
-                            return title.getBackground();
-                        }
+                if (highlight)
+                    {
+                    return Color.RED;
+                    }
+                else if ((number == ConstraintsChooser.INDEX && !(unit.getConstraintIn() instanceof Nil)) ||
+                    (number != ConstraintsChooser.INDEX && !unit.isDefaultInput(number)))
+                    {
+                    return Color.YELLOW;
+                    }
+                else
+                    {
+                    return title.getBackground();
+                    }
                 }
             };
 
@@ -174,15 +174,15 @@ public class UnitInput extends InputOutput implements Rebuildable
         JLabel aux = modPanel.getAuxUnitInputTitle(number);
         if (aux != null)
             {
-                add(aux, BorderLayout.EAST);
+            add(aux, BorderLayout.EAST);
             }
         add(jack, BorderLayout.WEST);
 
         MouseAdapter mouseAdapter = new MouseAdapter()
             {
-                public void mouseClicked(MouseEvent e)
+            public void mouseClicked(MouseEvent e)
                 {
-                    disconnect();
+                disconnect();
                 }
             };
             
@@ -191,17 +191,17 @@ public class UnitInput extends InputOutput implements Rebuildable
         String[] help = unit.wrapHelp(unit.getUnitInputHelp());
         if (help != null && help.length > number && help[number] != null)
             {
-                jack.setToolTipText(help[number]);
-                title.setToolTipText(help[number]);
+            jack.setToolTipText(help[number]);
+            title.setToolTipText(help[number]);
             }
-    }
+        }
 
     public String toString()
-    {
+        {
         return "UnitInput[name=" + title.getText() + ", number=" + number + ", panel=" + modPanel + "]"; 
-    }
+        }
 
     public boolean isInput() { return true; }
     public boolean isUnit() { return true; }
     
-}
+    }

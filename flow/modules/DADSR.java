@@ -23,7 +23,7 @@ import java.awt.*;
 
 
 public class DADSR extends Modulation implements ModSource
-{
+    {
     private static final long serialVersionUID = 1;
 
     //
@@ -142,15 +142,15 @@ public class DADSR extends Modulation implements ModSource
     public static final int OPTION_QUICK_RELEASE = 4;
 
     public Object clone()
-    {
+        {
         DADSR obj = (DADSR)(super.clone());
         obj.level = (double[])(obj.level.clone());
         obj.time = (double[])(obj.time.clone());
         return obj;
-    }
+        }
     
     public int getOptionValue(int option) 
-    { 
+        { 
         switch(option)
             {
             case OPTION_CURVE: return getCurve();
@@ -160,10 +160,10 @@ public class DADSR extends Modulation implements ModSource
             case OPTION_QUICK_RELEASE: return getQuickRelease() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
                 
     public void setOptionValue(int option, int value)
-    { 
+        { 
         switch(option)
             {
             case OPTION_CURVE: setCurve(value); return;
@@ -173,29 +173,29 @@ public class DADSR extends Modulation implements ModSource
             case OPTION_QUICK_RELEASE: setQuickRelease(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
 
     public DADSR(Sound sound)
-    {
+        {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.ZERO, Constant.HALF, Constant.ONE, Constant.ZERO, Constant.ONE, Constant.HALF, Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
-                          new String[] {  "Delay Time", "Delay Level", "Attack Time", "Attack Level", "Decay Time", "Sustain Level", "Release Time", "Release Level", "On Tr", "Off Tr" });
+            new String[] {  "Delay Time", "Delay Level", "Attack Time", "Attack Level", "Decay Time", "Sustain Level", "Release Time", "Release Level", "On Tr", "Off Tr" });
         defineOptions(new String[] { "Curve", "One Shot", "Gate Reset", "MIDI Sync", "Fast Release" }, 
-                      new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32", "Inv x^2", "Inv x^4", "Inv x^8"  }, 
-                                       { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" }, { "No Release" } } );
+            new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32", "Inv x^2", "Inv x^4", "Inv x^8"  }, 
+                { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" }, { "No Release" } } );
         defineModulationOutputs(new String[] { "Mod", "G", "A", "D", "S", "R", "E" }); 
         setModulationOutput(0, 0);  
-    }
+        }
 
     public void gate()
-    {
+        {
         super.gate();
         if (isModulationConstant(MOD_GATE_TR))
             doGate();
-    }
+        }
         
     void doGate()
-    {
+        {
         time[DELAY] = (modulate(MOD_DELAY_TIME));
         level[DELAY] = modulate(MOD_DELAY_LEVEL);
         time[ATTACK] = (modulate(MOD_ATTACK_TIME));
@@ -219,35 +219,35 @@ public class DADSR extends Modulation implements ModSource
         released = false;
 
         scheduleTrigger(T_DELAY);
-    }
+        }
         
     public void release()
-    {
+        {
         super.release();
         if (isModulationConstant(MOD_REL_TR))
             doRelease();
-    }
+        }
     
     void doRelease()
-    {
+        {
         if (oneshot) return;
         
         if (state != RELEASE && state != DONE)
             {
-                scheduleTrigger(T_RELEASE);
+            scheduleTrigger(T_RELEASE);
             }
         
         if (state == DECAY && !quickRelease)
             {
-                released = true;
-                return;
+            released = true;
+            return;
             }
                 
         state = RELEASE;
         start = getSyncTick(sync);
         interval = toTicks(time[RELEASE]);
         level[SUSTAIN] = getModulationOutput(0);  // so we decrease from there during release
-    }
+        }
     
     public static final int T_DELAY = 0;
     public static final int T_ATTACK = 1;
@@ -258,96 +258,96 @@ public class DADSR extends Modulation implements ModSource
     
     int scheduledTriggers = 0;
     void scheduleTrigger(int val)
-    {
+        {
         if (val == T_DELAY)
             {
-                scheduledTriggers |= 1;
+            scheduledTriggers |= 1;
             }
         if (val == T_ATTACK)
             {
-                scheduledTriggers |= 2;
+            scheduledTriggers |= 2;
             }
         else if (val == T_DECAY)
             {
-                scheduledTriggers |= 4;
+            scheduledTriggers |= 4;
             }
         else if (val == T_SUSTAIN)
             {
-                scheduledTriggers |= 8;
+            scheduledTriggers |= 8;
             }
         else if (val == T_RELEASE)
             {
-                scheduledTriggers |= 16;
+            scheduledTriggers |= 16;
             }
         else if (val == T_DONE)
             {
-                scheduledTriggers |= 32;
+            scheduledTriggers |= 32;
             }
-    }
+        }
 
     public double toTicks(double mod)
-    {
+        {
         return modToLongRate(mod) * Output.SAMPLING_RATE;
-    }
+        }
     
     public void go()
-    {
+        {
         super.go();
 
         if (isTriggered(MOD_GATE_TR))
             {
-                doGate();
+            doGate();
             }
         else if (isTriggered(MOD_REL_TR))
             {
-                doRelease();
+            doRelease();
             }
             
         if (scheduledTriggers != 0)
             {
-                if ((scheduledTriggers & 1) == 1)
-                    {
-                        updateTrigger(OUT_DELAY);
-                    }
-                if ((scheduledTriggers & 2) == 2)
-                    {
-                        updateTrigger(OUT_ATTACK);
-                        updateTrigger(OUT_MOD);
-                    }
-                if ((scheduledTriggers & 4) == 4)
-                    {
-                        updateTrigger(OUT_DECAY);
-                        updateTrigger(OUT_MOD);
-                    }
-                if ((scheduledTriggers & 8) == 8)
-                    {
-                        updateTrigger(OUT_SUSTAIN);
-                        updateTrigger(OUT_MOD);
-                    }
-                if ((scheduledTriggers & 16) == 16)
-                    {
-                        updateTrigger(OUT_RELEASE);
-                        updateTrigger(OUT_MOD);
-                    }
-                if ((scheduledTriggers & 32) == 32)
-                    {
-                        updateTrigger(OUT_DONE);
-                        updateTrigger(OUT_MOD);
-                    }
-                scheduledTriggers = 0;
+            if ((scheduledTriggers & 1) == 1)
+                {
+                updateTrigger(OUT_DELAY);
+                }
+            if ((scheduledTriggers & 2) == 2)
+                {
+                updateTrigger(OUT_ATTACK);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 4) == 4)
+                {
+                updateTrigger(OUT_DECAY);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 8) == 8)
+                {
+                updateTrigger(OUT_SUSTAIN);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 16) == 16)
+                {
+                updateTrigger(OUT_RELEASE);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 32) == 32)
+                {
+                updateTrigger(OUT_DONE);
+                updateTrigger(OUT_MOD);
+                }
+            scheduledTriggers = 0;
             }
 
         long tick = getSyncTick(sync);
 
         if (tick < start) // uh oh, probably switched to MIDI Sync
             {
-                start = tick;
+            start = tick;
             }
     
         // need to reset level[DONE]        
         if (state > DELAY)
             {
-                level[DONE] = level[RELEASE];
+            level[DONE] = level[RELEASE];
             }
                 
         // What state are we in?
@@ -355,67 +355,67 @@ public class DADSR extends Modulation implements ModSource
         // if we're in a sticky state, just return the level
         if (state == DONE)
             {
-                setModulationOutput(0, level[DONE]);
-                return;
+            setModulationOutput(0, level[DONE]);
+            return;
             }
             
         if (!oneshot && !released && state == SUSTAIN)
             {
-                setModulationOutput(0, level[SUSTAIN]);
-                return;
+            setModulationOutput(0, level[SUSTAIN]);
+            return;
             }
         
         
         // Do we need to transition to a new state?
         while (tick >= start + interval)
             {
-                state++;
-                if (state == DELAY)                         // this can't happen
-                    {
-                        updateTrigger(OUT_DELAY);
-                    }
-                else if (state == ATTACK)
-                    {
-                        updateTrigger(OUT_MOD);
-                        updateTrigger(OUT_ATTACK);
-                    }
-                else if (state == DECAY)
-                    {
-                        updateTrigger(OUT_MOD);
-                        updateTrigger(OUT_DECAY);
-                    }
-                else if (state == SUSTAIN)
-                    {
-                        updateTrigger(OUT_MOD);
-                        updateTrigger(OUT_SUSTAIN);
-                    }
-                else if (state == RELEASE)
-                    {
-                        updateTrigger(OUT_MOD);
-                        updateTrigger(OUT_RELEASE);
-                    }
-                else if (state == DONE)
-                    {
-                        updateTrigger(OUT_MOD);
-                        updateTrigger(OUT_DONE);
-                    }
+            state++;
+            if (state == DELAY)                         // this can't happen
+                {
+                updateTrigger(OUT_DELAY);
+                }
+            else if (state == ATTACK)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_ATTACK);
+                }
+            else if (state == DECAY)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_DECAY);
+                }
+            else if (state == SUSTAIN)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_SUSTAIN);
+                }
+            else if (state == RELEASE)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_RELEASE);
+                }
+            else if (state == DONE)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_DONE);
+                }
                  
-                // try sticky again
-                if (state == DONE)
-                    {
-                        setModulationOutput(0, level[DONE]);
-                        return;
-                    }
+            // try sticky again
+            if (state == DONE)
+                {
+                setModulationOutput(0, level[DONE]);
+                return;
+                }
 
-                if (!oneshot && !released && state == SUSTAIN)
-                    {
-                        setModulationOutput(0, level[SUSTAIN]);
-                        return;
-                    }
+            if (!oneshot && !released && state == SUSTAIN)
+                {
+                setModulationOutput(0, level[SUSTAIN]);
+                return;
+                }
 
-                // update the state
-                start = start + interval;
-                interval = toTicks(time[state]);
+            // update the state
+            start = start + interval;
+            interval = toTicks(time[state]);
             }
         
       
@@ -432,208 +432,208 @@ public class DADSR extends Modulation implements ModSource
             {
             case CURVE_LINEAR:
                 {
-                    // do nothing
+                // do nothing
                 }
-                break;
+            break;
             case CURVE_X_2:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = 1 - alpha;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = 1 - alpha;
                 }
-                break;
+            break;
             case CURVE_X_4:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    alpha = 1 - alpha;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
                 }
-                break;
+            break;
             case CURVE_X_8:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = 1 - alpha;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
                 }
-                break;
+            break;
             case CURVE_X_16:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = 1 - alpha;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
                 }
-                break;
+            break;
             case CURVE_X_32:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = 1 - alpha;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
                 }
-                break;
+            break;
             case CURVE_STEP:
                 {
-                    alpha = 1.0;
+                alpha = 1.0;
                 }
-                break;
+            break;
             case CURVE_X_2_X_8:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    double beta = alpha;            // x^2
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;          // x^8
-                    alpha = 1 - (alpha + beta) * 0.5;
+                alpha = (1-alpha) * (1-alpha);
+                double beta = alpha;            // x^2
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;          // x^8
+                alpha = 1 - (alpha + beta) * 0.5;
                 }
-                break;
+            break;
             case CURVE_X_4_X_16:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    double beta = alpha;            // x^4
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;          // x^16
-                    alpha = 1 - (alpha + beta) * 0.5;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                double beta = alpha;            // x^4
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;          // x^16
+                alpha = 1 - (alpha + beta) * 0.5;
                 }
-                break;
+            break;
             case CURVE_X_8_X_32:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    double beta = alpha;            // x^8
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;          // x^32
-                    alpha = 1 - (alpha + beta) * 0.5;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                double beta = alpha;            // x^8
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;          // x^32
+                alpha = 1 - (alpha + beta) * 0.5;
                 }
-                break;
+            break;
             case CURVE_1_MINUS_X_2:
                 {
-                    alpha = alpha * alpha;
+                alpha = alpha * alpha;
                 }
-                break;
+            break;
             case CURVE_1_MINUS_X_4:
                 {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
                 }
-                break;
+            break;
             case CURVE_1_MINUS_X_8:
                 {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
                 }
-                break;
+            break;
             default:
                 {
-                    // shouldn't happen
+                // shouldn't happen
                 }
             }
         double levels = (1 - alpha) * firstLevel + alpha * level[state];
         setModulationOutput(0, levels);
-    }
+        }
     
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-    {
+        {
         if (isConstant)
             {
-                if (modulation % 2 == 0)  // it's a time
-                    {
-                        return String.format("%.4f" , modToLongRate(value)) + " Sec";
-                    }
-                else return super.getModulationValueDescription(modulation, value, isConstant);
+            if (modulation % 2 == 0)  // it's a time
+                {
+                return String.format("%.4f" , modToLongRate(value)) + " Sec";
+                }
+            else return super.getModulationValueDescription(modulation, value, isConstant);
             }
         else return "";
-    }
+        }
         
         
     public ModulePanel getPanel()
-    {
+        {
         return new ModulePanel(DADSR.this)
             {
-                public JComponent buildPanel()
+            public JComponent buildPanel()
                 {               
-                    Modulation mod = getModulation();
-                    Box box = new Box(BoxLayout.Y_AXIS);
-                    box.add(new ModulationOutput(mod, 0, this));
+                Modulation mod = getModulation();
+                Box box = new Box(BoxLayout.Y_AXIS);
+                box.add(new ModulationOutput(mod, 0, this));
 
-                    for(int i = 0; i < mod.getNumModulations(); i++)
+                for(int i = 0; i < mod.getNumModulations(); i++)
+                    {
+                    ModulationInput t;
+                    if (i == MOD_DELAY_TIME || i == MOD_ATTACK_TIME || i == MOD_DECAY_TIME || i == MOD_RELEASE_TIME)
                         {
-                            ModulationInput t;
-                            if (i == MOD_DELAY_TIME || i == MOD_ATTACK_TIME || i == MOD_DECAY_TIME || i == MOD_RELEASE_TIME)
+                        t = new ModulationInput(mod, i, this)
+                            {
+                            public String[] getOptions() { return MidiClock.CLOCK_NAMES; }
+                            public double convert(int elt) 
                                 {
-                                    t = new ModulationInput(mod, i, this)
-                                        {
-                                            public String[] getOptions() { return MidiClock.CLOCK_NAMES; }
-                                            public double convert(int elt) 
-                                            {
-                                                return MIDI_CLOCK_LONG_MOD_RATES[elt];
-                                            }
-                                        };
+                                return MIDI_CLOCK_LONG_MOD_RATES[elt];
                                 }
-                            else 
-                                {
-                                    t = new ModulationInput(mod, i, this);
-                                }
-                            box.add(t);
+                            };
                         }
+                    else 
+                        {
+                        t = new ModulationInput(mod, i, this);
+                        }
+                    box.add(t);
+                    }
 
-                    for(int i = 0; i < mod.getNumOptions(); i++)
-                        {
-                            box.add(new OptionsChooser(mod, i));
-                        }
+                for(int i = 0; i < mod.getNumOptions(); i++)
+                    {
+                    box.add(new OptionsChooser(mod, i));
+                    }
                     
 
-                    box.add(Strut.makeVerticalStrut(5));
-                    Box box2 = new Box(BoxLayout.X_AXIS);
-                    box2.add(Box.createGlue());
+                box.add(Strut.makeVerticalStrut(5));
+                Box box2 = new Box(BoxLayout.X_AXIS);
+                box2.add(Box.createGlue());
                 
                 
-                    Box box3 = new Box(BoxLayout.Y_AXIS);
-                    box3.add(Box.createGlue());
-                    ModulationOutput mo = new ModulationOutput(mod, OUT_DELAY, this);
-                    mo.setTitleText(" D", false);
-                    box3.add(mo);
-                    box3.add(Strut.makeVerticalStrut(5));
+                Box box3 = new Box(BoxLayout.Y_AXIS);
+                box3.add(Box.createGlue());
+                ModulationOutput mo = new ModulationOutput(mod, OUT_DELAY, this);
+                mo.setTitleText(" D", false);
+                box3.add(mo);
+                box3.add(Strut.makeVerticalStrut(5));
                 
-                    mo = new ModulationOutput(mod, OUT_SUSTAIN, this);
-                    mo.setTitleText(" S", false);
-                    box3.add(mo);
+                mo = new ModulationOutput(mod, OUT_SUSTAIN, this);
+                mo.setTitleText(" S", false);
+                box3.add(mo);
                 
-                    box2.add(box3);
-                    box3 = new Box(BoxLayout.Y_AXIS);
+                box2.add(box3);
+                box3 = new Box(BoxLayout.Y_AXIS);
                                 
-                    mo = new ModulationOutput(mod, OUT_ATTACK, this);
-                    mo.setTitleText(" A", false);
-                    box3.add(mo);
-                    box3.add(Strut.makeVerticalStrut(5));
+                mo = new ModulationOutput(mod, OUT_ATTACK, this);
+                mo.setTitleText(" A", false);
+                box3.add(mo);
+                box3.add(Strut.makeVerticalStrut(5));
                 
-                    mo = new ModulationOutput(mod, OUT_RELEASE, this);
-                    mo.setTitleText(" R", false);
-                    box3.add(mo);
+                mo = new ModulationOutput(mod, OUT_RELEASE, this);
+                mo.setTitleText(" R", false);
+                box3.add(mo);
 
-                    box2.add(box3);
-                    box3 = new Box(BoxLayout.Y_AXIS);
+                box2.add(box3);
+                box3 = new Box(BoxLayout.Y_AXIS);
                                 
-                    mo = new ModulationOutput(mod, OUT_DECAY, this);
-                    mo.setTitleText(" D", false);
-                    box3.add(mo);
-                    box3.add(Strut.makeVerticalStrut(5));
+                mo = new ModulationOutput(mod, OUT_DECAY, this);
+                mo.setTitleText(" D", false);
+                box3.add(mo);
+                box3.add(Strut.makeVerticalStrut(5));
 
-                    mo = new ModulationOutput(mod, OUT_DONE, this);
-                    mo.setTitleText(" E", false);
-                    box3.add(mo);
+                mo = new ModulationOutput(mod, OUT_DONE, this);
+                mo.setTitleText(" E", false);
+                box3.add(mo);
 
-                    box2.add(box3);
+                box2.add(box3);
 
-                    box.add(box2);
-                    return box;
+                box.add(box2);
+                return box;
                 }
-        };
+            };
+        }
     }
-}

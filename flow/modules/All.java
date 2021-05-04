@@ -12,11 +12,11 @@ import flow.*;
 */
 
 public class All extends Unit implements UnitSource
-{
+    {
     private static final long serialVersionUID = 1;
 
     public All(Sound sound) 
-    {
+        {
         super(sound);
         
         double[] amplitudes = getAmplitudes(0);
@@ -24,7 +24,7 @@ public class All extends Unit implements UnitSource
         setClearOnReset(false);
         for(int i = 0; i < amplitudes.length; i++)
             {
-                amplitudes[i] = 0.25;
+            amplitudes[i] = 0.25;
             }
+        }
     }
-}

@@ -14,57 +14,57 @@ import java.lang.reflect.*;
 // I used the reflection version so it compiles cleanly on linux and windows as well.
 
 public class Mac
-{
-    public static void setup(Rack rack)
     {
+    public static void setup(Rack rack)
+        {
         if (System.getProperty("os.name").contains("Mac")) 
             {
-                System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
-                System.setProperty("apple.laf.useScreenMenuBar", "true");
-                try 
-                    {
-                        Object app = Class.forName("com.apple.eawt.Application").getMethod("getApplication").invoke(null);
+            System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+            try 
+                {
+                Object app = Class.forName("com.apple.eawt.Application").getMethod("getApplication").invoke(null);
 
-                        Object al = Proxy.newProxyInstance(
-                                                           Class.forName("com.apple.eawt.AboutHandler").getClassLoader(),
-                                                           new Class[]{Class.forName("com.apple.eawt.AboutHandler")},
-                                                           new AboutListener(rack));
+                Object al = Proxy.newProxyInstance(
+                    Class.forName("com.apple.eawt.AboutHandler").getClassLoader(),
+                    new Class[]{Class.forName("com.apple.eawt.AboutHandler")},
+                    new AboutListener(rack));
 
-                        app.getClass().getMethod("setAboutHandler", Class.forName("com.apple.eawt.AboutHandler")).invoke(app, al);
+                app.getClass().getMethod("setAboutHandler", Class.forName("com.apple.eawt.AboutHandler")).invoke(app, al);
 
-                        al = Proxy.newProxyInstance(
-                                                    Class.forName("com.apple.eawt.QuitHandler").getClassLoader(),
-                                                    new Class[]{Class.forName("com.apple.eawt.QuitHandler")},
-                                                    new QuitListener(rack));
+                al = Proxy.newProxyInstance(
+                    Class.forName("com.apple.eawt.QuitHandler").getClassLoader(),
+                    new Class[]{Class.forName("com.apple.eawt.QuitHandler")},
+                    new QuitListener(rack));
 
-                        app.getClass().getMethod("setQuitHandler", Class.forName("com.apple.eawt.QuitHandler")).invoke(app, al);
-                    }
-                catch (Exception e) 
-                    {
-                        //fail quietly
-                    }
+                app.getClass().getMethod("setQuitHandler", Class.forName("com.apple.eawt.QuitHandler")).invoke(app, al);
+                }
+            catch (Exception e) 
+                {
+                //fail quietly
+                }
             }       
+        }
     }
-}
         
 class AboutListener implements InvocationHandler 
-{
+    {
     Rack rack;
     public AboutListener(Rack rack) { this.rack = rack; }
     public Object invoke(Object proxy, Method method, Object[] args) 
-    {
+        {
         AppMenu.doAbout();
         return null;
+        }
     }
-}
 
 class QuitListener implements InvocationHandler 
-{
+    {
     Rack rack;
     public QuitListener(Rack rack) { this.rack = rack; }
     public Object invoke(Object proxy, Method method, Object[] args) 
-    {
+        {
         rack.doQuit();
         return null;
+        }
     }
-}

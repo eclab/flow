@@ -16,7 +16,7 @@ import flow.*;
 */
    
 public class Swap extends Unit
-{
+    {
     private static final long serialVersionUID = 1;
 
     public static final int MOD_DISTANCE = 0;
@@ -29,36 +29,36 @@ public class Swap extends Unit
     public static final int OPTION_SWAP_FUNDAMENTAL = 0;
 
     public int getOptionValue(int option) 
-    { 
+        { 
         switch(option)
             {
             case OPTION_SWAP_FUNDAMENTAL: return getSwapFundamental() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
                 
     public void setOptionValue(int option, int value)
-    { 
+        { 
         switch(option)
             {
             case OPTION_SWAP_FUNDAMENTAL: setSwapFundamental(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
 
     public Swap(Sound sound) 
-    {
+        {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Distance" });
         defineOptions(new String[] { "Fundamental" }, new String[][] { { "Fundamental" } } );
         setSwapFundamental(false);
-    }
+        }
         
     double[] amp2 = new double[NUM_PARTIALS];
         
     public void go()
-    {
+        {
         super.go();
                         
         pushFrequencies(0);
@@ -78,40 +78,40 @@ public class Swap extends Unit
 
         for(int i = start; i < amplitudes.length; i += swap)
             {
-                for(int j = 0; j < swap / 2; j++)
+            for(int j = 0; j < swap / 2; j++)
+                {
+                if (i + swap - j - 1 < amplitudes.length)
                     {
-                        if (i + swap - j - 1 < amplitudes.length)
-                            {
-                                double temp = amplitudes[i + j];
-                                amplitudes[i + j] = amplitudes[i + swap - j - 1];
-                                amplitudes[i + swap - j - 1] = temp;
-                            }
+                    double temp = amplitudes[i + j];
+                    amplitudes[i + j] = amplitudes[i + swap - j - 1];
+                    amplitudes[i + swap - j - 1] = temp;
                     }
+                }
             }
 
         if (swap != NUM_PARTIALS)
             {
-                swap++;
-                System.arraycopy(getAmplitudes(0), 0, amp2, 0, amp2.length);
-                for(int i = start; i < amp2.length; i += swap)
+            swap++;
+            System.arraycopy(getAmplitudes(0), 0, amp2, 0, amp2.length);
+            for(int i = start; i < amp2.length; i += swap)
+                {
+                for(int j = 0; j < swap / 2; j++)
                     {
-                        for(int j = 0; j < swap / 2; j++)
-                            {
-                                if (i + swap - j - 1 < amp2.length)
-                                    {
-                                        double temp = amp2[i + j];
-                                        amp2[i + j] = amp2[i + swap - j - 1];
-                                        amp2[i + swap - j - 1] = temp;
-                                    }
-                            }
+                    if (i + swap - j - 1 < amp2.length)
+                        {
+                        double temp = amp2[i + j];
+                        amp2[i + j] = amp2[i + swap - j - 1];
+                        amp2[i + swap - j - 1] = temp;
+                        }
                     }
+                }
             }
                         
         for(int i = start; i < amplitudes.length; i++)
             {
-                amplitudes[i] = (1.0 - by) * amplitudes[i] + by * amp2[i];
+            amplitudes[i] = (1.0 - by) * amplitudes[i] + by * amp2[i];
             }
 
         constrain();
-    }       
-}
+        }       
+    }

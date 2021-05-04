@@ -14,11 +14,11 @@ import flow.*;
 */
 
 public class Triangle extends Unit implements UnitSource
-{       
+    {       
     private static final long serialVersionUID = 1;
 
     public Triangle(Sound sound) 
-    {
+        {
         super(sound);
 
         double[] amplitudes = getAmplitudes(0);
@@ -27,9 +27,9 @@ public class Triangle extends Unit implements UnitSource
                 
         for(int i = 0; i < amplitudes.length; i += 2)
             {
-                amplitudes[i] = (double)(1.0 / ((i+1) * (i+1)));
+            amplitudes[i] = (double)(1.0 / ((i+1) * (i+1)));
             }
                 
         normalizeAmplitudes();
+        }
     }
-}

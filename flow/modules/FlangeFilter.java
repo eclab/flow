@@ -23,7 +23,7 @@ import flow.*;
 */
 
 public class FlangeFilter extends Unit
-{       
+    {       
     private static final long serialVersionUID = 1;
 
     public static final int MOD_WET = 0;
@@ -59,7 +59,7 @@ public class FlangeFilter extends Unit
     public static final int OPTION_INCLUDE_FUNDAMENTAL = 2;
         
     public int getOptionValue(int option) 
-    { 
+        { 
         switch(option)
             {
             case OPTION_STYLE: return getStyle();
@@ -67,10 +67,10 @@ public class FlangeFilter extends Unit
             case OPTION_INCLUDE_FUNDAMENTAL: return getIncludeFundamental() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
                 
     public void setOptionValue(int option, int value)
-    { 
+        { 
         switch(option)
             {
             case OPTION_STYLE: setStyle(value); return;
@@ -78,19 +78,19 @@ public class FlangeFilter extends Unit
             case OPTION_INCLUDE_FUNDAMENTAL: setIncludeFundamental(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
     
     public FlangeFilter(Sound sound) 
-    { 
+        { 
         super(sound);   
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] {  Constant.ONE, Constant.HALF, Constant.HALF, Constant.ZERO },
-                          new String[] { "Wet", "OffsetMod", "Stretch", "StretchMod"});
+            new String[] { "Wet", "OffsetMod", "Stretch", "StretchMod"});
         defineOptions(new String[] { "Style", "Fixed", "Fundamental" }, new String[][] { STYLE_NAMES, { "Fixed" }, { "Fundamental" } } );
-    }
+        }
         
     public void go()
-    {
+        {
         super.go();
                 
         pushFrequencies(0);
@@ -113,101 +113,101 @@ public class FlangeFilter extends Unit
                                 
         for(int i = 0; i < amplitudes.length; i++)
             {
-                if (i == 0 && !includeFundamental) { amplitudes[i] =  inAmp[i]; continue; }
+            if (i == 0 && !includeFundamental) { amplitudes[i] =  inAmp[i]; continue; }
                         
-                // we need to figure out where in the lobe (or really "trough") we are.  We define our POSITION in
-                // the lobe as a value 0..1 where 0 is located at the full height of the previous lobe and 1 is
-                // at the full height of the next lobe.  That way the fundamental is at full height by default.
-                //
-                // The baseline frequency is filterFreq.                f
-                // The width of a lobe is filterStretch.                s
-                // Our input frequency is                                                           a
-                //
-                // position = ((((a - f) % s) + s) % s) / s
-                //
-                // We convert this as follows:
-                //
-                // position = ((((a - f) % s) + s) % s) / s
-                //
-                // position = ((((a - f) % s) + s) % s) * inv_s
-                //
-                // position = ((((a - f) * inv_s) % s) + s) % s
-                //
-                // position = ((((a - f) * inv_s) % 1) + 1) % 1
-                //
-                // position = (((a - f) * inv_s) % 1
-                // if (position < 1) position += 1
-                //
-                // position = (((a - f) * inv_s)
-                // position = position - (int) position                 // much faster than % 1
-                // if (position < 0) position += 1
+            // we need to figure out where in the lobe (or really "trough") we are.  We define our POSITION in
+            // the lobe as a value 0..1 where 0 is located at the full height of the previous lobe and 1 is
+            // at the full height of the next lobe.  That way the fundamental is at full height by default.
+            //
+            // The baseline frequency is filterFreq.                f
+            // The width of a lobe is filterStretch.                s
+            // Our input frequency is                                                           a
+            //
+            // position = ((((a - f) % s) + s) % s) / s
+            //
+            // We convert this as follows:
+            //
+            // position = ((((a - f) % s) + s) % s) / s
+            //
+            // position = ((((a - f) % s) + s) % s) * inv_s
+            //
+            // position = ((((a - f) * inv_s) % s) + s) % s
+            //
+            // position = ((((a - f) * inv_s) % 1) + 1) % 1
+            //
+            // position = (((a - f) * inv_s) % 1
+            // if (position < 1) position += 1
+            //
+            // position = (((a - f) * inv_s)
+            // position = position - (int) position                 // much faster than % 1
+            // if (position < 0) position += 1
 
-                double a = frequencies[i] * pitch;
+            double a = frequencies[i] * pitch;
 
-                //            double pos = (((a - f) % s + s) % s) / s;                                         // ugh three divides, very costly.  We need to improve this
+            //            double pos = (((a - f) % s + s) % s) / s;                                         // ugh three divides, very costly.  We need to improve this
             
-                double pos = (a - filterFreq) * invFilterStretch;
-                pos = pos - (int) pos;
-                if (pos < 0.0) pos += 1.0;
+            double pos = (a - filterFreq) * invFilterStretch;
+            pos = pos - (int) pos;
+            if (pos < 0.0) pos += 1.0;
             
                         
-                // Now we're between 0 and 1.  Consider reflections
-                double p = (pos < 0.5 ? pos : 1.0 - pos) * 2;
-                // still between 0 and 1
+            // Now we're between 0 and 1.  Consider reflections
+            double p = (pos < 0.5 ? pos : 1.0 - pos) * 2;
+            // still between 0 and 1
 
-                double gain = 0;
-                switch (style)
+            double gain = 0;
+            switch (style)
+                {
+                case STYLE_LINEAR:
                     {
-                    case STYLE_LINEAR:
-                        {
-                            gain = (1 - p);
-                        }
-                        break;
-                    case STYLE_SPIKE_UP:
-                        {
-                            gain = (1 - p) * (1 - p) * (1 - p);
-                        }
-                        break;
-                    case STYLE_SPIKE_DOWN:
-                        {
-                            gain = 1 - p * p * p;
-                        }
-                        break;
-                    case STYLE_CURVY:
-                        {
-                            if (p < 0.5)
-                                gain = 1 - 4 * p * p * p;
-                            else
-                                gain = -4 * (p - 1) * (p - 1) * (p - 1);
-                        }
-                        break;
-                    case STYLE_SPIKEY:
-                        {
-                            if (p < 0.5)
-                                gain = (1 + (1 - p * 2) * (1 - p * 2) * (1 - p * 2)) / 2;
-                            else
-                                gain = (1 - (2 * p - 1) * (2 * p - 1) * (2 * p - 1)) / 2;
-                        }
-                        break;
-                    default:
-                        {
-                            warn("modules/FlangeFilter.java", "default occurred when it shouldn't be possible");
-                            break;
-                        }
+                    gain = (1 - p);
                     }
+                break;
+                case STYLE_SPIKE_UP:
+                    {
+                    gain = (1 - p) * (1 - p) * (1 - p);
+                    }
+                break;
+                case STYLE_SPIKE_DOWN:
+                    {
+                    gain = 1 - p * p * p;
+                    }
+                break;
+                case STYLE_CURVY:
+                    {
+                    if (p < 0.5)
+                        gain = 1 - 4 * p * p * p;
+                    else
+                        gain = -4 * (p - 1) * (p - 1) * (p - 1);
+                    }
+                break;
+                case STYLE_SPIKEY:
+                    {
+                    if (p < 0.5)
+                        gain = (1 + (1 - p * 2) * (1 - p * 2) * (1 - p * 2)) / 2;
+                    else
+                        gain = (1 - (2 * p - 1) * (2 * p - 1) * (2 * p - 1)) / 2;
+                    }
+                break;
+                default:
+                    {
+                    warn("modules/FlangeFilter.java", "default occurred when it shouldn't be possible");
+                    break;
+                    }
+                }
 
-                // Gain is right now 0...1.  We need to make it 0...2 centered at 1 with a variable modulation
-                gain -= 0.5;
-                gain *= 2.0;
+            // Gain is right now 0...1.  We need to make it 0...2 centered at 1 with a variable modulation
+            gain -= 0.5;
+            gain *= 2.0;
                         
-                // Now we go -1...1
-                gain *= wet;
-                gain += 1.0;
+            // Now we go -1...1
+            gain *= wet;
+            gain += 1.0;
                         
-                // Finally we multiply it in
-                amplitudes[i] = inAmp[i] * gain;
+            // Finally we multiply it in
+            amplitudes[i] = inAmp[i] * gain;
             }
 
         constrain();
-    }       
-}
+        }       
+    }

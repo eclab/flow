@@ -145,7 +145,7 @@ public class FreeVerb {
         roomSize = 0.5f;
         IOTA = 0;
         wet = 0.3333f;
-    }
+        }
 
 
     /** This is the number of samples to read and write, with two channels. */
@@ -285,6 +285,6 @@ public class FreeVerb {
             fRec8_1 = fRec8_0;
             IOTA = IOTA+1;
             fRec9_1 = fRec9_0;
+            }
         }
     }
-}

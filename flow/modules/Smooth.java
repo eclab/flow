@@ -19,7 +19,7 @@ import flow.*;
 */
 
 public class Smooth extends Unit
-{
+    {
     private static final long serialVersionUID = 1;
 
     public static final int MOD_AMOUNT = 0;
@@ -32,13 +32,13 @@ public class Smooth extends Unit
     byte smoothedOrders[];
         
     public Object clone()
-    {
+        {
         Smooth obj = (Smooth)(super.clone());
         obj.smoothedFrequencies = (double[])(obj.smoothedFrequencies.clone());
         obj.smoothedAmplitudes = (double[])(obj.smoothedAmplitudes.clone());
         obj.smoothedOrders = (byte[])(obj.smoothedOrders.clone());
         return obj;
-    }
+        }
 
     public boolean getFree() { return free; }
     public void setFree(boolean free) { this.free = free; }
@@ -46,25 +46,25 @@ public class Smooth extends Unit
     public static final int OPTION_FREE = 0;
 
     public int getOptionValue(int option) 
-    { 
+        { 
         switch(option)
             {
             case OPTION_FREE: return getFree() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
                 
     public void setOptionValue(int option, int value)
-    { 
+        { 
         switch(option)
             {
             case OPTION_FREE: setFree(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
 
     public Smooth(Sound sound) 
-    {
+        {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Amount" });
@@ -76,23 +76,23 @@ public class Smooth extends Unit
         smoothedOrders = new byte[NUM_PARTIALS];
         System.arraycopy(getOrders(0), 0, smoothedOrders, 0, smoothedOrders.length);
         setPushOrders(false);
-    }
+        }
         
     public void reset()
-    {
+        {
         super.reset();
         start = true;
-    }
+        }
                 
     public void gate()
-    {
+        {
         super.gate();
                 
         if (!free) start = true;
-    }
+        }
 
     public void go()
-    {
+        {
         super.go();
             
         double[] amplitudes = getAmplitudes(0);
@@ -105,46 +105,46 @@ public class Smooth extends Unit
         
         if (start)
             {
-                for(int i = 0; i < frequencies.length; i++)
-                    {
-                        int order = inputs0orders[i] & 0xFF;
-                        //                if (order < 0) order += 256;
-                        smoothedFrequencies[order] = inputs0frequencies[i];
-                        smoothedAmplitudes[order] = inputs0amplitudes[i];
-                        smoothedOrders[order] = (byte)i;
-                    }
-                start = false;
+            for(int i = 0; i < frequencies.length; i++)
+                {
+                int order = inputs0orders[i] & 0xFF;
+                //                if (order < 0) order += 256;
+                smoothedFrequencies[order] = inputs0frequencies[i];
+                smoothedAmplitudes[order] = inputs0amplitudes[i];
+                smoothedOrders[order] = (byte)i;
+                }
+            start = false;
             }
         else
             {
-                double mod = makeVerySensitive(1.0 - modulate(MOD_AMOUNT));
-                for(int i = 0; i < frequencies.length; i++)
-                    {
-                        // This elaborate version of (1-mod) * s + mod * q
-                        // is to make sure we don't hit the subnormals, with a massive performance penalty.
-                        // I don't have evidence that it will happen here, but it sure did in Output.java
-                        // under very similar circumstances.  See "difficult bug" in Output.java.
-                        int order = inputs0orders[i] & 0xFF;
-                        //                if (order < 0) order += 256;
+            double mod = makeVerySensitive(1.0 - modulate(MOD_AMOUNT));
+            for(int i = 0; i < frequencies.length; i++)
+                {
+                // This elaborate version of (1-mod) * s + mod * q
+                // is to make sure we don't hit the subnormals, with a massive performance penalty.
+                // I don't have evidence that it will happen here, but it sure did in Output.java
+                // under very similar circumstances.  See "difficult bug" in Output.java.
+                int order = inputs0orders[i] & 0xFF;
+                //                if (order < 0) order += 256;
                 
-                        double sFreq = smoothedFrequencies[order];
-                        double iFreq = inputs0frequencies[order];
-                        double aa = (1 - mod) * sFreq;
-                        double bb = mod * iFreq;
-                        if (aa > Output.WELL_ABOVE_SUBNORMALS || bb > Output.WELL_ABOVE_SUBNORMALS)
-                            smoothedFrequencies[order] = aa + bb;
-                        else
-                            smoothedFrequencies[order] = 0;
+                double sFreq = smoothedFrequencies[order];
+                double iFreq = inputs0frequencies[order];
+                double aa = (1 - mod) * sFreq;
+                double bb = mod * iFreq;
+                if (aa > Output.WELL_ABOVE_SUBNORMALS || bb > Output.WELL_ABOVE_SUBNORMALS)
+                    smoothedFrequencies[order] = aa + bb;
+                else
+                    smoothedFrequencies[order] = 0;
                     
-                        double sAmp = smoothedAmplitudes[order];
-                        double iAmp = inputs0amplitudes[order];
-                        aa = (1 - mod) * sAmp;
-                        bb = mod * iAmp;
-                        if (aa > Output.WELL_ABOVE_SUBNORMALS || bb > Output.WELL_ABOVE_SUBNORMALS)
-                            smoothedAmplitudes[order] = aa + bb;
-                        else
-                            smoothedAmplitudes[order] = 0;
-                    }
+                double sAmp = smoothedAmplitudes[order];
+                double iAmp = inputs0amplitudes[order];
+                aa = (1 - mod) * sAmp;
+                bb = mod * iAmp;
+                if (aa > Output.WELL_ABOVE_SUBNORMALS || bb > Output.WELL_ABOVE_SUBNORMALS)
+                    smoothedAmplitudes[order] = aa + bb;
+                else
+                    smoothedAmplitudes[order] = 0;
+                }
             }
 
         System.arraycopy(smoothedFrequencies, 0, frequencies, 0, frequencies.length);
@@ -155,5 +155,5 @@ public class Smooth extends Unit
         
         // always sort   
         simpleSort(0, false);
-    }       
-}
+        }       
+    }

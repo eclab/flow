@@ -12,13 +12,13 @@ import flow.*;
 */
 
 public class Sine extends Unit implements UnitSource
-{
+    {
     private static final long serialVersionUID = 1;
 
     public static final int MOD_FREQUENCY = 0;
 
     public Sine(Sound sound) 
-    {
+        {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Frequency" });
 
@@ -27,13 +27,13 @@ public class Sine extends Unit implements UnitSource
         setClearOnReset(false);
         sine = 0;
         amplitudes[0] = 1;
-    }
+        }
 
     double lastMod = Double.NaN;
     int sine = 0;
         
     public void go()
-    {
+        {
         super.go();
  
         double[] frequencies = getFrequencies(0);        
@@ -42,15 +42,15 @@ public class Sine extends Unit implements UnitSource
         
         if (lastMod != mod)
             {
-                frequencies[sine] = mod * ((double)Unit.NUM_PARTIALS - 1.0) + 1;
-                simpleSort(0, false);
+            frequencies[sine] = mod * ((double)Unit.NUM_PARTIALS - 1.0) + 1;
+            simpleSort(0, false);
                         
-                for(int i = 0; i < Unit.NUM_PARTIALS; i++)
-                    if (amplitudes[i] > 0)  // found it
-                        {
-                            sine = i;
-                            break;
-                        }
+            for(int i = 0; i < Unit.NUM_PARTIALS; i++)
+                if (amplitudes[i] > 0)  // found it
+                    {
+                    sine = i;
+                    break;
+                    }
             }
+        }
     }
-}

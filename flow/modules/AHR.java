@@ -21,7 +21,7 @@ import java.awt.*;
 
 
 public class AHR extends Modulation implements ModSource
-{
+    {
     private static final long serialVersionUID = 1;
 
     //
@@ -133,15 +133,15 @@ public class AHR extends Modulation implements ModSource
     public static final int OPTION_RAMP = 4;
 
     public Object clone()
-    {
+        {
         AHR obj = (AHR)(super.clone());
         obj.level = (double[])(obj.level.clone());
         obj.time = (double[])(obj.time.clone());
         return obj;
-    }
+        }
     
     public int getOptionValue(int option) 
-    { 
+        { 
         switch(option)
             {
             case OPTION_ATTACK_CURVE: return getAttackCurve();
@@ -151,10 +151,10 @@ public class AHR extends Modulation implements ModSource
             case OPTION_RAMP: return getRamp() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
                 
     public void setOptionValue(int option, int value)
-    { 
+        { 
         switch(option)
             {
             case OPTION_ATTACK_CURVE: setAttackCurve(value); return;
@@ -164,31 +164,31 @@ public class AHR extends Modulation implements ModSource
             case OPTION_RAMP: setRamp(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
 
     public AHR(Sound sound)
-    {
+        {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, Constant.HALF, Constant.ONE, Constant.ZERO, Constant.HALF, Constant.ZERO, Constant.ZERO }, 
-                          new String[] { "Start Level", "Attack Time", "Attack Level", "Hold Time",  "Release Time", "On Tr", "Off Tr" });
+            new String[] { "Start Level", "Attack Time", "Attack Level", "Hold Time",  "Release Time", "On Tr", "Off Tr" });
         defineOptions(new String[] { "Attack Curve", "Release Curve", "One Shot",  "MIDI Sync", "Ramp" }, 
-                      new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32", "Inv x^2", "Inv x^4", "Inv x^8"  }, 
-                                       { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32", "Inv x^2", "Inv x^4", "Inv x^8" },
-                                       { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" } } );
+            new String[][] { { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32", "Inv x^2", "Inv x^4", "Inv x^8"  }, 
+                { "Linear", "x^2", "x^4", "x^8", "x^16", "x^32", "Step", "x^2, 8", "x^4, 16", "x^8, 32", "Inv x^2", "Inv x^4", "Inv x^8" },
+                { "One Shot" }, { "Gate Reset" }, { "MIDI Sync" } } );
         defineModulationOutputs(new String[] { "Mod", "A", "H", "R", "E" }); 
         this.oneshot = false;
         setModulationOutput(0, 0);  
-    }
+        }
         
     public void gate()
-    {
+        {
         super.gate();
         if (isModulationConstant(MOD_GATE_TR))
             doGate();
-    }
+        }
         
     void doGate()
-    {
+        {
         time[ATTACK] = modulate(MOD_ATTACK_TIME);
         level[ATTACK] = modulate(MOD_ATTACK_LEVEL);
         time[HOLD] = modulate(MOD_HOLD_TIME);
@@ -203,14 +203,14 @@ public class AHR extends Modulation implements ModSource
         interval = toTicks(time[ATTACK]);
 
         scheduleTrigger(T_ATTACK);
-    }
+        }
         
     public void release()
-    {
+        {
         super.release();
         if (isModulationConstant(MOD_REL_TR))
             doRelease();
-    }
+        }
     
     public static final int T_ATTACK = 1;
     public static final int T_HOLD = 2;
@@ -219,94 +219,94 @@ public class AHR extends Modulation implements ModSource
     
     int scheduledTriggers = 0;
     void scheduleTrigger(int val)
-    {
+        {
         if (val == T_ATTACK)
             {
-                scheduledTriggers |= 1;
+            scheduledTriggers |= 1;
             }
         if (val == T_HOLD)
             {
-                scheduledTriggers |= 2;
+            scheduledTriggers |= 2;
             }
         else if (val == T_RELEASE)
             {
-                scheduledTriggers |= 4;
+            scheduledTriggers |= 4;
             }
         else if (val == T_DONE)
             {
-                scheduledTriggers |= 8;
+            scheduledTriggers |= 8;
             }
-    }
+        }
     
     void doRelease()
-    {
+        {
         if (oneshot) return;
         
         if (state != RELEASE && state != DONE)
             {
-                scheduleTrigger(T_RELEASE);
+            scheduleTrigger(T_RELEASE);
             }
         
         if (state == DONE)
             {
-                // do nothing
+            // do nothing
             }
         else if (ramp)
             {
-                state = HOLD;
-                start = getSyncTick(sync);
-                interval = toTicks(time[HOLD]);
-                level[ATTACK] = level[HOLD] = getModulationOutput(0);  // so we decrease from there during release
+            state = HOLD;
+            start = getSyncTick(sync);
+            interval = toTicks(time[HOLD]);
+            level[ATTACK] = level[HOLD] = getModulationOutput(0);  // so we decrease from there during release
             }
         else
             {
-                state = RELEASE;
-                start = getSyncTick(sync);
-                interval = toTicks(time[RELEASE]);
-                level[HOLD] = getModulationOutput(0);  // so we decrease from there during release
+            state = RELEASE;
+            start = getSyncTick(sync);
+            interval = toTicks(time[RELEASE]);
+            level[HOLD] = getModulationOutput(0);  // so we decrease from there during release
             }
-    }
+        }
     
     public double toTicks(double mod)
-    {
+        {
         return modToLongRate(mod) * Output.SAMPLING_RATE;
-    }
+        }
     
     public void go()
-    {
+        {
         super.go();
         
         if (isTriggered(MOD_GATE_TR))
             {
-                doGate();
+            doGate();
             }
         else if (isTriggered(MOD_REL_TR))
             {
-                doRelease();
+            doRelease();
             }
             
         if (scheduledTriggers != 0)
             {
-                if ((scheduledTriggers & 1) == 1)
-                    {
-                        updateTrigger(OUT_ATTACK);
-                    }
-                if ((scheduledTriggers & 2) == 2)
-                    {
-                        updateTrigger(OUT_HOLD);
-                        updateTrigger(OUT_MOD);
-                    }
-                if ((scheduledTriggers & 4) == 4)
-                    {
-                        updateTrigger(OUT_RELEASE);
-                        updateTrigger(OUT_MOD);
-                    }
-                if ((scheduledTriggers & 8) == 8)
-                    {
-                        updateTrigger(OUT_DONE);
-                        updateTrigger(OUT_MOD);
-                    }
-                scheduledTriggers = 0;
+            if ((scheduledTriggers & 1) == 1)
+                {
+                updateTrigger(OUT_ATTACK);
+                }
+            if ((scheduledTriggers & 2) == 2)
+                {
+                updateTrigger(OUT_HOLD);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 4) == 4)
+                {
+                updateTrigger(OUT_RELEASE);
+                updateTrigger(OUT_MOD);
+                }
+            if ((scheduledTriggers & 8) == 8)
+                {
+                updateTrigger(OUT_DONE);
+                updateTrigger(OUT_MOD);
+                }
+            scheduledTriggers = 0;
             }
 
         long tick = getSyncTick(sync);
@@ -315,57 +315,57 @@ public class AHR extends Modulation implements ModSource
                         
         if (tick < start) // uh oh, probably switched to MIDI Sync
             {
-                start = tick;
+            start = tick;
             }
     
         // if we're in a sticky state, just return the level
         if (state == DONE)
             {
-                setModulationOutput(0, level[DONE]);
-                return;
+            setModulationOutput(0, level[DONE]);
+            return;
             }
     
         // Do we need to transition to a new state?
         while (tick >= start + interval)
             {
-                if (ramp && state == HOLD)
-                    {
-                        // don't transition
-                        setModulationOutput(0, level[HOLD]);
-                        return;
-                    }
+            if (ramp && state == HOLD)
+                {
+                // don't transition
+                setModulationOutput(0, level[HOLD]);
+                return;
+                }
                            
-                state++;
-                if (state == ATTACK)                                // this can't happen
-                    {
-                        updateTrigger(OUT_ATTACK);
-                    }
-                else if (state == HOLD)
-                    {
-                        updateTrigger(OUT_MOD);
-                        updateTrigger(OUT_HOLD);
-                    }
-                else if (state == RELEASE)
-                    {
-                        updateTrigger(OUT_MOD);
-                        updateTrigger(OUT_RELEASE);
-                    }
-                else if (state == DONE)
-                    {
-                        updateTrigger(OUT_MOD);
-                        updateTrigger(OUT_DONE);
-                    }
+            state++;
+            if (state == ATTACK)                                // this can't happen
+                {
+                updateTrigger(OUT_ATTACK);
+                }
+            else if (state == HOLD)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_HOLD);
+                }
+            else if (state == RELEASE)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_RELEASE);
+                }
+            else if (state == DONE)
+                {
+                updateTrigger(OUT_MOD);
+                updateTrigger(OUT_DONE);
+                }
                  
-                // try sticky again
-                if (state == DONE)
-                    {
-                        setModulationOutput(0, level[DONE]);
-                        return;
-                    }
+            // try sticky again
+            if (state == DONE)
+                {
+                setModulationOutput(0, level[DONE]);
+                return;
+                }
 
-                // update the state
-                start = start + interval;
-                interval = toTicks(time[state]);
+            // update the state
+            start = start + interval;
+            interval = toTicks(time[state]);
             }
   
         // Where are we in the state?  We compute only for delay, attack, decay, and release
@@ -387,197 +387,197 @@ public class AHR extends Modulation implements ModSource
             {
             case CURVE_LINEAR:
                 {
-                    // do nothing
+                // do nothing
                 }
-                break;
+            break;
             case CURVE_X_2:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = 1 - alpha;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = 1 - alpha;
                 }
-                break;
+            break;
             case CURVE_X_4:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    alpha = 1 - alpha;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
                 }
-                break;
+            break;
             case CURVE_X_8:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = 1 - alpha;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
                 }
-                break;
+            break;
             case CURVE_X_16:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = 1 - alpha;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
                 }
-                break;
+            break;
             case CURVE_X_32:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = 1 - alpha;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = 1 - alpha;
                 }
-                break;
+            break;
             case CURVE_STEP:
                 {
-                    alpha = 1.0;
+                alpha = 1.0;
                 }
-                break;
+            break;
             case CURVE_X_2_X_8:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    double beta = alpha;            // x^2
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;          // x^8
-                    alpha = 1 - (alpha + beta) * 0.5;
+                alpha = (1-alpha) * (1-alpha);
+                double beta = alpha;            // x^2
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;          // x^8
+                alpha = 1 - (alpha + beta) * 0.5;
                 }
-                break;
+            break;
             case CURVE_X_4_X_16:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    double beta = alpha;            // x^4
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;          // x^16
-                    alpha = 1 - (alpha + beta) * 0.5;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                double beta = alpha;            // x^4
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;          // x^16
+                alpha = 1 - (alpha + beta) * 0.5;
                 }
-                break;
+            break;
             case CURVE_X_8_X_32:
                 {
-                    alpha = (1-alpha) * (1-alpha);
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    double beta = alpha;            // x^8
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;          // x^32
-                    alpha = 1 - (alpha + beta) * 0.5;
+                alpha = (1-alpha) * (1-alpha);
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                double beta = alpha;            // x^8
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;          // x^32
+                alpha = 1 - (alpha + beta) * 0.5;
                 }
-                break;
+            break;
             case CURVE_1_MINUS_X_2:
                 {
-                    alpha = alpha * alpha;
+                alpha = alpha * alpha;
                 }
-                break;
+            break;
             case CURVE_1_MINUS_X_4:
                 {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
                 }
-                break;
+            break;
             case CURVE_1_MINUS_X_8:
                 {
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
-                    alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
+                alpha = alpha * alpha;
                 }
-                break;
+            break;
             default:
                 {
-                    // shouldn't happen
+                // shouldn't happen
                 }
             }
         double levels = (1 - alpha) * firstLevel + alpha * level[state];
         setModulationOutput(0, levels);
-    }
+        }
     
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-    {
+        {
         if (isConstant)
             {
-                if (modulation == MOD_ATTACK_TIME || modulation == MOD_HOLD_TIME || modulation == MOD_RELEASE_TIME)  // it's a time
-                    {
-                        return String.format("%.4f" , modToLongRate(value)) + " Sec";
-                    }
-                else return super.getModulationValueDescription(modulation, value, isConstant);
+            if (modulation == MOD_ATTACK_TIME || modulation == MOD_HOLD_TIME || modulation == MOD_RELEASE_TIME)  // it's a time
+                {
+                return String.format("%.4f" , modToLongRate(value)) + " Sec";
+                }
+            else return super.getModulationValueDescription(modulation, value, isConstant);
             }
         else return "";
-    }
+        }
         
         
     public ModulePanel getPanel()
-    {
+        {
         return new ModulePanel(AHR.this)
             {
-                public JComponent buildPanel()
+            public JComponent buildPanel()
                 {               
-                    Modulation mod = getModulation();
-                    Box box = new Box(BoxLayout.Y_AXIS);
-                    box.add(new ModulationOutput(mod, 0, this));
+                Modulation mod = getModulation();
+                Box box = new Box(BoxLayout.Y_AXIS);
+                box.add(new ModulationOutput(mod, 0, this));
 
-                    for(int i = 0; i < mod.getNumModulations(); i++)
+                for(int i = 0; i < mod.getNumModulations(); i++)
+                    {
+                    ModulationInput t;
+                    if (i == MOD_ATTACK_TIME || i == MOD_HOLD_TIME || i == MOD_RELEASE_TIME)
                         {
-                            ModulationInput t;
-                            if (i == MOD_ATTACK_TIME || i == MOD_HOLD_TIME || i == MOD_RELEASE_TIME)
+                        t = new ModulationInput(mod, i, this)
+                            {
+                            public String[] getOptions() { return MidiClock.CLOCK_NAMES; }
+                            public double convert(int elt) 
                                 {
-                                    t = new ModulationInput(mod, i, this)
-                                        {
-                                            public String[] getOptions() { return MidiClock.CLOCK_NAMES; }
-                                            public double convert(int elt) 
-                                            {
-                                                return MIDI_CLOCK_LONG_MOD_RATES[elt];
-                                            }
-                                        };
+                                return MIDI_CLOCK_LONG_MOD_RATES[elt];
                                 }
-                            else 
-                                {
-                                    t = new ModulationInput(mod, i, this);
-                                }
-                            box.add(t);
+                            };
                         }
+                    else 
+                        {
+                        t = new ModulationInput(mod, i, this);
+                        }
+                    box.add(t);
+                    }
 
-                    for(int i = 0; i < mod.getNumOptions(); i++)
-                        {
-                            box.add(new OptionsChooser(mod, i));
-                        }
+                for(int i = 0; i < mod.getNumOptions(); i++)
+                    {
+                    box.add(new OptionsChooser(mod, i));
+                    }
                     
-                    box.add(Strut.makeVerticalStrut(5));
-                    Box box2 = new Box(BoxLayout.X_AXIS);
+                box.add(Strut.makeVerticalStrut(5));
+                Box box2 = new Box(BoxLayout.X_AXIS);
                 
-                    Box box3 = new Box(BoxLayout.Y_AXIS);
-                    ModulationOutput mo = new ModulationOutput(mod, OUT_ATTACK, this);
-                    mo.setTitleText(" A", false);
-                    box3.add(mo);
+                Box box3 = new Box(BoxLayout.Y_AXIS);
+                ModulationOutput mo = new ModulationOutput(mod, OUT_ATTACK, this);
+                mo.setTitleText(" A", false);
+                box3.add(mo);
 
-                    box3.add(Strut.makeVerticalStrut(5));
+                box3.add(Strut.makeVerticalStrut(5));
                 
-                    mo = new ModulationOutput(mod, OUT_RELEASE, this);
-                    mo.setTitleText(" R", false);
-                    box3.add(mo);
+                mo = new ModulationOutput(mod, OUT_RELEASE, this);
+                mo.setTitleText(" R", false);
+                box3.add(mo);
 
-                    box2.add(box3);
-                    box3 = new Box(BoxLayout.Y_AXIS);
+                box2.add(box3);
+                box3 = new Box(BoxLayout.Y_AXIS);
                                 
-                    mo = new ModulationOutput(mod, OUT_HOLD, this);
-                    mo.setTitleText(" H", false);
-                    box3.add(mo);
-                    box3.add(Strut.makeVerticalStrut(5));
+                mo = new ModulationOutput(mod, OUT_HOLD, this);
+                mo.setTitleText(" H", false);
+                box3.add(mo);
+                box3.add(Strut.makeVerticalStrut(5));
                 
-                    mo = new ModulationOutput(mod, OUT_DONE, this);
-                    mo.setTitleText(" E", false);
-                    box3.add(mo);
+                mo = new ModulationOutput(mod, OUT_DONE, this);
+                mo.setTitleText(" E", false);
+                box3.add(mo);
 
-                    box2.add(box3);
+                box2.add(box3);
                 
-                    JPanel pan = new JPanel();
-                    pan.setLayout(new BorderLayout());
-                    pan.add(box2, BorderLayout.EAST);
+                JPanel pan = new JPanel();
+                pan.setLayout(new BorderLayout());
+                pan.add(box2, BorderLayout.EAST);
 
-                    box.add(pan);
-                    return box;
+                box.add(pan);
+                return box;
                 }
-        };
+            };
+        }
     }
-}

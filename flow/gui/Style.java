@@ -15,7 +15,7 @@ import javax.swing.*;
 */
 
 public class Style
-{
+    {
     public final static Color UNIT_COLOR = Color.BLUE;
     public final static Color MOD_COLOR = Color.BLACK;
     
@@ -58,12 +58,12 @@ public class Style
         
     /** Updates the graphics rendering hints before drawing.  Called by a few widgets.  */
     public static void prepareGraphics(Graphics g)
-    {
+        {
         Graphics2D graphics = (Graphics2D) g;
         graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         graphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-    }
+        }
         
          
     /////// OS DISTINGUISHING PROCEDURES
@@ -71,17 +71,17 @@ public class Style
     private static String OS() { return System.getProperty("os.name").toLowerCase(); }
 
     public static boolean isWindows() 
-    {
+        {
         return (OS().indexOf("win") >= 0);
-    }
+        }
 
     public static boolean isMac() 
-    {
+        {
         return (OS().indexOf("mac") >= 0 || System.getProperty("mrj.version") != null);
-    }
+        }
 
     public static boolean isUnix() 
-    {
+        {
         return (OS().indexOf("nix") >= 0 || OS().indexOf("nux") >= 0 || OS().indexOf("aix") > 0 );
+        }
     }
-}

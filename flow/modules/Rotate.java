@@ -26,7 +26,7 @@ import java.awt.event.*;
 
 
 public class Rotate extends Unit
-{
+    {
     private static final long serialVersionUID = 1;
 
     public static final int MOD_ROTATE = 0;
@@ -77,7 +77,7 @@ public class Rotate extends Unit
     public static final double FREQUENCY_SCALE = 256;
     
     public int getOptionValue(int option) 
-    { 
+        { 
         switch(option)
             {
             case OPTION_WINDOW: return getWindow();
@@ -86,10 +86,10 @@ public class Rotate extends Unit
             case OPTION_SOLO: return getSolo() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
                 
     public void setOptionValue(int option, int value)
-    { 
+        { 
         switch(option)
             {
             case OPTION_WINDOW: setWindow(value); return;
@@ -98,20 +98,20 @@ public class Rotate extends Unit
             case OPTION_SOLO: setSolo(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
-    }
+        }
 
         
     public Rotate(Sound sound) 
-    {
+        {
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ZERO, Constant.ONE, Constant.ZERO, Constant.ZERO }, new String[] { "Rotate", "Upper", "Lower", "Thin" });
         defineOptions(new String[] { "Stretch", "Window", "Center", "Solo" }, new String[][] { { "None", "x^2", "x^4", "x^8", "x^16"}, { "None", "Tri", "x^2", "x^4", "x^8", "x^16", "x^32", "x^64", "x^128" }, { "Center" }, { "Solo" } } );
-    }
+        }
     
     
     public void go()
-    {
+        {
         super.go();
                 
         double rotate = modulate(MOD_ROTATE);
@@ -128,9 +128,9 @@ public class Rotate extends Unit
                 
         if (upper < lower)
             {
-                double swap = upper;
-                upper = lower;
-                lower = swap;
+            double swap = upper;
+            upper = lower;
+            lower = swap;
             }
                         
         upper *= FREQUENCY_SCALE;
@@ -144,7 +144,7 @@ public class Rotate extends Unit
         double scale = 0.5;
         for(int w = WINDOW_X_2 ; w <= window ; w++)
             {
-                scale = scale * scale;
+            scale = scale * scale;
             }
                 
         int x = 0;
@@ -152,74 +152,74 @@ public class Rotate extends Unit
         int remove = (int)Math.floor(modulate(MOD_SPACE) * MAX_SPACING);
         for(int i = 0; i < frequencies.length; i++)
             {
-                if (frequencies[i] >= lower && frequencies[i] <= upper)
+            if (frequencies[i] >= lower && frequencies[i] <= upper)
+                {
+                // space
+                if (x > 0)
                     {
-                        // space
-                        if (x > 0)
-                            {
-                                amplitudes[i] = 0;
-                            }
-                        x++;
-                        if (x > remove) x = 0;
+                    amplitudes[i] = 0;
+                    }
+                x++;
+                if (x > remove) x = 0;
                         
-                        // map
-                        frequencies[i] = frequencies[i] + delta;
+                // map
+                frequencies[i] = frequencies[i] + delta;
                         
-                        if (frequencies[i] < lower) 
-                            frequencies[i] += (upper - lower);
-                        else if (frequencies[i] > upper) 
-                            {
-                                frequencies[i] -= (upper - lower);
-                            }
+                if (frequencies[i] < lower) 
+                    frequencies[i] += (upper - lower);
+                else if (frequencies[i] > upper) 
+                    {
+                    frequencies[i] -= (upper - lower);
+                    }
                                         
-                        double f = (frequencies[i] - lower) / (upper - lower);
-                        double a = f;
-                        for(int s = 0; s < stretch; s++)
-                            f = f * f;
+                double f = (frequencies[i] - lower) / (upper - lower);
+                double a = f;
+                for(int s = 0; s < stretch; s++)
+                    f = f * f;
                                 
-                        if (center) a = f;
+                if (center) a = f;
                                 
-                        f = f * (upper - lower) + lower;
-                        frequencies[i] = f;
+                f = f * (upper - lower) + lower;
+                frequencies[i] = f;
 
 
-                        // window
-                        if (window == WINDOW_NONE)
-                            {
-                                // do nothing
-                                a = 1.0;
-                            }
-                        else if (window == WINDOW_TRIANGLE)
-                            {
-                                a = 1 - 2 * Math.abs(a - 0.5);
-                            }
-                        else
-                            {
-                                a = a - 0.5;
-                                for(int w = WINDOW_X_2 ; w <= window ; w++)
-                                    {
-                                        a = a * a;
-                                    }
-                                a /= scale;
-                                a = 1 - a;
-                            }
-                        amplitudes[i] *= a;
-                    }
-                else if (solo)
+                // window
+                if (window == WINDOW_NONE)
                     {
-                        amplitudes[i] = 0;
+                    // do nothing
+                    a = 1.0;
                     }
+                else if (window == WINDOW_TRIANGLE)
+                    {
+                    a = 1 - 2 * Math.abs(a - 0.5);
+                    }
+                else
+                    {
+                    a = a - 0.5;
+                    for(int w = WINDOW_X_2 ; w <= window ; w++)
+                        {
+                        a = a * a;
+                        }
+                    a /= scale;
+                    a = 1 - a;
+                    }
+                amplitudes[i] *= a;
+                }
+            else if (solo)
+                {
+                amplitudes[i] = 0;
+                }
             }
 
         if (constrain())
             {
-                simpleSort(0, true);
+            simpleSort(0, true);
             }
         else
             {
-                // In the future, we could do better than this since we know exactly
-                // which partials got moved, so we could very easily shift.
-                simpleSort(0, true);
+            // In the future, we could do better than this since we know exactly
+            // which partials got moved, so we could very easily shift.
+            simpleSort(0, true);
             }
-    }       
-}
+        }       
+    }

@@ -20,7 +20,7 @@ package flow;
 **/
 
 public class Constant extends Modulation
-{
+    {
     private static final long serialVersionUID = 1;
 
     public static final Constant ZERO = new Constant(0);
@@ -29,24 +29,24 @@ public class Constant extends Modulation
     public static final Constant ONE = new Constant(1);
     
     public Constant(double val)
-    {
+        {
         super(null);  // don't register me
         setValue(val);
-    }
+        }
     
     /** Returns the Constant's value, between 0...1.  This method is the same as modulate(). */
     public double getValue()
-    {
+        {
         return getModulationOutput(0);
-    }
+        }
                 
     /** Sets the Constant's value, bounded to between 0...1. */
     public void setValue(double val)
-    {
+        {
         if (val < 0) val = 0;
         else if (val > 1) val = 1;
         setModulationOutput(0, val);
-    }
+        }
                 
     public String toString() { return "<" + getValue() + ">"; }
-}
+    }
