@@ -21,11 +21,13 @@ public class Oscilloscope extends JComponent
     public static final int WAVE_SIZE = 96;
     public static final int WAVE_HEIGHT = 96;
     public static final int BORDER = 8;
-    public static final float STROKE_WIDTH = 1f;
+    public static final float STROKE_WIDTH = 1.25f;
     
     public static final int FUNCTION_MAIN_MOD = 0;
     public static final int FUNCTION_AUX_MOD = 1;
     public static final int FUNCTION_OUTPUT = 2;
+    
+    public static final int INTERVAL_MS = 20;
     
     public static final Color CLIP_COLOR = Color.RED;
     
@@ -56,7 +58,7 @@ public class Oscilloscope extends JComponent
         this.output = output;
         stroke = new BasicStroke(STROKE_WIDTH);
 
-        Timer timer = new Timer(50, new ActionListener()
+        Timer timer = new Timer(INTERVAL_MS, new ActionListener()
             {
             public void actionPerformed(ActionEvent e)
                 {
@@ -122,8 +124,14 @@ public class Oscilloscope extends JComponent
             output.unlock();
             }
         
+    RenderingHints rh = new RenderingHints(
+             RenderingHints.KEY_ANTIALIASING,
+             RenderingHints.VALUE_ANTIALIAS_ON);
+             
+             
         // fill with black regardless
         Graphics2D g = (Graphics2D) graphics;
+        g.setRenderingHints(rh);
         int height = getHeight();
         int width = getWidth();
         g.setColor(Color.BLACK);

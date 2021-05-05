@@ -168,7 +168,7 @@ public class Tinkle extends Unit implements UnitSource
     void reduce()
         {
         double mod = modulate(MOD_DECAY);
-        double alpha = mod * 0.01 + 0.99;
+        double alpha = mod * 0.05 + 0.95;
         
         if (hold && mod == 0)   // special case
             alpha = 0;              // clear old tinkles

@@ -22,8 +22,10 @@ public class Chord extends Unit
 
     public static final String[] names = 
         { 
-        "None", "m2", "M2", "m3", "M3", "4", "TT", "5", "m6", "M6", "m7", "M7", "Oct", "Oct+m3", "Oct+M3", "Oct+5", "2 Oct",
-        "min", "min-1", "min-2", "Maj", "Maj-1", "Maj-2", "7", "min7", "Maj7", "dim7", "min+Oct", "Maj+Oct"
+        "None", 
+        "m2", "M2", "m3", "M3", "4", "TT", "5", "m6", "M6", "m7", "M7", "Oct", "Oct+m3", "Oct+M3", "Oct+5", "2 Oct",
+        "min", "min-1", "min-2", "Maj", "Maj-1", "Maj-2", 
+        "7", "min7", "Maj7", "dim7", "min+Oct", "Maj+Oct"
         };
 
     // These are the semitone values for the chords
@@ -91,19 +93,56 @@ public class Chord extends Unit
         4.0
         };
 
+
+    // Relative frequency ratios for each semitone
+    public static final double[] alignedSemitoneFrequencyRatios = 
+        {
+        1.0,
+        1.0594630943592953,
+        1.1224620483093730,
+        1.1892071150027210,
+        1.2599210498948732,
+        1.3348398541700344,
+        1.4142135623730951,
+        1.5,
+        1.5874010519681994,
+        1.6817928305074290,
+        1.7817974362806785,
+        1.8877486253633868,
+        2.0,
+        2.1189261887185906,
+        2.2449240966187460,
+        2.3784142300054420,
+        2.5198420997897464,
+        2.6696797083400687,
+        2.8284271247461903,
+        3.0,
+        3.1748021039363990,
+        3.3635856610148580,
+        3.5635948725613570,
+        3.7754972507267740,
+        4.0
+        };
+
     public static String getName() { return "Chord"; }
 
     int chord = 0;
     public void setChord(int val) { chord = val; }
     public int getChord() { return chord; }
 
+    boolean align = false;
+    public void setAlign(boolean val) { align = val; }
+    public boolean getAlign() { return align; }
+
     public static final int OPTION_CHORD = 0;
+    public static final int OPTION_ALIGN = 1;
 
     public int getOptionValue(int option) 
         { 
         switch(option)
             {
             case OPTION_CHORD: return getChord();
+            case OPTION_ALIGN: return (getAlign() ? 1 : 0);
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -113,6 +152,7 @@ public class Chord extends Unit
         switch(option)
             {
             case OPTION_CHORD: setChord(value); return;
+            case OPTION_ALIGN: setAlign(value == 1); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -123,7 +163,7 @@ public class Chord extends Unit
         super(sound);
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineModulations(new Constant[] { Constant.ONE }, new String[] { "Gain" });
-        defineOptions(new String[] { "Chord" }, new String[][] { names } );
+        defineOptions(new String[] { "Chord", "Align 5ths" }, new String[][] { names, { "Align 5ths" } } );
         }
         
     public void go()
@@ -139,6 +179,7 @@ public class Chord extends Unit
             {
             copyFrequencies(0);
             copyAmplitudes(0);
+            double[] ratios = align ? alignedSemitoneFrequencyRatios : semitoneFrequencyRatios;
             double[] frequencies = getFrequencies(0);
             double[] amplitudes = getAmplitudes(0);
             double gain = modulate(MOD_GAIN);
@@ -150,7 +191,7 @@ public class Chord extends Unit
                 int start = offset + numPartials * i;
                 for(int j = 0; j < numPartials; j++)
                     {
-                    frequencies[start + j] = frequencies[j] * semitoneFrequencyRatios[chords[chord][i]];
+                    frequencies[start + j] = frequencies[j] * ratios[chords[chord][i]];
                     amplitudes[start + j] = amplitudes[j] * gain;
                     }
                 }

@@ -158,7 +158,7 @@ public class Out extends Unit implements Miscellaneous
         else
             {
             // Macros will extract the amplitudes, frequencies, and all modulation
-            // on their own.  And they're also handle the gain.
+            // on their own.  And they also handle the gain.
             }
 
         int tick = sound.getOutput().getTick();
