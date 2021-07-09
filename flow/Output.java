@@ -658,10 +658,11 @@ public class Output
                     position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
                     pos[oi] = position;
                     
-                    if (sinQuality == SIN_QUALITY_LOW)
+                    //if (sinQuality == SIN_QUALITY_LOW)
                         {
                         sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude;
                         }
+                    /*
                     else if (sinQuality == SIN_QUALITY_MEDIUM)
                         {
                         sample += Utility.fastIntSin(position * PI2 + MIXING[oi]) * amplitude;
@@ -669,7 +670,8 @@ public class Output
                     else
                         {
                         sample += Math.sin(position * PI2 + MIXING[oi]) * amplitude;
-                        }                    
+                        }   
+                    */                 
                     }
                 }
             }
@@ -702,10 +704,11 @@ public class Output
                 
                 if (frequency * pitch <= NYQUIST && amplitude > MINIMUM_VOLUME)
                     {
-                    if (sinQuality == SIN_QUALITY_LOW)
+                    //if (sinQuality == SIN_QUALITY_LOW)
                         {
                         sample += Utility.fastSin(position * PI2) * amplitude;
                         }
+                    /*
                     else if (sinQuality == SIN_QUALITY_MEDIUM)
                         {
                         sample += Utility.fastIntSin(position * PI2) * amplitude;
@@ -714,6 +717,7 @@ public class Output
                         {
                         sample += Math.sin(position * PI2) * amplitude;
                         }                    
+                    */
                     }
                 }
             }

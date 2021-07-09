@@ -194,7 +194,7 @@ public class Out extends Unit implements Miscellaneous
         else if (modulation == MOD_PAN && isConstant)
             {
             double val = (value * 200);
-            return (val == 100 ? "--" : (val < 100 ? ("< " + (int)(100 - val)) : ("" + (int)(val - 100) + " >")));
+            return (val == 100 ? "--" : (val < 100 ? ("< " + (int)Math.ceil(100 - val)) : ("" + (int)Math.ceil(val - 100) + " >")));
             }
         else return super.getModulationValueDescription(modulation, value, isConstant);
         }

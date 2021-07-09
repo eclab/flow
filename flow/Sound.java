@@ -60,6 +60,8 @@ public class Sound
     volatile double bend = DEFAULT_BEND;
     // The current pitch of the sound: equals the note times the bend
     volatile double pitch = DEFAULT_NOTE * DEFAULT_BEND;
+    // The current sound's portamento
+    volatile double portamento = 1.0;
     // The current aftertouch
     volatile double aftertouch = DEFAULT_AFTERTOUCH;
     // The current note velocity
@@ -126,7 +128,7 @@ public class Sound
         }
         
     /** Sets the Pitch Bend.  The Bend is multiplied against the current note to determine the current pitch. */ 
-    public void setBend(double bend) { this.bend = bend; if (output.getInput().getRespondsToBend()) this.pitch = note * bend; }
+    public void setBend(double bend) { this.bend = bend; }
     /** Returns the Pitch Bend.  The Bend is multiplied against the current note to determine the current pitch. */ 
     public double getBend() { return bend; }
      
@@ -156,16 +158,23 @@ public class Sound
     public double getAftertouch() { return aftertouch; }
                 
     /** Returns the pitch.  The pitch is simply the note times the bend. */
-    public double getPitch() { return pitch; }
+    public double getPitch() { if (output.getInput().getRespondsToBend()) return pitch * bend; else return pitch; }
 
     /** Sets the Unit responsible for emitting the final partials. */
     public void setEmits(Unit unit) { this.emits = unit; }
     /** Returns the Unit responsible for emitting the final partials. */
     public Unit getEmits() { return this.emits; }
     
+    /** Sets the portamento rate to a value between 0.0 and 1.0. */
+    public void setPortamento(double alpha) { if (alpha >= 0.0 && alpha <= 1.0) this.portamento = alpha; }
+    /** Retirns the portamento rate. */
+    public double getPortamento() { return portamento; }
+    void updatePortamento() { pitch = portamento * note + (1.0 - portamento) * pitch; }
+    
     /** Causes all Modulations / Units to have their go() methods called, in order. */
     public void go()
         {
+        updatePortamento();
         int len = elements.size();
         for(int i = 0; i < len; i++)
             {

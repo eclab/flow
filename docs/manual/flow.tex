@@ -13,6 +13,7 @@
 \usepackage{color}
 \usepackage{bm}
 \usepackage{gensymb}
+\usepackage{multicol}
 %\usepackage[hyperfootnotes=false,linktocpage=true,linkbordercolor={0.5 0 0}]{hyperref}
 \usepackage{xcolor}
 
@@ -68,7 +69,7 @@
 
 \noindent {\Huge\bf {\name}}\\[0.5em]
 {\large \bf An Open-source, Fully Modular, Multitimbral, Polyphonic, Additive Synthesizer\\[0.2em]
-Version 8\\[0.2em]
+Version 9\\[0.2em]
 https://github.com/eclab/flow\\\\[0.2em]
 By Sean Luke\\[0.2em]
 Department of Computer Science\\[0.25em]
@@ -859,6 +860,11 @@ Okay, here we go.
 %\end{figure}
 
 \paragraph{Amp Math}  This shaper modifies the partials from two sources \(A\) and \(B\) by putting every pair of them \(\langle A_i, B_i\rangle\) through the same function, along with a modulation source \(M\).  The operations are:
+
+{
+\small
+\begin{multicols}{2}
+\begin{flushleft}
 \begin{itemize}
 \item \(\boldsymbol{+}\)\quad Does \(A_i + B_i + M\)
 \item \(\boldsymbol -\)\quad Does \(\max(A_i - B_i - M,\ 0)\)
@@ -872,13 +878,16 @@ Okay, here we go.
 \item {\bf filter not}\quad  If \(B_i \geq M\) then returns 0, else \(A_i\)
 \item {\bf fill}\quad If \(A_i > M\) then returns \(A_i\), else \(B_i\)
 \item {\bf threshold}\quad If \(A_i > M\) then returns 1 else 0
-\item {\bf scaledown}\quad Does \(A_i \times M + B_i\)\qquad\quad\ (Scales in the range 0...1)
-\item {\bf scaleup}\quad Does \(A_i \times (M + 1) + B_i\)\qquad (Scales in the range 1...2)
-\item {\bf scalefar}\quad Does \(A_i \times (M + 9) + B_i\)\qquad (Scales in the range 1...10)
+\item {\bf scaledown}\quad Does \(A_i \times M + B_i\)\\(Scales in the range 0...1)
+\item {\bf scaleup}\quad Does \(A_i \times (M + 1) + B_i\)\\(Scales in the range 1...2)
+\item {\bf scalefar}\quad Does \(A_i \times (M + 9) + B_i\)\\(Scales in the range 1...10)
 \item {\bf clampdown}\quad Does \(\min(A_i,\ M) + B_i\)
 \item {\bf clampup}\quad Does \(\max(A_i,\ M) + B_i\)
 %\item {\bf remove}\quad If \(i\ \text{mod} (M \times 127) = 0\) then returns \(A_i\), else \(B_i\)
 \end{itemize}
+\end{flushleft}
+\end{multicols}
+}
 
 
 You have the option of normalizing the resulting partials.   Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Combine} and {\bf Fill} and {\bf Mix} and {\bf Morph}.
@@ -889,8 +898,12 @@ One common task is to set the amplitudes of a source to 0 if they're below a cer
 
 \paragraph{Buffer}  This is a sort of Sample and Hold for partials.  Every time Buffer receives an incoming trigger, it takes a snapshot of its input and uses that snapshot for its output.  Buffer can be constrained, which means that it outputs its snapshot for certain partials, while outputting the current source partials for the remainder.
 
-\paragraph{Chord}  Reassigns high frequency partials in order to form an interval or chord.  The volume of additional chord notes (beyond the original root) is controlled by {\it Gain}.  Your {\it Chord} options are:
+\paragraph{Chord}  Reassigns high frequency partials in order to form an interval or chord.  The volume of additional chord notes (beyond the original root) is controlled by {\it Gain}.  You can {\it Align} the fifth to be exactly a harmonic (normally it's slightly off of a harmonic, which can produce beating).   Your {\it Chord} options are:
 
+{
+\small
+\begin{multicols}{2}
+\begin{flushleft}
 \begin{itemize}
 \item {\bf None}\quad Do nothing (just pass the sound through)
 \item {\bf m2}\quad Minor Second Interval
@@ -922,6 +935,9 @@ One common task is to set the amplitudes of a source to 0 if they're below a cer
 \item {\bf min+Oct}\quad Minor Triad plus Octave
 \item {\bf Maj+Oct}\quad Major Triad plus Octave
 \end{itemize}
+\end{flushleft}
+\end{multicols}
+}
 
 \paragraph{Combine} The partials from two sources are merged by throwing together all the partials from both sources.  Then we take the lowest frequency partials, over both sources, then the next lowest frequency partials, and so on, until we have enough partials.  The remaining (higher frequency) partials are discarded.  You can scale (down) the amplitude of each of the incoming sources.  Combine has two options.  First, you can indicate that partials of identical frequency aren't added separately but are rather merged together (their amplitudes are added), which allows us to include more partials but tends to create unusual discontinuities if the sources are changing in frequency relative to one another.  Second, you can indicate that exactly half of the chosen partials must come from each source.  This is useful if the two sources differ greatly in frequency, so one will dominate the combination.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}, particularly if you're hearing pops.  See also {\bf Amp Math} and {\bf Fill} and {\bf Mix} and {\bf Morph}.
 
@@ -1674,7 +1690,7 @@ Third: you might also change your module, which causes problems when trying to b
 \item {\it subpatch-gain:}\quad The requested gain for this subpatch (a double \(\geq 0.0\)).
 \item {\it subpatch-pan:}\quad The requested pan for this subpatch (a double 0.0--1.0).
 \item {\it optional-subpatch-midi-channel:}\quad The subpatch's midi channel, 0--16.  0, or missing, means ``No channel''. 
-\item {\it optional-subpatch-midi-channel:}\quad The MIDI note for the subpath, 0--128.  0, or missing, means ``Any note''.  Otherwise the note is the value, minus 1.
+\item {\it optional-subpatch-midi-channel:}\quad The MIDI note for the subpatch, 0--128.  0, or missing, means ``Any note''.  Otherwise the note is the value, minus 1.
 \end{itemize}
 
 \paragraph{Cloning}  One obscure feature of {\name} is that Modulations and Units can not just be {\it moved} in the Rack, but can in fact be {\it copied}.  This is done by holding the Control key (on the Mac, Option also works) while dragging the Module's title bar.  This in turn calls the Module's {\tt clone()} method.  You need to override this method to insure that it performs a deep clone.  In many situations you'd need not implement this method at all.  But if your Modulation or Unit is holding an array or perhaps some other object which must be copied, you'll need to implement it like this:

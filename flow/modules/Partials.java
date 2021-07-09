@@ -45,13 +45,83 @@ public class Partials extends Unit implements UnitSource
  
         double[] amplitudes = getAmplitudes(0);        
         double[] frequencies = getFrequencies(0);  
-              
+        
+        boolean changed = false;
         for(int i = 0; i < NUM_PARTIALS; i++)
             {
-            frequencies[i] = modulate(i) * FREQUENCY_RANGE;
-            amplitudes[i] = modulate(i + NUM_PARTIALS);
+            double f = modulate(i) * FREQUENCY_RANGE;
+            	
+            if (f != frequencies[i])
+            	{
+            	frequencies[i] = f;
+            	changed = true;
+            	}
+            
+            double a = modulate(i + NUM_PARTIALS);
+            if (a != amplitudes[i])
+            	{
+            	amplitudes[i] = a;
+            	changed = true;
+            	}
             }
+        
+        int harmonic = 1;
+        if (changed)
+        	{
+	        for(int i = NUM_PARTIALS; i < amplitudes.length; i++)
+	        	{
+	        	frequencies[i] = FREQUENCY_RANGE + 1 + (harmonic++);
+    	    	}
+			simpleSort(0, false);
+        	}
+        		
         }
+
+	// Only compresses Constants, avoiding other modulations
+	public void compress()
+		{
+        for(int i = 0; i < NUM_PARTIALS - 1; i++)				// no need to do last one
+            {
+            if (getModulation(i) instanceof Constant &&			// frequency
+            	getModulation(i + NUM_PARTIALS) instanceof Constant &&		// amplitude
+            	modulate(i + NUM_PARTIALS) == 0)
+            	{
+            	for(int j = i + 1; j < NUM_PARTIALS; j++)
+            		{
+					if (getModulation(j) instanceof Constant &&			// frequency
+            			getModulation(j + NUM_PARTIALS) instanceof Constant &&		// amplitude
+						modulate(j + NUM_PARTIALS) != 0)
+						{
+						// swap frequencies
+						Constant from = (Constant)getModulation(i);
+						Constant to = (Constant)getModulation(j);
+						double val = from.getValue();
+						from.setValue(to.getValue());
+						to.setValue(val);
+
+						// swap amplitudes
+						 from = (Constant)getModulation(i + NUM_PARTIALS);
+						 to = (Constant)getModulation(j + NUM_PARTIALS);
+						 val = from.getValue();
+						from.setValue(to.getValue());
+						to.setValue(val);
+						break;
+						}
+            		}
+            	}
+            }
+
+        for(int i = 0; i < NUM_PARTIALS; i++)
+            {
+            if (getModulation(i) instanceof Constant &&			// frequency
+            	getModulation(i + NUM_PARTIALS) instanceof Constant &&		// amplitude
+            	modulate(i + NUM_PARTIALS) == 0)
+            	{
+				Constant freq = (Constant)getModulation(i);
+				freq.setValue(FREQUENCY_RANGE);
+            	}
+            }
+		}
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
         {
@@ -72,26 +142,6 @@ public class Partials extends Unit implements UnitSource
                 Box box = new Box(BoxLayout.Y_AXIS);
                 Unit unit = (Unit) getModulation();
                 box.add(new UnitOutput(unit, 0, this));
-                
-                /*                
-                                  Box box2 = new Box(BoxLayout.X_AXIS);
-                                  Box box3 = new Box(BoxLayout.Y_AXIS);
-                                  for(int i = 0; i < NUM_PARTIALS; i++)
-                                  {
-                                  mi[i] = new ModulationInput(unit, i, this);
-                                  mi[i].getData().setMinimumSize(example.getMinimumSize());
-                                  box3.add(mi[i]);
-                                  }
-                                  box2.add(box3);
-
-                                  Box box4 = new Box(BoxLayout.Y_AXIS);
-                                  for(int i = NUM_PARTIALS; i < NUM_PARTIALS * 2; i++)
-                                  {
-                                  box4.add(mi[i] = new ModulationInput(unit, i, this));
-                                  }
-                                  box2.add(box4);
-                                  box.add(box2);
-                */
 
                 Box box1 = new Box(BoxLayout.Y_AXIS);
                 for(int i = 0; i < NUM_PARTIALS; i++)
@@ -171,6 +221,42 @@ public class Partials extends Unit implements UnitSource
                 box5.add(sample);
                 box5.add(Box.createGlue());
                 box.add(box5);
+
+                PushButton compress = new PushButton("Compress")
+                    {
+                    public void perform()
+                        {
+                        Partials partials = (Partials)(getModulation());
+                        int index = partials.getSound().findRegistered(partials);
+                        Output output = getRack().getOutput();
+                        int numSounds = output.getNumSounds();
+                        output.lock();
+                        try
+                            {
+							// distribute compression to all the sounds
+							for(int j = 0; j < numSounds; j++)
+								{
+								Sound s = output.getSound(j);
+								if (s.getGroup() == Output.PRIMARY_GROUP)
+									{
+									Partials d = (Partials)(s.getRegistered(index));
+									d.compress();
+									}
+								}
+                            }
+                        finally 
+                            {
+                            output.unlock();
+                            }
+                        for(int i = 0; i < NUM_PARTIALS * 2; i++)
+                            {
+                            mi[i].updateText();
+                            }
+                        mp[0].repaint();
+                        }
+                    };
+                box.add(compress);
+                
                 return box;
                 }
             };

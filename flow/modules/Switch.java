@@ -114,9 +114,17 @@ public class Switch extends Unit
         if (isTriggered(MOD_NEXT))
             {
             lastInput = currentInput;
-            currentInput = currentInput + 1;
-            if (currentInput >= NUM_INPUTS)
-                currentInput = 0;
+            // look for the next non-NIL input
+            while(true)
+            	{
+				currentInput = currentInput + 1;
+				if (currentInput >= NUM_INPUTS)
+					currentInput = 0;
+				if (getInput(currentInput) != Unit.NIL)
+					break;
+				else if (currentInput == lastInput)
+					break;
+				}
             alpha = 1.0;
             }
         else

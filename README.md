@@ -2,7 +2,7 @@
 
 
 # Flow  
-A Polyphonic, Multitimbral, Modular Additive Synthesizer (Version 8)
+A Polyphonic, Multitimbral, Modular Additive Synthesizer (Version 9)
  
 By Sean Luke (sean@cs.gmu.edu) \
 With Help from Bryan Hoyle \
