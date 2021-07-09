@@ -192,15 +192,15 @@ public class Combine extends Unit
                 }
 
 /*
-            // To make things relatively smooth, we ramp down the amplitude of the final partial based on
-            // the ratio of distance between it and its two neighbors.  This won't work right if all three
-            // are the same value though; that will be a discontinuity.
+// To make things relatively smooth, we ramp down the amplitude of the final partial based on
+// the ratio of distance between it and its two neighbors.  This won't work right if all three
+// are the same value though; that will be a discontinuity.
 
-            if ((f_out - frequencies[frequencies.length - 1]) != (f_out - frequencies[frequencies.length - 2]))
-            	{
-            	double d = (f_out - frequencies[frequencies.length - 1]) / Math.abs(f_out - frequencies[frequencies.length - 2]);
-                amplitudes[amplitudes.length - 1] *= (f_out - frequencies[frequencies.length - 1]) / Math.abs(f_out - frequencies[frequencies.length - 2]);
-                }
+if ((f_out - frequencies[frequencies.length - 1]) != (f_out - frequencies[frequencies.length - 2]))
+{
+double d = (f_out - frequencies[frequencies.length - 1]) / Math.abs(f_out - frequencies[frequencies.length - 2]);
+amplitudes[amplitudes.length - 1] *= (f_out - frequencies[frequencies.length - 1]) / Math.abs(f_out - frequencies[frequencies.length - 2]);
+}
 */
             }
 

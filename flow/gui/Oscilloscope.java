@@ -124,9 +124,9 @@ public class Oscilloscope extends JComponent
             output.unlock();
             }
         
-    RenderingHints rh = new RenderingHints(
-             RenderingHints.KEY_ANTIALIASING,
-             RenderingHints.VALUE_ANTIALIAS_ON);
+        RenderingHints rh = new RenderingHints(
+            RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_ON);
              
              
         // fill with black regardless

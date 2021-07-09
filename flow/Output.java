@@ -663,14 +663,14 @@ public class Output
                         sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude;
                         }
                     /*
-                    else if (sinQuality == SIN_QUALITY_MEDIUM)
-                        {
-                        sample += Utility.fastIntSin(position * PI2 + MIXING[oi]) * amplitude;
-                        }
-                    else
-                        {
-                        sample += Math.sin(position * PI2 + MIXING[oi]) * amplitude;
-                        }   
+                      else if (sinQuality == SIN_QUALITY_MEDIUM)
+                      {
+                      sample += Utility.fastIntSin(position * PI2 + MIXING[oi]) * amplitude;
+                      }
+                      else
+                      {
+                      sample += Math.sin(position * PI2 + MIXING[oi]) * amplitude;
+                      }   
                     */                 
                     }
                 }
@@ -709,14 +709,14 @@ public class Output
                         sample += Utility.fastSin(position * PI2) * amplitude;
                         }
                     /*
-                    else if (sinQuality == SIN_QUALITY_MEDIUM)
-                        {
-                        sample += Utility.fastIntSin(position * PI2) * amplitude;
-                        }
-                    else
-                        {
-                        sample += Math.sin(position * PI2) * amplitude;
-                        }                    
+                      else if (sinQuality == SIN_QUALITY_MEDIUM)
+                      {
+                      sample += Utility.fastIntSin(position * PI2) * amplitude;
+                      }
+                      else
+                      {
+                      sample += Math.sin(position * PI2) * amplitude;
+                      }                    
                     */
                     }
                 }

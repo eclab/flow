@@ -50,78 +50,78 @@ public class Partials extends Unit implements UnitSource
         for(int i = 0; i < NUM_PARTIALS; i++)
             {
             double f = modulate(i) * FREQUENCY_RANGE;
-            	
+                
             if (f != frequencies[i])
-            	{
-            	frequencies[i] = f;
-            	changed = true;
-            	}
+                {
+                frequencies[i] = f;
+                changed = true;
+                }
             
             double a = modulate(i + NUM_PARTIALS);
             if (a != amplitudes[i])
-            	{
-            	amplitudes[i] = a;
-            	changed = true;
-            	}
+                {
+                amplitudes[i] = a;
+                changed = true;
+                }
             }
         
         int harmonic = 1;
         if (changed)
-        	{
-	        for(int i = NUM_PARTIALS; i < amplitudes.length; i++)
-	        	{
-	        	frequencies[i] = FREQUENCY_RANGE + 1 + (harmonic++);
-    	    	}
-			simpleSort(0, false);
-        	}
-        		
+            {
+            for(int i = NUM_PARTIALS; i < amplitudes.length; i++)
+                {
+                frequencies[i] = FREQUENCY_RANGE + 1 + (harmonic++);
+                }
+            simpleSort(0, false);
+            }
+                        
         }
 
-	// Only compresses Constants, avoiding other modulations
-	public void compress()
-		{
-        for(int i = 0; i < NUM_PARTIALS - 1; i++)				// no need to do last one
+    // Only compresses Constants, avoiding other modulations
+    public void compress()
+        {
+        for(int i = 0; i < NUM_PARTIALS - 1; i++)                               // no need to do last one
             {
-            if (getModulation(i) instanceof Constant &&			// frequency
-            	getModulation(i + NUM_PARTIALS) instanceof Constant &&		// amplitude
-            	modulate(i + NUM_PARTIALS) == 0)
-            	{
-            	for(int j = i + 1; j < NUM_PARTIALS; j++)
-            		{
-					if (getModulation(j) instanceof Constant &&			// frequency
-            			getModulation(j + NUM_PARTIALS) instanceof Constant &&		// amplitude
-						modulate(j + NUM_PARTIALS) != 0)
-						{
-						// swap frequencies
-						Constant from = (Constant)getModulation(i);
-						Constant to = (Constant)getModulation(j);
-						double val = from.getValue();
-						from.setValue(to.getValue());
-						to.setValue(val);
+            if (getModulation(i) instanceof Constant &&                 // frequency
+                getModulation(i + NUM_PARTIALS) instanceof Constant &&          // amplitude
+                modulate(i + NUM_PARTIALS) == 0)
+                {
+                for(int j = i + 1; j < NUM_PARTIALS; j++)
+                    {
+                    if (getModulation(j) instanceof Constant &&                     // frequency
+                        getModulation(j + NUM_PARTIALS) instanceof Constant &&          // amplitude
+                        modulate(j + NUM_PARTIALS) != 0)
+                        {
+                        // swap frequencies
+                        Constant from = (Constant)getModulation(i);
+                        Constant to = (Constant)getModulation(j);
+                        double val = from.getValue();
+                        from.setValue(to.getValue());
+                        to.setValue(val);
 
-						// swap amplitudes
-						 from = (Constant)getModulation(i + NUM_PARTIALS);
-						 to = (Constant)getModulation(j + NUM_PARTIALS);
-						 val = from.getValue();
-						from.setValue(to.getValue());
-						to.setValue(val);
-						break;
-						}
-            		}
-            	}
+                        // swap amplitudes
+                        from = (Constant)getModulation(i + NUM_PARTIALS);
+                        to = (Constant)getModulation(j + NUM_PARTIALS);
+                        val = from.getValue();
+                        from.setValue(to.getValue());
+                        to.setValue(val);
+                        break;
+                        }
+                    }
+                }
             }
 
         for(int i = 0; i < NUM_PARTIALS; i++)
             {
-            if (getModulation(i) instanceof Constant &&			// frequency
-            	getModulation(i + NUM_PARTIALS) instanceof Constant &&		// amplitude
-            	modulate(i + NUM_PARTIALS) == 0)
-            	{
-				Constant freq = (Constant)getModulation(i);
-				freq.setValue(FREQUENCY_RANGE);
-            	}
+            if (getModulation(i) instanceof Constant &&                 // frequency
+                getModulation(i + NUM_PARTIALS) instanceof Constant &&          // amplitude
+                modulate(i + NUM_PARTIALS) == 0)
+                {
+                Constant freq = (Constant)getModulation(i);
+                freq.setValue(FREQUENCY_RANGE);
+                }
             }
-		}
+        }
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
         {
@@ -233,16 +233,16 @@ public class Partials extends Unit implements UnitSource
                         output.lock();
                         try
                             {
-							// distribute compression to all the sounds
-							for(int j = 0; j < numSounds; j++)
-								{
-								Sound s = output.getSound(j);
-								if (s.getGroup() == Output.PRIMARY_GROUP)
-									{
-									Partials d = (Partials)(s.getRegistered(index));
-									d.compress();
-									}
-								}
+                            // distribute compression to all the sounds
+                            for(int j = 0; j < numSounds; j++)
+                                {
+                                Sound s = output.getSound(j);
+                                if (s.getGroup() == Output.PRIMARY_GROUP)
+                                    {
+                                    Partials d = (Partials)(s.getRegistered(index));
+                                    d.compress();
+                                    }
+                                }
                             }
                         finally 
                             {
