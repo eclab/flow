@@ -36,6 +36,7 @@ public class Modules
     static final Class[] modules = new Class[]
     {
     flow.modules.AHR.class,
+    flow.modules.AKWF.class,
     flow.modules.All.class,
     flow.modules.AmpMath.class,
     flow.modules.AudioIn.class,
