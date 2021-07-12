@@ -771,7 +771,9 @@ At the bottom are outputs which trigger when the step sequencer reaches any sing
 
 \subsection{Partials Sources}
 
-\paragraph{All}  Outputs all partials, standardized, at full amplitude.  Useful for later shaping.
+\paragraph{AKWF}  A collection of harmonics drawn from the Adventure Kid Waveform single-cycle wave collection.\footnote{The AKWF collection is public domain at https:/\!/www.adventurekid.se, but the author asks that you consider making a small Paypal donation to kristoffer.ekstrand@gmail.com.}  Waves are grouped into categories: pick a category first, then dial in the wave.  You can {\it mix} two different sources and have the additional option of {\it Normalizing} the partials.  See also {\bf Waves} and {\bf KHarmonics}.
+
+\paragraph{All}  Outputs all harmonics, standardized, at full amplitude.  Useful for later shaping.
 
 \paragraph{Audio In}  This takes snippets of sound from the Input Device (which you specify from {\it MIDI and Audio options} under the {\it Options} menu), extracts their harmonics in real time, and organizes them as harmonics for the current note. Because the partials are relatively few and are organized as harmonics, this has the effect of making the input sound like a robot.  This is exactly the same process used to load samples into the Wavetable module.  The sampling is designed to remove some of the choppiness from reading an arbitrary sound, but it won't remove all of it.  You can eliminate most of the rest by running the partials through a Smooth module set to about 0.5.  Also beware of audio feedback during testing!  You might be able to tamp some of that down with a filter. See also {\bf Wavetable}.
 
@@ -782,9 +784,9 @@ At the bottom are outputs which trigger when the step sequencer reaches any sing
 
 \paragraph{Draw}   Lets you draw partials, which are then output.   You can constrain the partials being drawn to a variety of subsets.  When you click on the {\it Menu} button, you can also save your scribbles and load them again, clear them, maximize, normalize, and standardize them, and (importantly) take a snapshot of partials from an incoming source.  The module can be collapsed to a smaller size if you wish.
 
-Draw also allows you to load {\it single-cycle waveforms}, that is, sound files which start and end at zero and represent a single cycle of a sound wave.  You can do this by choosing {\it Load Wave...} from the {\it Menu} button.  These must be WAV files, mono, and cannot be very long (presently at most 2048 samples).  After loading, Flow converts them (naturally) into harmonics.  A good source of single-cycle waves is the AdventureKid Single Cycle Waveforms collection, available at https:/\!/www.adventurekid.se/akrt/waveforms/%\quad Flow can read these.
+Draw also allows you to load {\it single-cycle waveforms}, that is, sound files which start and end at zero and represent a single cycle of a sound wave.  You can do this by choosing {\it Load Wave...} from the {\it Menu} button.  These must be WAV files, mono, and cannot be very long (presently at most 2048 samples).  After loading, Flow converts them (naturally) into harmonics.
 
-See also {\bf Waves}, which contains harmonics of single-cycle waves from certain well-known synthesizers.  See also {\bf KHarmonics}, a similar collection drawn from various Kawai K5 harmonics.
+See also {\bf Waves}, which contains harmonics of single-cycle waves from certain well-known synthesizers, as well as {\bf AKWF}.  See also {\bf KHarmonics}, a similar collection drawn from various Kawai K5 harmonics.
 
 \paragraph{Drawbars}   Produces the sine wave equivalents of the drawbars of a tone wheel organ.  You can also set the percussion type, decay, and volume.  There are three different tuning options: the ``classic'' tuning found on drawbar organs, the equal temperment tuning which the classic tuning tries to approximate, and the true harmonic ratio tuning (integer harmonics).\footnote{See https:/\!/electricdruid.net/technical-aspects-of-the-hammond-organ/ for more information on these tunings.}  Finally, there are a number of preset options for the drawbars.
 
@@ -792,9 +794,9 @@ See also {\bf Waves}, which contains harmonics of single-cycle waves from certai
 
 \paragraph{Harmonics}  Outputs the first 32 harmonics, whose amplitude you can define independently.  You optionally can load these harmonics from a source. See also {\bf Partials}.
 
-\paragraph{KHarmonics}  Produces a wide range of partials drawn from patches from the Kawai K5 synthesizer, including both factory patches (with Kawai's permission) and various patches in the public domain.  You have the additional option of {\it Normalizing} the partials.  Note that among the harmonics are ones purporting to be drawn from the Kawai K3.  These are just wrong.  However the {\bf Waves} module has the correct ones.
+\paragraph{KHarmonics}  Produces a wide range of partials drawn from patches from the Kawai K5 synthesizer, including both factory patches (with Kawai's permission) and various patches in the public domain.  You can {\bf mix} two different sources and have the additional option of {\it Normalizing} the partials.  Note that among the harmonics are ones purporting to be drawn from the Kawai K3.  These are just wrong.  However the {\bf Waves} module has the correct ones.
 
-See also {\bf Draw}, which allows you to load single-cycle waves: the manual section on Draw has suggestions for sources of these waves.  See also {\bf Waves}, a similar collection drawn from various other synthesizers.
+See also {\bf Draw}, which allows you to load single-cycle waves: the manual section on Draw has suggestions for sources of these waves.  See also {\bf Waves}, a similar collection drawn from various other synthesizers, as well as {\bf AKWF}.
 
 
 %\begin{figure}[t]
@@ -839,7 +841,7 @@ Tinkle behaves differently than other modules when it comes to constraints.  Whe
 Obviously morphing from a Sine wave to one of these waves in Flow won't be anything like applying Phase Distortion on a CZ: but there you go.
 \end{itemize}
 
-See also {\bf Draw}, which can load single-cycle waves: the manual section on Draw has suggestions for other single-cycle wave sources.  See also {\bf KHarmonics}, a similar collection drawn from Kawai K5 harmonics.
+See also {\bf Draw}, which can load single-cycle waves: the manual section on Draw has suggestions for other single-cycle wave sources.  See also {\bf KHarmonics}, a similar collection drawn from Kawai K5 harmonics, as well as {\bf AKWF}.
 
 \paragraph{Wavetable}  Lets you load wavetables from WaveEditOnline (https:/\!/waveeditonline.com/), then wander through them using the provided modulation.  You can turn off interpolation between waves.  Wavetables are loaded (as ``.WAV'' files) using the {\it Wavetable} button.  If you're interested, you can edit wavetables directly using WaveEdit (https:/\!/synthtech.com/waveedit).
 
@@ -850,9 +852,7 @@ You can also load an arbitrary sound directly and Flow will chop it up into a wa
 \label{unitshapers}
 
 
-All of the shapers have the ability of being {\bf constrained}.  This means that you can tell the shaper to {\it only} perform its operation on certain partials; the others should be left as they are.\footnote{If a shaper has multiple partials sources, then ``left as they are'' means that they should be reverted to whatever values they had in the first partials source.  For example, in Amp Math the first partials source is A.}  The constraint facility (Figure~\ref{constraintfacility}) is at the bottom of the shapers and consists of three widgets.  First, there is a pop-up menu (combobox) where you can specify common constraints.  Above it is a checkbox labelled {\bf Not}, where you can optionally flip things: that is, specify that you want to perform the operation on everything {\it but} the partials in question.  Finally, there is a {\it constraint partials source}, labelled {\bf Only}. If you attach a unit's output to this, then its incoming partials indicate what the constraint should be: specifically, the partials that will be constrained will be those whose positions match up with non-zero amplitude partials coming into the constraint partials source. For example if the constraint partials source has non-zero amplitudes for partials 4, 7, and 9, then this tells the shaper to constrain its outputted partials 4, 7, and 9.  The constraint partials source overrides the pop-up menu.
-
-Okay, here we go.
+All of the shapers have the ability of being {\bf constrained}.  This means that you can tell the shaper to {\it only} perform its operation on certain partials; the others should be left as they are.\footnote{If a shaper has multiple partials sources, then ``left as they are'' means that they should be reverted to whatever values they had in the first partials source.  For example, in Amp Math the first partials source is A.}  The constraint facility (Figure~\ref{constraintfacility}) is at the bottom of the shapers and consists of three widgets.  First, there is a pop-up menu (combobox) where you can specify common constraints.  Above it is a checkbox labelled {\bf Not}, where you can optionally flip things: that is, specify that you want to perform the operation on everything {\it but} the partials in question.  Finally, there is a {\it constraint partials source}, labelled {\bf Only}. If you attach a unit's output to this, then its incoming partials indicate what the constraint should be: specifically, the partials that will be constrained will be those whose positions match up with non-zero amplitude partials coming into the constraint partials source. For example if the constraint partials source has non-zero amplitudes for partials 4, 7, and 9, then this tells the shaper to constrain its outputted partials 4, 7, and 9.  The constraint partials source overrides the pop-up menu.  Okay, here we go.
 
 %\begin{figure}[t]
 %\begin{center}\includegraphics[width=6.5in]{UnitShapers1}\end{center}
