@@ -74,6 +74,12 @@ Now you should be able to run Flow.  Let us know if this all works.
 
 * Flow cannot access your laptop's microphone on Catalina.  I don't know if it can access external microphones.
 
+#### Rosetta and the M1
+
+At present Flow only runs under Rosetta on the M1, because its package contains an Intel-only Java VM (because I ownly own an Intel Mac and am not running Big Sur).  Don't expect things to change until I get an M1.  If you have installed Java yourself, you can run Flow from the command line (see later below) and it'll probably run natively.
+
+
+
 
 ### Installation and Running on Windows
 
