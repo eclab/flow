@@ -79,7 +79,7 @@ public class KHarmonics extends Unit implements UnitSource
             NAMES[i] = scan.nextLine();
             for(int j = 0; j < MAX_HARMONICS; j++)
                 {
-                HARMONICS[i][j] = (scan.nextInt() / MAX_AMPLITUDE);
+                HARMONICS[i][j] = (Integer.parseInt(scan.next()) / MAX_AMPLITUDE);	//(scan.nextInt() / MAX_AMPLITUDE);
                 }
             scan.nextLine();
             }

@@ -1,4 +1,4 @@
-// Copyright 2018 by George Mason University
+// Copyright 2021 by George Mason University
 // Licensed under the Apache 2.0 License
 
 
@@ -11,7 +11,7 @@ import javax.swing.*;
 
 /**
    This is basically the same class as KHARMONICS, except that the harmonics being
-   loaded are derived from single-cycle waves from various synthesizers.
+   loaded are derived from waves loaded from the AdventureKid Waveform collection.
 */
 
 public class AKWF extends Unit implements UnitSource
@@ -111,7 +111,6 @@ public class AKWF extends Unit implements UnitSource
         // gotta update the labels for the dials
         ModulePanel pan = getModulePanel();
         if (pan != null) SwingUtilities.invokeLater(new Runnable() { public void run() { pan.repaint(); } });
-        else System.err.println("repaint failed");
         }
         
     static boolean done = false;
@@ -135,7 +134,7 @@ public class AKWF extends Unit implements UnitSource
 				double max = 0;
 				for(int j = 0; j < MAX_HARMONICS; j++)
 					{
-					HARMONICS[i][k][j] = scan.nextDouble();
+					HARMONICS[i][k][j] = Double.parseDouble(scan.next());	//scan.nextDouble();
 					if (max < HARMONICS[i][k][j]) 
 						max = HARMONICS[i][k][j] ;
 					}
