@@ -36,6 +36,8 @@ import org.json.*;
 
 public class Rack extends JPanel
     {
+    public static final int REPAINT_TIMER = 8000;		// every 8 seconds
+    
     JScrollPane pane;
     Box box;
     Output output;
@@ -194,14 +196,14 @@ public class Rack extends JPanel
                     {
                     getOutput().getInput().reset();
                     }
-                try { getOutput().getInput().processNoteOn(new ShortMessage(ShortMessage.NOTE_ON,key,slider.getValue())); }
+                try { getOutput().getInput().processNoteOn(new ShortMessage(ShortMessage.NOTE_ON,key,slider.getValue()), true); }
                 catch (InvalidMidiDataException ex) { System.err.println(ex); }
                 }
             public void userReleased(int key)
                 {
                 if (!latch.isSelected())
                     {
-                    try { getOutput().getInput().processNoteOff(new ShortMessage(ShortMessage.NOTE_OFF,key, 64), false); }
+                    try { getOutput().getInput().processNoteOff(new ShortMessage(ShortMessage.NOTE_OFF,key, 64), false, true); }
                     catch (InvalidMidiDataException ex) { System.err.println(ex); }
                     }
                 }
@@ -226,7 +228,17 @@ public class Rack extends JPanel
 
         if (Style.isMac())
             Mac.setup(this);
-        }
+            
+        // we want to repaint the wires every so often as they get obscured by
+        // the user changing dials or selecting from comboboxes and so forth
+		  new javax.swing.Timer(REPAINT_TIMER, new ActionListener() 
+			{
+			  public void actionPerformed(ActionEvent evt) 
+			  {
+			  box.repaint();
+			  }
+			}).start();
+		}
     
     public void rebuildSubpatches()
         {

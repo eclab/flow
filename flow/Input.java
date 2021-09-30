@@ -689,7 +689,7 @@ public class Input
         }
 
     // Processes a NOTE ON message.
-    public void processNoteOn(ShortMessage sm)
+    public void processNoteOn(ShortMessage sm, boolean ignoreChannel)
         {
         Sound sound = null;
         int i = sm.getData1();
@@ -698,12 +698,15 @@ public class Input
         
         synchronized(lock)
             {
-            g = findGroup(sm.getChannel(), i);
+            if (ignoreChannel)
+            	g = Output.PRIMARY_GROUP;
+            else	
+            	g = findGroup(sm.getChannel(), i);
 
             // we have no one who listens in on this channel
             if (g == Output.NO_GROUP)
                 {
-                System.err.println("no group");
+                //System.err.println("no group");
                 return;
                 }
 
@@ -829,7 +832,7 @@ public class Input
         }
 
     // Processes a NOTE OFF message.
-    public void processNoteOff(ShortMessage sm, boolean noteOnMessage)
+    public void processNoteOff(ShortMessage sm, boolean noteOnMessage, boolean ignoreChannel)
         {
         Sound sound = null;
         int i = sm.getData1();
@@ -848,7 +851,7 @@ public class Input
                 int c = sound1.getChannel();
                 // Unlike, say, aftertouch, I *think* the right behavior
                 // here is simply to match the channel or OMNI
-                if ((c != sm.getChannel() && c != CHANNEL_OMNI)
+                if (!ignoreChannel && (c != sm.getChannel() && c != CHANNEL_OMNI)
                     || (sound1.getMIDINote() != i))
                     {
                     continue;
@@ -991,11 +994,11 @@ public class Input
                 int command = sm.getCommand();                  // Note not getStatus().  See below.
                 if ((command == ShortMessage.NOTE_OFF || (command == ShortMessage.NOTE_ON && sm.getData2() == 0)))
                     {
-                    processNoteOff(sm, command == ShortMessage.NOTE_ON);
+                    processNoteOff(sm, command == ShortMessage.NOTE_ON, false);
                     }
                 else if (command == ShortMessage.NOTE_ON)
                     {
-                    processNoteOn(sm);
+                    processNoteOn(sm, false);
                     }
                 else if (command == ShortMessage.PITCH_BEND)
                     {
