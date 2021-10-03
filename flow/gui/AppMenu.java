@@ -1133,8 +1133,17 @@ public class AppMenu
         ButtonGroup group = new ButtonGroup();
         for(int i = 0; i < bendButtons.length; i++)
             {
+            final int _i = i;
             bendOctave.add(bendButtons[i]);
             group.add(bendButtons[i]);
+            bendButtons[i].addActionListener(new ActionListener()
+                {
+                public void actionPerformed(ActionEvent e)
+                    {
+                    rack.getOutput().getInput().setBendOctave(_i + 1); // + 1 because octave starts at 1
+                    Prefs.setLastBendOctave(_i + 1);  // + 1 because octave starts at 1
+                    }
+                });
             }
         
         int sel = Prefs.getLastBendOctave();
@@ -1142,22 +1151,6 @@ public class AppMenu
             sel = Input.DEFAULT_BEND_OCTAVE;
         bendButtons[sel - 1].setSelected(true);         // - 1 because octave starts at 1
         rack.getOutput().getInput().setBendOctave(sel);
-        bendOctave.addActionListener(new ActionListener()
-            {
-            public void actionPerformed(ActionEvent e)
-                {
-                // yuck
-                int selected = 0;
-                for(int i = 0; i < bendButtons.length; i++)
-                    if (bendButtons[i].isSelected()) 
-                        { 
-                        selected = i; 
-                        break; 
-                        }                
-                rack.getOutput().getInput().setBendOctave(selected + 1);                // + 1 because octave starts at 1
-                Prefs.setLastBendOctave(selected + 1);                                          // + 1 because octave starts at 1
-                }
-            });
         return bendOctave;
         }
 
@@ -1217,7 +1210,7 @@ public class AppMenu
         JMenuBar menubar = new JMenuBar();
         menubar.add(provideFileMenu(rack));
         menubar.add(providePlayMenu(rack));
-        menubar.add(provideModuleMenu(rack));
+       	provideModuleMenu(rack, menubar);
         menubar.add(provideOptionsMenu(rack));
         if (Style.isWindows() || Style.isUnix())
             {
@@ -1304,7 +1297,7 @@ public class AppMenu
         }
 
     // Produces the Module menu
-    public static JMenu provideModuleMenu(Rack rack)
+    public static JMenu provideModuleMenu(Rack rack, JMenuBar bar)
         {
         JMenu menu = new JMenu("Modules");
 
@@ -1336,33 +1329,41 @@ public class AppMenu
                 modShapers.add(m);
             }
                 
+JMenu sub;
                 
-        JMenu sub = new JMenu("Modulation Sources");
-        for(JMenuItem m : modSources)
-            sub.add(m);
-        menu.add(sub);
-
-        sub = new JMenu("Modulation Shapers");
-        for(JMenuItem m : modShapers)
-            sub.add(m);
-        menu.add(sub);
-
-        sub = new JMenu("Partials Sources");
+        sub = new JMenu("Sources");
         for(JMenuItem m : unitSources)
             sub.add(m);
-        menu.add(sub);
+        //menu.add(sub);
+        bar.add(sub);
 
-        sub = new JMenu("Partials Shapers");
+        sub = new JMenu("Shapers");
         for(JMenuItem m : unitShapers)
             sub.add(m);
-        menu.add(sub);
-                        
+        //menu.add(sub);
+        bar.add(sub);
+
+          
+        sub = new JMenu("Modulation");
+        for(JMenuItem m : modSources)
+            sub.add(m);
+        sub.addSeparator();
+        //menu.add(sub);
+
+        //sub = new JMenu("Mod Shapers");
+        for(JMenuItem m : modShapers)
+            sub.add(m);
+        //menu.add(sub);
+        bar.add(sub);
+
         sub = new JMenu("Other");
+        sub.add(loadMacroMenu(rack));
+        sub.addSeparator();
         for(JMenuItem m : miscellaneous)
             sub.add(m);
-        menu.add(sub);
-        menu.add(sub);
-                        
+        //menu.add(sub);
+        bar.add(sub);
+
         return menu;
         }
 
