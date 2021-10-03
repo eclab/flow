@@ -5,6 +5,7 @@
 package flow.modules;
 
 import flow.*;
+import java.util.*;
 
 /** 
     A Unit which combines the lower partials of two sources, A, and B.  The way the
@@ -26,60 +27,238 @@ public class Combine extends Unit
     {
     private static final long serialVersionUID = 1;
 
+    static final int NUM_INPUTS = 4; 
     public static final int UNIT_INPUT_A = 0;
     public static final int UNIT_INPUT_B = 1;
+    public static final int UNIT_INPUT_C = 2;
+    public static final int UNIT_INPUT_D = 3;
 
     public static final int MOD_SCALE_A = 0;
     public static final int MOD_SCALE_B = 1;
+    public static final int MOD_SCALE_C = 2;
+    public static final int MOD_SCALE_D = 3;
 
-    int[] outstandingOrders;
-    int[] outstandingOrderPositions;
-        
-    /// Do we attempt to merge identical frequencies into one frequency, or load them independently?
-    boolean merge = false;
-    /// Do we guarantee that each incoming partials gets 1/2 of the final partials, or just load them both asynchronously until expended?
-    boolean half = false;
-        
-    public boolean getMerge() { return merge; }
-    public void setMerge(boolean val) { merge = val; }
-        
-    public boolean getHalf() { return half; }
-    public void setHalf(boolean val) { half = val; }
-        
-    public static final int OPTION_MERGE = 0;
-    public static final int OPTION_HALF = 1;
-    public int getOptionValue(int option) 
-        { 
-        switch(option)
-            {
-            case OPTION_MERGE: return getMerge() ? 1 : 0;
-            case OPTION_HALF: return getHalf() ? 1 : 0;
-            default: throw new RuntimeException("No such option " + option);
-            }
-        }
- 
-    public void setOptionValue(int option, int value)
-        { 
-        switch(option)
-            {
-            case OPTION_MERGE: setMerge(value != 0); return;
-            case OPTION_HALF: setHalf(value != 0); return;
-            default: throw new RuntimeException("No such option " + option);
-            }
-        }
+    static final int INVALID = -1;
+    Unit[/*NUM_INPUTS*/] currentInputs = null;						// Which inputs are active?
+    int[/*NUM_INPUTS*/][/*Unit.NUM_PARTIALS*/] inToIndex = null;	// For each input, mapping of incoming partial ordering (& 255) -> input index.  Mappings of nonexistent partials INVALID.
+    int[/*NUM_INPUTS*/][/*division*/] indexToOut = null;			// For each input, what is (or was) the output ordering of incoming partial #n?  Will be values 0...255.
+    int[/*NUM_INPUTS*/][/*division*/] newIndexToOut = null;			// We'll swap this back and forth with indexToOut to avoid reallocation
+	int[/*Unit.NUM_PARTIALS*/] outIndex = new int[Unit.NUM_PARTIALS];	// For each output partial, where is it located in the output?
+	
+	
+    void resetOrderMapping()
+    	{
+    	indexToOut = null;
+    	newIndexToOut = null;
+    	inToIndex = null;
+    	currentInputs = null;
+    	}
+    	
+    void rebuildMappings()
+    	{
+    	// This code will either BUILD entirely new mappings or will UPDATE them.
+    	// Ideally building only happens when we absolutely must, since it will create
+    	// clicks.  Updating will happen regularly as small changes occur.
+		//
+    	// This code works as follows:
+    	//
+    	// If the inputs have changed, 
+    	//     If there are no inputs at all
+    	//         Set the mappings to null
+    	//     Else
+    	//         Build all mappings from scratch
+    	// Else we have to fix the mappings:
+    	//     If the mappings are not null
+    	//         For each input
+    	//             If the input's mapping has changed 
+    	//                 Fix it
+    	//
+    	// After calling this method:
+    	//     0. currentInputs will not be null and will reflect all the getInput(...) inputs
+    	//     1. If indexToOut is null, then there are no inputs
+    	//     2. Else indexToOut will reflect mappings of output orderings (and thus indices) corresponding to input partial indices
+    	//
+    	// The challenge is in doing this method without O(n^2) operations nor with any hashing.  Ideally O(n).
+    	// We also would like to avoid allocation, though we can't avoid bzero-style refilling in several places.
+    	// So here we go...
+    	
+    	
+    	// If we don't have any inputs specified OR if they have changed
+    	if (currentInputs == null ||
+    		(getInput(0) != currentInputs[0]) ||
+    		(getInput(1) != currentInputs[1]) ||
+    		(getInput(2) != currentInputs[2]) ||
+    		(getInput(3) != currentInputs[3]))
+    		{
+    		// Reload the current inputs and count them
+    		currentInputs = new Unit[NUM_INPUTS];
+	    	int count = 0;
+	    	for(int i = 0; i < NUM_INPUTS; i++)
+	    		{
+	    		currentInputs[i] = getInput(i);
+	    		if (currentInputs[i] != Unit.NIL)
+	    			{
+	    			count++;
+	    			}
+	    		}
+	    	
+	    	// Do we have any inputs?
+	    	if (count == 0)  // nobody is connected
+	    		{
+	    		// clear everything
+	    		resetOrderMapping();
+	    		}
+	    	else
+	    		{
+	    		// Determine which is the first active input
+	    		int firstInput = 0;
+				for(int i = 0; i < NUM_INPUTS; i++)
+					{
+					if (getInput(i) != Unit.NIL)
+						{
+						firstInput = i;
+						break;
+						}
+					}
+					
+				// How many outgoing partials will be apportioned to each input?  These are "divisions".
+				// Compute divisions of the outgoing partials by incoming input.
+				// The first active input will have the extra if it's not an even split.
+				int division = Unit.NUM_PARTIALS / count;
+				int firstInputDivision = division + Unit.NUM_PARTIALS - division * count;
 
+				// Build the mappings
+				indexToOut = new int[NUM_INPUTS][];
+				newIndexToOut = new int[NUM_INPUTS][];
+				inToIndex = new int[NUM_INPUTS][Unit.NUM_PARTIALS];
+				int ordOut = 0;
+				for(int i = 0; i < NUM_INPUTS; i++)
+					{
+					int maplen = (i == firstInput) ? firstInputDivision : division;
+					byte[] ord = getOrdersIn(i);
+					indexToOut[i] = new int[maplen];
+					newIndexToOut[i] = new int[maplen];
+					int[] ito = indexToOut[i];					
+					int[] iti = inToIndex[i];
+					Arrays.fill(iti, INVALID);
+					for(int j = 0; j < maplen; j++)
+						{
+						iti[ord[j] & 255] = j;
+						ito[j] = ordOut++;
+						}
+					}
+	    		}
+    		}
+    	else
+    		{
+    		// If the current mapping is null, we do nothing at all, as there are no inputs
+//    		if (indexToOut != null)
+//				{
+				// Go through every input and determine if its valid partials have changed 
+				for(int i = 0; i < NUM_INPUTS; i++)
+					{
+					byte[] ord = getOrdersIn(i);		// this is the NEW mapping of incoming indices to orders
+					int[] iti = inToIndex[i];			// this is the OLD mapping of incoming orders to indices
+					int[] ito = indexToOut[i];			// this is the OLD mapping of indices to outgoing orders
+					int maplen = ito.length;			// ord is full 256, but we want oti's length instead
+
+					// Maybe nothing has changed at all?
+					// We'll not do anything special to test this -- 
+					// just check to see that the orderings haven't changed.
+					boolean changed = false;
+					
+					for(int j = 0; j < maplen; j++)
+						{
+						if (iti[ord[j] & 255] != j)
+							{
+							changed = true;					// oops something changed
+							break;
+							}
+						}
+						
+					if (changed)
+						{
+						// Okay, since something has changed, we have to determine what's what
+						
+						// Build a new version of ito index->output ordering, initially INVALID. 
+						// Also count how many slots we filled.
+						int[] newito = newIndexToOut[i];
+						Arrays.fill(newito, INVALID);
+						int count = 0;
+						for(int j = 0; j < maplen; j++)	// we're going through ord, but only up to maplen
+							{
+							int o = ord[j] & 255;				// new ordering at position j
+							if (iti[o] != INVALID)
+								{
+								// iti[o] is the OLD index associated with this ordering now at index j
+								// We need to set newito[j] to be the ito at that old index
+								newito[j] = ito[iti[o]];
+								// Now we mark out the old output ordering to indicate that it's been used
+								ito[iti[o]] = INVALID;
+								count++;
+								}
+							}
+
+						// At this point, newito contains proper mappings or INVALID.  We can use the INVALID
+						// regions of newito in two ways: (1) to identify the spots that still need to be filled,
+						// and (2) to identify the incoming partials that need to fill then.  We might as well
+						// fill a partial with the partial at the same location. 
+						//
+						// count is the number of proper mappings.   If we don't have any NEW mappings
+						// coming and going, then count will equal maplen and we're done.  Otherwise
+						// we have to fill in the new mappings							
+						if (count != maplen)
+							{
+							int nextUnmapped = 0;			// next available slot in newito
+							int nextOpen = 0;				// next available slot in ito
+							for(int x = 0; x < maplen - count; x++)
+								{
+								// Find the next unmapped input index
+								for( ; newito[nextUnmapped] == INVALID; nextUnmapped++);
+								// Find the next unused output ordering
+								for( ; ito[nextOpen] == INVALID; nextOpen++);
+								// Fill in the empty slot with the ordering of at the same position
+								// as it so happens
+								newito[nextUnmapped] = ito[nextOpen];
+								// skip over these so we don't do them again
+								nextUnmapped++;
+								nextOpen++;
+								}
+							}
+							
+						// Swap the new ito with the old one
+						int[] temp = newIndexToOut[i];
+						newIndexToOut[i] = indexToOut[i];
+						indexToOut[i] = temp;
+						
+						// Build :-( the new iti
+						Arrays.fill(iti, INVALID);					// is this really necessary?
+						for(int j = 0; j < maplen; j++)
+							{
+							iti[ord[j] & 255] = j;
+							}
+						}
+					}
+//				}
+    		}
+    	}
+    	
+    
+    	
     // Combines the partials of two units, then strips back the highest frequency partials
     // until we arrive at the original number of partials.
         
     public Combine(Sound sound)
         {
         super(sound);
-        defineInputs( new Unit[] { Unit.NIL, Unit.NIL }, new String[] { "Input A", "Input B" });
-        defineOptions(new String[] { "Merge", "Half" }, new String[][] { { "Merge" }, { "Half" } } );
-        defineModulations(new Constant[] { Constant.ONE, Constant.ONE }, new String[] { "Scale A", "Scale B" });
+        defineInputs( new Unit[] { Unit.NIL, Unit.NIL, Unit.NIL, Unit.NIL }, new String[] { "Input A", "Input B", "Input C", "Input D" });
+        defineModulations(new Constant[] { Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE }, new String[] { "Scale A", "Scale B", "Scale C", "Scale D" });
         setPushOrders(false);
+        for(int i = 0; i < outIndex.length; i++)
+        	outIndex[i] = i;
         }
-                        
+                    
+    int foo = 0;    
     public void go()
         {
         super.go();
@@ -87,152 +266,45 @@ public class Combine extends Unit
         double[] amplitudes = getAmplitudes(0);
         double[] frequencies = getFrequencies(0);
         byte[] orders = getOrders(0);
-                
-                
-        /// PROPOSAL FOR COMBINING
-        /// 1: Determine WHICH partials of A and B will be preserved 
-        /// 2: Map A's partials to low 1/n partials?  Preserving numbers when possible.  When not possible, fill remainder in low-to-high
-        /// 3. Map B's partials to low 1/m partials?  In same way
-        /// 4. Remap to even-odd afterwards: A -> even, B -> odd, then remainder    // this way, both A and B have low partials in case of further combination
-        /// 5. Load partials
-        /// 6. Sort by frequency
-    
-    
-                
-        // Combine is kind of a mess at preserving orders.  So we're doing it as follows:
-        // 1. All of A's orders are preserved
-        // 2. Any of B's orders which CAN be preserved without conflicting with #1 will be preserved
-        // 3. We arbitrarily assign the remainder
-        // To do this we need some arrays, and we'll have to allocate them every time or otherwise
-        // zero them out.  This allows us to avoid doing sorts, yay.
-        boolean[] filledOrders = new boolean[amplitudes.length];  // all false
-
-        if (outstandingOrders == null) outstandingOrders = new int[amplitudes.length];
-        if (outstandingOrderPositions == null) outstandingOrderPositions = new int[amplitudes.length];
-                
-        boolean _merge = merge;
-                
-        int iA = 0;
-        int iB = 0;
-        int numOutstanding = 0;
-        double[] frequenciesA = getFrequenciesIn(UNIT_INPUT_A);
-        double[] amplitudesA = getAmplitudesIn(UNIT_INPUT_A);
-        double[] frequenciesB = getFrequenciesIn(UNIT_INPUT_B);
-        double[] amplitudesB = getAmplitudesIn(UNIT_INPUT_B);
-        byte[] ordersA = getOrdersIn(UNIT_INPUT_A);
-        byte[] ordersB = getOrdersIn(UNIT_INPUT_B);
-        double f_out;
         
-        double scaleA = modulate(MOD_SCALE_A);
-        double scaleB = modulate(MOD_SCALE_B);
-                
-        double maxIncomingFreqLen = (half ? frequenciesA.length / 2 : frequenciesA.length);
-
-        for(int i = 0; i < frequencies.length; i++)
-            {
-            if (_merge && iA < maxIncomingFreqLen && iB < maxIncomingFreqLen && frequenciesA[iA] == frequenciesB[iB])
-                {
-                frequencies[i] = frequenciesA[iA];
-                amplitudes[i] = amplitudesA[iA] * scaleA + amplitudesB[iB] * scaleB;
-                
-                // we'll assign the order from A
-                orders[i] = ordersA[iA];
-                int o = ordersA[iA] & 0xFF;
-                //               if (o < 0) o += 256;
-                filledOrders[o] = true;         // this order is now used
-                iA++;
-                iB++;
-                }
-            else if (iA < maxIncomingFreqLen && (iB >= maxIncomingFreqLen || frequenciesA[iA] <= frequenciesB[iB]))  // notice <=
-                {
-                frequencies[i] = frequenciesA[iA];
-                amplitudes[i] = amplitudesA[iA] * scaleA;
-
-                // we'll assign the order from A
-                orders[i] = ordersA[iA];
-                int o = ordersA[iA] & 0xFF;
-                //               if (o < 0) o += 256;
-                filledOrders[o] = true;         // this order is now used
-                iA++;
-                }
-            else // if (iB < maxIncomingFreqLen && (iA >= maxIncomingFreqLen || frequenciesB[iB] < frequenciesA[iA]))
-                {
-                frequencies[i] = frequenciesB[iB];
-                amplitudes[i] = amplitudesB[iB] * scaleB;
-                
-                // we won't assign the order from B just yet, but we'll store it in the hopes that we can assign it later
-                int o = ordersB[iB] & 0xFF;
-                //                if (o < 0) o += 256;
-                outstandingOrders[numOutstanding] = o;
-                outstandingOrderPositions[numOutstanding] = i;          // this basically says that partial i would *like* to have order o
-                numOutstanding++;
-                iB++;
-                }
-            }
-
-        // Now I just need to know what the frequency of the NEXT partial would have been
-
-        if (iA >= frequencies.length || iB >= frequencies.length)
-            {
-            // do nothing
-            }
-        else if (_merge && iA >= frequenciesA.length && iB >= frequenciesB.length)   // dunno
-            {
-            // do nothing
-            }
-        else
-            {
-            if (iA < maxIncomingFreqLen && (iB >= maxIncomingFreqLen || frequenciesA[iA] <= frequenciesB[iB]))  // notice <=
-                {
-                f_out = frequenciesA[iA];
-                }
-            else // if (iB < maxIncomingFreqLen && (iA >= maxIncomingFreqLen || frequenciesB[iB] < frequenciesA[iA]))
-                {
-                f_out = frequenciesB[iB];
-                }
-
-/*
-// To make things relatively smooth, we ramp down the amplitude of the final partial based on
-// the ratio of distance between it and its two neighbors.  This won't work right if all three
-// are the same value though; that will be a discontinuity.
-
-if ((f_out - frequencies[frequencies.length - 1]) != (f_out - frequencies[frequencies.length - 2]))
-{
-double d = (f_out - frequencies[frequencies.length - 1]) / Math.abs(f_out - frequencies[frequencies.length - 2]);
-amplitudes[amplitudes.length - 1] *= (f_out - frequencies[frequencies.length - 1]) / Math.abs(f_out - frequencies[frequencies.length - 2]);
-}
-*/
-            }
-
+        rebuildMappings();
         
-        /*
-        // Fill in the outstanding orders that we can fill
-        for(int j = 0; j < numOutstanding; j++)
-        {
-        if (!filledOrders[outstandingOrders[j]]) // the requested order isn't being used yet, so we can use it
-        {
-        filledOrders[outstandingOrders[j]] = true;                                                              // mark it used
-        orders[outstandingOrderPositions[j]] = (byte)outstandingOrders[j];              // use it
-        outstandingOrders[j] = -1;                                                                                      // eliminate it so we don't try to force it in the next pass
-        }
-        }
-        */
-                
-        // Force the remaining orders
-        int nextOrder = 0;
-        for(int j = 0; j < numOutstanding; j++)
-            {
-            if (outstandingOrders[j] >= 0)  // still hasn't been filled, we need to force it to something
-                {
-                // find next unfilled order
-                while(filledOrders[nextOrder]) nextOrder++;
-                        
-                // fill
-                filledOrders[nextOrder] = true;
-                orders[outstandingOrderPositions[j]] = (byte)nextOrder;
-                }
-            }
-                
-        if (constrain()) simpleSort(0, false);
+        // Now we copy over amplitudes, frequencies, orderings
+        if (currentInputs != null)
+        	{
+			for(int i = 0; i < NUM_INPUTS; i++)
+				{
+				double mod = modulate(i);
+				if (currentInputs[i] != Unit.NIL)
+					{
+					double[] ampIn = getAmplitudesIn(i);
+					double[] freqIn = getFrequenciesIn(i);
+				
+					int[] ito = indexToOut[i];
+					for(int j = 0; j < ito.length; j++)
+						{
+						int position = outIndex[ito[j]];
+						amplitudes[position] = ampIn[j] * mod;
+						frequencies[position] = freqIn[j];
+						orders[position] = (byte)(ito[j]);
+						}
+					}
+				}
+			}
+			
+        // we're probably way out of whack
+        //if (constrain() || outOfOrder(0))
+        constrain();
+        
+        if (outOfOrder(0))
+        	{
+        	bigSort(0, false);
+        	
+        	orders = getOrders(0);		// reload now that we have sorted
+        	for(int i = 0; i < orders.length; i++)
+        		{
+        		outIndex[orders[i] & 255] = i;
+        		}
+        	}
         }
     }
