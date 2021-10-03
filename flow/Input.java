@@ -699,9 +699,9 @@ public class Input
         synchronized(lock)
             {
             if (ignoreChannel)
-            	g = Output.PRIMARY_GROUP;
-            else	
-            	g = findGroup(sm.getChannel(), i);
+                g = Output.PRIMARY_GROUP;
+            else        
+                g = findGroup(sm.getChannel(), i);
 
             // we have no one who listens in on this channel
             if (g == Output.NO_GROUP)
