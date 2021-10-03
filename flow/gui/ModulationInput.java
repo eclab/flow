@@ -560,6 +560,8 @@ public class ModulationInput extends InputOutput implements Rebuildable
         /** Returns the actual square within which the Dial's circle is drawn. */
         public void paintComponent(Graphics g)
             {
+            updateText();
+                        
             Style.prepareGraphics(g);
                 
             Graphics2D graphics = (Graphics2D) g;
