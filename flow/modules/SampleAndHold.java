@@ -113,5 +113,11 @@ public class SampleAndHold extends Modulation
                 setModulationOutput(0, modulate(MOD_SIGNAL));
                 }
             }
+        
+        // pass through trigger
+        if (isTriggered(MOD_SIGNAL))
+            {
+            updateTrigger(0);
+            }
         }
     }
