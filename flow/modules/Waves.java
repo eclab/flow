@@ -79,7 +79,7 @@ public class Waves extends Unit implements UnitSource
             double max = 0;
             for(int j = 0; j < MAX_HARMONICS; j++)
                 {
-                HARMONICS[i][j] = Double.parseDouble(scan.next());	//scan.nextDouble();
+                HARMONICS[i][j] = Double.parseDouble(scan.next());      //scan.nextDouble();
                 if (max < HARMONICS[i][j]) 
                     max = HARMONICS[i][j] ;
                 }

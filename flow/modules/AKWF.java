@@ -18,51 +18,51 @@ public class AKWF extends Unit implements UnitSource
     {
     private static final long serialVersionUID = 1;
 
-	public static final int[] NUM_WAVES = 
-		{
-		100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 
-		100, 100, 100, 100, 100, 100, 100, 100, 100, 111, 
-		38, 26, 14, 68, 73, 4, 50, 10, 42, 52, 
-		12, 100, 52, 25, 32, 19, 25, 33, 69, 45, 
-		70, 22, 154, 73, 17, 122, 44, 50, 104, 85, 
-		13, 158, 44, 30, 9, 36, 16, 47, /* 0,*/ 6, 
-		17, 26, 137, 64, 14
-		};
+    public static final int[] NUM_WAVES = 
+        {
+        100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 
+        100, 100, 100, 100, 100, 100, 100, 100, 100, 111, 
+        38, 26, 14, 68, 73, 4, 50, 10, 42, 52, 
+        12, 100, 52, 25, 32, 19, 25, 33, 69, 45, 
+        70, 22, 154, 73, 17, 122, 44, 50, 104, 85, 
+        13, 158, 44, 30, 9, 36, 16, 47, /* 0,*/ 6, 
+        17, 26, 137, 64, 14
+        };
 
-	public static final String[] CATEGORIES = 
-		{
-		"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
-		"11", "12", "13", "14", "15", "16", "17", "18", "19", "20", 
-		"aguitar", "altosax", "birds", "bitreduced", "bw blended", "bw perfectwaves", "bw saw", "bw sawbright", "bw sawgap", "bw sawrounded", 
-		"bw sin", "bw squ", "bw squrounded", "bw tri", "c604", "cello", "clarinet", "clavinet", "dbass", "distorted", 
-		"ebass", "eguitar", "eorgan", "epiano", "flute", "fmsynth", "granular", "hdrawn", "hvoice", "linear", 
-		"oboe", "oscchip", "overtone", "piano", "pluckalgo", "raw", "sinharm", "snippets", /* "stereo.zip",*/ "stringbox", 
-		"symetric", "theremin", "vgame", "vgamebasic", "violin"
-		};
-	
-	public static String getName(int category, double mod)
-		{
-		int len = NAMES[category].length;
-		return NAMES[category][(int)(mod * (len - 1))].substring(5).replace("_", " ");
-		}
-	
-	public static double[] getHarmonics(int category, double mod)
-		{
-		int len = HARMONICS[category].length;
-		return HARMONICS[category][(int)(mod * (len - 1))];
-		}
-	
-	// HARMONICS[category][wave][harmonics]
-	public static double[][][] HARMONICS = null;
-	// NAMES[category][name]
-	public static String[][] NAMES = null;
+    public static final String[] CATEGORIES = 
+        {
+        "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", 
+        "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", 
+        "aguitar", "altosax", "birds", "bitreduced", "bw blended", "bw perfectwaves", "bw saw", "bw sawbright", "bw sawgap", "bw sawrounded", 
+        "bw sin", "bw squ", "bw squrounded", "bw tri", "c604", "cello", "clarinet", "clavinet", "dbass", "distorted", 
+        "ebass", "eguitar", "eorgan", "epiano", "flute", "fmsynth", "granular", "hdrawn", "hvoice", "linear", 
+        "oboe", "oscchip", "overtone", "piano", "pluckalgo", "raw", "sinharm", "snippets", /* "stereo.zip",*/ "stringbox", 
+        "symetric", "theremin", "vgame", "vgamebasic", "violin"
+        };
+        
+    public static String getName(int category, double mod)
+        {
+        int len = NAMES[category].length;
+        return NAMES[category][(int)(mod * (len - 1))].substring(5).replace("_", " ");
+        }
+        
+    public static double[] getHarmonics(int category, double mod)
+        {
+        int len = HARMONICS[category].length;
+        return HARMONICS[category][(int)(mod * (len - 1))];
+        }
+        
+    // HARMONICS[category][wave][harmonics]
+    public static double[][][] HARMONICS = null;
+    // NAMES[category][name]
+    public static String[][] NAMES = null;
 
     public static final int MAX_HARMONICS = 256;  // regardless of number of partials
     public static final double MAX_AMPLITUDE = 999.0;  // highest legal amplitude
 
-	public static final int MOD_MIX = 0;
-	public static final int MOD_SOUND_1 = 1;
-	public static final int MOD_SOUND_2 = 2;
+    public static final int MOD_MIX = 0;
+    public static final int MOD_SOUND_1 = 1;
+    public static final int MOD_SOUND_2 = 2;
 
     boolean normalize;
     boolean oldNormalize;
@@ -129,26 +129,26 @@ public class AKWF extends Unit implements UnitSource
             HARMONICS[i] = new double[NUM_WAVES[i]][MAX_HARMONICS];
             
             for(int k = 0; k < NUM_WAVES[i]; k++)
-            	{
-				NAMES[i][k] = scan.nextLine();
-				double max = 0;
-				for(int j = 0; j < MAX_HARMONICS; j++)
-					{
-					HARMONICS[i][k][j] = Double.parseDouble(scan.next());	//scan.nextDouble();
-					if (max < HARMONICS[i][k][j]) 
-						max = HARMONICS[i][k][j] ;
-					}
-			
-				// Normalize
-				if (max != 0.0)
-					{
-					for(int j = 0; j < MAX_HARMONICS; j++)
-						{
-						HARMONICS[i][k][j] = HARMONICS[i][k][j] / max;
-						}
-					}
-				scan.nextLine();
-				}
+                {
+                NAMES[i][k] = scan.nextLine();
+                double max = 0;
+                for(int j = 0; j < MAX_HARMONICS; j++)
+                    {
+                    HARMONICS[i][k][j] = Double.parseDouble(scan.next());   //scan.nextDouble();
+                    if (max < HARMONICS[i][k][j]) 
+                        max = HARMONICS[i][k][j] ;
+                    }
+                        
+                // Normalize
+                if (max != 0.0)
+                    {
+                    for(int j = 0; j < MAX_HARMONICS; j++)
+                        {
+                        HARMONICS[i][k][j] = HARMONICS[i][k][j] / max;
+                        }
+                    }
+                scan.nextLine();
+                }
             }
         scan.close();
         }
