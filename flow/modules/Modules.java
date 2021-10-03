@@ -67,6 +67,7 @@ public class Modules
     flow.modules.Harmonics.class,
     flow.modules.Jitter.class,
     flow.modules.KHarmonics.class,
+    flow.modules.LadderFilter.class,
     flow.modules.LFO.class,
     flow.modules.LinearFilter.class,
     flow.modules.Map.class,
