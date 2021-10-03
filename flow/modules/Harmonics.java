@@ -8,6 +8,7 @@ import flow.*;
 import java.awt.*;
 import javax.swing.*;
 import flow.gui.*;
+import java.util.*;
 
 /**
    A Unit which allows you to set the amplitudes of
@@ -42,6 +43,42 @@ public class Harmonics extends Unit implements UnitSource
         for(int i = 0; i < NUM_HARMONICS; i++)
             {
             amplitudes[i] = modulate(i);
+            }
+        }
+
+    // Only mutate Constants, avoiding other modulations
+    public void mutate(double[] noise)
+        {
+        for(int i = 0; i < NUM_HARMONICS; i++)
+            {
+            if (getModulation(i) instanceof Constant)
+                {
+                Constant val = (Constant)getModulation(i);
+                double v = val.getValue();
+                if (noise[i] < 0)
+                    {
+                    if (v + noise[i] < 0)
+                        {
+                        v = v - noise[i];
+                        }
+                    else
+                        {
+                        v = v + noise[i];
+                        }
+                    }
+                else // noise[i] >= 0
+                    {
+                    if (v + noise[i] > 1)
+                        {
+                        v = v - noise[i];
+                        }
+                    else
+                        {
+                        v = v + noise[i];
+                        }
+                    }
+                val.setValue(v);
+                }
             }
         }
 
@@ -127,6 +164,53 @@ public class Harmonics extends Unit implements UnitSource
                 box5.add(sample);
                 box5.add(Box.createGlue());
                 box.add(box5);
+
+
+                PushButton mutate = new PushButton("Mutate", new String[] { "0.1%", "0.3%", "1%", "3%", "10%", "30%", "100%" } )
+                    {
+                    public void perform(int result)
+                        {
+                        Harmonics harmonics = (Harmonics)(getModulation());
+                        int index = harmonics.getSound().findRegistered(harmonics);
+                        Output output = getRack().getOutput();
+                        int numSounds = output.getNumSounds();
+                        output.lock();
+                        try
+                            {
+                            // build noise array
+                            double[] amts = new double[] { 0.001, 0.003, 0.01, 0.03, 0.10, 0.3, 1.0};
+                            double amt = amts[result];
+                            double[] noise = new double[NUM_HARMONICS];
+                            Random random = output.getSound(0).getRandom();
+                            for(int i = 0; i < noise.length; i++)
+                                {
+                                noise[i] = random.nextDouble() * amt - amt / 2.0;
+                                }
+                                
+                            // randomize
+                            for(int j = 0; j < numSounds; j++)
+                                {
+                                Sound s = output.getSound(j);
+                                if (s.getGroup() == Output.PRIMARY_GROUP)
+                                    {
+                                    Harmonics d = (Harmonics)(s.getRegistered(index));
+                                    d.mutate(noise);
+                                    }
+                                }
+                            }
+                        finally 
+                            {
+                            output.unlock();
+                            }
+                        for(int i = 0; i < NUM_HARMONICS; i++)
+                            {
+                            mi[i].updateText();
+                            }
+                        mp[0].repaint();
+                        }
+                    };
+                box.add(mutate);
+                
                 return box;
                 }
             };
