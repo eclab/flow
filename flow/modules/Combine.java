@@ -1,4 +1,4 @@
-// Copyright 2018 by George Mason University
+// Copyright 2018, 2021 by George Mason University
 // Licensed under the Apache 2.0 License
 
 
@@ -38,6 +38,32 @@ public class Combine extends Unit
     public static final int MOD_SCALE_C = 2;
     public static final int MOD_SCALE_D = 3;
 
+/*
+	Given N total partials and 1 <= M <= 4 inputs, Combine must first identify how many
+	partials to allocate to each input.  It allocates floor(N/M) partials to each input,
+	and gives the remainder (that is, N - M * floor(N/M)) additionally to the first input.
+	
+	Because the partials of the inputs are sorted by frequency, and Combine takes the lowest
+	~floor(N/M) partials from each input, then Combine is taking the FIRST ~floor(N/M) partials
+	from each partial array of each input.  We refer to the positions in partial arrays as
+	INDEXES, as oppose to the ORDERINGS of each partial.
+	
+	Combine now must map the indexes of the incoming partials to the outgoing partials.  It
+	does this with two tables.  First there is prebuilt table called INDEXTOOUT[input][index].  
+	This maps each of the (low) indexes of each of the active inputs to an ordering in the
+	output.  From there, another table called OUTINDEX[ordering] maps output orderings to
+	actual output indexes.  Initially this is just the identity function because the output
+	indexes are ordered sequentially.  But as soon as we have resorted the outgoing partials
+	by frequency, the order of the orderings changes and so we update OUTINDEX to reflect this.
+
+	To build, or update, the INDEXTOOUT table, we call rebuildMappings().  This table must
+	maintain a few more tables.  INTOINDEX[input][partial] maps the orderings of the first 
+	~floor(N/M) indexes to those indexes.  The remaining values are filled with INVALID
+	(there is no such partial).  CURRENTINPUTS simply holds the current inputs so we can 
+	compare against previous inputs to see if anything has changed.  And newIndexToOut
+	gets swapped back and forth with INDEXTOOUT to save memory.
+*/
+
     static final int INVALID = -1;
     Unit[/*NUM_INPUTS*/] currentInputs = null;						// Which inputs are active?
     int[/*NUM_INPUTS*/][/*Unit.NUM_PARTIALS*/] inToIndex = null;	// For each input, mapping of incoming partial ordering (& 255) -> input index.  Mappings of nonexistent partials INVALID.
@@ -53,6 +79,9 @@ public class Combine extends Unit
     	inToIndex = null;
     	currentInputs = null;
     	}
+    	
+	
+	
     	
     void rebuildMappings()
     	{
@@ -151,9 +180,6 @@ public class Combine extends Unit
     		}
     	else
     		{
-    		// If the current mapping is null, we do nothing at all, as there are no inputs
-//    		if (indexToOut != null)
-//				{
 				// Go through every input and determine if its valid partials have changed 
 				for(int i = 0; i < NUM_INPUTS; i++)
 					{
@@ -239,7 +265,6 @@ public class Combine extends Unit
 							}
 						}
 					}
-//				}
     		}
     	}
     	
@@ -283,7 +308,7 @@ public class Combine extends Unit
 					int[] ito = indexToOut[i];
 					for(int j = 0; j < ito.length; j++)
 						{
-						int position = outIndex[ito[j]];
+						int position = outIndex[ito[j]];		// map ordering -> index position
 						amplitudes[position] = ampIn[j] * mod;
 						frequencies[position] = freqIn[j];
 						orders[position] = (byte)(ito[j]);
@@ -292,8 +317,6 @@ public class Combine extends Unit
 				}
 			}
 			
-        // we're probably way out of whack
-        //if (constrain() || outOfOrder(0))
         constrain();
         
         if (outOfOrder(0))
@@ -303,7 +326,7 @@ public class Combine extends Unit
         	orders = getOrders(0);		// reload now that we have sorted
         	for(int i = 0; i < orders.length; i++)
         		{
-        		outIndex[orders[i] & 255] = i;
+        		outIndex[orders[i] & 255] = i;			// remap ordering -> index position
         		}
         	}
         }
