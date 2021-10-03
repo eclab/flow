@@ -8,6 +8,7 @@ import flow.*;
 import java.awt.*;
 import javax.swing.*;
 import flow.gui.*;
+import java.util.*;
 
 /**
    A Unit which allows you to set the amplitudes and
@@ -119,6 +120,46 @@ public class Partials extends Unit implements UnitSource
                 {
                 Constant freq = (Constant)getModulation(i);
                 freq.setValue(FREQUENCY_RANGE);
+                }
+            }
+        }
+
+
+    // Only mutate Constants, avoiding other modulations
+    public void mutate(double[] noise, boolean freq)
+        {
+        for(int _i = 0; _i < NUM_PARTIALS; _i++)
+            {
+            int i = _i;
+            if (!freq) i += NUM_PARTIALS;
+            
+            if (getModulation(i) instanceof Constant)
+                {
+                Constant val = (Constant)getModulation(i);
+                double v = val.getValue();
+                if (noise[_i] < 0)
+                    {
+                    if (v + noise[_i] < 0)
+                        {
+                        v = v - noise[_i];
+                        }
+                    else
+                        {
+                        v = v + noise[_i];
+                        }
+                    }
+                else // noise[_i] >= 0
+                    {
+                    if (v + noise[_i] > 1)
+                        {
+                        v = v - noise[_i];
+                        }
+                    else
+                        {
+                        v = v + noise[_i];
+                        }
+                    }
+                val.setValue(v);
                 }
             }
         }
@@ -256,6 +297,51 @@ public class Partials extends Unit implements UnitSource
                         }
                     };
                 box.add(compress);
+
+                PushButton mutate = new PushButton("Mutate", new String[] { "Freq 0.1%", "Freq 0.3%", "Freq 1%", "Freq 3%", "Freq 10%", "Freq 30%", "Freq 100%", "Amp 0.1%", "Amp 0.3%", "Amp 1%", "Amp 3%", "Amp 10%", "Amp 30%", "Amp 100%" } )
+                    {
+                    public void perform(int result)
+                        {
+                        Partials partials = (Partials)(getModulation());
+                        int index = partials.getSound().findRegistered(partials);
+                        Output output = getRack().getOutput();
+                        int numSounds = output.getNumSounds();
+                        output.lock();
+                        try
+                            {
+                            // build noise array
+                            double[] amts = new double[] { 0.001, 0.003, 0.01, 0.03, 0.10, 0.3, 1.0, 0.001, 0.003, 0.01, 0.03, 0.10, 0.3, 1.0};
+                            double amt = amts[result];
+                            double[] noise = new double[NUM_PARTIALS];
+                            Random random = output.getSound(0).getRandom();
+                            for(int i = 0; i < noise.length; i++)
+                                {
+                                noise[i] = random.nextDouble() * amt - amt / 2.0;
+                                }
+                                
+                            // randomize
+                            for(int j = 0; j < numSounds; j++)
+                                {
+                                Sound s = output.getSound(j);
+                                if (s.getGroup() == Output.PRIMARY_GROUP)
+                                    {
+                                    Partials d = (Partials)(s.getRegistered(index));
+                                    d.mutate(noise, result < amts.length / 2);
+                                    }
+                                }
+                            }
+                        finally 
+                            {
+                            output.unlock();
+                            }
+                        for(int i = 0; i < NUM_PARTIALS * 2; i++)
+                            {
+                            mi[i].updateText();
+                            }
+                        mp[0].repaint();
+                        }
+                    };
+                box.add(mutate);
                 
                 return box;
                 }
