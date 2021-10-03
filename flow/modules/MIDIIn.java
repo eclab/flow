@@ -151,6 +151,8 @@ public class MIDIIn extends Modulation implements ModSource
     public static String[] OPTIONS = new String[] { "Learn Most Recent CC", "00 Bank Select", "01 Mod Wheel", "02 Breath Controller", "04 Foot Controller", "05 Portamento Time", "07 Volume", "10 Pan", "11 Expression Controller", "32 Bank Select LSB", "33 Mod Wheel LSB", "34 Breath Controller LSB", "36 Foot Controller LSB", "37 Portamento Time LSB", "39 Volume LSB", "42 Pan LSB", "43 Expression Controller LSB", "64 Sustain", "65 Portamento On/Off", "66 Sostenuto on/Off", "67 Soft Pedal On/Off", "68 Legato On/Off", "74 Y Axis", "84 Portamento Amount" };
     public static int[] CCS = new int[] { -1, 0, 1, 2, 4, 5, 7, 10, 11, 32, 33, 34, 36, 37, 39, 42, 43, 64, 65, 66, 67, 68, 74, 84 };
 
+    public static String getName() { return "MIDI In"; }
+
     public ModulePanel getPanel()
         {
         return new ModulePanel(MIDIIn.this)

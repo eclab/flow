@@ -89,6 +89,8 @@ public class FlangeFilter extends Unit
         defineOptions(new String[] { "Style", "Fixed", "Fundamental" }, new String[][] { STYLE_NAMES, { "Fixed" }, { "Fundamental" } } );
         }
         
+    public static String getName() { return "Flange Filter"; }
+
     public void go()
         {
         super.go();

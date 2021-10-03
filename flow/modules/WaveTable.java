@@ -81,6 +81,8 @@ public class WaveTable extends Unit implements UnitSource
         
     public static final int OPTION_INTERPOLATE = 0;
 
+    public static String getName() { return "Wavetable"; }
+
     public int getOptionValue(int option) 
         { 
         switch(option)

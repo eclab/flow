@@ -41,6 +41,8 @@ public class FormantFilter extends Unit
             new String[] { "Interpolation", "Num Vowels", "Gain", "Formants", "Resonance" });
         }
 
+    public static String getName() { return "Formant Filter"; }
+
     int vowelIndex[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
     public int getVowel(int f) { return vowelIndex[f]; }
     public void setVowel(int f, int val) { vowelIndex[f] = val; }

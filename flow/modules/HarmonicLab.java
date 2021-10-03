@@ -229,6 +229,8 @@ public class HarmonicLab extends Unit implements UnitSource
         }
 
 
+    public static String getName() { return "Harmonic Lab"; }
+
     public ModulePanel getPanel()
         {
         return new ModulePanel(HarmonicLab.this)
