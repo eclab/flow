@@ -163,7 +163,8 @@ public class Combine extends Unit
 				int ordOut = 0;
 				for(int i = 0; i < NUM_INPUTS; i++)
 					{
-					int maplen = (i == firstInput) ? firstInputDivision : division;
+					int maplen = (getInput(i) == Unit.NIL ? 0 :
+									(i == firstInput ? firstInputDivision : division));
 					byte[] ord = getOrdersIn(i);
 					indexToOut[i] = new int[maplen];
 					newIndexToOut[i] = new int[maplen];
@@ -240,7 +241,7 @@ public class Combine extends Unit
 							for(int x = 0; x < maplen - count; x++)
 								{
 								// Find the next unmapped input index
-								for( ; newito[nextUnmapped] == INVALID; nextUnmapped++);
+								for( ; newito[nextUnmapped] != INVALID; nextUnmapped++);
 								// Find the next unused output ordering
 								for( ; ito[nextOpen] == INVALID; nextOpen++);
 								// Fill in the empty slot with the ordering of at the same position
