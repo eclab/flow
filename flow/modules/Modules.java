@@ -63,6 +63,7 @@ public class Modules
     flow.modules.FormantFilter.class,
     flow.modules.Geiger.class,
     flow.modules.In.class,
+    flow.modules.Joy.class,
     flow.modules.HarmonicLab.class,
     flow.modules.Harmonics.class,
     flow.modules.Jitter.class,

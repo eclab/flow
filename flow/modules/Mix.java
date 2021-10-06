@@ -83,6 +83,7 @@ public class Mix extends Unit
         double gain3 = modulate(MOD_GAIN_C);
         double gain4 = modulate(MOD_GAIN_D);
                 
+        /*
         if (gain1 > 0)
             pushFrequencies(0);
         else if (gain2 > 0)
@@ -90,6 +91,18 @@ public class Mix extends Unit
         else if (gain3 > 0)
             pushFrequencies(2);
         else if (gain4 > 0)
+            pushFrequencies(3);
+        else
+            pushFrequencies(0);
+        */
+
+        if (!(isInputNil(0)))
+            pushFrequencies(0);
+        else if (!(isInputNil(1)))
+            pushFrequencies(1);
+        else if (!(isInputNil(2)))
+            pushFrequencies(2);
+        else if (!(isInputNil(3)))
             pushFrequencies(3);
         else
             pushFrequencies(0);
