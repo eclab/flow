@@ -77,7 +77,8 @@ public class SubpatchPanel extends JPanel implements Transferable
             this.setDropTarget(new DropTarget(this, new ModulePanelDropTargetListener()));
                 
             Output out = rack.getOutput();
-            titleLabel.setText(" " + out.getGroup(group).getPatchName());
+            String patchName = out.getGroup(group).getPatchName();
+            titleLabel.setText(" " + (patchName == null ? Sound.UNTITLED_PATCH_NAME : patchName));
             gain.setValue((int)(out.getGroup(group).getGain() * GAIN_RESOLUTION * Out.MAX_GAIN));
             double val = gain.getValue() / (double) GAIN_RESOLUTION;
             gainLabel.setText(String.format("%1.2f", val));
@@ -485,8 +486,9 @@ public class SubpatchPanel extends JPanel implements Transferable
                 rack.getOutput().lock();
                 try
                     {
+                    String patchName = rack.getOutput().getGroup(group).getPatchName();
                     String result = AppMenu.showSimpleInput("Rename", "Provide a name for this patch.", 
-                        rack.getOutput().getGroup(group).getPatchName(), rack);
+                        patchName == null ? Sound.UNTITLED_PATCH_NAME : patchName, rack);
                     if (result != null)
                         {
                         rack.getOutput().getGroup(group).setPatchName(result);
