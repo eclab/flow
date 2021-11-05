@@ -15,7 +15,7 @@
 \usepackage{gensymb}
 \usepackage{multicol}
 %\usepackage[hyperfootnotes=false,linktocpage=true,linkbordercolor={0.5 0 0}]{hyperref}
-\usepackage{xcolor}
+\usepackage[usenames,dvipsnames]{xcolor}
 
 \sloppy
 
@@ -85,7 +85,7 @@ sean@cs.gmu.edu}
 
 {\name} is a {\bf fully modular, polyphonic and multitimbral, additive software synthesizer.}  It is free open source and written in Java, and designed to be extended with new, easy to write modules.  You can also create your own patches, then store them as modules to be used in larger patches. 
 
-There have been many additive synthesizers, even semi-modular additive synths, but a fully-modular additive synthesizer is not very common, much less one that s multitimbral.   It's been fun to write this.  Hopefully this software will inspire others to design similar systems.
+There have been many additive synthesizers, even semi-modular additive synths, but a fully-modular additive synthesizer is not very common, much less one that is multitimbral.   It's been fun to write this.  Hopefully this software will inspire others to design similar systems.
 
 {\name} is an academic research experiment and a personal and amateur effort, not a professional product.  Synthesis of the kind attempted here is very costly, and furthermore {\name} tends to emphasize ease of development over efficiency.  This means it'll keep your laptop quite warm and will have lots of odd ends and strings poking out here and there.  Absolutely no guarantees are made with regard to its stability or correctness.  If you find problems with the software, repeatable bugs, or general irritations, send me mail (sean@cs.gmu.edu).
 
@@ -109,7 +109,7 @@ Consider Figure~\ref{sinewaves}, which shows three sine waves in green, orange, 
 
 Notice we didn't mention {\it phase}.  Phase is the horizontal shift in the sine wave, as shown in Figure \ref{phases}.  As it turns out, humans often can't easily distinguish between sounds whose partials only differ in phase relative to one another: we just don't have the hardware built-in to do it.\footnote{While this is certainly true for high- and mid-pitch sounds, it isn't really true for bass sounds: a low-frequency square wave (for example) sounds pretty different\,---\,buzzier\,---\,than one whose partials have randomly-assigned phases.}   As a result, most additive synthesizers, including {\name}, don't consider phase in order to simplify matters.
 
-If we only consider frequency and amplitude, we can chart our three sine waves as shown in Figure~\ref{partials}: showing the amplitude of each partial by frequency.  Notice that the \(Y\) axis is still Amplitude, but the \(X\) axis has changed from {\it time} to {\it frequency}. For this reason, thinking of a sound in this fashion is known as casting the sound into the {\bf frequency domain}; whereas thinking of a sound as a wave in the traditional way (Figure~\ref{sinewaves}) is known as considering it in the {\bf time domain}.  While we have been trained to think of sound waves in the time domain: in fact our brains receive sound information in the frequency domain: hardware in our ears first breaks out the sounds into high and low frequencies and their respective amplitudes before our brains even get them.
+If we only consider frequency and amplitude, we can chart our three sine waves as shown in Figure~\ref{partials}: plotting the amplitude of each partial by frequency.  Notice that the \(Y\) axis is still Amplitude, but the \(X\) axis has changed from {\it time} to {\it frequency}. For this reason, thinking of a sound in this fashion is known as casting the sound into the {\bf frequency domain}; whereas thinking of a sound as a wave in the traditional way (Figure~\ref{sinewaves}) is known as considering it in the {\bf time domain}.  While we have been trained to think of sound waves in the time domain: in fact our brains receive sound information in the frequency domain: hardware in our ears first breaks out the sounds into high and low frequencies and their respective amplitudes before our brains even get them.
 
 \begin{wrapfigure}{r}{3in}
 \includegraphics[width=3in]{phases}
@@ -128,7 +128,7 @@ The lowest partial is commonly known as the {\bf fundamental},\footnote{This is 
 \label{partials}
 \end{wrapfigure}
 
-Many early (and current!)\ additive synthesizers, such as the Kawai K5 and K5000, simply assumed that all sounds of interest would be generated using harmonics, not arbitrary partials.   {\name} does not make this assumption: you can have partials at any frequency you like.  But you will see harmonics in many places, as they are common and useful.
+Many early (and current!)\ additive synthesizers, such as the Kawai K5 and K5000, simply assumed that all sounds of interest would be generated using harmonics, not arbitrary partials.   {\name} does not make this assumption: you can have partials at any frequency you like.  But you will see sounds consisting of only harmonics in many places, as they are musical and useful.
 
 In {\name}, if you adjust partials so that they are all harmonics, with no gaps among the integers, this procedure is called {\bf standardizing} them.  Another term you'll see: if you adjust the partials so that their amplitudes add to 1.0, this is called {\bf normalizing} them.  Some modules can do standardization or normalization as an option.
 
@@ -141,7 +141,7 @@ is to create a series of modules which either generate sets of partials or modif
 
 {\name} is in contrast closer to a {\bf fully modular synthesis} approach: you can organize as many modules as you like, and wire them up however you like, just like a hardware modular synthesizer. Since they're not in a line, modules can be fed from, and feed into, {\it multiple} other modules.  There's no reason you can't have modules wired up in cycles or other patterns.  And just like in a hardware modular synthesizer, if you don't wire the modules up at all, you don't get any sound. 
 
-Note however that unlike a classical fully-modular synthesizer, a software synthesizer like {\name} can easily be (and is) {\bf polyphonic} and {\bf multitmbral}, and you can save and load patches.  And of course, unlike a traditional modular synthesizer, {\name} is {\bf additive}.
+Note however that unlike a classical fully-modular synthesizer, a software synthesizer like {\name} can easily be (and is) {\bf polyphonic} and {\bf multitmbral}, and you can save and load patches.  And of course, unlike a traditional modular synthesizer, {\name} is {\bf additive}: the stuff moving through wires isn't sound waves but arrays of partials.
 
 {\name} has another powerful trick up its sleeve: after you have saved your collection of wired modules out as a {\bf patch}, you then have the option of loading that patch to operate as a {\bf self-contained module in another patch!}  When a patch is loaded in this way, it is called a {\bf macro}.  And yes, you can have macros which contain macros which contain macros.
 
@@ -183,18 +183,18 @@ If you look carefully at Figure~\ref{screenshot}, you'll see that there are not 
 \subsection{Tuning Parameters}
 First things first.  {\name} is very, very computationally expensive and benefits from tuning for your computer speed.  If your computer can't keep up with Flow's demands, you'll hear a {\bf glitch}.  This is a pop or a buzz in the audio stream, and will be accompanied by the {\bf Out} module (the top-right module shown in Figure \ref{screenshot}) coloring its black title bar red and saying \smash{\fcolorbox{black}{red}{\color{white}\small\sf{Glitch}}}\,.  A glitch occurs when Flow can't keep the audio buffer filled fast enough, so your computer is forced to start filling it with zeros.  You don't want that.  Some of these parameters may also have an effect on {\bf latency}, especially MIDI input.
 
-How do we tamp down glitches, etc.?  By playing with a few parameters. If you select {\bf Tuning Parameters} from the {\bf Options} menu, you can at present change six parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session.   
+Glitches often settle down after running Flow a minute or so.  But if not, how should we tamp them down?  By playing with a few parameters. If you select {\bf Tuning Parameters} from the {\bf Options} menu, you can at present change six parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session.   
 
 You may not yet understand some of the terminology below: in this case, read the rest of the manual, try out the synth, and return to the Tuning Parameters later.
 
 \begin{itemize}
 \item {\bf Polyphony} (1--32, default: 8)\qquad This is the number of voices the synthesizer can play at once.  More voices incurs a higher load.
 
-\item {\bf Buffer Size Per Channel} (default: 1152, which is crummy, but the best Java on the Mac can do)\qquad This is the size of the audio buffer (for each channel) that {\name} keeps filled for your operating system to tap into to generate sounds.  You want a low buffer if you can (much less latency); but a bigger buffer makes it easier for Flow to keep up.  Some operating systems require a large buffer size: for example, OS X typically needs at least 1152 . On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{connecting} for more information.  I can't help you much regarding Windows.
+\item {\bf Buffer Size Per Channel} (default: 1152, which is crummy, but the best Java on the Mac can do)\qquad This is the size of the audio buffer (for each channel) that {\name} keeps filled for your operating system to tap into to generate sounds.  You want a small buffer if you can (much less latency); but a bigger buffer makes it easier for Flow to keep up.  Some operating systems require a large buffer size: for example, OS X typically needs at least 1152 . On Linux you can get away with much smaller buffers: see the Linux portion of Section~\ref{connecting} for more information.  I can't help you much regarding Windows.
 
-\item {\bf Partials} (64--256, default: 128)\qquad This is the number of partials passed around from module to module.  More partials will produce a richer sound, particularly in bass notes, but incurs a much higher load.
+\item {\bf Partials} (64--256, default: 256)\qquad This is the number of partials passed around from module to module.  More partials will produce a richer sound, particularly in bass notes, but incurs a much higher load.
 
-\item {\bf Voices Per Thread} (1, 2, 4, 8, 16, default: 8)\qquad This is the number of voices which will be assigned to a single CPU thread in the partials-updating stage of synthesis.  More voices per thread means fewer threads.  You'd like as many voices assigned to a given thread as possible, because switching threads incurs significant computational overhead.  However if you have too many voices on a thread, then they cannot take advantage of the parallelism afforded by your laptop's nifty multi-core CPU and you won't have fast partials updates.  Also if you have very few voices per thread, then you'll have many more threads in the partials-updating stage and this may nudge out the critical output threads, resulting in more glitches.  You have to find a balance.   I have found 8 to be a good default.
+\item {\bf Voices Per Thread} (1, 2, 4, 8, 16, default: 8)\qquad This is the number of voices which will be assigned to a single CPU thread in the modular partials-updating stage of synthesis.  More voices per thread means fewer threads.  You'd like as many voices assigned to a given thread as possible, because switching threads incurs significant computational overhead.  However if you have too many voices on a thread, then they cannot take advantage of the parallelism afforded by your laptop's nifty multi-core CPU and you won't have fast partials updates.  Also if you have very few voices per thread, then you'll have many more threads in the partials-updating stage and this may nudge out the critical output threads, resulting in more glitches.  You have to find a balance.   I have found 8 to be a good default.
 
 \item {\bf Outputs Per Thread} (1, 2, 4, 8, 16, default: 2)\qquad This is the number of voices which will be assigned to a single CPU thread in the sound-output stage of synthesis.  More voices per thread means fewer threads.  You'd like as many voices assigned to a given thread as possible, because switching threads incurs significant computational overhead.  However if you have too many voices on a thread, then they cannot take advantage of the parallelism afforded by your laptop's multi-core CPU.  You have to find a balance.    I have found 2 to be a good default.
 
@@ -204,12 +204,20 @@ To make sound, Flow runs two procedures in parallel.  The {\it voice facility} r
 
 If the output facility hasn't grabbed the most recently posted partials, and the voice facility has even newer partials to give it, it will wait until the output facility grabs the older ones before posting the newer ones.  This means that if \(N\) is {\it high}, then the voice facility will wait for longer times.  This causes two bad things.  First, it means that the voice facility will take longer to respond to new MIDI messages, resulting in a noticeable latency.  Second, it means that sounds will change partials more slowly: you may or may not notice this second effect (though if \(N=1\), the partials update is so fast that you can effectively do FM with the LFOs).  So why not keep this value low?  Because low values of \(N\) mean that the output facility will constantly be grabbing the latest partials, which incurs a significant computational load.  
 
-The default value is \(N=32\), but if the lag is too high, try \(N=16\) or possibly lower.  Be warned that if you have a large and complex patch, then the amount of time can easily be high enough that the MIDI latency and partials update speed will be poor anyway.
+The default value is \(N=16\), but if the lag is too high, try a bit lower.  Be warned that if you have a large and complex patch, then the amount of time can easily be high enough that the MIDI latency and partials update speed will be poor anyway.
 
 \item {\bf Stereo}  If this is unchecked, then Flow will output mono sound regardless of the setting of the pan knob or slider. This might incur a somewhat lower overhead, but it's likely to be minor.
 \end{itemize}
 
-\subsection{Adding, Moving, Copying, and Closing Modules}  Modules are added to the rack by choosing them from one of the menus: {\bf Modulation}, {\bf Sources}, {\bf Shapers}, and {\bf Other}.  You can move a module to another location by dragging its title bar.  You can also copy a module to another location by dragging its title bar while holding the Control key (on the Mac, you can also hold the Option key).  Finally, you can delete a module by clicking on its close box: the little white dot to the left of its title.
+Okay, we're done with tuning, so let's make a patch.  Quit Flow, fire it up again (so its tuning parameters take effect), and start adding modules...
+
+\subsection{Modules}
+
+A Module in Flow is very similar to one in a modular synthesizer: it's a device which takes modulation signals or incoming audio (in the form of partials), and outputs modulation signals or audio (again as partials).  Modules which mostly {\it produce} partials or modulation signals are known as Modulation or Partials {\bf Sources}.  Modules which largely {\it modify} incoming partials or modulation signals, and output the results, are known as {\bf Shapers}. 
+
+Select a module!  The {\bf Sources} menu contains partials sources, and the {\bf Shapers} menu contains partials shapers.  The {\bf Modulation} menu contains modulation sources at top and partials sources at bottom.  Finally, the {\bf Other} module contains some special modules which don't fit in with the others.
+
+You add a module to the rack by choosing it from the menu.  Once it is in the rack, you can move a module to another location by dragging its title bar.  You can also copy a module to another location by dragging its title bar while holding the Control key (on the Mac, you can also hold the Option key).  You can delete a module by clicking on its close box: the little white dot to the left of its title.  Finally, if you double-click on a module, it will expand to show some {\bf help documentation.}  Double-click again to shrink it back. 
 
 By default, modules are added to the beginning of the rack.  You might find this annoying.  If you would prefer modules to be added to the end of the rack (just before the Out module), choose {\bf Add Modules At End} from the {\bf Options} menu.
 
@@ -269,6 +277,7 @@ Though modules such as envelopes (or LFOs) already know that notes have been pla
 In addition to input and output jacks and dials, modules also sport options in the form of pop-up combobox menus and check boxes.  For example, on the LFO you can choose a wave {\it Type} (currently set to ``Sine'').  You can also click a checkbox to {\it Invert} the wave among other features.  Another checkbox option on the LFO, {\it Half Trigger}, tells it to send triggers every half of a wave rather than every full wave.
 
 \begin{wrapfigure}{r}{1.25in}
+\vspace{-2em}
 {\setlength\fboxsep{0in}\framebox{\includegraphics[width=1.25in]{constrain.png}}}
 \vspace{-2em}
 \caption{Constraints}
@@ -342,17 +351,16 @@ Now, if you directly connect a partials source ({\bf Sawtooth}, say) to the {\bf
 
 You might also choose {\bf Monophonic} if you'd like a monophonic synth.  Flow does {\it last note priority}, meaning that if, while playing monophonically, you hold down note A, then hold down note B, then hold down note C, then let go of C, then B will begin to sound, and if you let go of B, then A will begin to sound.
 
+Ultimately you'll probably set things up with a {\bf VCA} (see the last entry in Section~\ref{unitshapers}) modulated by an {\bf Envelope} (typically a {\bf DADSR Envelope}: see Section~\ref{modsources}) which won't play the sound unless a key is pressed. See Figure~\ref{adsr} at right That way different voices are played when you play different keys.  At that point you'll want to uncheck {\bf Monophonic} so you can play more than one voice.
+
+So how do you play a using keyboard?  You attach it to {\name} by selecting {\bf MIDI and Audio Preferences} from the {\bf Options} menu, then choosing the appropriate {\bf MIDI Device} and {\bf MIDI Channel}.  You'll notice an {\bf Auxillary MIDI Device} as an option: this lets you connect two MIDI devices to Flow.  It's not useful to use this unless you're in multitimbral mode (discussed in Section~\ref{multitimbral}).
+
 \begin{wrapfigure}{r}{3in}
-\vspace{-1em}
 \includegraphics[width=3in]{adsr}
 \caption{Playing a Saw wave modulated by an ADSR envelope and a VCA}
 \vspace{-1em}
 \label{adsr}
 \end{wrapfigure}
-
-Ultimately you'll probably set things up with a {\bf VCA} (see the last entry in Section~\ref{unitshapers}) modulated by an {\bf Envelope} (typically a {\bf DADSR Envelope}: see Section~\ref{modsources}) which won't play the sound unless a key is pressed. See Figure~\ref{adsr} at right That way different voices are played when you play different keys.  At that point you'll want to uncheck {\bf Monophonic} so you can play more than one voice.
-
-So how do you play a using keyboard?  You attach it to {\name} by selecting {\bf MIDI and Audio Preferences} from the {\bf Options} menu, then choosing the appropriate {\bf MIDI Device} and {\bf MIDI Channel}.  You'll notice an {\bf Auxillary MIDI Device} as an option: this lets you connect two MIDI devices to Flow.  It's not useful to use this unless you're in multitimbral mode (discussed in Section~\ref{multitimbral}).
 
 If Flow is playing too loudly its sound will {\bf clip}. The title bar of the {\bf Out} module will briefly turn yellow and say \smash{\fcolorbox{black}{yellow}{\color{black}\small\sf{Clip}}}\,.  You may also hear an audible buzz or click, and you'll see red portions of the wave on the audio output oscilloscope.  To prevent this in the future, you can turn down the sound's {\bf Gain} (in the {\bf Out module}).  You can also change the {\bf Master Gain} in the {\bf MIDI and Audio Preferences}, but this is better reserved for multitimbral mode instead.
 
@@ -411,7 +419,7 @@ The problem with loopback devices is that they are slow: they introduce a great 
 \paragraph{Routing MIDI from a Digital Audio Workstation}
 
 \begin{wrapfigure}{r}{3in}
-\vspace{-2em}
+\vspace{-1em}
 \begin{center}\includegraphics[width=3in]{loopbackmidi}\end{center}
 \vspace{-1em}
 \caption{A MIDI loopback connecting a Digital Audio Workstation to {\name}.  Compare to Figure~\ref{loopbackaudio}.}\label{loopbackmidi}
@@ -583,12 +591,6 @@ Flow can handle this without any difficulty: each percussion subpatch has the ex
 
 \paragraph{Master Gain} At the end of the day I can get my whole song to play without glitching, but it still clips here and there.  Rather than go through and adjust the gain of each subpatch separately, I just pull down the master gain (see the {\bf MIDI and Audio Options} window).     Note that Master Gain is not saved with patches and is reset when you restart Flow.
 
-\subsection{Module Help}
-
-Forgot what a given dial or button does?  Each module has a built-in help panel.  Just double-click on the module's title-bar to expand it.  You can double-click a second time to retract the panel.
-
-\bump
-
 \section{The Modules}
 
 The Modules are divided into five categories:
@@ -610,7 +612,7 @@ There are four menus
 \begin{wrapfigure}{r}{3.1in}
 \vspace{-1.25em}
 \includegraphics[height=1.5in]{CurveUp}~~~\includegraphics[height=1.5in]{CurveDown}
-\caption{Envelope modulation curves, shown in rising and falling scenarios.  Solid lines are (right to left) {\it Linear}, \(x^2\), \(x^4\), \(x^8\), \(x^{16}\), and \(x^{32}\).  {\bf If you're looking for an exponential-sounding curve, \(\bm x^4\) works pretty well.}  Dashed lines are (right to left) \((x^2 + x^8)/2\),  \((x^4 + x^{16})/2\), and  \((x^8 + x^{32})/2\) (denoted \(x^2, 8\),\ \  \(x^4, 16\),\ \  and \(x^8, 32\)\ \  in the popup menu).  Dot-dash lines are (left to right) \(1-(1-x)^2, 1-(1-x)^4,\) and \(1-(1-x)^8\) (denoted {\it Inv \(x^2\), Inv \(x^4\),} and {\it Inv \(x^8\)} in the popup menu).  The dotted line is {\it Step}, which stays put until the very end, then suddenly jumps to the ultimate value. }
+\caption{Envelope modulation curves, shown in rising and falling scenarios.  Solid lines are (right to left) {\color{NavyBlue}{\it Linear}}, {\color{Tan}\(x^2\)}, {\color{LimeGreen}\(x^4\)}, {\color{Red}\(x^8\)}, {\color{Periwinkle}\(x^{16}\)}, and {\color{Mahogany}\(x^{32}\)}.  {\bf If you're looking for an exponential-sounding curve, \(\bm x^4\) works pretty well.}  Dashed lines are (right to left) {\color{YellowOrange}\((x^2 + x^8)/2\)},  {\color{Fuchsia}\((x^4 + x^{16})/2\)}, and  {\color{OliveGreen}\((x^8 + x^{32})/2\)} (denoted {\color{YellowOrange}\(x$\mbox{\textasciicircum}$ 2, 8\)},\ \  {\color{Fuchsia}\(x$\mbox{\textasciicircum}$ 4, 16\)},\ \  and {\color{OliveGreen}\(x$\mbox{\textasciicircum}$ 8, 32\)}\ \  in the popup menu).  Dot-dash lines are (left to right) {\color{Red}\(1-(1-x)^2\)}, {\color{RoyalBlue}\(1-(1-x)^4\)}, and {\color{BurntOrange}\(1-(1-x)^8\)} (denoted {\color{Red}{\it Inv \(x^2\)}, {\color{RoyalBlue}Inv \(x^4\)},} and {\color{BurntOrange}{\it Inv \(x^8\)}} in the popup menu).  The dotted line is {\color{Cerulean}{\it Step}}, which stays put until the very end, then suddenly jumps to the ultimate value. }
 \label{curves}
 \end{wrapfigure}
 
@@ -641,15 +643,22 @@ The {\it On Tr} option restarts the envelope whenever it receives a trigger (as 
 
 At the bottom are outputs which trigger when the envelope starts its Pre 1, Pre 2,  Pre 3, Sus 1, Sus 2, Sus 3, Rel 1, or Rel 2 stages, or when it at its End.  Mod will trigger in all these cases.  See also {\bf DADSR} and {\bf AHR}.
 
-\paragraph{Joystick}  A controller that lets you simultaneously change four different modulation values.   Click {\bf Show} to reveal the Joystick.  Each value is associated with a corner (\(\nwarrow \nearrow \swarrow \searrow\)) and is highest in that position.\footnote{Technically the value of a modulation is \(1.0 - w\), where \(w\) is the maximum of the \(x\) and \(y\) distances from the corner, assuming that the joystick has a width and height of 1.0.}   The center location is a uniform mixture of all four modulations.  You can click on a location to move the joystick there, or you can drag the joystick: it turns red while dragged.  All voices are simultaneously affected when you manually drag the joystick.
+\paragraph{Joystick}  A controller that lets you simultaneously change six different modulation outputs.   Click {\it Show} to reveal the Joystick.  As you change the joystick, you modify the modulation outputs in the following way:
 
-True to vector synthesis tradition, you can also {\it record} a drag sequence, and once you are finished, the recording will be played back each time you press a key, affecting that voice.  You record a sequence by clicking on the {\bf Record} button, which arms it.  The joystick turns green and the button now says {\bf Cancel}, and clicking on it again will (of course) cancel the recording.  Recording begins as soon as you grab the joystick and start moving it (the button will then say {\bf Recording} and the joystick will turn red as usual).  When you let go, the joystick turns blue again, and the button now says {\bf Clear}, indicating that you have made a recording.  Playing notes will now trigger the recorded movements (independent of one another).  If you now click the button, you will erase the recording and go back to {\bf Record}.   You can always click the little triangle to hide the joystick: the recording remains (and is saved with your patch).
+\begin{itemize}
+\item The \(\rightarrow\) and \(\uparrow\) outputs vary as you drag the joystick horizontally and vertically respectively.  These are useful if you want to control two different modulations completely independently of one another.
+\item The  (\(\nwarrow \nearrow \swarrow \searrow\)) outputs are each associated with a corner the value of each output is based on how {\it close} the joystick is to its corner (closer \(=\) higher value).\footnote{Technically the value of a modulation is \(1.0 - w\), where \(w\) is the maximum of the horizontal and vertical distances from the corner: the joystick has a width and height of 1.0.}   All four modulations are at 0.5 in the center.  This is more useful if you want to ``blend together'' four different modulation sources, and is the classic vector synthesis arrangement.
+\end{itemize}
+
+True to vector synthesis tradition, you can also {\it record} a drag sequence, and once you are finished, the recording will be played back each time you press a key, affecting that voice.  You record a sequence by clicking on the {\it Record} button, which arms it.  The joystick turns green and the button now says {\it Cancel}, and clicking on it again will (of course) cancel the recording.  Recording begins as soon as you grab the joystick and start moving it: the button will then say {\it Recording} and the joystick will turn red as usual.  A point labelled {\it Start} will indicate where you started (helpful for closing loops, see below).  When you let go, the joystick turns blue again, and the button now says {\it Clear}, indicating that you have made a recording.  Playing notes will now trigger the prerecorded movements (independent of one another).  If you now click the button, you will erase the recording and go back to {\it Record}.   You can always click the little triangle to hide the joystick: the recording remains (and is saved with your patch).
+
+The {\it Loop} checkbox determines whether the recorded trajectory, when played back, does so in an infinite loop. You can also start (or restart) playback of a recorded trajectory by sending a trigger to the {\it On Tr} dial. If the On Tr trigger is connected, then a Note On will no longer start the playback: only the trigger will. 
 
 Joystick is particularly useful with the {\bf Mix} or {\bf Combine} modules, where you can hook up each corner to the Gain or Scale of a different input to get those classic vector synthesis vibes.  
   
 \paragraph{LFO}  A low-frequency oscillator with a rate and phase, a shift of its zero point vertically, and vertical scaling of the wave.   If you double-click on the rate dial, a pop-up menu will appear which lets you set various note speeds corresponding to playing at 120BPM.  If the MIDI clock is running, these note speeds will correspond to the MIDI clock's rate.
 
-The oscillator can run free, you can invert the wave.    The LFO triggers on completion of one full wave, or one-half wave if {\bf Half Trigger} is set.  If {\it Init Trigger} is set, then the LFO also triggers on the start of the very first wave.  The waves can be sine, triangle, saw up, square, random, and random sample and hold.   You can request that the LFO sync to MIDI when the synthesizer is set to MIDI (otherwise it's based on time as usual).  And finally, you can indicate that the rate dial should be linear and not exponential (which is useful when modulating an LFO with another LFO).
+The oscillator can run free, you can invert the wave.    The LFO triggers on completion of one full wave, or one-half wave if {\it Half Trigger} is set.  If {\it Init Trigger} is set, then the LFO also triggers on the start of the very first wave.  The waves can be sine, triangle, saw up, square, random, and random sample and hold.   You can request that the LFO sync to MIDI when the synthesizer is set to MIDI (otherwise it's based on time as usual).  And finally, you can indicate that the rate dial should be linear and not exponential (which is useful when modulating an LFO with another LFO).
 
 Random works as follows: a random new target Y position is set and the LFO spends {\it rate} time to get there.  Once it reaches the point, it picks a new random target Y position and repeats.  The sample and hold version is similar except that the wave does not move to the target Y position, but rather immediately jumps to it and stays there for {\it rate} time.   {\it Variance} indicates how big a typical random jump is: this is also scaled by {\it Scale}.  If the seed is set to {\it Free} (0), then the random waves are fully random; but if the seed is \(\neq 0\), then every time a gate occurs (assuming the LFO is not free), the LFO's random behavior will be exactly the same as before, so you can make a predictable ``random'' sound.
 
@@ -755,7 +764,7 @@ Operations:
 \item{\bf center}\quad Triggers when A's value crosses the center line (0.5).
 \end{itemize}
 
-\paragraph{S \& H}  Sample and Hold.  Takes an incoming modulation signal and a trigger.  If the type is {\it S \& H}, then on receiving the trigger, it samples the signal and outputs that value until the next trigger, when it resamples, etc.  If the type is {\it T \& H} or {\it T \& H 2}, then we are in {\it Track and Hold} mode.  Here, the trigger {\it toggles} between sampling and holding the value, or letting it pass through normally.  The difference between the two Track and Hold modes is just one of phase: in the first version, when a gate is received, we are in sample-and-hold mode, where as in the second version, when a gate is received, we are in pass-through mode.
+\paragraph{S \& H}  Sample and Hold.  Takes an incoming modulation signal and a trigger.  If the type is {\it S \& H}, then on receiving the trigger, it samples the signal and outputs that value until the next trigger, when it samples again, and so on.  If the type is {\it T \& H} or {\it T \& H 2}, then we are in {\it Track and Hold} mode.  Here, the trigger {\it toggles} between sampling and holding the value, or letting it pass through normally.  The difference between the two Track and Hold modes is just one of phase: in the first version, when a gate is received, we are in sample-and-hold mode, where as in the second version, when a gate is received, we are in pass-through mode.
 
 \paragraph{Seq}  A step sequencer of up to 32 steps, as specified by {\it Steps}.  Each step is a modulation value which you can set.  On note-on, the sequencer resets itself to step 1, and begins incrementing each time the {\it Trigger} is fired.   If {\it Stop on Release} then on note-off the sequencer stops, otherwise note-off is ignored.  If {\it Free} is true, then the sequencer is free-running and ignores both note-on and note-off.    
 
@@ -803,7 +812,7 @@ See also {\bf Waves}, which contains harmonics of single-cycle waves from certai
 
 \paragraph{Harmonics}  Outputs the first 32 harmonics, whose amplitude you can define independently.  You optionally can load these harmonics from a source, compress them (moving zero-amplitude partials to the end), and mutate them. See also {\bf Partials}.
 
-\paragraph{KHarmonics}  Produces a wide range of partials drawn from patches from the Kawai K5 synthesizer, including both factory patches (with Kawai's permission) and various patches in the public domain.  You can {\bf mix} two different sources and have the additional option of {\it Normalizing} the partials.  Note that among the harmonics are ones purporting to be drawn from the Kawai K3.  These are just wrong.  However the {\bf Waves} module has the correct ones.
+\paragraph{KHarmonics}  Produces a wide range of partials drawn from patches from the Kawai K5 synthesizer, including both factory patches (with Kawai's permission) and various patches in the public domain.  You can {\it Mix} two different sources and have the additional option of {\it Normalizing} the partials.  Note that among the harmonics are ones purporting to be drawn from the Kawai K3.  These are just wrong.  However the {\bf Waves} module has the correct ones.
 
 See also {\bf Draw}, which allows you to load single-cycle waves: the manual section on Draw has suggestions for sources of these waves.  See also {\bf Waves}, a similar collection drawn from various other synthesizers, as well as {\bf AKWF}.
 
@@ -843,7 +852,7 @@ Tinkle behaves differently than other modules when it comes to constraints.  Whe
  
 \item{\bf Ensoniq SQ-80}\quad   This collection is incomplete: my original source had some errors.\footnote{The SQ-80 harmonics are drawn from the waves in http:/\!/www.buchty.net/ensoniq/files/the\_waves.zip by /\!/christian.}  To combat antialiasing, the SQ-80 had different oversampled versions of the same wave depending on the octave of the note played on the keyboard.  The harmonics here are taken from the lowest octaves (with the most harmonics).
 
-\item{\bf Sequential Prophet VS}\quad The Prophet VS traditionally had waves 32--127, and these more or less line up with the harmonics provided by Flow: but you'll notice that Flow is missing a few because my original source is missing them.\footnote{The Prophet VS harmonics are drawn from https:/\!/www.dropbox.com/sh/ja0tc8wn6cnudzj/AACYqe2mjrWU2CeXIttm6MhOa as discussed in the forum thread http:/\!/www.muffwiggler.com/forum/viewtopic.php?t=33918\&sid=9e0b9554f0ac483b62a88c074c6136c3}  Note that some additional waves are labelled {\bf VS Extra}: these were a few additional waves in the original sources originally with numbers outside the VS range.  I asked John Bowen about them, and he thinks that they might be a few additional waves that were on the development hard drive at Sequential but which didn't find their way into the VS proper.  So I'm including them.
+\item{\bf Sequential Prophet VS}\quad The Prophet VS traditionally had waves 32--127, and these more or less line up with the harmonics provided by Flow: but you'll notice that Flow is missing a few because my original source is missing them.\footnote{The Prophet VS harmonics are drawn from https:/\!/www.dropbox.com/sh/ja0tc8wn6cnudzj/AACYqe2mjrWU2CeXIttm6MhOa as discussed in the forum thread http:/\!/www.muffwiggler.com/forum/viewtopic.php?t=33918\&sid=9e0b9554f0ac483b62a88c074c6136c3}  Note that some additional waves are labelled {\it VS Extra}: these were a few additional waves in the original sources originally with numbers outside the VS range.  I asked John Bowen about them, and he thinks that they might be a few additional waves that were on the development hard drive at Sequential but which didn't find their way into the VS proper.  So I'm including them.
 
 \item{\bf Casio CZ Series}\quad These are many of the CZ's standard waves.  Casio's waves are formed by concatenating two simpler wave shapes and then applying a window function.  The wave names in the menu are of the form ``\mbox{\it CZ Number Wave1 Wave2 WindowFunction}''.  The basic wave shapes are Sawtooth (Saw), Square (Sqr), Pulse (Puls), Null (-{}-{}-), Sine-Pulse (Sinp), Saw-Pulse (Sawp), Multi-Sine (Msin), and Pulse 2 (Pul2).  The window shapes are None (-{}-{}-), Sawtooth (Saw), Triangle (Tri), Trapezoid (Trap), Pulse (Puls), and Double-Saw (2Saw).  You'll note that not all combinations are here: effective duplicates have been removed.\footnote{See https:/\!/www.kasploosh.com/cz/11800-spelunking/ for an extended discussion of these waves, including pictures.  The original waves are from the project {\it Casio CZ-1 Spelunking REMIXED} by John Thompson (https:/\!/www.facebook.com/Hardwood01) and Michael Rickard  (https:/\!/www.kasploosh.com).  Many thanks to them for giving me permission to extract the harmonics from these waves.  If you'd like to get the wave sources, just buy them for \$10 from the project home page at https:/\!/www.kasploosh.com/cz/16293-cz\_waves\_for\_your\_mix/}  Some wave names start with ``CZ\#'' rather than ``CZ''.  This denotes that a wave is one of the classic original waves directly accessible from the CZ front panel (many CZ waves could only be generated via sysex).
 
@@ -899,9 +908,9 @@ All of the shapers have the ability of being {\bf constrained}.  This means that
 }
 
 
-You have the option of normalizing the resulting partials.   Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Combine} and {\bf Fill} and {\bf Mix} and {\bf Morph}.
+You have the option of normalizing the resulting partials.   Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Combine} and {\bf Fill} and {\bf Mix} and {\bf Dissolve}  and {\bf Morph}.
 
-One common task is to set the amplitudes of a source to 0 if they're below a certain limit. To do this, just set to {\bf filter}, plug your source into {\it both} \(A\) and \(B\), and use \(M\) as your limit.
+One common task is to set the amplitudes of a source to 0 if they're below a certain limit. To do this, just set to {\it filter}, plug your source into {\it both} \(A\) and \(B\), and use \(M\) as your limit.
 
 %\paragraph{Average}  Computes the average amplitude of all the partials, then nudges the amplitudes of all the partials towards the average.  The amount of nudging is an incoming modulation.  You can specify whether to include the zero-amplitude partials in the average.
 
@@ -948,7 +957,7 @@ One common task is to set the amplitudes of a source to 0 if they're below a cer
 \end{multicols}
 }
 
-\paragraph{Combine} The partials from up to four sources are merged by throwing together all their lowest partials.  This works as follows.  We first divide the number of partials evenly among the sources, then take that number of the lowest partials from each source.  The remaining (higher frequency) partials are discarded.  We then toss together all those lower partials to form the output.  You also can scale (down) the amplitude of each of the incoming sources.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}, particularly if you're hearing pops.  See also {\bf Amp Math} and {\bf Fill} and {\bf Mix} and {\bf Morph} and especially {\bf Joystick}.
+\paragraph{Combine} The partials from up to four sources are merged by throwing together all their lowest partials.  This works as follows.  We first divide the number of partials evenly among the sources, then take that number of the lowest partials from each source.  The remaining (higher frequency) partials are discarded.  We then toss together all those lower partials to form the output.  You also can scale (down) the amplitude of each of the incoming sources.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}, particularly if you're hearing pops.  See also {\bf Amp Math} and {\bf Fill} and {\bf Mix} and {\bf Morph} and {\bf Dissolve} and especially {\bf Joystick}.
 
 \paragraph{Compress}  The amplitude of every partial is raised to a certain power, controlled by the {\it Scale} modulation.  If Scale is greater than 0.5 (the mid-point), then the amplitude is raised and compressed more and more, resulting in them getting louder and with less difference among them.  If Scale is less than 0.5, then the opposite happens: the amplitudes are {\it expanded}, resulting in a larger difference among them, and with them all getting quieter.
 
@@ -956,9 +965,11 @@ One common task is to set the amplitudes of a source to 0 if they're below a cer
 
 \paragraph{Dilate} If a partial has a neighbor partial which is {\it larger} than it, then its amplitude is increased towards its neighbor: this change trickles down to its further (smaller) neighbors as well.  This has the effect of boosting neighboring partials until ultimately all partials are the same amplitude.  {\it Boost} is the amount to increase.  You can specify whether only lower neighbors, higher neighbors, or both are considered.  See also {\bf Skeletonize} (which is almost, but not quite, the opposite concept).
 
+\paragraph{Dissolve} Given two incoming sources \(A\) and \(B\), this module one by one replaces each of \(A\)'s partials with the equivalent partial in \(B\). The amount of replacement is specified by {\it Dissolve}.  The order in which this replacement is done is at random, determined by the {\it Seed}.   If {\it Seed} is {\it Free} (0), the replacement order will be randomly different with every new note: otherwise the replacement order will be the same from note to note.  If you don't like the sudden replacement of partials and would prefer that a partial cross-fade into another, you might try hooking Dissolve up to {\bf Smooth}.  See also {\bf Either/Or} and {\bf Amp Math} and {\bf Combine} and {\bf Fill} and {\bf Morph}.
+
 \paragraph{Fatten}  The top half partials are discarded and reused to create detuned versions of the lower half partials.  The detuning amount is specified as well as the wet/dry ratio.
 
-\paragraph{Fill}  Given two incoming sources \(A\) and \(B\), this module first adds all of the non-zero-partials of \(A\) to the output; any remaining partials are filled from non-zero amplitude partials in \(B\), starting at its lowest frequency partials and working up.  You can scale (down) the amplitude of each of the incoming sources.  This module is particularly useful with {\bf Noise}.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Amp Math} and {\bf Combine} and {\bf Mix} and {\bf Morph}.
+\paragraph{Fill}  Given two incoming sources \(A\) and \(B\), this module first adds all of the non-zero-partials of \(A\) to the output; any remaining partials are filled from non-zero amplitude partials in \(B\), starting at its lowest frequency partials and working up.  You can scale (down) the amplitude of each of the incoming sources.  This module is particularly useful with {\bf Noise}.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Amp Math} and {\bf Combine} and {\bf Mix} and {\bf Morph} and {\bf Dissolve}.
 
 \paragraph{Filter}  This is a resonant state-variable 2- or 4-pole filter. You can sweep through High Pass (at 0.0) to Notch (at 0.25) to Low Pass (the default, at 0.5), to Band Pass (at 0.75) and finally to High Pass again (at~1.0).  Resonance values currently range from no resonance (that is, resonance \(\smash{Q=\frac{1}{\sqrt{2}}}\)) at 0.0 to ten times that amount (\(\smash{Q =\frac{10}{\sqrt{2}}}\))  at 1.0.  And you can, of course, set the cutoff frequency.
 
@@ -995,7 +1006,7 @@ The bass in Ladder filters tends to bottom out with increasing resonance.  You m
 
 Linear Filter can be {\it Relative}.  This means that the filter cutoff frequency is set to be relative to Middle C.  If you're playing a higher note, the cutoff frequency will automatically be set higher to match; similarly if you're playing a lower note, the cutoff frequency will be automatically lower.  See also {\bf Partial Filter}.
 
-\paragraph{Mix} This is a straightforward mixer: the amplitudes of the partials of four different inputs can be mixed, with their respective gains.  The {\it frequencies} of the partials are set to those of the first input whose amplitudes are non-zero.  In many cases, it's likely that all four inputs have partials with the same frequency, so it wouldn't matter.  But this strategy is also useful because it allows Mix to be used in combination with {\bf Either/Or} to select a single output among the four mix inputs.  Be sure to also read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Either/Or} and {\bf Amp Math} and {\bf Combine} and {\bf Fill} and {\bf Morph} and especially {\bf Joystick}.
+\paragraph{Mix} This is a straightforward mixer: the amplitudes of the partials of four different inputs can be mixed, with their respective gains.  The {\it frequencies} of the partials are set to those of the first input whose amplitudes are non-zero.  In many cases, it's likely that all four inputs have partials with the same frequency, so it wouldn't matter.  But this strategy is also useful because it allows Mix to be used in combination with {\bf Either/Or} to select a single output among the four mix inputs.  Be sure to also read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Either/Or} and {\bf Amp Math} and {\bf Combine} and {\bf Fill} and {\bf Morph} and {\bf Dissolve} and especially {\bf Joystick}.
 
 \paragraph{Morph} This module morphs (interpolates) between two or more inputs.  In the most basic configuration, when two signals are morphed together, the amplitudes of their partials are weighted and averaged, and the frequencies of their partials are {\it also} weighted and averaged.  The weighting constant \(\alpha\) is controlled by the {\it Interpolation} knob.  For example, consider Inputs X and Y.  For each pair of partials \(\langle P^X_i, P^Y_i\rangle\) in X and Y respectively, with frequencies \(\langle F^X_i, F^Y_i\rangle\) and amplitudes \(\langle A^X_i, A^Y_i\rangle\), we produce a final partial \(P_i\) whose frequency \(F_i = (1-\alpha) F^X_i + \alpha F^Y_i\) and whose amplitude \(A_i = (1-\alpha) A^X_i + \alpha A^Y_i\).
 
@@ -1022,7 +1033,7 @@ Normally every Partial \(i\) in the first Input is paired up with the same Parti
 
 If {\it Free} is set, then Morph doesn't reset to Inputs A and B every time you press a note\,---\,it keeps morphing from wherever it left off.  Finally, if {\it Random} is set, then Morph chooses random new inputs each time it transitions, rather than rotating through them in turn. The random seed is (you guessed it) {\it Seed}, reset every note-on, except if Seed is 0, in which case it's fully random.  
 
-Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Switch}, {\bf Amp Math},  {\bf Combine}, {\bf Fill}, and {\bf Mix}.
+Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Switch}, {\bf Amp Math},  {\bf Combine}, {\bf Fill}, {\bf Dissolve}, and {\bf Mix}.
 
 \paragraph{Normalize} This {\it normalizes} the input (scales it so that the amplitudes all sum to 1.0, creating a relatively consistent volume) or {\it maximizes} it (scaling it so that the highest amplitude equals 1.0).  Optionally it also {\it standardizes} it (sets all the frequencies to standard harmonic values).
 
@@ -1063,7 +1074,7 @@ The {\it add} modulation, normally zero, shifts the overall amplification up or 
 
 There are currently six special modules: {\bf In}, {\bf Out}, {\bf Choice}, {\bf Fix}, {\bf Note}, {\bf Patch}, and {\bf Macro}.  The {\bf Out} module is critical in every patch, and is discussed below in Section~\ref{outmodule}.  {\bf In} and {\bf Macro} enable {\it macros}\.---\,and {\bf Out} helps out here as well\,---\,as discussed below in Section~\ref{creatingmacros}.  Here are the others:
 
-\paragraph{Choice}  The Choice module is an odd duck: it doesn't produce any sounds or modulation at all.  Instead, it enables you to change a module's checkboxes and comboboxes using a modulation signal.  To do this, note that Choice has a modulation input and a sound input port both called {\bf Target}.   Plug one of your target module's modulation or sound outputs into the appropriate Target port: this tells Choice what target module it should be modifying.  Don't attach to both of them, or Choice will just use the sound input port.
+\paragraph{Choice}  The Choice module is an odd duck: it doesn't produce any sounds or modulation at all.  Instead, it enables you to change a module's checkboxes and comboboxes using a modulation signal.  To do this, note that Choice has a modulation input and a sound input port both called {\it Target}.   Plug one of your target module's modulation or sound outputs into the appropriate Target port: this tells Choice what target module it should be modifying.  Don't attach to both of them, or Choice will just use the sound input port.
 
 After this is done, you will find you can select an option (a combobox or a checkbox) via the {\it Option} dial.\footnote{At present, the constraints facility is not part of the available options.  This might change in the future.} Once this is done, you can change the value of the selected option via the {\it Value} dial.  This might be particularly interesting to do via an LFO.
 
@@ -1080,19 +1091,19 @@ Note that when you change the value, it's not immediately reflected (or reflecte
 
 Every useful patch has to have an Out module, since it provides the facility for outputting your final partials to the audio system.  Out does several important basic things:
 
-\paragraph{Audio Generation}  Out is responsible for converting your partials into sound.  To do this, connect your final partials to the port on Out normally labelled {\bf A}: it's the topmost port in the module.  You can adjust the volume of this port by changing the {\it Gain} knob.  Similarly you can adjust the pan via the {\it Pan} knob.\footnote{Note that changing Pan manually will cause clicks due to the sudden change in relative volume of the two channels.  Attaching a square, sample and hold, or sawtooth LFO will cause pops for the same reason: while sine and triangle and random will sound fine.  If you want a square, sample and hold,  sawtooth to control Pan, consider Softening them very slightly first.}
+\paragraph{Audio Generation}  Out is responsible for converting your partials into sound.  To do this, connect your final partials to the port on Out normally labelled {\it A}: it's the topmost port in the module.  You can adjust the volume of this port by changing the {\it Gain} knob.  Similarly you can adjust the pan via the {\it Pan} knob.\footnote{Note that changing Pan manually will cause clicks due to the sudden change in relative volume of the two channels.  Attaching a square, sample and hold, or sawtooth LFO will cause pops for the same reason: while sine and triangle and random will sound fine.  If you want a square, sample and hold,  sawtooth to control Pan, consider Softening them very slightly first.}
 
 \paragraph{Reverb} Flow sports a simple implementation of the Freeverb algorithm.\footnote{A well regarded reverb algorithm in the public domain by ``Jezar at Dreampoint''.}  This algorithm has three parameters.  {\it Wet} is the dry/wet knob for the algorithm (0 is fully dry).  {\it Damp} is the damping: basically a low-pass filter applied to the reflected signals.  {\it Size} is the room size, which translates roughly into the reverb decay.  Note only a single sound (voice \#0) controls the modulation of Wet, Damp, and Size.  This means that if you attach an Envelope etc. to any of these modules, it may not respond in exactly the way you think.  It's probably best to keep them as knobs rather than attaching a modulation source.
 
 \paragraph{Dephase} By default Flow tries to keep all of its partials consistent with their original phases, so when you output a Sawtooth it'll look like this:  \smash{\raisebox{-0.5em}{\includegraphics[trim=1cm 1cm 1cm 8cm, clip=true, width=1in, height=0.15in]{Saw1}}}\quad However this may sound too buzzy in low pitch sounds, so selecting this button will cause Flow to add a specific fixed set of random values to the phases of its partials.  This might change the Sawtooth wave to look like this \smash{\raisebox{-0.5em}{\includegraphics[trim=1cm 1cm 1cm 8cm, clip=true,width=1in, height=0.15in]{Saw2}}}\quad This sure doesn't {\it look} like a Sawtooth wave, but if you play it in the high- and mid- pitch notes, you'll find it {\it sounds} exactly the same!  For low-frequency notes the randomly-phased Sawtooth will sound less buzzy; you may or may not prefer this.  It {\it is} the case that Dephasse gives Flow the opportunity to do some tricks which reduce computational cost by a bit.
 
-\paragraph{Partials Visualization}  When you connect to the {\bf A} port, the resulting partials are also displayed on the left partials display in your rack.  The {\bf B} (Aux) port is also useful for displaying partials (it shows them on the right partials display).  
+\paragraph{Partials Visualization}  When you connect to the {\it A} port, the resulting partials are also displayed on the left partials display in your rack.  The {\it B} (Aux) port is also useful for displaying partials (it shows them on the right partials display).  
 
 The displays have certain special colors you should be aware of: the {\it Green} line is where your frequency 1.0 partial is located (if you have one!).  The {\it Blue} line, if displayed, shows the Nyquist limit: partials beyond this line (in {\it Gray}) are too high frequency to be represented in the digital sound signal and will be discarded.  Partials with zero amplitude are displayed in {\it Red}.  Similarly, partials with more than 1.0 amplitude are also displayed in {\it Red}.
 
-\paragraph{Modulation Visualization} The Out module also lets you display modulation signals: the first two dials, normally labelled {\bf 1} and {\bf 2}, correspond to the left and right oscilloscope displays respectively.
+\paragraph{Modulation Visualization} The Out module also lets you display modulation signals: the first two dials, normally labelled {\it 1} and {\it 2}, correspond to the left and right oscilloscope displays respectively.
 
-In addition to the modulation signal, the oscilloscope also draws a helpful set of axes.  The color of these axes can be either {\it Blue} or {\it Green}: every time the signal produces a {\bf trigger}, the oscilloscope will change the color of the axes.
+In addition to the modulation signal, the oscilloscope also draws a helpful set of axes.  The color of these axes can be either {\it Blue} or {\it Green}: every time the signal produces a {\it trigger}, the oscilloscope will change the color of the axes.
 
 There's no reason you can't insert multiple Out modules into your patch: but only the last one will do anything.
 
@@ -1101,12 +1112,12 @@ There's no reason you can't insert multiple Out modules into your patch: but onl
 \subsubsection{Creating a Macro with the \textit{In}, \textit{Out,} and \textit{Macro} Modules}
 \label{creatingmacros}
 
-Once you have saved your patch, you can reload it as a {\bf Macro} in a higher-level patch of your design: it will appear as a module like any other.  The partials fed into the ({\bf A}) port of your Out module, normally used to produce audio, will be available to feed into other modules. When used in a macro, Out's Reverb and Gain are disabled.  The underlying patch's information (author, etc.) are available by clicking on a disclosure triangle labelled {\it Info}.  
+Once you have saved your patch, you can reload it as a {\bf Macro} in a higher-level patch of your design: it will appear as a module like any other.  The partials fed into the ({\it A}) port of your Out module, normally used to produce audio, will be available to feed into other modules. When used in a macro, Out's Reverb and Gain are disabled.  The underlying patch's information (author, etc.) are available by clicking on a disclosure triangle labelled {\it Info}.  
 
-But that's not all.  Your patch can in fact output {\it four} partials streams, by default called {\bf A}, {\bf B}, {\bf C}, and {\bf D}.  And you can also output {\it four} modulation signals, called {\bf 1}, {\bf 2}, {\bf 3}, and {\bf 4}.  Just connect to them in the Out module of your original patch, and when you load it as a Macro, they're all available as outputs in the Macro module to feed into other modules.
+But that's not all.  Your patch can in fact output {\it four} partials streams, by default called {\it A}, {\it B}, {\it C}, and {\it D}.  And you can also output {\it four} modulation signals, called {\it 1}, {\it 2}, {\it 3}, and {\it 4}.  Just connect to them in the Out module of your original patch, and when you load it as a Macro, they're all available as outputs in the Macro module to feed into other modules.
 
 
-\paragraph{Input to a Macro: the \textit{In} Module}  So far so good.  But how about feeding partials and modulation signals {\it into} your Macro?  This is accomplished with the {\bf In} module.  The In module has eight partials outputs and eight modulation outputs, conveniently called {\bf A} ... {\bf H} and {\bf 1} ... {\bf 8}.  If, before you save your patch, you wire up some modules to listen in on these ports, then when you load the patch as a Macro, you can attach modules to feed into the Macro at those ports and their partials and modulation signals will be handed the modules inside the Macro.  Unlike Out, you can have as many In modules as you like: all of them will happily provide (the same) signals.
+\paragraph{Input to a Macro: the \textit{In} Module}  So far so good.  But how about feeding partials and modulation signals {\it into} your Macro?  This is accomplished with the {\bf In} module.  The In module has eight partials outputs and eight modulation outputs, conveniently called {\it A} ... {\it H} and {\it 1} ... {\it 8}.  If, before you save your patch, you wire up some modules to listen in on these ports, then when you load the patch as a Macro, you can attach modules to feed into the Macro at those ports and their partials and modulation signals will be handed the modules inside the Macro.  Unlike Out, you can have as many In modules as you like: all of them will happily provide (the same) signals.
 
 When a Macro has Inputs, it will also sport Constraints just like other partials shapers.
 
@@ -1116,7 +1127,7 @@ The In module also contains some modulation inputs (dials) with the same name as
 
 \paragraph{Naming Things}
 
-You can rename the input and output partials and modulation ports of your Macro.  This is accomplished by renaming their compatriots in your In and Out modules.  Note that, unlike in other modules, the ports in your In and Out modules have {\bf underlined labels}.  Just click on a label and you'll be asked to give it a new name.
+You can rename the input and output partials and modulation ports of your Macro.  This is accomplished by renaming their compatriots in your In and Out modules.  Note that, unlike in other modules, the ports in your In and Out modules have {\it underlined labels}.  Just click on a label and you'll be asked to give it a new name.
 
 Note that although you can have as many In modules as you like, and they will all work, only the ports of the first one will be used to rename ports in the Macro.  (Of course, as mentioned before, while you can have multiple Out modules, only the last one will function at all, and this includes naming ports).
 
@@ -1124,7 +1135,7 @@ Note that although you can have as many In modules as you like, and they will al
 
 You can load a Macro using {\it Load Patch as Macro...} in the {\it Other} menu.  A Macro will appear with exactly the modulation inputs and outputs specified by your In and Out modules; and you can expand the {\it Info...} disclosure button to show the original Patch information (version, author, date, info).
 
-A Macro also contains an {\it On Tr} and an {\it Off Tr} modulation dial.  If you send a trigger to On Tr, then a Gate (Note On) message will be sent to all the underlying modules in the Macro.  This results in the Macro resetting itself as if a new note had been played.  This is particularly useful in combination with {\bf Switch} or {\bf Morph}: see those modules for further information.  Likewise, sending a trigger to {\bf Off Tr} will send a Release (Note Off) message to the underlying modules.
+A Macro also contains an {\it On Tr} and an {\it Off Tr} modulation dial.  If you send a trigger to On Tr, then a Gate (Note On) message will be sent to all the underlying modules in the Macro.  This results in the Macro resetting itself as if a new note had been played.  This is particularly useful in combination with {\bf Switch} or {\bf Morph}: see those modules for further information.  Likewise, sending a trigger to {\it Off Tr} will send a Release (Note Off) message to the underlying modules.
 
 Macros have one more trick up their sleeves.  The {\it Pause} button changes the behavior of the {\it On Tr} modulation dial.  If you turn on {\it Pause}, then while {\it On Tr} is set to zero (0.0), the underlying modules in the Macro will not be stepped at all: they're effectively put to sleep.  This can be used in combination with {\bf Switch} or {\bf Morph} again to entirely shut off Macro sounds while they're not being used, saving a bit of computational power.  This is because the modulation outputs of Switch and Morph both go to zero when they are not using the corresponding sound.  With great power comes great responsibility: be careful that you know what you're doing here.
 
@@ -1147,6 +1158,8 @@ This can produce some surprises.  Let's say you made a sawtooth wave and detuned
 \item {\bf Fill} adds to \(O\) all the non-zero amplitude partials of \(A\).  Any remaining partials come from the lowest non-zero partials of \(B\).  Fill is particularly useful when mixing in Noise from a limited number of partials: set \(A\) to the noise.  Fill also works great if both sources (or at least \(A\)) have lots of empty partials.  At present orders come from \(A\): orders in \(B\) are reassigned.  This could potentially create the same pop/buzz situation as discussed in Combine.
 
 \item {\bf Morph} lines up partials in \(A\) and \(B\) according to some map and interpolates their frequencies and amplitudes.  Orders come from \(A\).  Because of interpolation, this is unlikely to create pops or buzzes in most situations.  
+
+\item {\bf Dissolve} one by one replaces the partials in \(A\) with their equivalents in \(B\) in some specified order.  This is also unlikely to create pops or buzzes.  
 
 
 
