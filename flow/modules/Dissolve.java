@@ -12,23 +12,6 @@ import java.awt.event.*;
 import java.util.*;
 
 /**
-   A Unit which shifts the frequency of all partials.  There are three
-   options:
-   
-   <ol>
-   <li>Pitch.  Shift all partials by a certain pitch (for example, up an octave).
-   This multiplies their frequencies by a certain amount.
-   <li>Frequency.  Add a certain amount to the frequency of all partials.
-   partials based on their distance from the nearest
-   <li>Partials.  Move all partials towards the frequency of the next partial.
-   </ol>
-   
-   The degree of shifting depends on the SHIFT modulation, bounded by the
-   BOUND modulation.
-   
-   <P>To make pitch shifting a bit easier, if you doiuble-click on a Shift dial,
-   a keyboard will pop up which provides translation equivalents (when Bound is 1.0): 
-   Middle C is equivalent to no shift.
 */
 
 public class Dissolve extends Unit
@@ -144,4 +127,19 @@ public class Dissolve extends Unit
         constrain();
         simpleSort(0, true);
         }               
+
+
+    public String getModulationValueDescription(int modulation, double value, boolean isConstant)
+        {
+        if (isConstant)
+            {
+            if (modulation == MOD_SEED)
+                {
+                return (value == 0.0 ? "Free" : String.format("%.4f" , value));
+                }
+            else return super.getModulationValueDescription(modulation, value, isConstant);
+            }
+        else return "";
+        }
+    
     }
