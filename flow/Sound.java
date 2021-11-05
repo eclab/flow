@@ -297,7 +297,9 @@ public class Sound
     /** Loads the patch name from the given object. */
     public static String loadName(JSONObject obj) throws JSONException
         {
-        return obj.optString("name", UNTITLED_PATCH_NAME);
+        String str = obj.optString("name", UNTITLED_PATCH_NAME);
+        if (str.equals("")) return UNTITLED_PATCH_NAME;
+        else return str;
         }
                 
     /** Stores the patch version to the given object. */
