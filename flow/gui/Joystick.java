@@ -28,6 +28,7 @@ public class Joystick extends JComponent
     //int[] lastVal = new int[4];
     public Color[] colors = new Color[0];
     boolean drawsUnpressedCursor = true;
+    public String[] strings = null;
 
     public Color gridlineColor = Color.GRAY;
     public Color unsetColor = Color.BLUE;
@@ -96,8 +97,9 @@ public class Joystick extends JComponent
                 double hpos = centerY2 - JOYSTICK_WIDTH/ 4.0 - height;
                 if (hpos - height < 0)  // uh oh
                     hpos = centerY2 + JOYSTICK_WIDTH/ 4.0 + height;
-                g2d.drawString("" + i, 
-                    (float)(centerX2 - g2d.getFontMetrics().stringWidth("" + i) / 2.0),
+                String label = strings != null ? strings[i] : ("" + i);
+                g2d.drawString(label, 
+                    (float)(centerX2 - g2d.getFontMetrics().stringWidth(label) / 2.0),
                     (float)hpos);
                 }
             }
