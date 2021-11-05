@@ -1,14 +1,18 @@
-A joystick for simultaneously modifying four modulation outputs.
+A joystick for simultaneously modifying four modulation outputs, plus recorded joystick movement trajectories.
 <dl>
-<dt>&#8598;&#8599;&#8600;&#8601;
+<dt>&#8598;&#8599;&#8601;&#8600;
 <dd>The four modulation outputs, corresponding to (and highest in) the various corners of the joystick.
+<dt>On Tr
+<dd>Starts or restarts playback of a recorded trajectory (normally this is done at Note On).
+<dt>Loop
+<dd>Indicates that a recorded trajectory should loop forever.
 <dt>Show
-<dd>Reveals the joystick, plus the option to record.
+<dd>Reveals the joystick and record button.
 <dt>Record
 <dd>A button for recording the a joystick movement trajectory, which is then played back whenever a note is played.  This button has four states:
 <dl>
 <dt>Record
-<dd>Arms the recording.  The joystick turns green.  Drag the joystick to begin recording.
+<dd>Arms the recording.  The joystick turns green.  Drag the joystick to begin recording.  A point labelled "Start" will show where the trajectory started: thisis useful to close things up if you're looping.
 <dt>Cancel
 <dd>Disarms and cancels the recording.  The joystick turns blue.
 <dt>Recording
