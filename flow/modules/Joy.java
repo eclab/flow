@@ -26,6 +26,10 @@ public class Joy extends Modulation implements ModSource
     {
     private static final long serialVersionUID = 1;
 
+    public static final int MOD_GATE_TR = 0;
+    //public static final int MOD_REL_TR = 1;
+
+
 	// X, Y, and time of a movement of the joystick
 	class Spot
 		{
@@ -48,40 +52,98 @@ public class Joy extends Modulation implements ModSource
 	long startTime;
 	
 	// Is the note being held down?
-	boolean gated;
+	boolean running;
 	
+	void doGate()
+		{
+        	startTime = getSyncTick(true);		// reset the start time so we record/play properly
+    	    running = true;
+	        pos = 0;
+	        looped = false;
+		}
+		
     public void gate() 
         { 
         super.gate();
-        startTime = getSyncTick(true);		// reset the start time so we record/play properly
-        gated = true;
-        pos = 0;
+        if (isModulationConstant(MOD_GATE_TR))
+        	{
+        	doGate();
+	        }
         }
         
+    /*
+    void doRelease()
+    	{
+	    	running = false;
+    	}
+    	
     public void release()
     	{
     	super.release();
-    	gated = false;
+        if (isModulationConstant(MOD_REL_TR))
+        	{
+        	doRelease();
+	    	}
     	}
 
     public void restart()
         {
         super.restart();
-    	gated = false;
+    	running = false;
         } 
 
     public void reset() 
         { 
         super.reset();
-    	gated = false;
+    	running = false;
         }
+    */
+        
+    boolean loop;
+    public boolean getLoop() { return loop; }
+    public void setLoop(boolean val) { loop = val; }
+    boolean looped;
+    
+    public static final int OPTION_LOOP = 0;
+
+    public int getOptionValue(int option) 
+        { 
+        switch(option)
+            {
+            case OPTION_LOOP: return getLoop() ? 1 : 0;
+            default: throw new RuntimeException("No such option " + option);
+            }
+        }
+                
+    public void setOptionValue(int option, int value)
+        { 
+        switch(option)
+            {
+            case OPTION_LOOP: setLoop(value != 0); break;
+            default: throw new RuntimeException("No such option " + option);
+            }
+            
+        // gotta update the labels for the dials
+        ModulePanel pan = getModulePanel();
+        if (pan != null) SwingUtilities.invokeLater(new Runnable() { public void run() { pan.repaint(); } });
+        }
+
 
 	public void go()
 		{
 		super.go();
 		
-        // We only play back the recording if we're gated and if there IS a recording
-        if (gated && trajectory != null)
+        if (isTriggered(MOD_GATE_TR))
+            {
+            doGate();
+            }
+//        else if (isTriggered(MOD_REL_TR))
+//            {
+//            doRelease();
+//            }
+            
+        // We only play back the recording if we're running and if there IS a recording
+        if (running && trajectory != null)
         	{
 			long currentTime = getSyncTick(true) - startTime;
 		
@@ -90,14 +152,31 @@ public class Joy extends Modulation implements ModSource
 				{
 				pos++;
 				}
+			
+			if (pos >= trajectory.length && loop)
+				{
+				// loop back around!  We just go to zero rather than trying to find the right delta time difference; it probably won't matter much.
+				startTime = getSyncTick(true);
+				pos = 0;
+				currentTime = 0;
+				looped = true;
+				}
 				
 			// pos now contains the current position, or it is over the length
 			if (pos < trajectory.length)
 				{
 				Spot spot = trajectory[pos];
-				if (pos == 0)
+				if (pos == 0 && !looped)
 					{
 					updateModulation(spot.x, spot.y);
+					}
+				else if (pos == 0 && looped)
+					{
+					// let's update with a bit of linear interpolation
+					Spot prevspot = trajectory[trajectory.length - 1];
+					double alpha = (currentTime - prevspot.time) / (double)(spot.time - prevspot.time);
+					updateModulation(spot.x * alpha  + prevspot.x * (1.0 - alpha),
+									 spot.y * alpha  + prevspot.y * (1.0 - alpha));
 					}
 				else
 					{
@@ -112,6 +191,7 @@ public class Joy extends Modulation implements ModSource
 				{
 				Spot spot = trajectory[trajectory.length - 1];
 				updateModulation(spot.x, spot.y);
+				running = false;
 				}
 			}
 		}
@@ -129,10 +209,22 @@ public class Joy extends Modulation implements ModSource
     public Joy(Sound sound) 
         {
         super(sound);
-        defineModulationOutputs(new String[] { "\u2196", "\u2197", "\u2199", "\u2198" }); 
+        defineOptions(new String[] { "Loop" }, new String[][] { { "Loop" } } );
+        defineModulationOutputs(new String[] { 
+        	//"\u2192", "\u2191",
+        	"\u2194", "\u2195", 
+        	//"\u21C5", "\u21C6",
+        "\u2196", "\u2197", "\u2199", "\u2198" }); 
+        defineModulations(new Constant[] { new Constant(0) }, new String[] { "On Tr" });
         updateModulation(0,0);
         }
     
+    public static final String[] KEYS = { "H", "V", "TL", "TR", "BL", "BR" }; 
+    public String getKeyForModulationOutput(int output) 
+    	{ 
+    	return KEYS[output];
+    	}
+
 	public static String getName() { return "Joystick"; }
 
 	// Given a joystick position (the joystick runs -1 ... +1 in each direction)
@@ -142,10 +234,12 @@ public class Joy extends Modulation implements ModSource
     	xPos = (xPos + 1) / 2.0;
     	yPos = (yPos + 1) / 2.0;
 
-    	setModulationOutput(0, Math.min(1.0 - xPos, 1.0 - yPos));
-    	setModulationOutput(1, Math.min(xPos, 1.0 - yPos));
-    	setModulationOutput(2, Math.min(1.0 - xPos, yPos));
-    	setModulationOutput(3, Math.min(xPos, yPos));
+    	setModulationOutput(0, xPos);
+    	setModulationOutput(1, 1.0 - yPos);
+    	setModulationOutput(2, Math.min(1.0 - xPos, 1.0 - yPos));
+    	setModulationOutput(3, Math.min(xPos, 1.0 - yPos));
+    	setModulationOutput(4, Math.min(1.0 - xPos, yPos));
+    	setModulationOutput(5, Math.min(xPos, yPos));
     	}
     
     // Distribute the provided joystick values (-1 ... +1), updating the modulations on
@@ -230,7 +324,7 @@ public class Joy extends Modulation implements ModSource
 				if (trajectory == null)
 					{
 					state = STATE_WAITING;
-            		stick.unsetColor = Color.GREEN;
+            		stick.unsetColor = Color.GREEN.darker();
             		stick.repaint();
 					}
 				else				// CLEAR
@@ -285,6 +379,10 @@ public class Joy extends Modulation implements ModSource
                 	
                 	// Add initial joystick position
                 	trajectoryBuilder.add(new Spot(xPos, yPos, 0));
+                	xPositions = new double[] { xPos, xPos };
+                	yPositions = new double[] { yPos, yPos };
+                	colors = new Color[] { new Color(0,0,0,0), Color.GREEN.darker() };
+                	strings = new String[] { "", "Start" };
             		}
                 else if (recordButton.state == RecordButton.STATE_RECORDING)  /// If we're RECORDING
                 	{
@@ -308,6 +406,9 @@ public class Joy extends Modulation implements ModSource
             	{
             	if (recordButton.state == RecordButton.STATE_RECORDING)  /// If we're RECORDING and now want to STOP
             		{
+                	xPositions = new double[0];
+                	yPositions = new double[0];
+
 					// Update final joystick position if we're at a new tick
                 	long currentTick = getSyncTick(true) - firstTick;
                 	Spot lastSpot = trajectoryBuilder.get(trajectoryBuilder.size() - 1);
@@ -339,7 +440,7 @@ public class Joy extends Modulation implements ModSource
             {
             public JComponent buildPanel()
                 {
-                Joy draw = (Joy)(getModulation());
+                Joy joy = (Joy)(getModulation());
                 final JPanel panel = new JPanel();
                 panel.setLayout(new BorderLayout());
                                 
@@ -359,20 +460,39 @@ public class Joy extends Modulation implements ModSource
 
                 Box vert = new Box(BoxLayout.Y_AXIS);
                 Box horiz = new Box(BoxLayout.X_AXIS);
-                horiz.add(new ModulationOutput(draw, 0, this));
+                horiz.add(new ModulationOutput(joy, 0, this));
                 horiz.add(Strut.makeHorizontalStrut(8));
-                horiz.add(new ModulationOutput(draw, 1, this));
+                horiz.add(new ModulationOutput(joy, 1, this));
+                vert.add(horiz);
+                vert.add(Strut.makeVerticalStrut(8));
+                horiz = new Box(BoxLayout.X_AXIS);
+                horiz.add(new ModulationOutput(joy, 2, this));
+                horiz.add(Strut.makeHorizontalStrut(8));
+                horiz.add(new ModulationOutput(joy, 3, this));
                 vert.add(horiz);
                 horiz = new Box(BoxLayout.X_AXIS);
-                horiz.add(new ModulationOutput(draw, 2, this));
+                horiz.add(new ModulationOutput(joy, 4, this));
                 horiz.add(Strut.makeHorizontalStrut(8));
-                horiz.add(new ModulationOutput(draw, 3, this));
+                horiz.add(new ModulationOutput(joy, 5, this));
                 vert.add(horiz);
+
                 JPanel vertPanel = new JPanel();
                 vertPanel.setLayout(new BorderLayout());
                 vertPanel.add(vert, BorderLayout.EAST);
-                panel.add(vertPanel, BorderLayout.SOUTH);
+                
+				Box vert2 = new Box(BoxLayout.Y_AXIS);
+                vert2.add(new ModulationInput(joy, 0, this));
+//                vert2.add(new ModulationInput(joy, 1, this));
+                vert2.add(new OptionsChooser(joy, 0));
+                JPanel vertPanel2 = new JPanel();
+                vertPanel2.setLayout(new BorderLayout());
+                vertPanel2.add(vert2, BorderLayout.WEST);
+                
+                Box vert3 = new Box(BoxLayout.Y_AXIS);
+                vert3.add(vertPanel);
+                vert3.add(vertPanel2);
 
+                panel.add(vert3, BorderLayout.SOUTH);
                 return panel;
                 }
             };
