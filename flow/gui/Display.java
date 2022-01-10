@@ -21,6 +21,7 @@ public class Display extends JComponent
     {
     Output output;
     ModulePanel modPanel;
+    double xscale = 2;
     
     // Am I the "auxiliary" display?
     boolean aux;
@@ -327,17 +328,17 @@ public class Display extends JComponent
             buffer = null;
                 
             g.setColor(DARK_BLUE);
-            double xx = (width - BORDER * 2) / range * normalizedFrequency(nyquist, fundamental) + BORDER;
+            double xx = (width - BORDER * 2) / range * normalizedFrequency(nyquist, fundamental) * xscale + BORDER;
             g.draw(new Line2D.Double(xx, height, xx, 0));
                                 
             g.setColor(DARK_GREEN);
-            xx = (width - BORDER * 2) / range * normalizedFrequency(1.0, fundamental) + BORDER;
+            xx = (width - BORDER * 2) / range * normalizedFrequency(1.0, fundamental) * xscale + BORDER;
             g.draw(new Line2D.Double(xx, height, xx, 0));
 
             prepareColorsForPartials();
             for(int i = 0; i < frequencies.length; i++)
                 {
-                double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) + BORDER;
+                double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) * xscale + BORDER;
                 double y = (height - BORDER * 2) / maxAmplitude * amplitudes[i];
                                                 
                 if (x >= 0 && x <= width)
@@ -360,7 +361,7 @@ public class Display extends JComponent
             double closestX = -1;
             for(int i = 0; i < frequencies.length; i++)
                 {
-                double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) + BORDER;
+                double x = (width - BORDER * 2) / range * normalizedFrequency(frequencies[i], fundamental) * xscale + BORDER;
                 double y = (height - BORDER * 2) / maxAmplitude * amplitudes[i];
                                         
                 if (x >= 0 && x <= width)
@@ -501,7 +502,7 @@ public class Display extends JComponent
     // Returns the frequency associated with an x coordinate
     double mouseToFrequency(double x)
         {
-        double d = (x - BORDER) / (getWidth() - BORDER * 2);
+        double d = (x - BORDER) / xscale / (getWidth() - BORDER * 2) ;
 
         double max = maxFrequency;
         double min = minFrequency;

@@ -12,7 +12,7 @@ import java.io.*;
 import java.awt.geom.*;
 
 /** A joystick. When pressed, it updates by calling updatePosition(),
-	and there are also hooks for mouseDown() and mouseUp()
+    and there are also hooks for mouseDown() and mouseUp()
 */
 
 public class Joystick extends JComponent
@@ -39,8 +39,8 @@ public class Joystick extends JComponent
     public static final float STROKE_THIN_WIDTH = 1;
     public static BasicStroke makeThinStroke() { return new BasicStroke(STROKE_THIN_WIDTH, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL); }
     public static BasicStroke makeThickStroke() { return new BasicStroke(STROKE_WIDTH, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL); }
-	public Modulation modulation;
-	
+    public Modulation modulation;
+        
     public int margin = (int)JOYSTICK_WIDTH/ 2 + (int)STROKE_WIDTH/ 2;
 
     public void setNumPositions(Color[] colors) { xPositions = new double[colors.length]; yPositions = new double[colors.length]; position = 0; this.colors = colors; }
@@ -119,7 +119,7 @@ public class Joystick extends JComponent
     
     public void updatePosition()
         {
-		repaint();
+        repaint();
         }
         
     public void release()
@@ -184,7 +184,7 @@ public class Joystick extends JComponent
             public void mousePressed(MouseEvent e)
                 {
                  
-               mouseDown();
+                mouseDown();
                 
                 if (releaseListener != null)
                     {

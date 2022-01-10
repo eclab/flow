@@ -724,8 +724,8 @@ public class Unit extends Modulation
         {
         double[] frequencies = this.frequencies[j];
         for(int i = 1; i < frequencies.length; i++)
-        	if (frequencies[i] < frequencies[i-1])
-        		return true;
+            if (frequencies[i] < frequencies[i-1])
+                return true;
         return false;
         }
 

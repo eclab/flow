@@ -896,6 +896,7 @@ public class AppMenu
         return log;
         }
 
+/*
     public static final int DEFAULT_MAX_DISPLAYED_HARMONIC = 6;             // 150
         
     static JMenuItem maxDisplayedHarmonic(Rack rack)
@@ -1005,7 +1006,7 @@ public class AppMenu
             }
         return min;
         }
-
+*/
 
     static JMenuItem showKeyboard(Rack rack)
         {
@@ -1210,7 +1211,7 @@ public class AppMenu
         JMenuBar menubar = new JMenuBar();
         menubar.add(provideFileMenu(rack));
         menubar.add(providePlayMenu(rack));
-       	provideModuleMenu(rack, menubar);
+        provideModuleMenu(rack, menubar);
         menubar.add(provideOptionsMenu(rack));
         if (Style.isWindows() || Style.isUnix())
             {
@@ -1261,8 +1262,8 @@ public class AppMenu
         menu.add(showDisplay(rack));
         menu.add(logAxisDisplay(rack));
         menu.add(waterfallDisplay(rack));
-        menu.add(maxDisplayedHarmonic(rack));
-        menu.add(minDisplayedHarmonic(rack));
+//        menu.add(maxDisplayedHarmonic(rack));
+//        menu.add(minDisplayedHarmonic(rack));
         menu.add(showKeyboard(rack));
         menu.addSeparator();
         menu.add(addModulesAfterMenu(rack));
@@ -1329,7 +1330,7 @@ public class AppMenu
                 modShapers.add(m);
             }
                 
-JMenu sub;
+        JMenu sub;
                 
         sub = new JMenu("Sources");
         for(JMenuItem m : unitSources)

@@ -121,9 +121,9 @@ public class Prefs
                 {
                 return prop;
                 }
- 			else return Prefs.getAppPreferences(moduleName, "data").get(x, null);
+            else return Prefs.getAppPreferences(moduleName, "data").get(x, null);
             }
- 		else return null;
+        else return null;
         }
 
     /**
@@ -143,8 +143,8 @@ public class Prefs
         if (prop != null)
             {
             return prop;
-           }
- 		else return Prefs.getGlobalPreferences("data").get(x, null);
+            }
+        else return Prefs.getGlobalPreferences("data").get(x, null);
         }
 
     /** Sets the last directory used by load, save, or save as */

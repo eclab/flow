@@ -50,7 +50,7 @@ public class Normalize extends Unit
             {
             case OPTION_NORMALIZE: return getNormalize();
             case OPTION_STANDARDIZE: return getStandardize() ? 1 : 0;
-            //case OPTION_RESET: return getReset() ? 1 : 0;
+                //case OPTION_RESET: return getReset() ? 1 : 0;
             default: throw new RuntimeException("No such option " + option);
             }
         }
@@ -61,12 +61,12 @@ public class Normalize extends Unit
             {
             case OPTION_NORMALIZE: setNormalize(value); return;
             case OPTION_STANDARDIZE: setStandardize(value != 0); return;
-            //case OPTION_RESET: setReset(value != 0); return;
+                //case OPTION_RESET: setReset(value != 0); return;
             default: throw new RuntimeException("No such option " + option);
             }
         }
         
-	boolean noteOn = false;
+    boolean noteOn = false;
 
     public void gate()
         {
@@ -79,13 +79,13 @@ public class Normalize extends Unit
         super.release();
         noteOn = false;
         }
-	
+        
     public void reset()
         {
         super.release();
         noteOn = false;
         }
-	
+        
     public void go()
         {
         super.go();
