@@ -1,8 +1,16 @@
 Outputs partials from wavetable.
 
-<p>Traditionaly a wavetable is a list of single-cycle waves, and you can modulate which wave is being outputted.  Flow doesn't have waves: instead Flow's wavetable is a list of sets f partials: the effect is the same.
+<p>Traditionaly a wavetable is a list of single-cycle waves, and you can modulate which wave is being outputted.  Flow doesn't have waves: instead Flow's wavetable is a list of sets of partials: the effect is the same.
 
-<p>The Wavetable module can load wavetables from .WAV files.  A good source of these files is <b>waveeditonline.com</b>  You can also load a raw sound sample as a .WAV file, and it will be treated as a wavetable, creating a vocoder effect.
+<p>The Wavetable module can load the following wavetables:
+
+<ul>
+<li>Sysex files for <b>Waldorf Blofeld wavetables</b>.  These files end end in .syx or .SYX.  See the About pane for information about where to find them.
+
+<p><li>WAV files from <b>waveeditoneline.com</b>.  These files are a concatenation of 128 waves, each of which is 256 samples.  The WAV files must be 16-bit signed integer PCM, Mono only, and end in .wav or .WAV
+
+<p><li>WAV files representing an arbitrary raw sound sample.  he WAV files must be 16-bit signed integer PCM, Mono only, and end in .wav or .WAV
+</ul>
 
 <dl>
 <dt>Position
@@ -10,7 +18,7 @@ Outputs partials from wavetable.
 <dt>Interpolate
 <dd>If the position specified is in between two waves, should we output a wave that is the interpolation (average) of the two, or should we just output the wave that is nearest?
 <dt>Wavetable...
-<dd>Loads the wavetable
+<dd>Loads the wavetable either from WAV or from Blofeld sysex
 <dt>Sample...
 <dd>Loads a sample as if it were wavetable.  This does some additional smoothing on the sample to convert it appropriately.
 </dl>
