@@ -3,6 +3,10 @@ If this is a top-level patch, outputs sound as audio and displays sound and sign
 Macros can provide up to four audio outputs and four modulation signal outputs to their parents.  The default names for these are A, B, C, D and 1, 2, 3, 4 respectively.  You can change the names of these outputs by clicking on the title (the underlined portion).  Unused outputs are trimmed out when a Macro is displayed.
 
 <dl>
+<dt><font style="color:black; background-color:yellow;">&nbsp;Clip&nbsp;</font></span>
+<dd>Indicates that Flow is producing sound louder than the maximum amplitude of your machine, resulting in clipping.
+<dt><font style="color:white; background-color:red;">&nbsp;Glitch&nbsp;</font>
+<dd>Indicates that Flow cannot run fast enough to keep the audio buffer filled, resulting in glitches as the buffer gets filled with 0.
 <dt>A (Audio)
 <dd>If this is a top-level patch, then this outputs the partials as audio, and also displays it in the left partials display.  If this is a macro, then this routes to partials output A in the parent.
 <dt>B (Aux)
