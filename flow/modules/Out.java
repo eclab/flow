@@ -498,7 +498,7 @@ public class Out extends Unit implements Miscellaneous
                     String labeladdendum = "";
                     if (playFirst)
                         {
-                        labeladdendum = "  (Mono)";
+                        labeladdendum = "  (Monophonic)";
                         }
                     else if (numVoices < Output.getNumVoices())  // we don't have a fully complement
                         {
