@@ -157,7 +157,46 @@ public class Chord extends Unit
             }
         }
 
-        
+
+	// Chord's strategy for loading chords without having to resort is to
+	// Load all the partials for each note into a separate array, then
+	// merge the arrays in an O(1) merge kind of like mergesort
+
+
+	double[][] _freqs;
+	double[][] _amps;
+	int[] _pos;
+	int lastChord = 0;			// 0 ("no chord") is the default
+    
+    void loadSubarrays(int chord, double[] frequencies, double[] amplitudes, double[] ratios)
+    	{
+    	if (_freqs == null || lastChord != chord)
+    		{
+    		int chordSize = chords[chord].length;
+    		int numPartials = NUM_PARTIALS / chordSize + 1;
+    		_freqs = new double[chordSize][numPartials];
+    		_amps = new double[chordSize][numPartials];
+    		_pos = new int[chordSize];
+    		}
+    		
+        double gain = modulate(MOD_GAIN);
+        int[] _chords = chords[chord];
+        int chordSize = _chords.length;
+    	int numPartials = NUM_PARTIALS / chordSize + 1;
+		for(int j = 0; j < chordSize; j++)
+			{
+			double[] _freqsj = _freqs[j];
+			double[] _ampsj = _amps[j];
+			int _chordsj = _chords[j];
+    		for(int i = 0; i < numPartials; i++)
+    			{
+				_freqsj[i] = frequencies[i] * ratios[_chordsj];
+				_ampsj[i] = amplitudes[i] * gain;
+				}
+    		}
+    	}
+    	
+    
     public Chord(Sound sound) 
         {
         super(sound);
@@ -169,11 +208,12 @@ public class Chord extends Unit
     public void go()
         {
         super.go();
-        
+
         if (chord == 0) // no change
             {
             pushFrequencies(0);
             pushAmplitudes(0);
+            lastChord = 0;					// reset
             }
         else
             {
@@ -182,22 +222,42 @@ public class Chord extends Unit
             double[] ratios = align ? alignedSemitoneFrequencyRatios : semitoneFrequencyRatios;
             double[] frequencies = getFrequencies(0);
             double[] amplitudes = getAmplitudes(0);
-            double gain = modulate(MOD_GAIN);
 
-            int numPartials = frequencies.length / chords[chord].length;
-            int offset = frequencies.length - numPartials * chords[chord].length;
-            for(int i = 1; i < chords[chord].length; i++)                   // yes, 1, since 0 is the note itself
-                {
-                int start = offset + numPartials * i;
-                for(int j = 0; j < numPartials; j++)
-                    {
-                    frequencies[start + j] = frequencies[j] * ratios[chords[chord][i]];
-                    amplitudes[start + j] = amplitudes[j] * gain;
-                    }
-                }
+            loadSubarrays(chord, frequencies, amplitudes, ratios);
 
-            constrain();
-            bigSort(0, false);                      // we must always sort
+			int[] __pos = _pos;
+			double[][] __freqs = _freqs;
+			double[][] __amps = _amps;
+			
+			for(int i = 0; i < __pos.length; i++)
+				{
+				__pos[i] = 0;
+				}
+				
+			for(int i = 0; i < frequencies.length; i++)
+				{
+				// Find the lowest frequency.
+				// We can run out of partials among our subarrays but it should be impossible
+				// to run out of partials in ALL of them.
+				int best = 0;
+				for(int j = 1; j < __pos.length; j++)
+					{
+					if (__pos[best] >= (__freqs[best].length - 1) ||				// We're out of slots for best
+						(__pos[j] < (__freqs[j].length - 1) &&						// We still have slots for j
+						__freqs[j][__pos[j]] < __freqs[best][__pos[best]]))
+						{
+						best = j;
+						}
+					}	
+				
+				// load it
+				frequencies[i] = __freqs[best][_pos[best]];	
+				amplitudes[i] = _amps[best][_pos[best]];
+				_pos[best]++;
+				}
+
+            if (constrain())
+	            simpleSort(0, false);                      // we must always sort
             }
         }       
     }
