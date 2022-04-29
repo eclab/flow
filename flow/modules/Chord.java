@@ -159,8 +159,8 @@ public class Chord extends Unit
 
 
 	// Chord's strategy for loading chords without having to resort is to
-	// Load all the partials for each note into a separate array, then
-	// merge the arrays in an O(1) merge kind of like mergesort
+	// Load all the partials for each note into a separate array (O(n)), then
+	// merge the arrays in an O(n) merge kind of like mergesort
 
 
 	double[][] _freqs;
@@ -168,6 +168,10 @@ public class Chord extends Unit
 	int[] _pos;
 	int lastChord = 0;			// 0 ("no chord") is the default
     
+    // If needed, create subarrays of partials, one for each chord note, all the same length,
+    // such that they sum to >= NUM_PARTIALS.  Then assign partials to each subarray
+    // according to the original frequencies and amplitudes shifted by the note
+    // for that subarray.
     void loadSubarrays(int chord, double[] frequencies, double[] amplitudes, double[] ratios)
     	{
     	if (_freqs == null || lastChord != chord)
@@ -195,6 +199,47 @@ public class Chord extends Unit
 				}
     		}
     	}
+    	
+    // Given the subarrays produced in loadSubarrays(), load partials
+    // in order of frequency by repeatedly taking out the lowest frequency
+    // partial from among the subarrays and sticking it into the main
+    // partials.  Do this until the main partials is full.  Note that
+    // it's possible a subarray may be exhausted before the main partials
+    // is full, in which case it's taken out of consideration.
+    void mergePartials(double[] frequencies, double[] amplitudes)
+		{
+		int[] __pos = _pos;
+		double[][] __freqs = _freqs;
+		double[][] __amps = _amps;
+		int len = __freqs[0].length;
+		
+		for(int i = 0; i < __pos.length; i++)
+			{
+			__pos[i] = 0;
+			}
+			
+		for(int i = 0; i < frequencies.length; i++)
+			{
+			// Find the lowest frequency.
+			// We can run out of partials among our subarrays but it should be impossible
+			// to run out of partials in ALL of them.
+			int best = 0;
+			for(int j = 1; j < __pos.length; j++)
+				{
+				if (__pos[best] >= len - 1 ||							// We're out of slots for best
+					(__pos[j] < len - 1 &&								// We still have slots for j
+					__freqs[j][__pos[j]] < __freqs[best][__pos[best]]))
+					{
+					best = j;
+					}
+				}	
+			
+			// load it
+			frequencies[i] = __freqs[best][_pos[best]];	
+			amplitudes[i] = _amps[best][_pos[best]];
+			_pos[best]++;
+			}
+		}    	
     	
     
     public Chord(Sound sound) 
@@ -224,37 +269,7 @@ public class Chord extends Unit
             double[] amplitudes = getAmplitudes(0);
 
             loadSubarrays(chord, frequencies, amplitudes, ratios);
-
-			int[] __pos = _pos;
-			double[][] __freqs = _freqs;
-			double[][] __amps = _amps;
-			
-			for(int i = 0; i < __pos.length; i++)
-				{
-				__pos[i] = 0;
-				}
-				
-			for(int i = 0; i < frequencies.length; i++)
-				{
-				// Find the lowest frequency.
-				// We can run out of partials among our subarrays but it should be impossible
-				// to run out of partials in ALL of them.
-				int best = 0;
-				for(int j = 1; j < __pos.length; j++)
-					{
-					if (__pos[best] >= (__freqs[best].length - 1) ||				// We're out of slots for best
-						(__pos[j] < (__freqs[j].length - 1) &&						// We still have slots for j
-						__freqs[j][__pos[j]] < __freqs[best][__pos[best]]))
-						{
-						best = j;
-						}
-					}	
-				
-				// load it
-				frequencies[i] = __freqs[best][_pos[best]];	
-				amplitudes[i] = _amps[best][_pos[best]];
-				_pos[best]++;
-				}
+			mergePartials(frequencies, amplitudes);
 
             if (constrain())
 	            simpleSort(0, false);                      // we must always sort
