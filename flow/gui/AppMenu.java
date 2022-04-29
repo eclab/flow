@@ -896,6 +896,10 @@ public class AppMenu
         return log;
         }
 
+    public static final int DEFAULT_MAX_DISPLAYED_HARMONIC = 6;             // 150
+    public static final int DEFAULT_MIN_DISPLAYED_HARMONIC = 4;             // 1/16
+        
+
 /*
     public static final int DEFAULT_MAX_DISPLAYED_HARMONIC = 6;             // 150
         
@@ -956,8 +960,6 @@ public class AppMenu
         }
 
 
-    public static final int DEFAULT_MIN_DISPLAYED_HARMONIC = 4;             // 1/16
-        
     static JMenuItem minDisplayedHarmonic(Rack rack)
         {
         final double minHarm[] = new double[] { 1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125 };

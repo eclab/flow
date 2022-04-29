@@ -22,6 +22,7 @@ public class Display extends JComponent
     Output output;
     ModulePanel modPanel;
     double xscale = 2;
+    public static final double LOG_SCALE = 1.0 / 16;		// How much should we divide the log entries so as to shift the display to the left?
     
     // Am I the "auxiliary" display?
     boolean aux;
@@ -166,6 +167,7 @@ public class Display extends JComponent
         
     double invNormalizedFrequency(double nFrequency, double fundamental)
         {
+        System.err.println(fundamental);
         if (logFrequency)
             {
             return Math.exp(nFrequency - fundamental);
@@ -300,7 +302,7 @@ public class Display extends JComponent
         double range = max - min;
         if (logFrequency)
             {
-            double m = Math.abs(Math.log(min));
+            double m = Math.abs(Math.log(min)) * LOG_SCALE;
             range = Math.abs(Math.log(max)) + m;
             fundamental = m;  // this is the zero point
             } 
@@ -519,7 +521,7 @@ public class Display extends JComponent
         double range = max - min;
         if (logFrequency)
             {
-            double m = Math.abs(Math.log(min));
+            double m = Math.abs(Math.log(min)) * LOG_SCALE;
             range = Math.abs(Math.log(max)) + m;
             fundamental = m;  // this is the zero point
             } 
