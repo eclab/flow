@@ -176,6 +176,7 @@ public class Sound
         {
         updatePortamento();
         int len = elements.size();
+        
         for(int i = 0; i < len; i++)
             {
             elements.get(i).go();
