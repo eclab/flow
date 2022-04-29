@@ -615,13 +615,31 @@ public class Unit extends Modulation
         o[j] = e;
         }
 
+    void swap(int i, int j, double[] f)
+        {
+        double d = f[i];
+        f[i] = f[j];
+        f[j] = d;
+        }
+
+    void swap(int i, int j, byte[] f)
+        {
+        byte d = f[i];
+        f[i] = f[j];
+        f[j] = d;
+        }
+
     // standard insertion sort
     void insertionSort(double freq[], double[] amp, byte[] order) 
         {
-        for (int i=1; i<freq.length; i++) // Insert i'th record
+        int len = freq.length;
+        for (int i=1; i<len; i++) // Insert i'th record
             for (int j=i; (j>0) && (freq[j] < freq[j-1]); j--)
                 {
-                swap(j, j-1, freq, amp, order);
+                //swap(j, j-1, freq, amp, order);
+                swap(j, j-1, freq);
+                swap(j, j-1, amp);
+                swap(j, j-1, order);
                 }
         }
     
@@ -639,11 +657,17 @@ public class Unit extends Modulation
             if (freq[j] <= pivot)
                 {
                 i++;
-                swap(i, j, freq, amp, order);
+                //swap(i, j, freq, amp, order);
+				swap(i, j, freq);
+				swap(i, j, amp);
+				swap(i, j, order);
                 }
             }
  
-        swap(i+1, high, freq, amp, order); 
+        // swap(i+1, high, freq, amp, order); 
+        swap(i+1, high, freq); 
+        swap(i+1, high, amp); 
+        swap(i+1, high, order); 
         return i+1;
         }
 
@@ -725,10 +749,29 @@ public class Unit extends Modulation
         double[] frequencies = this.frequencies[j];
         for(int i = 1; i < frequencies.length; i++)
             if (frequencies[i] < frequencies[i-1])
-                return true;
+            	return true;
         return false;
         }
 
+
+	// February 2022: It appears that for nearly-sorted arrays, insertion sort is generally faster than bubble sort.x
+	public boolean simpleSort(int j, boolean copyAmplitudes)
+		{
+        if (copyAmplitudes)
+            {
+            this.amplitudes[j] = this.amplitudes[j].clone();
+            }
+        
+        this.orders[j] = this.orders[j].clone();
+
+        double[] frequencies = this.frequencies[j];
+        double[] amplitudes = this.amplitudes[j];
+        byte[] orders = this.orders[j];
+        
+        insertionSort(frequencies, amplitudes, orders);
+        return true;
+        } 
+        
 
     // This is basically a somewhat better bubble sort.  I think bubble sort
     // will likely be the best option in most cases because we won't have big
@@ -744,7 +787,7 @@ public class Unit extends Modulation
         frequencies are out of order.  This also implies that you have already copied the frequencies, so this
         method doesn't copy them again.  However, orders are always copied.  Amplitudes are
         only copied if indicated: you should pass in TRUE if you have not already copied the amplitudes, else FALSE.  */
-    public boolean simpleSort(int j, boolean copyAmplitudes) 
+    public boolean simpleSort2(int j, boolean copyAmplitudes) 
         {
         boolean swapped = true;
         boolean everSwapped = false;
@@ -776,7 +819,10 @@ public class Unit extends Modulation
                 {
                 if (frequencies[i] > frequencies[i + 1])
                     {
-                    swap(i, i+1, frequencies, amplitudes, orders);
+//                    swap(i, i+1, frequencies, amplitudes, orders);
+                    swap(i, i+1, frequencies);
+                    swap(i, i+1, amplitudes);
+                    swap(i, i+1, orders);
                     swapped = true;
                     }
                 }
@@ -799,7 +845,10 @@ public class Unit extends Modulation
                 {
                 if (frequencies[i] > frequencies[i+1])
                     {
-                    swap(i, i+1, frequencies, amplitudes, orders);
+//                    swap(i, i+1, frequencies, amplitudes, orders);
+                    swap(i, i+1, frequencies);
+                    swap(i, i+1, amplitudes);
+                    swap(i, i+1, orders);
                     swapped = true;
                     }
                 }
