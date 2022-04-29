@@ -625,9 +625,12 @@ public class Output
         double pitch = _with.pitches[s];
         double tr = pitch * INV_SAMPLING_RATE;
         int sinQuality = this.sinQuality;
+        double nyquistDividedByPitch = NYQUIST / pitch;
         
         if (_with.dephase[s])                    // this is a manual hoist
             {
+            double[] mixing = MIXING;
+            
             for (int i = 0; i < pos.length; i++)
                 {
                 double frequency = freq[i];
@@ -635,7 +638,7 @@ public class Output
                 // Because we're mixing, we can just ignore the higher frequency stuff, which gives us a speed boost.
                 // However if the user wants to switch back to non-mixing, it might produce a pop because we have
                 // reset everything.
-                if (frequency * pitch > NYQUIST)
+                if (frequency > nyquistDividedByPitch)
                     {
                     break;
                     }
@@ -660,16 +663,16 @@ public class Output
                     
                     //if (sinQuality == SIN_QUALITY_LOW)
                         {
-                        sample += Utility.fastSin(position * PI2 + MIXING[oi]) * amplitude;
+                        sample += Utility.fastSin(position * PI2 + mixing[oi]) * amplitude;
                         }
                     /*
                       else if (sinQuality == SIN_QUALITY_MEDIUM)
                       {
-                      sample += Utility.fastIntSin(position * PI2 + MIXING[oi]) * amplitude;
+                      sample += Utility.fastIntSin(position * PI2 + mixing[oi]) * amplitude;
                       }
                       else
                       {
-                      sample += Math.sin(position * PI2 + MIXING[oi]) * amplitude;
+                      sample += Math.sin(position * PI2 + mixing[oi]) * amplitude;
                       }   
                     */                 
                     }
@@ -694,15 +697,13 @@ public class Output
                                 
                 // Unlike the dephase situation, we MUST update the position for all partials            
                 
-                //if (amplitude != 0)
-                //      System.err.println("-->" + i + " " + frequency + " " + oi);
                 double position = pos[oi] + frequency * tr;
                 position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
                 pos[oi] = position;
                         
                 // only here can we avoid doing the fastSin.  But in truth this is just an array lookup at this point.
                 
-                if (frequency * pitch <= NYQUIST && amplitude > MINIMUM_VOLUME)
+                if (frequency <= nyquistDividedByPitch && amplitude > MINIMUM_VOLUME)
                     {
                     //if (sinQuality == SIN_QUALITY_LOW)
                         {
