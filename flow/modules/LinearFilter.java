@@ -28,7 +28,7 @@ public class LinearFilter extends Unit
     public static String getName() { return "Linear Filter"; }
 
     public int MAX_NODES = 8;
-    public double MAX_BASE_FREQUENCY = Output.SAMPLING_RATE / 20.0;
+    public double MAX_BASE_FREQUENCY = Output.SAMPLING_RATE / 2; //20.0;
     public static final double MIDDLE_C_FREQUENCY = 261.6256;    
         
     double[] nodeGain = new double[MAX_NODES];
