@@ -65,7 +65,7 @@ public class Drawbars extends Unit implements UnitSource, Presetable
             Constant.ZERO
             }, 
             new String[] { "1  (16')", "2  (5 1/3')", "3  (8')", "4  (4')", "5  (2 2/3')", "6  (2')", "7  (1 3/5')", 
-                           "8  (1 1/3')", "9  (1')",  "10", "11", "Perc Decay", "Perc Volume" }); // "10  (1 1/7', 8/9')", "11  (4/5', 2/3')" });
+                           "8  (1 1/3')", "9  (1')",  "10 (1 1/7', 8/9')", "11 (4/5', 2/3')", "Perc Decay", "Perc Volume" }); // "10  (1 1/7', 8/9')", "11  (4/5', 2/3')" });
         defineOptions(new String[] { "Percussion" , "Tuning" }, new String[][] { { "Off", "1st", "2nd" }, { "Classic", "Equal Temp", "Harmonic"} });
         setClearOnReset(false);
         setupOrganFrequencies();
@@ -105,50 +105,71 @@ public class Drawbars extends Unit implements UnitSource, Presetable
             // https://electricdruid.net/technical-aspects-of-the-hammond-organ/
                 
             frequencies[0] = 8.0 / (16.0);
-            frequencies[1] = 8.0 / (8.0);           /// yes, they're flipped relative to the mods
-            frequencies[2] = 1.498823530;                   /// yes, they're flipped relative to the mods
+            // Drawbar 3
+            frequencies[1] = 8.0 / (8.0);
+            // Drawbar 2
+            frequencies[2] = 1.498823530;
             frequencies[3] = 8.0 / (4.0);
             frequencies[4] = 2.997647060;
             frequencies[5] = 8.0 / (2.0);
             frequencies[6] = 5.040941178;
             frequencies[7] = 5.995294120;
-            frequencies[8] = 8.0 / (1.0);        
-            frequencies[9] = 8.0 / (1.0 + 1.0/7.0);         // I have no precision information on this drawbar
-            frequencies[10] = 8.0 / (4.0 / 5.0);            // I have no precision information on this drawbar     
-            frequencies[11] = 8.0 / (8.0 / 9.0);            // I have no precision information on this drawbar     
+            // Drawbar 10     
+            frequencies[8] = 8.0 / (1.0 + 1.0/7.0);         // I have no precision information on this drawbar
+            // Drawbar 9     
+            frequencies[9] = 8.0 / (1.0);   
+			// Drawbar 10 Second
+            frequencies[10] = 8.0 / (8.0 / 9.0);            // I have no precision information on this drawbar     
+            // Drawbar 11
+            frequencies[11] = 8.0 / (4.0 / 5.0);            // I have no precision information on this drawbar     
+            // Drawbar 11 Second
             frequencies[12] = 8.0 / (2.0 / 3.0);            // I have no precision information on this drawbar
             }
         else if (tuning == TUNING_EQUAL_TEMPERMENT)
             {
             frequencies[0] = 8.0 / (16.0);
-            frequencies[1] = 8.0 / (8.0);           /// yes, they're flipped relative to the mods
-            frequencies[2] = 1.498307077;                   /// yes, they're flipped relative to the mods
+            // Drawbar 3
+            frequencies[1] = 8.0 / (8.0);
+            // Drawbar 2
+            frequencies[2] = 1.498307077;
             frequencies[3] = 8.0 / (4.0);
             frequencies[4] = 2.996614154;
             frequencies[5] = 8.0 / (2.0);
             frequencies[6] = 5.039684200;
             frequencies[7] = 5.993228307;
-            frequencies[8] = 8.0 / (1.0);        
-            frequencies[9] = 8.0 / (1.0 + 1.0/7.0);         // I have no precision information on this drawbar
-            frequencies[10] = 8.0 / (4.0 / 5.0);            // I have no precision information on this drawbar     
-            frequencies[11] = 8.0 / (8.0 / 9.0);            // I have no precision information on this drawbar     
+            // Drawbar 10     
+            frequencies[8] = 8.0 / (1.0 + 1.0/7.0);         // I have no precision information on this drawbar
+            // Drawbar 9     
+            frequencies[9] = 8.0 / (1.0);   
+			// Drawbar 10 Second
+            frequencies[10] = 8.0 / (8.0 / 9.0);            // I have no precision information on this drawbar     
+            // Drawbar 11
+            frequencies[11] = 8.0 / (4.0 / 5.0);            // I have no precision information on this drawbar     
+            // Drawbar 11 Second
             frequencies[12] = 8.0 / (2.0 / 3.0);            // I have no precision information on this drawbar
             }
         else                    // TUNING_TRUE_HARMONIC
             {
             frequencies[0] = 8.0 / (16.0);
-            frequencies[1] = 8.0 / (8.0);           /// yes, they're flipped relative to the mods
-            frequencies[2] = 8.0 / (5.0 + 1.0/3.0); /// yes, they're flipped relative to the mods
+            // Drawbar 3
+            frequencies[1] = 8.0 / (8.0); 
+            // Drawbar 2
+            frequencies[2] = 8.0 / (5.0 + 1.0/3.0); 
             frequencies[3] = 8.0 / (4.0);
             frequencies[4] = 8.0 / (2.0 + 2.0/3.0);
             frequencies[5] = 8.0 / (2.0);
             frequencies[6] = 8.0 / (1.0 + 3.0/5.0);
             frequencies[7] = 8.0 / (1.0 + 1.0/3.0);
-            frequencies[8] = 8.0 / (1.0);        
-            frequencies[9] = 8.0 / (1.0 + 1.0/7.0);        
-            frequencies[10] = 8.0 / (4.0 / 5.0);        
-            frequencies[11] = 8.0 / (8.0 / 9.0);        
-            frequencies[12] = 8.0 / (2.0 / 3.0);   
+            // Drawbar 10     
+            frequencies[8] = 8.0 / (1.0 + 1.0/7.0);         // I have no precision information on this drawbar
+            // Drawbar 9     
+            frequencies[9] = 8.0 / (1.0);   
+			// Drawbar 10 Second
+            frequencies[10] = 8.0 / (8.0 / 9.0);            // I have no precision information on this drawbar     
+            // Drawbar 11
+            frequencies[11] = 8.0 / (4.0 / 5.0);            // I have no precision information on this drawbar     
+            // Drawbar 11 Second
+            frequencies[12] = 8.0 / (2.0 / 3.0);            // I have no precision information on this drawbar
             }
         lastTuning = tuning;            // we're all done
         }
@@ -203,13 +224,14 @@ public class Drawbars extends Unit implements UnitSource, Presetable
             percussion = Utility.hybridpow(modulate(MOD_VOLUME), SQRT_2) * 3;
             }
         }
-        
+    
+    static final int[] drawbarPositions = new int[] { 0, 2, 1, 3, 4, 5, 6, 7, 9, 8, 11 };
+    
     public void go()
         {
         super.go();
         if (lastTuning != tuning)
             setupOrganFrequencies();
-        
         
         //        Drawbar 8 is value 1.0.  A drawbar stop corresponds to 3db, or a Sqrt(2) increase in volume/amplitude.
         //                So (8d)^sqrt(2) = max
@@ -229,20 +251,16 @@ public class Drawbars extends Unit implements UnitSource, Presetable
                 {
                 previousMods[i] = mod;
                 
-                // frequencies 1 and 2 are flipped relative to their mods,
-                // so we need to flip them here.
-                int drawbar = i;
-                if (i == 1) drawbar = 2;
-                else if (i == 2) drawbar = 1;
-                
+                // revise drawbars
+                int drawbar = drawbarPositions[i];
                 amplitudes[drawbar] = Utility.hybridpow(mod, SQRT_2);
                 
-                // add in additional amplitudes for 10 and 11
-                if (i == 9) amplitudes[11] = Utility.hybridpow(mod , SQRT_2);
+                // add in additional amplitudes for drawbars 10 and 11
+                if (i == 9) amplitudes[10] = Utility.hybridpow(mod , SQRT_2);
                 else if (i == 10) amplitudes[12] = Utility.hybridpow(mod, SQRT_2);
                 }
             }
-        
+            
         // add percussion
         percussion *= (1 - ((1.0 - modulate(MOD_DECAY)) * 0.1));
         if (percussion < MIN_PERCUSSION) percussion = 0;
