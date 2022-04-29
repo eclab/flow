@@ -69,11 +69,12 @@ public class Sub extends Unit
                 
         for(int i = 0; i < NUM_SUBS; i++)
             {
-            frequencies[i] = SUB_FREQUENCIES[i];
-            amplitudes[i] = modulate(i) * amplitudes[NUM_SUBS] * BOUND;
-            orders[i] = topOrders[i];  // reuse the ones we just deleted
+            // the sub frequencies are flipped in freqency order (-1 oct, -2 oct, -3 oct, -4 oct)
+            // so we flip them back here
+            frequencies[NUM_SUBS - i - 1] = SUB_FREQUENCIES[i];
+            amplitudes[NUM_SUBS - i - 1] = modulate(i) * amplitudes[NUM_SUBS] * BOUND;
+            orders[NUM_SUBS - i - 1] = topOrders[i];  // reuse the ones we just deleted
             }        
-
         }       
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
