@@ -167,7 +167,6 @@ public class Display extends JComponent
         
     double invNormalizedFrequency(double nFrequency, double fundamental)
         {
-        System.err.println(fundamental);
         if (logFrequency)
             {
             return Math.exp(nFrequency - fundamental);
