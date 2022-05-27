@@ -5,7 +5,7 @@
 A Polyphonic, Multitimbral, Modular Additive Synthesizer (Version 10)
  
 By Sean Luke (sean@cs.gmu.edu) \
-With Help from Bryan Hoyle \
+With Help from V. Hoyle \
 Copyright 2018 by George Mason University
 
 Related projects:  
