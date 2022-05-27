@@ -23,5 +23,5 @@ Flow macros are patches meant to be loaded as modules inside other patches.  Thi
 * **Tamp**
   Starting at some cutoff frequency, linearly cuts down the amplitude of high harmonics until they reach 0 at around 22 KHz. 
 
-* Waver
+* **Waver**
   Adds random noise to an existing modulation signal, perhaps to humanise it. 
