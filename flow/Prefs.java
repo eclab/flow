@@ -621,11 +621,12 @@ public class Prefs
             int x = Integer.parseInt(s);
             if (x < Output.SIN_QUALITY_LOW || x > Output.SIN_QUALITY_HIGH)
                 x = Output.SIN_QUALITY_DEFAULT;
+            return x;
             } 
         catch (Exception e) 
             {
+	        return Output.SIN_QUALITY_DEFAULT;
             }
-        return Output.SIN_QUALITY_DEFAULT;
         }
 
     public static void setLastSinQuality(int val)

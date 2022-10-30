@@ -67,12 +67,24 @@ public class Oscilloscope extends JComponent
                 }
             });
         timer.start();
+        addMouseListener(new MouseAdapter()
+        	{
+        	public void mousePressed(MouseEvent evt)
+        		{
+        		frozen = true;
+        		}
+        	public void mouseReleased(MouseEvent evt)
+        		{
+        		frozen = false;
+        		}
+        	});
         }
                 
     public Dimension getMinimumSize() { return new Dimension(WAVE_SIZE + BORDER * 2, WAVE_HEIGHT + BORDER * 2); }
     public Dimension getPreferredSize() { return new Dimension(WAVE_SIZE + BORDER * 2, WAVE_HEIGHT + BORDER * 2); }
     public Dimension getMaximumSize() { return new Dimension(WAVE_SIZE + BORDER * 2, WAVE_HEIGHT + BORDER * 2); }
     
+    boolean frozen;
     public void paintComponent(Graphics graphics)
         {
         int p = 0;
@@ -108,7 +120,10 @@ public class Oscilloscope extends JComponent
                         {
                         synchronized(output.leftSamplesOut)
                             {
-                            System.arraycopy(output.leftSamplesOut, 0, wave, 0, wave.length);
+                            if (!frozen)
+                            	{
+                            	System.arraycopy(output.leftSamplesOut, 0, wave, 0, wave.length);
+                            	}
                             }
                         for(int i = 0; i < wave.length; i++)
                             {

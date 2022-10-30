@@ -601,13 +601,6 @@ public class Output
         }
     
     
-    /*
-      double equalize(double frequency, double low, double high, double mid, double midFreq, double amplitude)
-      {
-      return amplitude * (low 
-      }
-    */
-
 
     // Builds a single sample from the partials.  ALPHA is the current interpolation
     // factor (from 0...1) 
@@ -661,20 +654,24 @@ public class Output
                     position = position - (int) position;                   // fun fact. this is 9 times faster than position = position % 1.0
                     pos[oi] = position;
                     
-                    //if (sinQuality == SIN_QUALITY_LOW)
-                        {
-                        sample += Utility.fastSin(position * PI2 + mixing[oi]) * amplitude;
-                        }
-                    /*
-                      else if (sinQuality == SIN_QUALITY_MEDIUM)
-                      {
-                      sample += Utility.fastIntSin(position * PI2 + mixing[oi]) * amplitude;
-                      }
-                      else
-                      {
-                      sample += Math.sin(position * PI2 + mixing[oi]) * amplitude;
-                      }   
-                    */                 
+                    switch(sinQuality)
+                    	{
+						case SIN_QUALITY_LOW:
+							{
+							sample += Utility.fastSin(position * PI2 + mixing[oi]) * amplitude;
+							break;
+							}
+						case SIN_QUALITY_MEDIUM:
+							{
+                     		sample += Utility.fastIntSin(position * PI2 + mixing[oi]) * amplitude;
+                     		break;
+                      		}
+                      	case SIN_QUALITY_HIGH:
+                      		{
+                      		sample += Math.sin(position * PI2 + mixing[oi]) * amplitude;
+                      		break;
+                      		} 
+                      	}  
                     }
                 }
             }
@@ -705,20 +702,24 @@ public class Output
                 
                 if (frequency <= nyquistDividedByPitch && amplitude > MINIMUM_VOLUME)
                     {
-                    //if (sinQuality == SIN_QUALITY_LOW)
-                        {
-                        sample += Utility.fastSin(position * PI2) * amplitude;
-                        }
-                    /*
-                      else if (sinQuality == SIN_QUALITY_MEDIUM)
-                      {
-                      sample += Utility.fastIntSin(position * PI2) * amplitude;
-                      }
-                      else
-                      {
-                      sample += Math.sin(position * PI2) * amplitude;
-                      }                    
-                    */
+                    switch(sinQuality)
+                    	{
+                    	case SIN_QUALITY_LOW:
+                        	{
+                        	sample += Utility.fastSin(position * PI2) * amplitude;
+                        	break;
+                        	}
+                        case SIN_QUALITY_MEDIUM:
+                        	{
+                      		sample += Utility.fastIntSin(position * PI2) * amplitude;
+                      		break;
+                      		}
+                      	case SIN_QUALITY_HIGH:
+                      		{
+                      		sample += Math.sin(position * PI2) * amplitude;
+                      		break;
+                      		}  
+                      	}                  
                     }
                 }
             }
