@@ -107,7 +107,7 @@ An additive synthesizer is a synthesizer which produces sounds by {\it adding up
 
 Consider Figure~\ref{sinewaves}, which shows three sine waves in green, orange, and blue.  These sine waves are differing in their {\it frequency} (how fast they go up and down), and in their {\it amplitude} (how far they go up and down).  If you add the three sine waves up, you get the wave shown in bold.  In fact, it's easily shown that in theory you can synthesize {\it any wave} by adding up the right combination of sine waves.
 
-Notice we didn't mention {\it phase}.  Phase is the horizontal shift in the sine wave, as shown in Figure \ref{phases}.  As it turns out, humans often can't easily distinguish between sounds whose partials only differ in phase relative to one another: we just don't have the hardware built-in to do it.\footnote{While this is certainly true for high- and mid-pitch sounds, it isn't really true for bass sounds: a low-frequency square wave (for example) sounds pretty different\,---\,buzzier\,---\,than one whose partials have randomly-assigned phases.}   As a result, most additive synthesizers, including {\name}, don't consider phase in order to simplify matters.
+Notice we didn't mention {\it phase}.  Phase is the horizontal shift in the sine wave, as shown in Figure \ref{phases}.  As it turns out, humans often can't easily distinguish between sounds whose partials only differ in phase relative to one another: we just don't have the hardware built-in to do it.\footnote{While this is certainly true for high- and mid-pitch sounds, it isn't really true for bass sounds: a low-frequency square wave (for example) sounds pretty different\,---\,buzzier\,---\,than one whose partials have randomly-assigned phases.}   As a result, most (but not all!) additive synthesizers, including {\name}, don't consider phase in order to simplify matters.
 
 If we only consider frequency and amplitude, we can chart our three sine waves as shown in Figure~\ref{partials}: plotting the amplitude of each partial by frequency.  Notice that the \(Y\) axis is still Amplitude, but the \(X\) axis has changed from {\it time} to {\it frequency}. For this reason, thinking of a sound in this fashion is known as casting the sound into the {\bf frequency domain}; whereas thinking of a sound as a wave in the traditional way (Figure~\ref{sinewaves}) is known as considering it in the {\bf time domain}.  While we have been trained to think of sound waves in the time domain: in fact our brains receive sound information in the frequency domain: hardware in our ears first breaks out the sounds into high and low frequencies and their respective amplitudes before our brains even get them.
 
@@ -181,7 +181,7 @@ After you fire up {\name}, you're presented with a near-empty {\bf rack} (except
 If you look carefully at Figure~\ref{screenshot}, you'll see that there are not only twelve modules, but also two wide black rectangular regions called {\bf displays}, and two small squarish black regions called {\bf oscilloscopes}.  Displays show partials in the same manner as Figure~\ref{partials}, and oscilloscopes display modulation signals.
 
 \subsection{Tuning Parameters}
-First things first.  {\name} is very, very computationally expensive and benefits from tuning for your computer speed.  If your computer can't keep up with Flow's demands, you'll hear a {\bf glitch}.  This is a pop or a buzz in the audio stream, and will be accompanied by the {\bf Out} module (the top-right module shown in Figure \ref{screenshot}) coloring its black title bar red and saying \smash{\fcolorbox{black}{red}{\color{white}\small\sf{Glitch}}}\,.  A glitch occurs when Flow can't keep the audio buffer filled fast enough, so your computer is forced to start filling it with zeros.  You don't want that.  Some of these parameters may also have an effect on {\bf latency}, especially MIDI input.
+First things first.  {\name} is very, very computationally expensive and benefits from tuning to your computer speed.  If your computer can't keep up with Flow's demands, you'll hear a {\bf glitch}.  This is a pop or a buzz in the audio stream, and will be accompanied by the {\bf Out} module (the top-right module shown in Figure \ref{screenshot}) coloring its black title bar red and saying \smash{\fcolorbox{black}{red}{\color{white}\small\sf{Glitch}}}\,.  A glitch occurs when Flow can't keep the audio buffer filled fast enough, so your computer is forced to start filling it with zeros.  You don't want that.  Some of these parameters may also have an effect on {\bf latency}, especially MIDI input.
 
 Glitches often settle down after running Flow a minute or so.  But if not, how should we tamp them down?  By playing with a few parameters. If you select {\bf Tuning Parameters} from the {\bf Options} menu, you can at present change six parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session.   
 
@@ -329,7 +329,7 @@ Displays can also be set to {\it Waterfall Mode}, where the partials become dots
 \end{wrapfigure}
 
 \paragraph{Oscilloscopes}
-The far right oscilloscope shows the output audio.  When clipping, the clipped portions are shown in red.  
+The far right oscilloscope shows the output audio.  When clipping, the clipped portions are shown in red.  If you press on it, you can freeze the image.
 
 The middle two oscilloscopes instead display modulation signals of your choice. The left oscilloscope shows the modulation signal of anything connected to the {\it 1 (Scope)} jack in {\bf Out}.  Notice for example, that in Figure~\ref{simplepatch}, the LFO is wired up to modulate the {\it 1 (Scope)} jack: this will cause it to be displayed in the left oscilloscope display.  Similarly, the right oscilloscope shows the modulation signal of anything connected to the {\it 2 (Aux)} jack.  Oscilloscopes have axes (the horizontal axis passes through the 0.5 position).  These axes change colors from blue to green (or from green to blue) any time the modulation triggers.  Oscilloscopes don't currently display any text when you hover over them.  Maybe they should!
 
@@ -462,7 +462,7 @@ To send audio from Flow to your DAW to be recorded, you'll need a loopback devic
 ~\hspace{5em}{\tt sudo installer -pkg Soundflower.pkg -target /}\>{\it Then press RETURN}
 \end{tabbing}
 \item Enter your password and press RETURN.
-\item When you're told that this has failed, go to ``Security and Privacy'' in System Preferences, and permit the software to load.  You may need to click "Allow...", then select ``MATT INGALLS'' (he's the developer) in the list and approve it.  Then do steps 2 and 3 again.
+\item When you're told that this has failed, go to ``Security and Privacy'' in System Preferences, and permit the software to load.  You may need to click "Allow...", then select ``MATT INGALLS'' (the developer) in the list and approve it.  Then do steps 2 and 3 again.
 \item Wait a long time.  It takes quite a while to install for no good reason.
 \item At this point, SoundFlower 2ch and 64ch will appear as audio devices.  You want SoundFlower 2ch.  You can configure it further in Audio MIDI Setup if you like, or just use it straight.
 \end{enumerate}
@@ -547,7 +547,7 @@ As mentioned before, the order of the subpatches affects which patches get alloc
 
 \paragraph{Swapping a Subpatch with the Primary Patch}
 
-If you drag the titlebar of a subpatch clear into the region of the {\it primary patch}, it will {\bf swap} the subpatch with the primary patch.  Flow will preserve the reverb settings from the previous patch.  This is useful for making a subpatch the the Primary Patch temporarily in order to tweak it.
+If you drag the titlebar of a subpatch clear into the region of the {\it primary patch}, it will {\bf swap} the subpatch with the primary patch.  Flow will preserve the reverb settings from the previous patch.  This is useful for making a subpatch the Primary Patch temporarily in order to tweak it.
 
 Swapping the subpatch comes with some MIDI channel complications.  First, only the Primary patch can perform MPE: so if you are swapping a primary patch that uses MPE, when it becomes a subpatch its MIDI channel will become ``No Channel''.  Similarly, only subpatches can have ``No Channel'' as a MIDI channel option,\footnote{This may change in the future.} so if one of them is swapped to a primary path, its MIDI channel will change to ``All Channels''.
 
@@ -604,7 +604,7 @@ The Modules are divided into five categories:
 \item {\bf Special}\quad Various system modules, such as In, Out, Choice, Fix, Note, and Macro.  Just because these are at the end doesn't mean they're not important (they're probably the {\it most} important!).  These appear in the {\bf Other} menu, along with the option of loading an entire patch as a Macro module.
 \end{itemize}
 
-There are four menus 
+%There are four menus 
 
 \subsection{Modulation Sources}
 \label{modsources}
@@ -632,6 +632,8 @@ If you double-click on any time dial, a pop-up menu will appear which lets you s
 The {\it On Tr} option restarts the envelope whenever it receives a trigger (as if a Note-On happened), and the {\it Off Tr} option starts the release stage whenever it receives a trigger (as if a Note-Off happened).  These are auxiliary triggers: don't use them to trigger on a note-on/note-off directly (as in from the MIDIIn module).  The envelope does that by default already.  Furthermore, f you connect to the On Tr port, then the envelope will {\it only} restart when a trigger occurs: it will {\it not} restart on a Note On.  Similarly, if you connect to the Off Tr port, then the envelope will {\it only} release when a trigger occurs: it will {\it not} release on a Note Off.  
  
 At the bottom are outputs which trigger when the envelope starts to Attack, Decay, Sustain, or Release, or when it at its End.  Mod will trigger in all these cases.  See also {\bf AHR} and {\bf Envelope}.
+
+\enlargethispage{1em}
 
 \paragraph{Envelope}  An eight-stage envelope with looping.  The envelope has three stages prior to sustain, then three sustain stages, then two stages at release.  Each stage has a time to completion, and a level at which it will have reached when completed.  If the time is set to 0.0, then the stage is ignored entirely.\footnote{This means that if you attach modulation to your envelope time values, you might want to make sure your modulation doesn't quite hit 0.0, or things might not work exactly as expected.}  There is also a {\it Start} option which specifies the initial level.  The envelope triggers on completion of any of its stages.  You can select curves from linear to pseudo-exponential, plus ``Step'', which immediately steps to the next level.  Figure~\ref{curves} on page~\pageref{curves} shows available curves.  You can request that the envelope sync to MIDI when the synthesizer is set to MIDI (otherwise it's based on time as usual). 
 
@@ -764,7 +766,7 @@ Operations:
 \item{\bf center}\quad Triggers when A's value crosses the center line (0.5).
 \end{itemize}
 
-\paragraph{S \& H}  Sample and Hold.  Takes an incoming modulation signal and a trigger.  If the type is {\it S \& H}, then on receiving the trigger, it samples the signal and outputs that value until the next trigger, when it samples again, and so on.  If the type is {\it T \& H} or {\it T \& H 2}, then we are in {\it Track and Hold} mode.  Here, the trigger {\it toggles} between sampling and holding the value, or letting it pass through normally.  The difference between the two Track and Hold modes is just one of phase: in the first version, when a gate is received, we are in sample-and-hold mode, where as in the second version, when a gate is received, we are in pass-through mode.
+\paragraph{S \& H}  Sample and Hold.  Takes an incoming modulation signal and a trigger.  If the type is {\it S \& H}, then on receiving the trigger, it samples the signal and outputs that value until the next trigger, when it samples again, and so on.  If the type is {\it T \& H} or {\it T \& H 2}, then we are in {\it Track and Hold} mode.  Here, the trigger {\it toggles} between sampling and holding the value, or letting it pass through normally.  The difference between the two Track and Hold modes is phase: in the first version, when a gate is received, we are in sample-and-hold mode, where as in the second version, when a gate is received, we are in pass-through mode.
 
 \paragraph{Seq}  A step sequencer of up to 32 steps, as specified by {\it Steps}.  Each step is a modulation value which you can set.  On note-on, the sequencer resets itself to step 1, and begins incrementing each time the {\it Trigger} is fired.   If {\it Stop on Release} then on note-off the sequencer stops, otherwise note-off is ignored.  If {\it Free} is true, then the sequencer is free-running and ignores both note-on and note-off.    
 
@@ -772,7 +774,7 @@ The value of the current step is outputted as {\it Mod}.  When {\it Sample} is t
 
 Seq doesn't just read trigger values from {\it Trigger}: it also reads modulation values.  This can be used in two ways.  First, you can use the modulation value to slide the sequencer from one step value to another.  Specifically, {\it Change} specifies how the sequencer interpolates from one step to the next: the default is {\it Step}, and other curves are shown in Figure~\ref{curves}.  Interpolation is based on the incoming modulation value: if you're using an LFO, try setting it to Sawtooth.  You can get the opposite interpolation waves by setting the LFO to an inverted Sawtooth.   Second, if {\it Guided} is true, then the {\it Trigger} not only specifies when a step occurs, but its modulation value also specifies {\it which} step is performed, rather than incrementing the step as normal.
 
-In addition to sequencing modulation signals, Seq can also be used in combination with {\bf Shift} to sequence note values.  To do this, attach {\it Mod} to Shift's {\it Shift} port, and set Shift's {\it Bound} to 1/3 and its {\it Type} to {\it Pitch}.  Feed the sound into Shift's {\it Input}, and the result in Shift's {\it Out}.  In this arrangement, each of Seq's modulation dials ranges from two octaves below to two octaves above.  To make things easier, if you double-click on a modulation dial, you'll get a pop-up menu with a keyboard, from two octaves below to two octaves above.  ``Middle C'' is 0.5 (the keyboard is keyed in C, but it'll be relative to whatever the current pitch is).  See also {\bf Shift}.
+In addition to sequencing modulation signals, Seq can also be used with {\bf Shift} to sequence note values.  To do this, attach {\it Mod} to Shift's {\it Shift} port, and set Shift's {\it Bound} to 1/3 and its {\it Type} to {\it Pitch}.  Feed the sound into Shift's {\it Input}, and the result in Shift's {\it Out}.  In this arrangement, each of Seq's modulation dials ranges from two octaves below to two octaves above.  To make things easier, if you double-click on a modulation dial, you'll get a pop-up menu with a keyboard, from two octaves below to two octaves above.  ``Middle C'' is 0.5 (the keyboard is keyed in C, but it'll be relative to whatever the current pitch is).  See also {\bf Shift}.
 
 At the bottom are outputs which trigger when the step sequencer reaches any single step.
 
@@ -787,11 +789,12 @@ At the bottom are outputs which trigger when the step sequencer reaches any sing
 %\end{figure}
 
 
+\enlargethispage{1em}
 \subsection{Partials Sources}
 
 \paragraph{AKWF}  A collection of harmonics drawn from the Adventure Kid Waveform single-cycle wave collection.\footnote{The AKWF collection is public domain at https:/\!/www.adventurekid.se, but the author asks that you consider making a small Paypal donation to kristoffer.ekstrand@gmail.com.}  Waves are grouped into categories: pick a category first, then dial in the wave.  You can {\it mix} two different sources and have the additional option of {\it Normalizing} the partials.  See also {\bf Waves} and {\bf KHarmonics}.
 
-\paragraph{All}  Outputs all harmonics, standardized, at full amplitude.  Useful for later shaping.
+\paragraph{All}  Outputs all harmonics, standardized, at full amplitude.  Useful for later shaping or for testing.
 
 \paragraph{Audio In}  This takes snippets of sound from the Input Device (which you specify from {\it MIDI and Audio options} under the {\it Options} menu), extracts their harmonics in real time, and organizes them as harmonics for the current note. Because the partials are relatively few and are organized as harmonics, this has the effect of making the input sound like a robot.  This is exactly the same process used to load samples into the Wavetable module.  The sampling is designed to remove some of the choppiness from reading an arbitrary sound, but it won't remove all of it.  You can eliminate most of the rest by running the partials through a Smooth module set to about 0.5.  Also beware of audio feedback during testing!  You might be able to tamp some of that down with a filter. See also {\bf Wavetable}.
 
@@ -802,7 +805,7 @@ At the bottom are outputs which trigger when the step sequencer reaches any sing
 
 \paragraph{Draw}   Lets you draw partials, which are then output.   You can constrain the partials being drawn to a variety of subsets.  When you click on the {\it Menu} button, you can also save your scribbles and load them again, clear them, maximize, normalize, and standardize them, and (importantly) take a snapshot of partials from an incoming source.  The module can be collapsed to a smaller size if you wish.
 
-Draw also allows you to load {\it single-cycle waveforms}, that is, sound files which start and end at zero and represent a single cycle of a sound wave.  You can do this by choosing {\it Load Wave...} from the {\it Menu} button.  These must be WAV files, mono, and cannot be very long (presently at most 2048 samples).  After loading, Flow converts them (naturally) into harmonics.
+Draw also allows you to load {\it single-cycle waveforms}, that is, sound files which start and end at zero and represent a single cycle of a sound wave.  You can do this by choosing {\it Load Wave...} from the {\it Menu} button.  These must be WAV files, 16-bit signed integer monophonic, and cannot be very long (presently at most 2048 samples).  After loading, Flow converts them (naturally) into harmonics.
 
 See also {\bf Waves}, which contains harmonics of single-cycle waves from certain well-known synthesizers, as well as {\bf AKWF}.  See also {\bf KHarmonics}, a similar collection drawn from various Kawai K5 harmonics.
 
@@ -810,7 +813,7 @@ See also {\bf Waves}, which contains harmonics of single-cycle waves from certai
 
 \paragraph{Harmonic Lab}  Allows you to describe a sound as a combination of three mathematical functions operating on your harmonics.  For each of the three, you can define the function type, a function parameter, the gain of the function, and the harmonics the function manipulates.  When multiple functions manipulate the same harmonic, the earlier function takes precedence.  {\bf Important Note 1}\quad Unlike standard constraints menus, PartialLab's constraints menus include ``All'' at the end.  {\bf Important Note 2}\quad This is a costly module if you are modulating any of these values in real time, perhaps by an LFO (there are many calls to \(x^y\)): you can do it, but it'll keep your laptop warm.
 
-\paragraph{Harmonics}  Outputs the first 32 harmonics, whose amplitude you can define independently.  You optionally can load these harmonics from a source, compress them (moving zero-amplitude partials to the end), and mutate them. See also {\bf Partials}.
+\paragraph{Harmonics}  Outputs the first 32 harmonics, whose amplitude (but not frequency) you can define independently.  You optionally can load these harmonics from a source, compress them (moving zero-amplitude partials to the end), and mutate them. See also {\bf Partials}.
 
 \paragraph{KHarmonics}  Produces a wide range of partials drawn from patches from the Kawai K5 synthesizer, including both factory patches (with Kawai's permission) and various patches in the public domain.  You can {\it Mix} two different sources and have the additional option of {\it Normalizing} the partials.  Note that among the harmonics are ones purporting to be drawn from the Kawai K3.  These are just wrong.  However the {\bf Waves} module has the correct ones.
 
@@ -836,19 +839,21 @@ You will find that very short bursts of Noise vary in amplitude, which makes it 
 
 \paragraph{Sawtooth}  The harmonics of a sawtooth wave.
 
+\paragraph{Square}  The harmonics of a pulse wave.  You can specify the pulse width modulation.
+
 \paragraph{Sine}  A single harmonic at 1.0 amplitude.  The harmonic can be any partial frequency from 1.0 to 128.0.
 
 \paragraph{Tinkle}  Produces random partials, creating a tinkling effect.  Some {\it number} of new partials are created whenever the {\it trigger} occurs, and at the given {\it volume}.  The partials {\it decay} at some rate.  The {\it probability} specifies the likelihood that partials will be created when a trigger occurs.   If the {\it seed} is {\it Free} (0), then the tinkles will be completely random and vary from note to note; if it's non-zero, then the pattern of randomness will be the same for each note: the seed specifies which pattern it is.  Finally, if {\it Hold} is true, then the decay of the most recent tinkles won't start until the next tinkles are entered.  Furthermore, {\it Hold} causes {\it decay} to behave differently when set to 0: normally this would be a very fast decay, but if {\it Hold} is true, then it's an {\it immediate} decay\,---\,the previous tinkles go straight to zero amplitude.  Try turning on Hold and setting decay to 0 to get a kind of sample and hold effect.
 
 Tinkle behaves differently than other modules when it comes to constraints.  Whereas in most modules the constraints {\it undo} the action of the module for certain partials, in Tinkle the constraints {\it bound} its actions.  For example, if you had 4 partials tinkling and you restricted the constraints to the low 32 harmonics, then you'd still be guaranteed to get 4 tinkles each time: they'd just be within 0...31.  Indeed, setting the constraints to bound to the low \(N\) harmonics is a useful way to guarantee that tinkles won't occur beyond Nyquist.
 
-\paragraph{Triangle}  A triangle wave.  Note that normally triangle waves include negative amplitude harmonics, that is ones with inverted phases.  As {\name} does not shift partial phases, these harmonics become all positive (you likely won't hear a difference).
+\paragraph{Triangle}  A triangle wave.  Note that normally triangle waves include negative amplitude harmonics, that is, ones with inverted phases.  As {\name} does not shift partial phases, these harmonics become all positive (you likely won't hear a difference).
 
 \paragraph{Waves}  A collection of harmonics drawn from the single-cycle waves of several major synthesizers:
 
 \begin{itemize}
 
-\item{\bf Kawai K3}\quad This is the full complement of Kawai K3 waves: though obviously wave 31 is missing since that's actually the user's additive harmonics slot.\footnote{The K3 harmonics are from http:/\!/www.deepsonic.ch/deep/audio\_samples/kawai\_k3\_-\_samples\_-\_33\_waveforms.mp3 by deep!sonic (http:/\!/www.deepsonic.ch)}
+\item{\bf Kawai K3}\quad This is the full complement of Kawai K3 waves, except for waves 31 (user-defined additive harmonics) and 32 (white noise).\footnote{The K3 harmonics are from http:/\!/www.deepsonic.ch/deep/audio\_samples/kawai\_k3\_-\_samples\_-\_33\_waveforms.mp3 by deep!sonic (http:/\!/www.deepsonic.ch)}
  
 \item{\bf Ensoniq SQ-80}\quad   This collection is incomplete: my original source had some errors.\footnote{The SQ-80 harmonics are drawn from the waves in http:/\!/www.buchty.net/ensoniq/files/the\_waves.zip by /\!/christian.}  To combat antialiasing, the SQ-80 had different oversampled versions of the same wave depending on the octave of the note played on the keyboard.  The harmonics here are taken from the lowest octaves (with the most harmonics).
 
@@ -908,7 +913,7 @@ All of the shapers have the ability of being {\bf constrained}.  This means that
 }
 
 
-You have the option of normalizing the resulting partials.   Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Combine} and {\bf Fill} and {\bf Mix} and {\bf Dissolve}  and {\bf Morph}.
+You have the option of normalizing the resulting partials.   Be sure to read ``Strategies for Merging Partial Sources'', Section~\ref{mixingstrategies}.  See also {\bf Combine} and {\bf Fill} and {\bf Mix} and {\bf Dissolve}  and {\bf Morph}.
 
 One common task is to set the amplitudes of a source to 0 if they're below a certain limit. To do this, just set to {\it filter}, plug your source into {\it both} \(A\) and \(B\), and use \(M\) as your limit.
 
@@ -957,7 +962,7 @@ One common task is to set the amplitudes of a source to 0 if they're below a cer
 \end{multicols}
 }
 
-\paragraph{Combine} The partials from up to four sources are merged by throwing together all their lowest partials.  This works as follows.  We first divide the number of partials evenly among the sources, then take that number of the lowest partials from each source.  The remaining (higher frequency) partials are discarded.  We then toss together all those lower partials to form the output.  You also can scale (down) the amplitude of each of the incoming sources.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}, particularly if you're hearing pops.  See also {\bf Amp Math} and {\bf Fill} and {\bf Mix} and {\bf Morph} and {\bf Dissolve} and especially {\bf Joystick}.
+\paragraph{Combine} The partials from up to four sources are merged by throwing together all their lowest partials.  This works as follows.  We first divide the number of partials evenly among the sources, then take that number of the lowest partials from each source.  The remaining (higher frequency) partials are discarded.  We then toss together all those lower partials to form the output.  You also can scale (down) the amplitude of each of the incoming sources.  Be sure to read ``Strategies for Merging Partial Sources'', Section~\ref{mixingstrategies}, particularly if you're hearing pops.  See also {\bf Amp Math} and {\bf Fill} and {\bf Mix} and {\bf Morph} and {\bf Dissolve} and especially {\bf Joystick}.
 
 \paragraph{Compress}  The amplitude of every partial is raised to a certain power, controlled by the {\it Scale} modulation.  If Scale is greater than 0.5 (the mid-point), then the amplitude is raised and compressed more and more, resulting in them getting louder and with less difference among them.  If Scale is less than 0.5, then the opposite happens: the amplitudes are {\it expanded}, resulting in a larger difference among them, and with them all getting quieter.
 
@@ -965,11 +970,11 @@ One common task is to set the amplitudes of a source to 0 if they're below a cer
 
 \paragraph{Dilate} If a partial has a neighbor partial which is {\it larger} than it, then its amplitude is increased towards its neighbor: this change trickles down to its further (smaller) neighbors as well.  This has the effect of boosting neighboring partials until ultimately all partials are the same amplitude.  {\it Boost} is the amount to increase.  You can specify whether only lower neighbors, higher neighbors, or both are considered.  See also {\bf Skeletonize} (which is almost, but not quite, the opposite concept).
 
-\paragraph{Dissolve} Given two incoming sources \(A\) and \(B\), this module one by one replaces each of \(A\)'s partials with the equivalent partial in \(B\). The amount of replacement is specified by {\it Dissolve}.  The order in which this replacement is done is at random, determined by the {\it Seed}.   If {\it Seed} is {\it Free} (0), the replacement order will be randomly different with every new note: otherwise the replacement order will be the same from note to note.  If you don't like the sudden replacement of partials and would prefer that a partial cross-fade into another, you might try hooking Dissolve up to {\bf Smooth}.  See also {\bf Either/Or} and {\bf Amp Math} and {\bf Combine} and {\bf Fill} and {\bf Morph}.
+\paragraph{Dissolve} Given two incoming sources \(A\) and \(B\), this module one by one replaces each of \(A\)'s partials with the equivalent partial in \(B\) one at a time. The amount of replacement is specified by {\it Dissolve}.  A partial isn't suddenly replaced: it's smoothly morphed with its corresponding partial. If you want an even smoother transition, you might try hooking Dissolve up to {\bf Smooth}.   By default the order in which this replacement is done is at random, determined by the {\it Seed}.   If {\it Seed} is {\it Free} (0), the replacement order will be randomly different with every new note: otherwise the replacement order will be the same from note to note.  Alternatively you can perform a {\it Wipe}: replacing the partials in order top to bottom or bottom to top.  This is done by selecting the appropriate {\it Type} option.  See also {\bf Either/Or} and {\bf Amp Math} and {\bf Combine} and {\bf Fill} and {\bf Morph}.
 
 \paragraph{Fatten}  The top half partials are discarded and reused to create detuned versions of the lower half partials.  The detuning amount is specified as well as the wet/dry ratio.
 
-\paragraph{Fill}  Given two incoming sources \(A\) and \(B\), this module first adds all of the non-zero-partials of \(A\) to the output; any remaining partials are filled from non-zero amplitude partials in \(B\), starting at its lowest frequency partials and working up.  You can scale (down) the amplitude of each of the incoming sources.  This module is particularly useful with {\bf Noise}.  Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Amp Math} and {\bf Combine} and {\bf Mix} and {\bf Morph} and {\bf Dissolve}.
+\paragraph{Fill}  Given two incoming sources \(A\) and \(B\), this module first adds all of the non-zero-partials of \(A\) to the output; any remaining partials are filled from non-zero amplitude partials in \(B\), starting at its lowest frequency partials and working up.  You can scale (down) the amplitude of each of the incoming sources.  This module is particularly useful with {\bf Noise}.  Be sure to read ``Strategies for Merging Partial Sources'', Section~\ref{mixingstrategies}.  See also {\bf Amp Math} and {\bf Combine} and {\bf Mix} and {\bf Morph} and {\bf Dissolve}.
 
 \paragraph{Filter}  This is a resonant state-variable 2- or 4-pole filter. You can sweep through High Pass (at 0.0) to Notch (at 0.25) to Low Pass (the default, at 0.5), to Band Pass (at 0.75) and finally to High Pass again (at~1.0).  Resonance values currently range from no resonance (that is, resonance \(\smash{Q=\frac{1}{\sqrt{2}}}\)) at 0.0 to ten times that amount (\(\smash{Q =\frac{10}{\sqrt{2}}}\))  at 1.0.  And you can, of course, set the cutoff frequency.
 
@@ -1006,7 +1011,7 @@ The bass in Ladder filters tends to bottom out with increasing resonance.  You m
 
 Linear Filter can be {\it Relative}.  This means that the filter cutoff frequency is set to be relative to Middle C.  If you're playing a higher note, the cutoff frequency will automatically be set higher to match; similarly if you're playing a lower note, the cutoff frequency will be automatically lower.  See also {\bf Partial Filter}.
 
-\paragraph{Mix} This is a straightforward mixer: the amplitudes of the partials of four different inputs can be mixed, with their respective gains.  The {\it frequencies} of the partials are set to those of the first input whose amplitudes are non-zero.  In many cases, it's likely that all four inputs have partials with the same frequency, so it wouldn't matter.  But this strategy is also useful because it allows Mix to be used in combination with {\bf Either/Or} to select a single output among the four mix inputs.  Be sure to also read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Either/Or} and {\bf Amp Math} and {\bf Combine} and {\bf Fill} and {\bf Morph} and {\bf Dissolve} and especially {\bf Joystick}.
+\paragraph{Mix} This is a straightforward mixer: the amplitudes of the partials of four different inputs can be mixed, with their respective gains.  The {\it frequencies} of the partials are set to those of the first input whose amplitudes are non-zero.  In many cases, it's likely that all four inputs have partials with the same frequency, so it wouldn't matter.  But this strategy is also useful because it allows Mix to be used in combination with {\bf Either/Or} to select a single output among the four mix inputs.  Be sure to also read ``Strategies for Merging Partial Sources'', Section~\ref{mixingstrategies}.  See also {\bf Either/Or} and {\bf Amp Math} and {\bf Combine} and {\bf Fill} and {\bf Morph} and {\bf Dissolve} and especially {\bf Joystick}.
 
 \paragraph{Morph} This module morphs (interpolates) between two or more inputs.  In the most basic configuration, when two signals are morphed together, the amplitudes of their partials are weighted and averaged, and the frequencies of their partials are {\it also} weighted and averaged.  The weighting constant \(\alpha\) is controlled by the {\it Interpolation} knob.  For example, consider Inputs X and Y.  For each pair of partials \(\langle P^X_i, P^Y_i\rangle\) in X and Y respectively, with frequencies \(\langle F^X_i, F^Y_i\rangle\) and amplitudes \(\langle A^X_i, A^Y_i\rangle\), we produce a final partial \(P_i\) whose frequency \(F_i = (1-\alpha) F^X_i + \alpha F^Y_i\) and whose amplitude \(A_i = (1-\alpha) A^X_i + \alpha A^Y_i\).
 
@@ -1033,7 +1038,7 @@ Normally every Partial \(i\) in the first Input is paired up with the same Parti
 
 If {\it Free} is set, then Morph doesn't reset to Inputs A and B every time you press a note\,---\,it keeps morphing from wherever it left off.  Finally, if {\it Random} is set, then Morph chooses random new inputs each time it transitions, rather than rotating through them in turn. The random seed is (you guessed it) {\it Seed}, reset every note-on, except if Seed is 0, in which case it's fully random.  
 
-Be sure to read ``Mixing Strategies'', Section~\ref{mixingstrategies}.  See also {\bf Switch}, {\bf Amp Math},  {\bf Combine}, {\bf Fill}, {\bf Dissolve}, and {\bf Mix}.
+Be sure to read ``Strategies for Merging Partial Sources'', Section~\ref{mixingstrategies}.  See also {\bf Switch}, {\bf Amp Math},  {\bf Combine}, {\bf Fill}, {\bf Dissolve}, and {\bf Mix}.
 
 \paragraph{Normalize} This {\it normalizes} the input (scales it so that the amplitudes all sum to 1.0, creating a relatively consistent volume) or {\it maximizes} it (scaling it so that the highest amplitude equals 1.0).  Optionally it also {\it standardizes} it (sets all the frequencies to standard harmonic values).
 
@@ -1049,7 +1054,7 @@ There are a number of options.  First, you can {\it stretch} the partials to a n
 
 \paragraph{Shift} This shifts all the partials in your input in a certain way.  {\it Shift} specifies by how much (this is easily modulated), and {\it Bound} scales the shifting.  There are three ways you can shift.  First you can shift the {\it Pitch}: this is essentially multiplying the partials by a certain amount.  Second, you can shift the {\it Frequency}: this {\it adds} a certain amount to the partials, which creates an inharmonic shift effect.  Third, you can shift the {\it Partials}: this shifts the whole partial amplitude array up or down.  A warning about partials shifting: this can make abrupt changes in amplitude, and you may hear static-like clicks or pops, especially in low pitches.  You can clean this up by running things through {\bf Smooth} set to about 0.9. See also {\bf Seq}.  Finally, {\it Vibrato} is the same as {\it Pitch}, but with a much smaller bound: at maximum, the bound is one whole step (major second) in each direction.  This makes it easier to dial in precise vibrato amounts.
 
-\paragraph{Skeletonize} If a partial has a neighbor partial which is {\it larger} than it, then its amplitude is cut by a percentage.  The percentage is a power of the distance of the partial to the peak partial on the left or right, whichever is further.  This has the effect of stripping partials out and only leaving the locally highest partials.  {\it Cut} is the base percentage.  You can specify whether only lower neighbors, higher neighbors, or both are considered.  See also {\bf Dilate}, which is almost, but not quite the opposite concept.\footnote{Odd names?  Skeletonize and Dilate are both the names of similar operations on 2D images in computer graphics.}
+\paragraph{Skeletonize} If a partial has a neighbor partial which is {\it larger} than it, then its amplitude is cut by a percentage.  The percentage is a power of the distance of the partial to the peak partial on the left or right, whichever is further.  This has the effect of stripping partials out and only leaving the locally highest partials.  {\it Cut} is the base percentage.  You can specify whether only lower neighbors, higher neighbors, or both are considered.  See also {\bf Dilate}, which is almost, but not quite, the opposite concept.\footnote{Odd names?  Skeletonize and Dilate are both the names of similar operations on 2D images in computer graphics.}
 
 \paragraph{Smooth} This module smooths over the frequency and amplitude differences between successive sets of partials.  The degree of smoothing is specified by {\it Amount}.  Specifically, it maintains an internal set of Partials \(P\).  At every timestep, it takes the current incoming Partials \(Q\), and sets each amplitude \(A^P_i\) of \(P\) to \(A^P_i = (1-\alpha) A^P_i + \alpha A^Q_i\).  Likewise it sets each frequency \(F^P_i = (1-\alpha) F^P_i + \alpha F^Q_i\), where \(\alpha\) is the Amount.  Smooth has to deal with one unusual case: when the incoming partials of \(Q\) start wandering about in frequency and eventually cross one another.  This creates discontinuities in the smoothing.  Smooth handles this by trying to remember which partials were which; this strategy will work fine if Smooth is fed partials from the {\it first} partials output of any module.  No guarantees are made regarding other partials outputs.  Modules rarely have more than one output, anyway.
 
@@ -1067,7 +1072,7 @@ Switch is useful for playing sequences of sounds: you can do this by attaching a
 
 \paragraph{VCA} This is just what it says on the tin: an amplifier (VCA is the classic term).  A VCA is very commonly used in conjunction with an envelope.  It takes an input and multiplies all of its amplitudes by a value.  This value is determined by multiplying {\it mod} (which goes 0--1) by {\it scale} (which goes 0--8), and then adding {\it add} (which goes 0--8).  The {\it mod} modulation is designed for you to attach LFOs or envelopes etc.  The {\it scale} modulation is not linear and so is just meant for you to dial in a maximum scale value.   
 
-The {\it add} modulation, normally zero, shifts the overall amplification up or down, and is useful in creating tremolo (slight variation in volume), because without it the VCA would just shift between a given volume and {\it silence}. For example, normally if your scaling was 1.0, then the volume would go between silence (0.0) and normal volume (1.0).  If you instead set {\it add} to 1.0, then the volume would go between 0.5 and 1.5.
+The {\it add} modulation, normally zero, shifts the overall amplification up or down, and is useful in creating tremolo (slight variation in volume), because without it the VCA would just range between a given volume and {\it silence}. For example, normally if your scaling was 1.0, then the volume would go between silence (0.0) and normal volume (1.0).  If you instead set {\it add} to 1.0, then the volume would go between 0.5 and 1.5.
 
 \subsection{Special Modules}
 \label{specialmodules}
@@ -1139,7 +1144,7 @@ A Macro also contains an {\it On Tr} and an {\it Off Tr} modulation dial.  If yo
 
 Macros have one more trick up their sleeves.  The {\it Pause} button changes the behavior of the {\it On Tr} modulation dial.  If you turn on {\it Pause}, then while {\it On Tr} is set to zero (0.0), the underlying modules in the Macro will not be stepped at all: they're effectively put to sleep.  This can be used in combination with {\bf Switch} or {\bf Morph} again to entirely shut off Macro sounds while they're not being used, saving a bit of computational power.  This is because the modulation outputs of Switch and Morph both go to zero when they are not using the corresponding sound.  With great power comes great responsibility: be careful that you know what you're doing here.
 
-\subsection{Strategies for Mixing}
+\subsection{Strategies for Merging Partial Sources}
 \label{mixingstrategies}
 
 Ordinarily if you wanted to mix two sources into one stream, you'd imagine you could just lump all the partials together and be done with it.  But there are two catches.  First, {\name} has a fixed number of partials: so if you lump the partials from two sources together, half of them must be eliminated.  Second, partials are each associated with a sine wave oscillator in the output (that's the partial's {\it order}): when two sets of partials are mixed, you'll often have the situation where partials from each set are competing for the same oscillator, and in the end only one can have it.   If this results in a sudden shift of control, the oscillator's frequency or amplitude may suddenly shift, producing a pop. So all this is a little more complex than you'd think.
@@ -1155,7 +1160,7 @@ This can produce some surprises.  Let's say you made a sawtooth wave and detuned
 
 \item {\bf Combine} takes about the same number of lowest frequency partials from each source and puts them together to form the output.  Combine is good for many things, but not if you want to mix one source with lots of partials with another source with only one or two partials: you might use {\bf Fill} instead.
 
-\item {\bf Fill} adds to \(O\) all the non-zero amplitude partials of \(A\).  Any remaining partials come from the lowest non-zero partials of \(B\).  Fill is particularly useful when mixing in Noise from a limited number of partials: set \(A\) to the noise.  Fill also works great if both sources (or at least \(A\)) have lots of empty partials.  At present orders come from \(A\): orders in \(B\) are reassigned.  This could potentially create the same pop/buzz situation as discussed in Combine.
+\item {\bf Fill} adds to \(O\) all the non-zero amplitude partials of \(A\).  Any remaining partials come from the lowest non-zero partials of \(B\).  Fill is particularly useful when mixing in Noise from a limited number of partials: set \(A\) to the noise.  Fill also works great if both sources (or at least \(A\)) have lots of empty partials.  Note that orders come from \(A\): orders in \(B\) are reassigned.  This means that if the non-zero-amplitude partials in \(A\) change in number or location, this could potentially create a pop or buzz as a partial in \(O\) suddenly gets reassigned from \(A\) to \(B\) or vice versa.
 
 \item {\bf Morph} lines up partials in \(A\) and \(B\) according to some map and interpolates their frequencies and amplitudes.  Orders come from \(A\).  Because of interpolation, this is unlikely to create pops or buzzes in most situations.  
 
