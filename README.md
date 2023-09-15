@@ -16,8 +16,7 @@ Related projects:
 
 ## Donations
 
-Donations are welcome via Paypal.
-
+Donations are welcome via Paypal to my email address (sean@cs.gmu.edu).
 
 ## About
 
