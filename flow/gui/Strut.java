@@ -1,6 +1,7 @@
-// Copyright 2017 by George Mason University
-// Licensed under the Apache 2.0 License
-
+/***
+    Copyright 2023 by Sean Luke
+    Licensed under the Apache License version 2.0
+*/
 
 package flow.gui;
 
@@ -20,20 +21,27 @@ import java.awt.event.*;
 
 public class Strut
     {
-    /** Makes a strut with zero height. */
     public static JComponent makeHorizontalStrut(final int space)
         {
         return makeStrut(space, 0);
         } 
                 
-    /** Makes a strut with zero width. */
     public static JComponent makeVerticalStrut(final int space)
         {
         return makeStrut(0, space);
         }
 
-    /** Makes a strut with the given height and width. */
-    public static JComponent makeStrut(final int width, final int height)
+    public static JComponent makeHorizontalStrut(final int space, boolean setBackground)
+        {
+        return makeStrut(space, 0, setBackground);
+        } 
+                
+    public static JComponent makeVerticalStrut(final int space, boolean setBackground)
+        {
+        return makeStrut(0, space, setBackground);
+        }
+
+    public static JComponent makeStrut(final int width, final int height, boolean setBackground)
         {
         JPanel panel = new JPanel()
             {
@@ -41,11 +49,21 @@ public class Strut
             public Dimension getPreferredSize() { return new Dimension(width, height); }
             public Dimension getMaximumSize() { return new Dimension(width, height); }
             };
+        if (setBackground) panel.setBackground(Style.BACKGROUND_COLOR());
         return panel;
         } 
     
-    /** Makes a strut the maximum width and maximum height over several components. */
+    public static JComponent makeStrut(final int width, final int height)
+        {
+        return makeStrut(width, height, true);
+        } 
+    
     public static JComponent makeStrut(Component[] components)
+        {
+        return makeStrut(components, false, false);
+        }
+
+    public static JComponent makeStrut(Component[] components, boolean zeroWidth, boolean zeroHeight)
         {
         int maxWidth = 0;
         int maxHeight = 0;
@@ -58,13 +76,37 @@ public class Strut
             if (maxHeight < size.height)
                 maxHeight = size.height;
             }
-        return makeStrut(maxWidth, maxHeight);
+        return makeStrut((zeroWidth ? 0 : maxWidth), (zeroHeight ? 0 : maxHeight));
         }
         
-    /** Makes a strut the width and height of a given component. */
+    public static JComponent makeStrut(Component[] components, boolean zeroWidth)
+        {
+        return makeStrut(components, zeroWidth, !zeroWidth);
+        }
+
+    public static JComponent makeStrut(Component component, boolean zeroWidth, boolean zeroHeight)
+        {
+        return makeStrut(new Component[] { component }, zeroWidth, zeroHeight);
+        }
+
+    public static JComponent makeStrut(Component component, boolean zeroWidth)
+        {
+        return makeStrut(new Component[] { component }, zeroWidth, !zeroWidth);
+        }
+
     public static JComponent makeStrut(Component component)
         {
         return makeStrut(new Component[] { component });
+        }
+
+    public static JComponent makeHorizontalStrut(Component component)
+        {
+        return makeStrut(new Component[] { component }, false, true);
+        }
+
+    public static JComponent makeVerticalStrut(Component component)
+        {
+        return makeStrut(new Component[] { component }, true, false);
         }
 
     }
