@@ -754,7 +754,7 @@ public class Unit extends Modulation
         }
 
 
-	// February 2022: It appears that for nearly-sorted arrays, insertion sort is generally faster than bubble sort.x
+	// February 2022: It appears that for nearly-sorted arrays, insertion sort is generally faster than bubble sort.
 	public boolean simpleSort(int j, boolean copyAmplitudes)
 		{
         if (copyAmplitudes)
