@@ -104,6 +104,7 @@ public class Modules
     //flow.modules.Squish.class,
     //flow.modules.Stretch.class,
     flow.modules.Sub.class,
+    flow.modules.Subharmonics.class,
     //flow.modules.Swap.class,
     flow.modules.Switch.class,
     flow.modules.Tinkle.class,
