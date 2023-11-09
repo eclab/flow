@@ -355,7 +355,7 @@ public class KeyDisplay extends JPanel
                         }
                     }
                 }        
-            else if (isWhiteKey(dynamicKey))        // otherwise don't bother with this
+            if (isWhiteKey(dynamicKey))        // otherwise don't bother with this
                 {
                 if (dynamicUpdate) 
                     graphics.setPaint(staticColor);
