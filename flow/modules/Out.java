@@ -131,7 +131,7 @@ public class Out extends Unit implements Miscellaneous
     public boolean showsOutputs() { return false; }
 
     transient int targetNextTick = 0;
-    public static final int TIME_INTERVAL = (int)(Output.SAMPLING_RATE / 1000);         // the amount of time before we add into the modulation buffer
+    public static final int TIME_INTERVAL = (int)(Output.SAMPLING_RATE / 500);         // the amount of time before we add into the modulation buffer
     public void go()
         {
         super.go();

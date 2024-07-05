@@ -1084,10 +1084,6 @@ public class Output
                 {
                 public void run()
                     {
-                    long lastTick = -1;
-                    int tickCount = 0;
-                    double tickAvg = 0;
-                                                
                     while(true) 
                         {
                         blockVoiceUntil(_i, true); 
@@ -1236,7 +1232,7 @@ public class Output
         // Spin-wait.  It's both faster and more efficient than a mutex in this case, but it eats up cycles
         while(emitsReady)
             {
-            Thread.currentThread().yield();
+            //Thread.currentThread().yield();
             }
                 
         lock();
