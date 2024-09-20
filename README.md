@@ -11,6 +11,7 @@ Copyright 2018 by George Mason University
 Related projects:  
 
 * [Edisyn](https://github.com/eclab/edisyn), a patch editor toolkit with sophisticated exploration tools.
+* [Seq](https://github.com/eclab/seq), a very unusual hierarchical and modular music sequencer.
 * [Gizmo](https://cs.gmu.edu/~sean/projects/gizmo/), an Arduino-based MIDI Swiss Army knife.
 * [*Computational Music Synthesis*](https://cs.gmu.edu/~sean/book/synthesis/), an open-content book on building software synthesizers.
 
