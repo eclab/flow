@@ -15,18 +15,35 @@ public class Sine extends Unit implements UnitSource
     {
     private static final long serialVersionUID = 1;
 
-    public static final int MOD_FREQUENCY = 0;
+    public static final int MOD_PARTIALS = 0;
 
+	public static final double NORMALIZED_GAIN = 1.0;
+	public static final double GAIN_MULTIPLIER = 4.0;
+    public static final int MOD_GAIN = 1;
+	double oldGain = NORMALIZED_GAIN;
+
+	void buildAmplitudes(double mod, double gain)
+		{
+        double[] amplitudes = getAmplitudes(0);
+		int p = (int)(mod * (Unit.NUM_PARTIALS - 1.0));
+		for(int i = 0; i < Unit.NUM_PARTIALS; i++)
+			{
+			if (i == p) amplitudes[i] = GAIN_MULTIPLIER * gain;
+			else amplitudes[i] = 0.0;
+			}
+		}
+		
     public Sine(Sound sound) 
         {
         super(sound);
-        defineModulations(new Constant[] { Constant.ZERO }, new String[] { "Frequency" });
+        defineModulations(new Constant[] { Constant.ZERO, new Constant(NORMALIZED_GAIN / GAIN_MULTIPLIER) }, 
+        	new String[] { "Partial", "Gain" });
 
-        double[] amplitudes = getAmplitudes(0);
+//        double[] amplitudes = getAmplitudes(0);
         
         setClearOnReset(false);
-        sine = 0;
-        amplitudes[0] = 1;
+//        sine = 0;
+//        amplitudes[0] = 1;
         }
 
     double lastMod = Double.NaN;
@@ -36,12 +53,13 @@ public class Sine extends Unit implements UnitSource
         {
         super.go();
  
-        double[] frequencies = getFrequencies(0);        
-        double[] amplitudes = getAmplitudes(0);
-        double mod = modulate(MOD_FREQUENCY);
+        //double[] frequencies = getFrequencies(0);        
+        double mod = modulate(MOD_PARTIALS);
+        double gain = modulate(MOD_GAIN);
         
-        if (lastMod != mod)
+        if (lastMod != mod || gain != oldGain)
             {
+            /*
             frequencies[sine] = mod * ((double)Unit.NUM_PARTIALS - 1.0) + 1;
             simpleSort(0, false);
                         
@@ -51,6 +69,24 @@ public class Sine extends Unit implements UnitSource
                     sine = i;
                     break;
                     }
+            */
+            buildAmplitudes(mod, gain);
+            lastMod = mod;
+            oldGain = gain;
             }
         }
+
+    public String getModulationValueDescription(int modulation, double value, boolean isConstant)
+        {
+        if (isConstant)
+            {
+            if (modulation == MOD_PARTIALS)
+                {
+                return "" + (int)(value * (Unit.NUM_PARTIALS - 1.0));
+                }
+            else return super.getModulationValueDescription(modulation, value, isConstant);
+            }
+        else return "";
+        }
+
     }

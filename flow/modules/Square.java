@@ -17,13 +17,20 @@ public class Square extends Unit implements UnitSource //, Parameterizable
     private static final long serialVersionUID = 1;
 
     public static final int MOD_PULSE_WIDTH = 0;
+    public static final int MOD_GAIN = 1;
 
     double lastMod = -1;
         
+	public static final double NORMALIZED_GAIN = 0.29344691229918385;
+	public static final double GAIN_MULTIPLIER = 4.0;
+	
+	double oldGain = -1;
+
     public Square(Sound sound) 
         {
         super(sound);
-        defineModulations(new Constant[] { Constant.HALF }, new String[] { "Pulse Width" });
+        defineModulations(new Constant[] { Constant.HALF, new Constant(NORMALIZED_GAIN / GAIN_MULTIPLIER) }, 
+        		new String[] { "Pulse Width", "Gain" });
         setClearOnReset(false);
         buildPWM();
         }
@@ -37,11 +44,12 @@ public class Square extends Unit implements UnitSource //, Parameterizable
                 
     public void buildPWM()
         {
-        double[] amplitudes = getAmplitudes(0);
-                
         double mod = modulate(MOD_PULSE_WIDTH);
-        if (lastMod != mod)
+    	double gain = modulate(MOD_GAIN) * GAIN_MULTIPLIER;
+        if (lastMod != mod || gain != oldGain)
             {
+	        double[] amplitudes = getAmplitudes(0);
+                
             if (mod == 0.5)  // easy case!
                 {
                 for(int i = 1; i < amplitudes.length; i+=2)
@@ -51,7 +59,7 @@ public class Square extends Unit implements UnitSource //, Parameterizable
                                         
                 for(int i = 0; i < amplitudes.length; i+=2)
                     {
-                    amplitudes[i] = (double)(1.0 / (i+1));
+                    amplitudes[i] = gain * (double)(1.0 / (i+1));
                     }
                 }
             else
@@ -71,8 +79,9 @@ public class Square extends Unit implements UnitSource //, Parameterizable
                     }
                 }
                                 
-            normalizeAmplitudes();
+            //normalizeAmplitudes();
             lastMod = mod;
+            oldGain = gain;
             }
         }
     }

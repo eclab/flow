@@ -832,19 +832,19 @@ You will find that very short bursts of Noise vary in amplitude, which makes it 
 
 %\paragraph{Rand}  Random partials.  Outputs all partials, standardized, with random amplitudes.  If the {\it Seed} is {\it Free} (0), then the amplitudes are different each gate; otherwise they are the same random values each gate, using a random number generator with the given seed.
 
-\paragraph{Rectified}  The harmonics of a rectified sine wave, that is, \(|\sin(x)|\).
+\paragraph{Rectified}  The harmonics of a rectified sine wave, that is, \(|\sin(x)|\).  You can set the gain: by default it is normalized so all the amplitudes sum to 1.0.
 
-\paragraph{Sawtooth}  The harmonics of a sawtooth wave.
+\paragraph{Sawtooth}  The harmonics of a sawtooth wave.  You can set the gain: by default it is normalized so all the amplitudes sum to 1.0.
 
-\paragraph{Square}  The harmonics of a pulse wave.  You can specify the pulse width modulation.
+\paragraph{Square}  The harmonics of a pulse wave.  You can specify the pulse width modulation.  You can also set the gain: by default it is normalized so all the amplitudes sum to 1.0.
 
-\paragraph{Sine}  A single harmonic at 1.0 amplitude.  The harmonic can be any partial frequency from 1.0 to 128.0.
+\paragraph{Sine}  A single harmonic at 1.0 amplitude.  The harmonic can be any partial frequency from 1.0 to 128.0.  You can also set the gain: by default it is normalized so the sine amplitude is 1.0.
 
 \paragraph{Tinkle}  Produces random partials, creating a tinkling effect.  Some {\it number} of new partials are created whenever the {\it trigger} occurs, and at the given {\it volume}.  The partials {\it decay} at some rate.  The {\it probability} specifies the likelihood that partials will be created when a trigger occurs.   If the {\it seed} is {\it Free} (0), then the tinkles will be completely random and vary from note to note; if it's non-zero, then the pattern of randomness will be the same for each note: the seed specifies which pattern it is.  Finally, if {\it Hold} is true, then the decay of the most recent tinkles won't start until the next tinkles are entered.  Furthermore, {\it Hold} causes {\it decay} to behave differently when set to 0: normally this would be a very fast decay, but if {\it Hold} is true, then it's an {\it immediate} decay\,---\,the previous tinkles go straight to zero amplitude.  Try turning on Hold and setting decay to 0 to get a kind of sample and hold effect.
 
 Tinkle behaves differently than other modules when it comes to constraints.  Whereas in most modules the constraints {\it undo} the action of the module for certain partials, in Tinkle the constraints {\it bound} its actions.  For example, if you had 4 partials tinkling and you restricted the constraints to the low 32 harmonics, then you'd still be guaranteed to get 4 tinkles each time: they'd just be within 0...31.  Indeed, setting the constraints to bound to the low \(N\) harmonics is a useful way to guarantee that tinkles won't occur beyond Nyquist.
 
-\paragraph{Triangle}  A triangle wave.  Note that normally triangle waves include negative amplitude harmonics, that is, ones with inverted phases.  As {\name} does not shift partial phases, these harmonics become all positive (you likely won't hear a difference).
+\paragraph{Triangle}  A triangle wave.  Note that normally triangle waves include negative amplitude harmonics, that is, ones with inverted phases.  As {\name} does not shift partial phases, these harmonics become all positive (you likely won't hear a difference).  You can also set the gain: by default it is normalized so all the amplitudes sum to 1.0.
 
 \paragraph{Waves}  A collection of harmonics drawn from the single-cycle waves of several major synthesizers:
 
@@ -878,6 +878,8 @@ All of the shapers have the ability of being {\bf constrained}.  This means that
 %\begin{center}\includegraphics[width=6.5in]{UnitShapers1}\end{center}
 %\caption{Partials Shapers (1)}
 %\end{figure}
+
+\paragraph{Alias} Applies aliasing (or foldover) to the partials.  You specify the cutoff frequency, which is the frequency at which they start aliasing.  In traditional aliasing scenarios, the cutoff frequency is the Nyquist frequency, that is, half the sampling rate.  Here you can artificially change the cutoff frequency, and aliasing will occur earlier.  This is only somewhat useful as an effect in actual musical scenarios: but it is very useful for educational demonstrations of aliasing.
 
 \paragraph{Amp Math}  This shaper modifies the partials from two sources \(A\) and \(B\) by putting every pair of them \(\langle A_i, B_i\rangle\) through the same function, along with a modulation source \(M\).  The operations are:
 

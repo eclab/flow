@@ -17,19 +17,42 @@ public class Triangle extends Unit implements UnitSource
     {       
     private static final long serialVersionUID = 1;
 
+	public static final double NORMALIZED_GAIN = 0.8118547451597639;
+	public static final double GAIN_MULTIPLIER = 4.0;
+    public static final int MOD_GAIN = 0;
+	double oldGain = NORMALIZED_GAIN;
+	
+	void buildAmplitudes(double gain)
+		{
+        double[] amplitudes = getAmplitudes(0);
+        for(int i = 0; i < amplitudes.length; i += 2)
+            {
+            amplitudes[i] = gain * (double)(1.0 / ((i+1) * (i+1)));
+            }
+                
+		}
+		
     public Triangle(Sound sound) 
         {
         super(sound);
+        defineModulations(new Constant[] { new Constant(NORMALIZED_GAIN / GAIN_MULTIPLIER) }, 
+        		new String[] { "Gain" });
 
-        double[] amplitudes = getAmplitudes(0);
-        
         setClearOnReset(false);
                 
-        for(int i = 0; i < amplitudes.length; i += 2)
-            {
-            amplitudes[i] = (double)(1.0 / ((i+1) * (i+1)));
-            }
-                
-        normalizeAmplitudes();
+        buildAmplitudes(NORMALIZED_GAIN);
+        //normalizeAmplitudes();
+        //System.err.println(amplitudes[0]);
         }
+
+    public void go()
+    	{
+    	super.go();
+    	double gain = modulate(MOD_GAIN);
+    	if (oldGain != gain)	// Need to change values
+    		{
+    		buildAmplitudes(gain * GAIN_MULTIPLIER);
+    		oldGain = gain;
+    		}
+    	}
     }
