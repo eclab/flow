@@ -31,7 +31,7 @@ install8: jar
 	
 install: jar
 	rm -rf install/Flow.app install/bundles install/Flow.dmg.html install/Flow.dmg.jnlp
-	- jpackage --input install --name Flow --main-jar flow.jar --main-class flow.Flow --type dmg --mac-package-name "Flow" --verbose --java-options '-XX:+UseZGC -XX:MaxGCPauseMillis=1 -verbose:gc'
+	- jpackage --input install --name Flow --main-jar flow.jar --main-class flow.Flow --type dmg --mac-package-name "Flow" --verbose --java-options '-XX:+UseZGC -XX:MaxGCPauseMillis=1'
 	open Flow-1.0.dmg
 #	- mv install/bundles/Flow-0.0.dmg install/Flow.dmg
 #	rm -rf install/bundles install/Flow.dmg.html install/Flow.dmg.jnlp
