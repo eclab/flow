@@ -112,6 +112,8 @@ public class Output
 
     public static final float DEFAULT_MASTER_GAIN = 0.0f;
 
+	public static final float MAX_FREEVERB_INPUT = 32768 * 32768;
+
     // If a partial's volume is very low, we don't even bother computing its sample contribution, but just set it to zero.
     static final double MINIMUM_VOLUME = (1.0 / 65536 / 256);  // 0.0001
 
@@ -784,7 +786,7 @@ public class Output
         Thread thread = new Thread(new Runnable()
             {
             public void run()
-                {
+                {                
                 /// The last amplitudes (used for interpolation between the past partials and new ones)
                 /// Note that these are indexed by ORDER, not by actual index position
                 final double[][] currentAmplitudes = new double[numVoices][Unit.NUM_PARTIALS];
@@ -878,14 +880,11 @@ public class Output
                             with.reset[solo] = false;
                             }
                                                         
-                        //                        for(int i = 0; i < currentAmplitudes[0].length; i++)
-                        //                              System.err.println("" + i + " " + currentAmplitudes[0][i]);
                         double[] samplessnd = samples[solo];
                         for (int samp = 0; samp < skip; samp++)
                             {
                             samplessnd[samp] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
-                            //                            System.err.println(samplessnd[samp]);
-                            }
+                           }
                         }
                     else
                         {
@@ -943,8 +942,8 @@ public class Output
                                     left += samples[snd][samp];
                                     }
                                 }
-                            }
-                            
+                           }
+
                         // add reverb?
                         if (with.reverbWet > 0.0f)
                             {
@@ -958,6 +957,13 @@ public class Output
                                 
                             if (stereo)
                                 {
+
+                            /// freeverb freaks out with large values, so we will bound them
+                            if (left > MAX_FREEVERB_INPUT) left = MAX_FREEVERB_INPUT;    
+                            else if (left < -MAX_FREEVERB_INPUT) left = -MAX_FREEVERB_INPUT;    
+                            if (right > MAX_FREEVERB_INPUT) right = MAX_FREEVERB_INPUT;    
+                            else if (right < -MAX_FREEVERB_INPUT) right = -MAX_FREEVERB_INPUT;    
+                            
                                 freeverbInput[0][0] = (float)left;
                                 freeverbInput[1][0] = (float)right;
                                 freeverb.compute(1, freeverbInput, freeverbOutput);
@@ -966,6 +972,10 @@ public class Output
                                 }
                             else
                                 {
+                            /// freeverb freaks out with large values, so we will bound them
+                            if (left > MAX_FREEVERB_INPUT) left = MAX_FREEVERB_INPUT;    
+                            else if (left < -MAX_FREEVERB_INPUT) left = -MAX_FREEVERB_INPUT;    
+                            
                                 freeverbInput[0][0] = (float)left;
                                 freeverbInput[1][0] = (float)left;
                                 freeverb.compute(1, freeverbInput, freeverbOutput);
@@ -973,6 +983,7 @@ public class Output
                                 }
                             }
                                                     
+
                         left *= gain;
                                                             
                         if (left > 32767)
@@ -1000,7 +1011,7 @@ public class Output
                                 clipped = true;
                                 }
                             }
-                        
+                                                    
                         if (stereo)
                             {
                             int val = (int)(left);
@@ -1258,10 +1269,6 @@ public class Output
                     System.arraycopy(standardOrders, 0, swap.orders[i], 0, standardOrders.length); 
                     }
 
-                //for(int q = 0; q < emits.amplitudes[0].length; q++)
-                //    if (emits.amplitudes[0][q] != 0)
-                //      System.err.println("++>" + q + " " + emits.frequencies[0][q] + " " + emits.orders[0][q]);
-                    
                 swap.pitches[i] = sounds[i].getPitch();
                 swap.velocities[i] = (velocitySensitive ? sounds[i].getVelocity() : Sound.DEFAULT_VELOCITY);
                 if (emits instanceof Out)
