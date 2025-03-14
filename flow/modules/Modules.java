@@ -37,6 +37,7 @@ public class Modules
     {
     flow.modules.AHR.class,
     flow.modules.AKWF.class,
+    flow.modules.Alias.class,
     flow.modules.All.class,
     flow.modules.AmpMath.class,
     flow.modules.AudioIn.class,
@@ -68,6 +69,7 @@ public class Modules
     flow.modules.Harmonics.class,
     flow.modules.Jitter.class,
     flow.modules.KHarmonics.class,
+    flow.modules.Latch.class,
     flow.modules.LadderFilter.class,
     flow.modules.LFO.class,
     flow.modules.LinearFilter.class,
