@@ -69,7 +69,7 @@
 
 \noindent {\Huge\bf {\name}}\\[0.5em]
 {\large \bf An Open-source, Fully Modular, Multitimbral, Polyphonic, Additive Synthesizer\\[0.2em]
-Version 10\\[0.2em]
+Version 11\\[0.2em]
 https://github.com/eclab/flow\\\\[0.2em]
 By Sean Luke\\[0.2em]
 Department of Computer Science\\[0.25em]
@@ -183,7 +183,7 @@ If you look carefully at Figure~\ref{screenshot}, you'll see that there are not 
 \subsection{Tuning Parameters}
 First things first.  {\name} is very, very computationally expensive and benefits from tuning to your computer speed.  If your computer can't keep up with Flow's demands, you'll hear a {\bf glitch}.  This is a pop or a buzz in the audio stream, and will be accompanied by the {\bf Out} module (the top-right module shown in Figure \ref{screenshot}) coloring its black title bar red and saying \smash{\fcolorbox{black}{red}{\color{white}\small\sf{Glitch}}}\,.  A glitch occurs when Flow can't keep the audio buffer filled fast enough, so your computer is forced to start filling it with zeros.  You don't want that.  Some of these parameters may also have an effect on {\bf latency}, especially MIDI input.
 
-Glitches often settle down after running Flow a minute or so.  But if not, how should we tamp them down?  By playing with a few parameters. If you select {\bf Tuning Parameters} from the {\bf Options} menu, you can at present change six parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session.   
+Glitches often settle down after running Flow a minute or so.  But if not, how should we tamp them down?  By playing with a few parameters.\footnote{One major source of glitches is Java's garbage collection, which takes a long time to do.  Java has a new low-latency garbage collector called the {\bf Z Collector}.  With recent versions of Java (20 say), you can use the Z collector to dramatically reduce the glitches by running Flow like this:\quad{\tt java -jar flow.jar -XX:+UseZGC -XX:MaxGCPauseMillis=1}\quad Flow's Mac app automatically does this.}  If you select {\bf Tuning Parameters} from the {\bf Options} menu, you can at present change six parameters.  Pressing {\it Okay} or {\it Reset} (which resets to defaults) will change the parameters for the {\it next} time you run {\name}, not the current session.   
 
 You may not yet understand some of the terminology below: in this case, read the rest of the manual, try out the synth, and return to the Tuning Parameters later.
 
@@ -1005,6 +1005,10 @@ Filter can be set to be {\it Relative}.  This means that the filter cutoff frequ
 Filter emulates an analog filter: its dropoff stretches out to infinity. This means that at the Nyquist limit, the partials can still have a significant amplitude, particularly for high notes.  You may not want this, and instead prefer to gradually {\it Taper} the curve, starting at the cutoff frequency and dropping to zero by the time you reach Nyquist.  
 
 The bass in Ladder filters tends to bottom out with increasing resonance.  You might be happier with the filter used in {\bf Filter} in this case.
+
+\paragraph{Latch}  This is a mechanism to enable an initial impulse to flow through to output, but then immediately latch to some other input to flow to the output thereafter.  Its primary use is to start with a basic impulse sound, then recursively feed that impulse back through the Latch.  The {\it Initial} partials are flowed to the output when a {\it Trigger} occurs; otherwise the {\it Later} partials are flowed to the output.
+
+You select from among four different Initial partials sources using {\it Sel Initial}.  You also select from among four different Later partials sources using {\it Sel Partial}.  
 
 \paragraph{Linear Filter} This is a filter where you can specify up to 8 nodes (points of change) in terms of frequency and gain.  The filter then just draws lines attaching the nodes, and this becomes the filter frequency function.  Nodes are always sorted first by frequency.  A {\it Base} frequency is added to the frequencies of all the nodes.  {\it Num Nodes} is the number of nodes being used.
 
