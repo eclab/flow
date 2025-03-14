@@ -1232,6 +1232,7 @@ public class AppMenu
                 rack.reset();
                 }
             });
+        reset.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         return reset;
         }
 
