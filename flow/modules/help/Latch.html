@@ -1,0 +1,16 @@
+A latch for recurrent sound flows.
+
+When triggered (or Note On gate), Latch allows sound to flow from one of its INITIAL partials input sources.  Immediately thereafter, it only allows sound to flow from one of its LATER partials input sources.  The primary use of Latch is to attach its output to one of its LATER inputs recursively, so that it starts with an initial impulse and then recursively modifies it as time goes on.
+
+<dl>
+<dt>Initial 1 ... 4
+<dd>The initial partials input sources, selectable with Sel Initial.
+<dt>Later 1 ... 4
+<dd>The later partials input sources, selectable with Sel Later.
+<dt>Trigger
+<dd>When triggered, Latch will output sound from one Initial source (depending on Sel Initial).  Otherwise will output sound from one Later source (depending on Sel Later).  If you do not connect the trigger to anything, Latch will be automatically triggered by a Note On (a gate).
+<dt>Sel Initial
+<dd>Selects which of the Initial sources will be used.
+<dt>Sel Later
+<dd>Selects which of the Later sources will be used.
+</dl>
