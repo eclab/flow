@@ -56,7 +56,27 @@ public class Latch extends Unit
         	copyFrequencies(val);
         	copyAmplitudes(val);
         	}
+        constrain();	// is this useful?
         }       
 
     public static String getName() { return "Latch"; }
+
+    public String getModulationValueDescription(int modulation, double value, boolean isConstant)
+    	{
+    	if (isConstant)
+    		{
+    		if (modulation == MOD_TRIGGER)
+    			{
+    			return super.getModulationValueDescription(modulation, value, isConstant);
+    			}
+    		else
+    			{
+    			int d = (int)(value * NUM_INS);
+    			if (d == NUM_INS) d = NUM_INS - 1;
+    			d += 1;
+    			return String.valueOf(d);
+    			}
+    		}
+    	else return "";
+    	}
     }

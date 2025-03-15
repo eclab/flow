@@ -65,6 +65,9 @@ public class Unit extends Modulation
     /** The default name for the primary output unit.  This is "Out". */
     public static final String DEFAULT_UNIT_OUT_NAME = "Out";
         
+    /** The highest amplitude we'll permit to prevent things from going to infinity and NaN */
+    public static final double MAX_AMPLITUDE = 32768 * 32768;		// or something...
+    
     public Unit(Sound sound)
         {
         super(sound);
@@ -492,6 +495,37 @@ public class Unit extends Modulation
             }
         }
     
+    /** Sets the amplitudes of all partials of a given output port such that they are within
+     	a fairly large bound that is far from infinity.    */    
+    public void boundAmplitudes(int j)
+        {
+        double[] a = amplitudes[j];
+        for(int i = 0; i < a.length; i++)
+        	{
+        	// This is done in an odd order so that we properly check for NaN
+        	if (a[i] <= MAX_AMPLITUDE)
+        		{
+        		// do nothing
+        		}
+        	else if (a[i] != a[i]) 
+        		{
+        		a[i] = 0;		// or whatever
+        		}
+        	else // (a[i] > MAX_AMPLITUDE) 
+        		{
+        		a[i] = MAX_AMPLITUDE;
+        		}
+        	}
+        }
+
+    /** Sets the amplitudes of all partials of all of a unit's output ports such that they are within
+     	a fairly large bound that is far from infinity.    */    
+    public void boundAmplitudes()
+        {
+        for(int i = 0; i < amplitudes.length; i++)
+            boundAmplitudes(i);
+        }
+
     /** Sets the frequencies of the partials of all unit output ports such that
         frequency[i] is equal to i + 1.    */    
     public void standardizeFrequencies()
