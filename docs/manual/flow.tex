@@ -1899,6 +1899,9 @@ public class MyUnit extends Unit
 
 We created a boolean variable, {\tt lowpass}, to toggle between a low-pass and high-pass filter. In {\tt reset()} and {\tt gate()} we set {\tt lowpass} to true.  Next, we added an additional modulation for the trigger.  To get this trigger information, we call {\tt isTriggered(input)}.  There also exists a method called {\tt getTrigger(input)} which returns the {\it count} of how many times the trigger has been fired.  Finally, we use the trigger to toggle between low-pass and high-pass.  Recall that the trigger is reset the next iteration.
 
+\paragraph{Add Bounds} 
+Some filters, amplifiers, and other Units {\it increase} amplitudes.  If you placed them in a cycle, they could increase those amplitudes without bound.  We want those amplitudes to stay reasonable, or at least not go to infinity, at which point they can cause infinite or NaN amplitude values when summed and break everything.  To prevent this, we'll add a call to {\tt boundAmplitudes} at the very end of {\tt go()} to keep the amplitudes reasonable.  This is not very expensive but it is an O(n) call, so we'd like to only include it if we know the Unit we're building could do this.  As it so happens the one we're building here {\it cannot} increase amplitudes (it only decreases them to 0!), but let's include it just as an example.
+
 \paragraph{Add Constraints} 
 One item many filter-style Units have is a {\it constraints facility}.  This is a facility that the user can use to restrict which partials we're allowed to modify.  In fact we'll modify all of them anyway, but then the constraints facility will restore some of them.  The method that does this is called {\tt constrain()}.  We modify {\tt go()} thusly:
 
@@ -1925,6 +1928,7 @@ One item many filter-style Units have is a {\it constraints facility}.  This is 
                }
                
           constrain();
+          boundAmplitudes();        // as mentioned, not useful in this example...
           }
 \end{verbatim}
 }
