@@ -21,6 +21,21 @@ public class Mac
             {
             System.setProperty("apple.awt.graphics.EnableQ2DX", "true");
             System.setProperty("apple.laf.useScreenMenuBar", "true");
+            try
+                {
+                  java.awt.Desktop.getDesktop().setAboutHandler(new java.awt.desktop.AboutHandler()
+                  {
+                  public void handleAbout(java.awt.desktop.AboutEvent e)
+                  {
+AppMenu.doAbout();
+                  }
+                  });
+                }
+            catch (Exception e)
+                {
+                //fail quietly
+                }
+
             try 
                 {
                 Object app = Class.forName("com.apple.eawt.Application").getMethod("getApplication").invoke(null);

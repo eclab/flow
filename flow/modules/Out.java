@@ -146,10 +146,13 @@ public class Out extends Unit implements Miscellaneous
             //pushOrders(0);                      // already pushed in super.go()
 
             copyAmplitudes(0);
+            
             double[] amplitudes = getAmplitudes(0);
             for(int i = 0; i < amplitudes.length; i++)
                 amplitudes[i] *= gain;
                                 
+            boundAmplitudes();
+
             // provide for auxillary display
             pushFrequencies(1, 1);
             pushAmplitudes(1, 1);

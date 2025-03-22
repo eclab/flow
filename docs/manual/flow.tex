@@ -1740,6 +1740,7 @@ Third: you might also change your module, which causes problems when trying to b
 \end{verbatim}
 }
 
+\enlargethispage{1em}
 \subsection{Building a Unit}
 
 Read Section \ref{buildlingamodulation} (Building a Modulation) first.  It covers a lot of important stuff that we'll build on here.
@@ -1783,7 +1784,7 @@ public class MyUnit extends Unit
 
 We define one modulation input called ``Cutoff'', and set up {\tt go}.   Since we're receiving partials, we define one incoming partials port, called {\it In}.  By default the source module for this port is {\tt Unit.NIL}, which represents the ``empty Unit'', with standardized frequencies and all-zero amplitudes.    You can't use {\tt null} here: every partials input must be a real Unit.  When the user wires up the port to some other module, {\tt Unit.NIL} will be replaced with that module's output.
 
-It's important to understand what the {\tt pushFrequencies(0)} and {\tt copyAmplitudes(0)} lines are doing.  {\tt pushFrequencies(input, output)} instructs the module to set the frequencies of all partials in output port {\it output} to those in input port {\it input}.  Because in the large majority of cases we don't have more than one partials output,   {\tt pushFrequencies(input)} does the same thing as  {\tt pushFrequencies(input, 0)}.  If you have pushed your frequencies (or your amplitudes), you may read them but you {\bf may not modify them}.  You'd push frequencies or amplitudes if you're not modifying them, because pushing is more efficient than copying them.
+It's important to understand what the {\tt pushFrequencies(0)} and {\tt copyAmplitudes(0)} lines are doing.  {\tt pushFrequencies(input, output)} instructs the module to set the frequencies of all partials in output port {\it output} to those in input port {\it input}.  Because in almost all cases we don't have more than one partials output,   {\tt pushFrequencies(input)} does the same thing as  {\tt pushFrequencies(input, 0)}.  If you have pushed your frequencies (or your amplitudes), you may read them but you {\bf may not modify them}.  You'd push frequencies or amplitudes if you're not modifying them, because pushing is more efficient than copying them.
 
 Because we're modifying amplitudes, we call {\tt copyAmplitudes(0)} instead of {\tt pushAmplitudes(0)}.  The method {\tt copyAmplitudes(input, output)} makes a copy of the amplitudes from {\it input} and puts the copy in {\it output}.  And similarly, {\tt copyAmplitudes(input)} is just {\tt copyAmplitudes(input, 0)}.
 
@@ -1837,11 +1838,11 @@ Now we're cooking!  We just do a for-loop over the amplitudes and zero them if t
 
 Now, modulation values go from 0...1.  How do we convert that into a frequency?  We could just multiply by half the sampling rate (remember that anything over half the sampling rate is beyond the Nyquist limit), that is, something like \hbox{\tt cutoff = mod * Output.SAMPLING\_RATE}\quad But frequency is exponential, so we'd like something exponential-ish.  That's what the Modulation utility method {\tt modToFrequency(...)} does.
 
-The problem with modToFrequency is that by itself it takes too long to reach a reasonable value: so modToFrequency(0.5) is only 11 Hz.  This is a waste of dial space.  So we make the dial much less sensitive to the exponential-ish effect by including {\tt makeVeryInsensitive(...)}. Now the two together yield 6567 Hz at 0.5.
+The problem with modToFrequency is that it takes too long to reach a reasonable value: so modToFrequency(0.5) is only 11 Hz.  This is a waste of dial space.  So we make the dial much less sensitive to the exponential-ish effect by including {\tt makeVeryInsensitive(...)}. Now the two together yield 6567 Hz at 0.5.
 
+\enlargethispage{4em}
 \paragraph{Add Trigger Response} 
 Now let's throw in a monkey wrench.  Imagine that we'd like to swap between low-pass and high-pass depending on the state of a trigger sent to us, oh, let's say, the Modulation we just developed in Section~\ref{buildlingamodulation}.   We might write:
-
 
 \vbox{\footnotesize
 \begin{verbatim}
