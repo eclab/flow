@@ -2,7 +2,7 @@
 
 
 # Flow  
-A Polyphonic, Multitimbral, Modular Additive Synthesizer (Version 11)
+A Polyphonic, Multitimbral, Modular Additive Synthesizer (Version 12)
  
 By Sean Luke (sean@cs.gmu.edu) \
 With Help from V. Hoyle \
@@ -53,8 +53,8 @@ Flow is cross-platform and will run on a variety of platforms (Windows, Linux) b
 
 ### Installation and Running on MacOS
 
-First install Flow from this link: [Flow.app.zip](https://cs.gmu.edu/~eclab/projects/flow/Flow.app.zip). 
-Sadly, it's a whopping 70MB because it includes the Java VM.  :-(
+First install Flow from this link: [Flow.dmg](https://cs.gmu.edu/~eclab/projects/flow/Flow.dmg). 
+Sadly, it's a whopping 50MB because it includes the Java VM.  :-(
 
 You'll also want to download some [patches](https://cs.gmu.edu/~eclab/projects/flow/patches.zip), some [wavetables](https://waveeditonline.com/), and the [manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf).  Pay attention to section 2.1 of the manual, where it explains how to tune Flow for your computer speed.  
 
