@@ -901,113 +901,113 @@ public class AppMenu
         
 
 /*
-    public static final int DEFAULT_MAX_DISPLAYED_HARMONIC = 6;             // 150
+  public static final int DEFAULT_MAX_DISPLAYED_HARMONIC = 6;             // 150
         
-    static JMenuItem maxDisplayedHarmonic(Rack rack)
-        {
-        final double maxHarm[] = new double[] { 31, 49, 63, 79, 99, 127, 149, 199, 255, 299, 399, 499 };
-        final JMenu max = new JMenu("Max Displayed Harmonic");
-        final JRadioButtonMenuItem[] buttons = new JRadioButtonMenuItem[] 
-            {
-            new JRadioButtonMenuItem("32"),
-            new JRadioButtonMenuItem("50"),
-            new JRadioButtonMenuItem("64"),
-            new JRadioButtonMenuItem("80"),
-            new JRadioButtonMenuItem("100"),
-            new JRadioButtonMenuItem("128"),
-            new JRadioButtonMenuItem("150"),
-            new JRadioButtonMenuItem("200"),
-            new JRadioButtonMenuItem("256"),
-            new JRadioButtonMenuItem("300"),
-            new JRadioButtonMenuItem("400"),
-            new JRadioButtonMenuItem("500")
-            };
+  static JMenuItem maxDisplayedHarmonic(Rack rack)
+  {
+  final double maxHarm[] = new double[] { 31, 49, 63, 79, 99, 127, 149, 199, 255, 299, 399, 499 };
+  final JMenu max = new JMenu("Max Displayed Harmonic");
+  final JRadioButtonMenuItem[] buttons = new JRadioButtonMenuItem[] 
+  {
+  new JRadioButtonMenuItem("32"),
+  new JRadioButtonMenuItem("50"),
+  new JRadioButtonMenuItem("64"),
+  new JRadioButtonMenuItem("80"),
+  new JRadioButtonMenuItem("100"),
+  new JRadioButtonMenuItem("128"),
+  new JRadioButtonMenuItem("150"),
+  new JRadioButtonMenuItem("200"),
+  new JRadioButtonMenuItem("256"),
+  new JRadioButtonMenuItem("300"),
+  new JRadioButtonMenuItem("400"),
+  new JRadioButtonMenuItem("500")
+  };
         
-        ButtonGroup group = new ButtonGroup();
-        for(int i = 0; i < buttons.length; i++)
-            {
-            max.add(buttons[i]);
-            group.add(buttons[i]);
-            }
+  ButtonGroup group = new ButtonGroup();
+  for(int i = 0; i < buttons.length; i++)
+  {
+  max.add(buttons[i]);
+  group.add(buttons[i]);
+  }
         
-        int sel = Prefs.getMaxDisplayedHarmonic();
-        buttons[sel].setSelected(true);
-        rack.display1.setMaxFrequency(maxHarm[sel]);
-        rack.display2.setMaxFrequency(maxHarm[sel]);
+  int sel = Prefs.getMaxDisplayedHarmonic();
+  buttons[sel].setSelected(true);
+  rack.display1.setMaxFrequency(maxHarm[sel]);
+  rack.display2.setMaxFrequency(maxHarm[sel]);
                 
-        for(int q = 0; q < buttons.length; q++)
-            {
-            buttons[q].addActionListener(new ActionListener()
-                {
-                public void actionPerformed(ActionEvent e)
-                    {
-                    // yuck
-                    int selected = 0;
-                    for(int i = 0; i < buttons.length; i++)
-                        if (buttons[i].isSelected()) 
-                            { 
-                            selected = i; 
-                            break; 
-                            }
+  for(int q = 0; q < buttons.length; q++)
+  {
+  buttons[q].addActionListener(new ActionListener()
+  {
+  public void actionPerformed(ActionEvent e)
+  {
+  // yuck
+  int selected = 0;
+  for(int i = 0; i < buttons.length; i++)
+  if (buttons[i].isSelected()) 
+  { 
+  selected = i; 
+  break; 
+  }
                         
-                    rack.display1.setMaxFrequency(maxHarm[selected]);
-                    rack.display2.setMaxFrequency(maxHarm[selected]);
-                    Prefs.setMaxDisplayedHarmonic(selected);
-                    }
-                });
-            }
-        return max;
-        }
+  rack.display1.setMaxFrequency(maxHarm[selected]);
+  rack.display2.setMaxFrequency(maxHarm[selected]);
+  Prefs.setMaxDisplayedHarmonic(selected);
+  }
+  });
+  }
+  return max;
+  }
 
 
-    static JMenuItem minDisplayedHarmonic(Rack rack)
-        {
-        final double minHarm[] = new double[] { 1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125 };
-        final JMenu min = new JMenu("Min Displayed Harmonic");
-        final JRadioButtonMenuItem[] buttons = new JRadioButtonMenuItem[] 
-            {
-            new JRadioButtonMenuItem("Fundamental"),
-            new JRadioButtonMenuItem("1/2"),
-            new JRadioButtonMenuItem("1/4"),
-            new JRadioButtonMenuItem("1/8"),
-            new JRadioButtonMenuItem("1/16"),
-            new JRadioButtonMenuItem("1/32") 
-            };
+  static JMenuItem minDisplayedHarmonic(Rack rack)
+  {
+  final double minHarm[] = new double[] { 1.0, 0.5, 0.25, 0.125, 0.0625, 0.03125 };
+  final JMenu min = new JMenu("Min Displayed Harmonic");
+  final JRadioButtonMenuItem[] buttons = new JRadioButtonMenuItem[] 
+  {
+  new JRadioButtonMenuItem("Fundamental"),
+  new JRadioButtonMenuItem("1/2"),
+  new JRadioButtonMenuItem("1/4"),
+  new JRadioButtonMenuItem("1/8"),
+  new JRadioButtonMenuItem("1/16"),
+  new JRadioButtonMenuItem("1/32") 
+  };
         
-        ButtonGroup group = new ButtonGroup();
-        for(int i = 0; i < buttons.length; i++)
-            {
-            min.add(buttons[i]);
-            group.add(buttons[i]);
-            }
+  ButtonGroup group = new ButtonGroup();
+  for(int i = 0; i < buttons.length; i++)
+  {
+  min.add(buttons[i]);
+  group.add(buttons[i]);
+  }
         
-        int sel = Prefs.getMinDisplayedHarmonic();
-        buttons[sel].setSelected(true);
-        rack.display1.setMinFrequency(minHarm[sel]);
-        rack.display2.setMinFrequency(minHarm[sel]);
-        for(int q = 0; q < buttons.length; q++)
-            {
-            buttons[q].addActionListener(new ActionListener()
-                {
-                public void actionPerformed(ActionEvent e)
-                    {
-                    // yuck
-                    int selected = 0;
-                    for(int i = 0; i < buttons.length; i++)
-                        if (buttons[i].isSelected()) 
-                            { 
-                            selected = i; 
-                            break; 
-                            }
+  int sel = Prefs.getMinDisplayedHarmonic();
+  buttons[sel].setSelected(true);
+  rack.display1.setMinFrequency(minHarm[sel]);
+  rack.display2.setMinFrequency(minHarm[sel]);
+  for(int q = 0; q < buttons.length; q++)
+  {
+  buttons[q].addActionListener(new ActionListener()
+  {
+  public void actionPerformed(ActionEvent e)
+  {
+  // yuck
+  int selected = 0;
+  for(int i = 0; i < buttons.length; i++)
+  if (buttons[i].isSelected()) 
+  { 
+  selected = i; 
+  break; 
+  }
                         
-                    rack.display1.setMinFrequency(minHarm[selected]);
-                    rack.display2.setMinFrequency(minHarm[selected]);
-                    Prefs.setMinDisplayedHarmonic(selected);
-                    }
-                });
-            }
-        return min;
-        }
+  rack.display1.setMinFrequency(minHarm[selected]);
+  rack.display2.setMinFrequency(minHarm[selected]);
+  Prefs.setMinDisplayedHarmonic(selected);
+  }
+  });
+  }
+  return min;
+  }
 */
 
     static JMenuItem showKeyboard(Rack rack)

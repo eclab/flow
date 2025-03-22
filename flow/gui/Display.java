@@ -22,7 +22,7 @@ public class Display extends JComponent
     Output output;
     ModulePanel modPanel;
     double xscale = 2;
-    public static final double LOG_SCALE = 1.0 / 16;		// How much should we divide the log entries so as to shift the display to the left?
+    public static final double LOG_SCALE = 1.0 / 16;            // How much should we divide the log entries so as to shift the display to the left?
     
     // Am I the "auxiliary" display?
     boolean aux;

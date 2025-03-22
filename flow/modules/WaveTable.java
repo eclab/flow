@@ -193,14 +193,14 @@ public class WaveTable extends Unit implements UnitSource
                         {
                         sampled = false;
 
-						blofeldName = null;
+                        blofeldName = null;
                         File f = pan[0].doLoad("Load a Wavetable", FILENAME_EXTENSIONS);
                         if (blofeldName != null)
-                        	{
+                            {
                             name = blofeldName;
                             button[0].getButton().setText(name);
                             button2[0].getButton().setText("Sample...");
-                        	}
+                            }
                         else if (f != null)
                             {
                             name = AppMenu.removeExtension(f.getName());
@@ -232,119 +232,119 @@ public class WaveTable extends Unit implements UnitSource
                 {
                 String n = file.getName();
                 if (n.endsWith(".syx") || n.endsWith(".SYX"))
-                	loadBlofeldSysex(file, rack);
+                    loadBlofeldSysex(file, rack);
                 else
-                	{
-                try
                     {
-                    WavFile wavFile = WavFile.openWavFile(file);
-                    wavFile.display();
-                    int numChannels = wavFile.getNumChannels();
-                    if (numChannels != 1)
+                    try
                         {
-                        AppMenu.showSimpleError("Invalid WAV File", "WAV files must have only one channel.", rack);
-                        }
-                    else
-                        {
-                        ArrayList<double[]> buf = new ArrayList<>();
-                        if (sampled)
+                        WavFile wavFile = WavFile.openWavFile(file);
+                        wavFile.display();
+                        int numChannels = wavFile.getNumChannels();
+                        if (numChannels != 1)
                             {
-                            int sampleSize = WAVETABLE_SIZE * RESAMPLING;
-                            double[] a = new double[sampleSize];
-                            double[] b = new double[sampleSize];
-                            double[] buffer = new double[WAVETABLE_SIZE];
-                            while(true)
-                                {
-                                // Read frames into buffer
-                                int framesRead = wavFile.readFrames(buffer, WAVETABLE_SIZE);
-                                if (framesRead != WAVETABLE_SIZE) break;
-                                                        
-                                System.arraycopy(b, WAVETABLE_SIZE, b, 0, sampleSize - WAVETABLE_SIZE);
-                                System.arraycopy(buffer, 0, b, sampleSize - WAVETABLE_SIZE, WAVETABLE_SIZE);
-                                System.arraycopy(b, 0, a, 0, sampleSize);
-                                                      
-                                // is Hanning COLA?     
-                                a = FFT.applyHanningWindow(a);
-                                double[] harmonics = FFT.getHarmonics(a);
-                                double[] finished = new double[harmonics.length / 2 / RESAMPLING];
-                                for (int s=1 ; s < harmonics.length / 2 / RESAMPLING + 1; s++)
-                                    {
-                                    finished[s - 1] = (harmonics[s * RESAMPLING - 1] >= MINIMUM_AMPLITUDE ? harmonics[s * RESAMPLING - 1]  : 0 );
-                                    }
-                                buf.add(finished);
-                                }
+                            AppMenu.showSimpleError("Invalid WAV File", "WAV files must have only one channel.", rack);
                             }
                         else
                             {
-                            double[] buffer = new double[WAVETABLE_SIZE];
-                            while(true)
+                            ArrayList<double[]> buf = new ArrayList<>();
+                            if (sampled)
                                 {
-                                // Read frames into buffer
-                                int framesRead = wavFile.readFrames(buffer, WAVETABLE_SIZE);
-                                if (framesRead != WAVETABLE_SIZE) break;
+                                int sampleSize = WAVETABLE_SIZE * RESAMPLING;
+                                double[] a = new double[sampleSize];
+                                double[] b = new double[sampleSize];
+                                double[] buffer = new double[WAVETABLE_SIZE];
+                                while(true)
+                                    {
+                                    // Read frames into buffer
+                                    int framesRead = wavFile.readFrames(buffer, WAVETABLE_SIZE);
+                                    if (framesRead != WAVETABLE_SIZE) break;
                                                         
-                                // Note no window.  Should still be okay (I think?)
-                                double[] harmonics = FFT.getHarmonics(buffer);
-                                double[] finished = new double[harmonics.length / 2];
-                                for (int s=1 ; s < harmonics.length / 2; s++)                           // we skip the DC offset (0) and set the Nyquist frequency bin (harmonics.length / 2) to 0
-                                    {
-                                    finished[s - 1] = (harmonics[s] >= MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
+                                    System.arraycopy(b, WAVETABLE_SIZE, b, 0, sampleSize - WAVETABLE_SIZE);
+                                    System.arraycopy(buffer, 0, b, sampleSize - WAVETABLE_SIZE, WAVETABLE_SIZE);
+                                    System.arraycopy(b, 0, a, 0, sampleSize);
+                                                      
+                                    // is Hanning COLA?     
+                                    a = FFT.applyHanningWindow(a);
+                                    double[] harmonics = FFT.getHarmonics(a);
+                                    double[] finished = new double[harmonics.length / 2 / RESAMPLING];
+                                    for (int s=1 ; s < harmonics.length / 2 / RESAMPLING + 1; s++)
+                                        {
+                                        finished[s - 1] = (harmonics[s * RESAMPLING - 1] >= MINIMUM_AMPLITUDE ? harmonics[s * RESAMPLING - 1]  : 0 );
+                                        }
+                                    buf.add(finished);
                                     }
-                                buf.add(finished);
                                 }
-                            }
+                            else
+                                {
+                                double[] buffer = new double[WAVETABLE_SIZE];
+                                while(true)
+                                    {
+                                    // Read frames into buffer
+                                    int framesRead = wavFile.readFrames(buffer, WAVETABLE_SIZE);
+                                    if (framesRead != WAVETABLE_SIZE) break;
+                                                        
+                                    // Note no window.  Should still be okay (I think?)
+                                    double[] harmonics = FFT.getHarmonics(buffer);
+                                    double[] finished = new double[harmonics.length / 2];
+                                    for (int s=1 ; s < harmonics.length / 2; s++)                           // we skip the DC offset (0) and set the Nyquist frequency bin (harmonics.length / 2) to 0
+                                        {
+                                        finished[s - 1] = (harmonics[s] >= MINIMUM_AMPLITUDE ? harmonics[s]  : 0 );
+                                        }
+                                    buf.add(finished);
+                                    }
+                                }
 
-                        double max = 0;
-                        double[][] done = new double[buf.size()][];
+                            double max = 0;
+                            double[][] done = new double[buf.size()][];
                                         
-                        for(int i = 0; i < buf.size(); i++)
-                            {
-                            done[i] = (double[])(buf.get(i));
-                            for(int j = 0; j < done[i].length; j++)
-                                if (max < done[i][j])
-                                    max = done[i][j];
-                            }
-                                                
-                        // maximize over all waves [with max = 1.0]
-                        if (max > 0)
-                            {
-                            for(int i = 0; i < done.length; i++)
+                            for(int i = 0; i < buf.size(); i++)
                                 {
+                                done[i] = (double[])(buf.get(i));
                                 for(int j = 0; j < done[i].length; j++)
-                                    {
-                                    done[i][j] /= max;
-                                    }
+                                    if (max < done[i][j])
+                                        max = done[i][j];
                                 }
-                            }
-
-                        rack.getOutput().lock();
-                        try
-                            {
-                            waveTable = new double[done.length][NUM_PARTIALS];
-                            // load the wavetable independent of the number of partials
-                            for(int i = 0; i < waveTable.length; i++)
+                                                
+                            // maximize over all waves [with max = 1.0]
+                            if (max > 0)
                                 {
-                                for(int j = 0; j < waveTable[i].length; j++)
+                                for(int i = 0; i < done.length; i++)
                                     {
-                                    waveTable[i][j] = 0;
+                                    for(int j = 0; j < done[i].length; j++)
+                                        {
+                                        done[i][j] /= max;
+                                        }
                                     }
-                                System.arraycopy(done[i], 0, waveTable[i], 0, Math.min(done[i].length, waveTable[i].length));
                                 }
 
-                            distributeToAllSounds(waveTable);
-                            }
-                        finally 
-                            {
-                            rack.getOutput().unlock();
+                            rack.getOutput().lock();
+                            try
+                                {
+                                waveTable = new double[done.length][NUM_PARTIALS];
+                                // load the wavetable independent of the number of partials
+                                for(int i = 0; i < waveTable.length; i++)
+                                    {
+                                    for(int j = 0; j < waveTable[i].length; j++)
+                                        {
+                                        waveTable[i][j] = 0;
+                                        }
+                                    System.arraycopy(done[i], 0, waveTable[i], 0, Math.min(done[i].length, waveTable[i].length));
+                                    }
+
+                                distributeToAllSounds(waveTable);
+                                }
+                            finally 
+                                {
+                                rack.getOutput().unlock();
+                                }
                             }
                         }
+                    catch (Exception ex)
+                        {
+                        warnAlways("modules/WaveTable.java", "IOException in loading file: " + ex);
+                        ex.printStackTrace();
+                        }
                     }
-                catch (Exception ex)
-                    {
-                    warnAlways("modules/WaveTable.java", "IOException in loading file: " + ex);
-                    ex.printStackTrace();
-                    }
-                }
                 }
             };
         return pan[0];
@@ -411,122 +411,122 @@ public class WaveTable extends Unit implements UnitSource
     public static final int BLOFELD_WAVETABLE_SIZE = 64;
 
 
-	public void warnBlofeld(int pos)
-		{
-		System.err.println("WARNING (modules/WaveTable.java): improper data in wave " + pos);
-		}
+    public void warnBlofeld(int pos)
+        {
+        System.err.println("WARNING (modules/WaveTable.java): improper data in wave " + pos);
+        }
 
-	public void failBlofeld(int pos)
-		{
-		System.err.println("ERROR (modules/WaveTable.java): bad data, giving up on wavetable as of wave " + pos);
-		}
-		
+    public void failBlofeld(int pos)
+        {
+        System.err.println("ERROR (modules/WaveTable.java): bad data, giving up on wavetable as of wave " + pos);
+        }
+                
 
-	String blofeldName = null;
-	public void loadBlofeldSysex(File file, Rack rack)
-		{
-		try 
-			{
-			InputStream f = new BufferedInputStream(new FileInputStream(file));
-			waveTable = new double[64][NUM_PARTIALS];
+    String blofeldName = null;
+    public void loadBlofeldSysex(File file, Rack rack)
+        {
+        try 
+            {
+            InputStream f = new BufferedInputStream(new FileInputStream(file));
+            waveTable = new double[64][NUM_PARTIALS];
 
-		for(int i = 0; i < BLOFELD_WAVETABLE_SIZE; i++)
-			{
-			// read a wave
-			// 0. we find 0xF0
-			int b = f.read();
-			if (b != 0xF0) { warnBlofeld(i); continue; }
-			
-			// 1. Waldorf ID
-			b = f.read();
-			if (b < 0 || b > 127) { failBlofeld(i); break; }
-			if (b != 0x3E) { warnBlofeld(i); continue; }
+            for(int i = 0; i < BLOFELD_WAVETABLE_SIZE; i++)
+                {
+                // read a wave
+                // 0. we find 0xF0
+                int b = f.read();
+                if (b != 0xF0) { warnBlofeld(i); continue; }
+                        
+                // 1. Waldorf ID
+                b = f.read();
+                if (b < 0 || b > 127) { failBlofeld(i); break; }
+                if (b != 0x3E) { warnBlofeld(i); continue; }
 
-			// 2. Blofeld ID
-			b = f.read();
-			if (b < 0 || b > 127) { failBlofeld(i); break; }
-			if (b != 0x13) { warnBlofeld(i); continue; }
+                // 2. Blofeld ID
+                b = f.read();
+                if (b < 0 || b > 127) { failBlofeld(i); break; }
+                if (b != 0x13) { warnBlofeld(i); continue; }
 
-			// 3. Device ID
-			b = f.read();
-			if (b < 0 || b > 127) { failBlofeld(i); break; }
-			// The value doesn't matter
-			
-			// 4. Wavetable Dump Command
-			b = f.read();
-			if (b < 0 || b > 127) { failBlofeld(i); break; }
-			if (b != 0x12) { warnBlofeld(i); continue; }
+                // 3. Device ID
+                b = f.read();
+                if (b < 0 || b > 127) { failBlofeld(i); break; }
+                // The value doesn't matter
+                        
+                // 4. Wavetable Dump Command
+                b = f.read();
+                if (b < 0 || b > 127) { failBlofeld(i); break; }
+                if (b != 0x12) { warnBlofeld(i); continue; }
 
-			// 5. Wavetable Number
-			b = f.read();
-			if (b < 0 || b > 127) { failBlofeld(i); break; }
-			if (b < 0x50 || b > 0x76) { warnBlofeld(i); continue; }
-			int wt = b;
+                // 5. Wavetable Number
+                b = f.read();
+                if (b < 0 || b > 127) { failBlofeld(i); break; }
+                if (b < 0x50 || b > 0x76) { warnBlofeld(i); continue; }
+                int wt = b;
 
-			// 6. Wave Number
-			b = f.read();
-			if (b < 0 || b > 127) { failBlofeld(i); break; }
-			if (b > 0x3F) { warnBlofeld(i); continue; }
-			int wv = b;
+                // 6. Wave Number
+                b = f.read();
+                if (b < 0 || b > 127) { failBlofeld(i); break; }
+                if (b > 0x3F) { warnBlofeld(i); continue; }
+                int wv = b;
 
-			// 7. Wave "Format", always 0
-			b = f.read();
-			if (b < 0 || b > 127) { failBlofeld(i); break; }
-			if (b != 0x0) { warnBlofeld(i); continue; }
-			
-			// Data
-			double[] data = new double[BLOFELD_WAVE_SIZE];
-			for(int j = 0; j < data.length; j++)
-				{
-				int h = f.read();
-				if (h < 0 || h > 127) { failBlofeld(i); break; }
-				int m = f.read();
-				if (m < 0 || m > 127) { failBlofeld(i); break; }
-				int l = f.read();
-				if (l < 0 || l > 127) { failBlofeld(i); break; }
-				
-				// Form the 21-bit triplet
-				int d = (h << 14) | (m << 7) | l;
+                // 7. Wave "Format", always 0
+                b = f.read();
+                if (b < 0 || b > 127) { failBlofeld(i); break; }
+                if (b != 0x0) { warnBlofeld(i); continue; }
+                        
+                // Data
+                double[] data = new double[BLOFELD_WAVE_SIZE];
+                for(int j = 0; j < data.length; j++)
+                    {
+                    int h = f.read();
+                    if (h < 0 || h > 127) { failBlofeld(i); break; }
+                    int m = f.read();
+                    if (m < 0 || m > 127) { failBlofeld(i); break; }
+                    int l = f.read();
+                    if (l < 0 || l > 127) { failBlofeld(i); break; }
+                                
+                    // Form the 21-bit triplet
+                    int d = (h << 14) | (m << 7) | l;
 
-				// we're going to shift this to the very top, and then shift it down
-				// with >> so we have a signed fill
-				d = (d << 11) >> 11;
-				data[j] = d / 1048576.0;			// 2^20
-				}
-				
-			// Name
-			byte[] n = new byte[14];
-			boolean failedName = false;
-			for(int j = 0; j < n.length; j++)
-				{
-				b = f.read();
-				if (b < 0 || b > 127) { failBlofeld(i); failedName = true; break; }
-				n[j] = (byte)b;    
-				}
-			if (failedName) break;
-			blofeldName = new String(n, "US-ASCII");
+                    // we're going to shift this to the very top, and then shift it down
+                    // with >> so we have a signed fill
+                    d = (d << 11) >> 11;
+                    data[j] = d / 1048576.0;                        // 2^20
+                    }
+                                
+                // Name
+                byte[] n = new byte[14];
+                boolean failedName = false;
+                for(int j = 0; j < n.length; j++)
+                    {
+                    b = f.read();
+                    if (b < 0 || b > 127) { failBlofeld(i); failedName = true; break; }
+                    n[j] = (byte)b;    
+                    }
+                if (failedName) break;
+                blofeldName = new String(n, "US-ASCII");
 
-			// Reserved junk, checksum, and F7
-			b = f.read();
-			if (b < 0 || b > 127) { failBlofeld(i); break; }
-			b = f.read();
-			if (b < 0 || b > 127) { failBlofeld(i); break; }
-			b = f.read();
-			if (b < 0 || b > 127) { failBlofeld(i); break; }
-			b = f.read();
-			if (b != 0xF7) { warnBlofeld(i); continue; }
-			
-			// Perform FFT.  I am assuming that the wavetable is properly constructed such that
-			// we do not have to window first to force it to 0.
-            data = FFT.getHarmonics(data);
-			for(int j = 1; j < data.length / 2; j++)		// remove dc offset
-				{
-				waveTable[wv][j - 1] = data[j];
-				}
-			}
-		
-			f.close();
-			}
-		catch (IOException ex) { }
-		}
+                // Reserved junk, checksum, and F7
+                b = f.read();
+                if (b < 0 || b > 127) { failBlofeld(i); break; }
+                b = f.read();
+                if (b < 0 || b > 127) { failBlofeld(i); break; }
+                b = f.read();
+                if (b < 0 || b > 127) { failBlofeld(i); break; }
+                b = f.read();
+                if (b != 0xF7) { warnBlofeld(i); continue; }
+                        
+                // Perform FFT.  I am assuming that the wavetable is properly constructed such that
+                // we do not have to window first to force it to 0.
+                data = FFT.getHarmonics(data);
+                for(int j = 1; j < data.length / 2; j++)                // remove dc offset
+                    {
+                    waveTable[wv][j - 1] = data[j];
+                    }
+                }
+                
+            f.close();
+            }
+        catch (IOException ex) { }
+        }
     }

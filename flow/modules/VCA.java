@@ -52,7 +52,7 @@ public class VCA extends Unit
             amplitudes[i] = amplitudes[i] * mod * scale; 
         
         constrain();
-        boundAmplitudes();			// we can make the amplitudes go high, so we need to bound them
+        boundAmplitudes();                      // we can make the amplitudes go high, so we need to bound them
         }       
 
     public String[] getPopupOptions(int modulation)

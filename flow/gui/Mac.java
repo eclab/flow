@@ -23,13 +23,13 @@ public class Mac
             System.setProperty("apple.laf.useScreenMenuBar", "true");
             try
                 {
-                  java.awt.Desktop.getDesktop().setAboutHandler(new java.awt.desktop.AboutHandler()
-                  {
-                  public void handleAbout(java.awt.desktop.AboutEvent e)
-                  {
-AppMenu.doAbout();
-                  }
-                  });
+                java.awt.Desktop.getDesktop().setAboutHandler(new java.awt.desktop.AboutHandler()
+                    {
+                    public void handleAbout(java.awt.desktop.AboutEvent e)
+                        {
+                        AppMenu.doAbout();
+                        }
+                    });
                 }
             catch (Exception e)
                 {

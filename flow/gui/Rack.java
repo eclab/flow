@@ -1552,10 +1552,10 @@ class ModulePanelTransferHandler extends TransferHandler implements DragSourceMo
         }
     
     /*
-    public Image getDragImage()
-    	{
-    	return new ImageIcon(AppMenu.class.getResource("About.png")).getImage();
-    	}
+      public Image getDragImage()
+      {
+      return new ImageIcon(AppMenu.class.getResource("About.png")).getImage();
+      }
     */
 
     public void dragMouseMoved(DragSourceDragEvent dsde) {}

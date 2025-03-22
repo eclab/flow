@@ -65,7 +65,7 @@ public class Drawbars extends Unit implements UnitSource, Presetable
             Constant.ZERO
             }, 
             new String[] { "1  (16')", "2  (5 1/3')", "3  (8')", "4  (4')", "5  (2 2/3')", "6  (2')", "7  (1 3/5')", 
-                           "8  (1 1/3')", "9  (1')",  "10 (1 1/7', 8/9')", "11 (4/5', 2/3')", "Perc Decay", "Perc Volume" }); // "10  (1 1/7', 8/9')", "11  (4/5', 2/3')" });
+                              "8  (1 1/3')", "9  (1')",  "10 (1 1/7', 8/9')", "11 (4/5', 2/3')", "Perc Decay", "Perc Volume" }); // "10  (1 1/7', 8/9')", "11  (4/5', 2/3')" });
         defineOptions(new String[] { "Percussion" , "Tuning" }, new String[][] { { "Off", "1st", "2nd" }, { "Classic", "Equal Temp", "Harmonic"} });
         setClearOnReset(false);
         setupOrganFrequencies();
@@ -118,7 +118,7 @@ public class Drawbars extends Unit implements UnitSource, Presetable
             frequencies[8] = 8.0 / (1.0 + 1.0/7.0);         // I have no precision information on this drawbar
             // Drawbar 9     
             frequencies[9] = 8.0 / (1.0);   
-			// Drawbar 10 Second
+            // Drawbar 10 Second
             frequencies[10] = 8.0 / (8.0 / 9.0);            // I have no precision information on this drawbar     
             // Drawbar 11
             frequencies[11] = 8.0 / (4.0 / 5.0);            // I have no precision information on this drawbar     
@@ -141,7 +141,7 @@ public class Drawbars extends Unit implements UnitSource, Presetable
             frequencies[8] = 8.0 / (1.0 + 1.0/7.0);         // I have no precision information on this drawbar
             // Drawbar 9     
             frequencies[9] = 8.0 / (1.0);   
-			// Drawbar 10 Second
+            // Drawbar 10 Second
             frequencies[10] = 8.0 / (8.0 / 9.0);            // I have no precision information on this drawbar     
             // Drawbar 11
             frequencies[11] = 8.0 / (4.0 / 5.0);            // I have no precision information on this drawbar     
@@ -164,7 +164,7 @@ public class Drawbars extends Unit implements UnitSource, Presetable
             frequencies[8] = 8.0 / (1.0 + 1.0/7.0);         // I have no precision information on this drawbar
             // Drawbar 9     
             frequencies[9] = 8.0 / (1.0);   
-			// Drawbar 10 Second
+            // Drawbar 10 Second
             frequencies[10] = 8.0 / (8.0 / 9.0);            // I have no precision information on this drawbar     
             // Drawbar 11
             frequencies[11] = 8.0 / (4.0 / 5.0);            // I have no precision information on this drawbar     

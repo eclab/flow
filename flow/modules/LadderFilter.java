@@ -227,7 +227,7 @@ public class LadderFilter extends Unit
             }
 
         constrain();
-        boundAmplitudes();			// we can make the amplitudes go high in rare situations, so we need to bound them
+        boundAmplitudes();                      // we can make the amplitudes go high in rare situations, so we need to bound them
         }       
 
 

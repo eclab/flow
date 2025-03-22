@@ -155,10 +155,10 @@ public abstract class Modulation implements Cloneable
     public void restart() { }
         
     void _go()
-    	{
-    	go();
-    	}
-    	
+        {
+        go();
+        }
+        
     /** Called (many times) when the system wishes to inform the Modulation to revise itself. 
         Be sure to call super.go(); */
     public void go() 

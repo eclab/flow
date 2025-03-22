@@ -49,12 +49,12 @@ public class LinearFilter extends Unit
         defineInputs( new Unit[] { Unit.NIL }, new String[] { "Input" });
         defineOptions(new String[] {"Relative" }, new String[][] {{"Relative"}});
         defineModulations( new Constant[] { Constant.ONE, Constant.HALF,
-                                            Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO,
-                                            Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE }, 
+                Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO, Constant.ZERO,
+                Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE, Constant.ONE }, 
             new String[] { "Nodes", 
-                           "Base",
-                           "Freq 1 ", "Freq 2 ", "Freq 3 ", "Freq 4 ", "Freq 5 ", "Freq 6 ", "Freq 7 ", "Freq 8 ",  
-                           "Gain 1", "Gain 2", "Gain 3", "Gain 4", "Gain 5", "Gain 6", "Gain 7", "Gain 8" });
+                               "Base",
+                               "Freq 1 ", "Freq 2 ", "Freq 3 ", "Freq 4 ", "Freq 5 ", "Freq 6 ", "Freq 7 ", "Freq 8 ",  
+                               "Gain 1", "Gain 2", "Gain 3", "Gain 4", "Gain 5", "Gain 6", "Gain 7", "Gain 8" });
         }
     
     // probably small enough to be inlined (33 bytes)
@@ -176,7 +176,7 @@ public class LinearFilter extends Unit
             }
 
         constrain();
-        boundAmplitudes();			// we can make the amplitudes go high in rare situations, so we need to bound them
+        boundAmplitudes();                      // we can make the amplitudes go high in rare situations, so we need to bound them
         }       
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)

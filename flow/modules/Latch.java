@@ -13,14 +13,14 @@ public class Latch extends Unit
     {
     private static final long serialVersionUID = 1;
 
-	public static final int MOD_TRIGGER = 0;
-	public static final int MOD_SELECT_INITIAL = 1;
-	public static final int MOD_SELECT_IN = 2;
-	public static final int NUM_INITIALS = 4;
-	public static final int NUM_INS = 4;
-	
-	boolean trigger = false;
-	
+    public static final int MOD_TRIGGER = 0;
+    public static final int MOD_SELECT_INITIAL = 1;
+    public static final int MOD_SELECT_IN = 2;
+    public static final int NUM_INITIALS = 4;
+    public static final int NUM_INS = 4;
+        
+    boolean trigger = false;
+        
     public Latch(Sound sound)
         {
         super(sound);
@@ -32,9 +32,9 @@ public class Latch extends Unit
         {
         super.gate();
         if (isModulationConstant(MOD_TRIGGER))
-			{
-			trigger = true;
-			}
+            {
+            trigger = true;
+            }
         }
 
     public void go()
@@ -42,41 +42,41 @@ public class Latch extends Unit
         super.go();
         
         if (trigger || isTriggered(MOD_TRIGGER))
-        	{
-        	int val = (int)(modulate(MOD_SELECT_INITIAL) * NUM_INITIALS);		// 0...4
-        	if (val == NUM_INITIALS) val = NUM_INITIALS - 1;					// 0...3
-        	copyFrequencies(val);
-        	copyAmplitudes(val);
-        	trigger = false;
-        	}
+            {
+            int val = (int)(modulate(MOD_SELECT_INITIAL) * NUM_INITIALS);           // 0...4
+            if (val == NUM_INITIALS) val = NUM_INITIALS - 1;                                        // 0...3
+            copyFrequencies(val);
+            copyAmplitudes(val);
+            trigger = false;
+            }
         else
-        	{
-        	int val = (int)(modulate(MOD_SELECT_IN) * NUM_INS + NUM_INITIALS);		// 4...8
-        	if (val == NUM_INITIALS + NUM_INS) val = NUM_INITIALS + NUM_INS - 1;	// 4...7
-        	copyFrequencies(val);
-        	copyAmplitudes(val);
-        	}
-        constrain();	// is this useful?
+            {
+            int val = (int)(modulate(MOD_SELECT_IN) * NUM_INS + NUM_INITIALS);              // 4...8
+            if (val == NUM_INITIALS + NUM_INS) val = NUM_INITIALS + NUM_INS - 1;    // 4...7
+            copyFrequencies(val);
+            copyAmplitudes(val);
+            }
+        constrain();    // is this useful?
         }       
 
     public static String getName() { return "Latch"; }
 
     public String getModulationValueDescription(int modulation, double value, boolean isConstant)
-    	{
-    	if (isConstant)
-    		{
-    		if (modulation == MOD_TRIGGER)
-    			{
-    			return super.getModulationValueDescription(modulation, value, isConstant);
-    			}
-    		else
-    			{
-    			int d = (int)(value * NUM_INS);
-    			if (d == NUM_INS) d = NUM_INS - 1;
-    			d += 1;
-    			return String.valueOf(d);
-    			}
-    		}
-    	else return "";
-    	}
+        {
+        if (isConstant)
+            {
+            if (modulation == MOD_TRIGGER)
+                {
+                return super.getModulationValueDescription(modulation, value, isConstant);
+                }
+            else
+                {
+                int d = (int)(value * NUM_INS);
+                if (d == NUM_INS) d = NUM_INS - 1;
+                d += 1;
+                return String.valueOf(d);
+                }
+            }
+        else return "";
+        }
     }

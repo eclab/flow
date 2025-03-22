@@ -28,14 +28,14 @@ public class Alias extends Unit
         }
         
     public double fold(double val, double cutoff)
-    	{
-    	double v = val / cutoff;
-    	int times = (int)v;
-    	double frac = v - times;
-    	if (times % 2 == 1) frac = 1.0 - frac;
-    	return frac * cutoff;
-    	}
-    	
+        {
+        double v = val / cutoff;
+        int times = (int)v;
+        double frac = v - times;
+        if (times % 2 == 1) frac = 1.0 - frac;
+        return frac * cutoff;
+        }
+        
     public void go()
         {
         super.go();
@@ -50,10 +50,10 @@ public class Alias extends Unit
         double cutoff = modToFrequency(makeVeryInsensitive(modulate(MOD_CUTOFF))); // Note that this is in angular frequency, but we don't divide by 2 PI to get Hertz because that's done at the end of the day when we add up the sine waves
         if (cutoff < MINIMUM_FREQUENCY) cutoff = MINIMUM_FREQUENCY;  // so we're never 0
         
-		for(int i = 0; i < frequencies.length; i++)
-			{
-			frequencies[i] = fold(frequencies[i] * pitch, cutoff) / pitch;
-			}
+        for(int i = 0; i < frequencies.length; i++)
+            {
+            frequencies[i] = fold(frequencies[i] * pitch, cutoff) / pitch;
+            }
 
         constrain();
         }       

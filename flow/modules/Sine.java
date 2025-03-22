@@ -17,27 +17,27 @@ public class Sine extends Unit implements UnitSource
 
     public static final int MOD_PARTIALS = 0;
 
-	public static final double NORMALIZED_GAIN = 1.0;
-	public static final double GAIN_MULTIPLIER = 4.0;
+    public static final double NORMALIZED_GAIN = 1.0;
+    public static final double GAIN_MULTIPLIER = 4.0;
     public static final int MOD_GAIN = 1;
-	double oldGain = NORMALIZED_GAIN;
+    double oldGain = NORMALIZED_GAIN;
 
-	void buildAmplitudes(double mod, double gain)
-		{
+    void buildAmplitudes(double mod, double gain)
+        {
         double[] amplitudes = getAmplitudes(0);
-		int p = (int)(mod * (Unit.NUM_PARTIALS - 1.0));
-		for(int i = 0; i < Unit.NUM_PARTIALS; i++)
-			{
-			if (i == p) amplitudes[i] = GAIN_MULTIPLIER * gain;
-			else amplitudes[i] = 0.0;
-			}
-		}
-		
+        int p = (int)(mod * (Unit.NUM_PARTIALS - 1.0));
+        for(int i = 0; i < Unit.NUM_PARTIALS; i++)
+            {
+            if (i == p) amplitudes[i] = GAIN_MULTIPLIER * gain;
+            else amplitudes[i] = 0.0;
+            }
+        }
+                
     public Sine(Sound sound) 
         {
         super(sound);
         defineModulations(new Constant[] { Constant.ZERO, new Constant(NORMALIZED_GAIN / GAIN_MULTIPLIER) }, 
-        	new String[] { "Partial", "Gain" });
+            new String[] { "Partial", "Gain" });
 
 //        double[] amplitudes = getAmplitudes(0);
         
@@ -60,15 +60,15 @@ public class Sine extends Unit implements UnitSource
         if (lastMod != mod || gain != oldGain)
             {
             /*
-            frequencies[sine] = mod * ((double)Unit.NUM_PARTIALS - 1.0) + 1;
-            simpleSort(0, false);
+              frequencies[sine] = mod * ((double)Unit.NUM_PARTIALS - 1.0) + 1;
+              simpleSort(0, false);
                         
-            for(int i = 0; i < Unit.NUM_PARTIALS; i++)
-                if (amplitudes[i] > 0)  // found it
-                    {
-                    sine = i;
-                    break;
-                    }
+              for(int i = 0; i < Unit.NUM_PARTIALS; i++)
+              if (amplitudes[i] > 0)  // found it
+              {
+              sine = i;
+              break;
+              }
             */
             buildAmplitudes(mod, gain);
             lastMod = mod;

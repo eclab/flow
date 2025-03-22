@@ -112,7 +112,7 @@ public class Output
 
     public static final float DEFAULT_MASTER_GAIN = 0.0f;
 
-	public static final float MAX_FREEVERB_INPUT = 32768 * 32768;
+    public static final float MAX_FREEVERB_INPUT = 32768 * 32768;
 
     // If a partial's volume is very low, we don't even bother computing its sample contribution, but just set it to zero.
     static final double MINIMUM_VOLUME = (1.0 / 65536 / 256);  // 0.0001
@@ -657,23 +657,23 @@ public class Output
                     pos[oi] = position;
                     
                     switch(sinQuality)
-                    	{
-						case SIN_QUALITY_LOW:
-							{
-							sample += Utility.fastSin(position * PI2 + mixing[oi]) * amplitude;
-							break;
-							}
-						case SIN_QUALITY_MEDIUM:
-							{
-                     		sample += Utility.fastIntSin(position * PI2 + mixing[oi]) * amplitude;
-                     		break;
-                      		}
-                      	case SIN_QUALITY_HIGH:
-                      		{
-                      		sample += Math.sin(position * PI2 + mixing[oi]) * amplitude;
-                      		break;
-                      		} 
-                      	}  
+                        {
+                        case SIN_QUALITY_LOW:
+                            {
+                            sample += Utility.fastSin(position * PI2 + mixing[oi]) * amplitude;
+                            break;
+                            }
+                        case SIN_QUALITY_MEDIUM:
+                            {
+                            sample += Utility.fastIntSin(position * PI2 + mixing[oi]) * amplitude;
+                            break;
+                            }
+                        case SIN_QUALITY_HIGH:
+                            {
+                            sample += Math.sin(position * PI2 + mixing[oi]) * amplitude;
+                            break;
+                            } 
+                        }  
                     }
                 }
             }
@@ -705,23 +705,23 @@ public class Output
                 if (frequency <= nyquistDividedByPitch && amplitude > MINIMUM_VOLUME)
                     {
                     switch(sinQuality)
-                    	{
-                    	case SIN_QUALITY_LOW:
-                        	{
-                        	sample += Utility.fastSin(position * PI2) * amplitude;
-                        	break;
-                        	}
+                        {
+                        case SIN_QUALITY_LOW:
+                            {
+                            sample += Utility.fastSin(position * PI2) * amplitude;
+                            break;
+                            }
                         case SIN_QUALITY_MEDIUM:
-                        	{
-                      		sample += Utility.fastIntSin(position * PI2) * amplitude;
-                      		break;
-                      		}
-                      	case SIN_QUALITY_HIGH:
-                      		{
-                      		sample += Math.sin(position * PI2) * amplitude;
-                      		break;
-                      		}  
-                      	}                  
+                            {
+                            sample += Utility.fastIntSin(position * PI2) * amplitude;
+                            break;
+                            }
+                        case SIN_QUALITY_HIGH:
+                            {
+                            sample += Math.sin(position * PI2) * amplitude;
+                            break;
+                            }  
+                        }                  
                     }
                 }
             }
@@ -884,7 +884,7 @@ public class Output
                         for (int samp = 0; samp < skip; samp++)
                             {
                             samplessnd[samp] = buildSample(solo, currentAmplitudes) * DEFAULT_VOLUME_MULTIPLIER;
-                           }
+                            }
                         }
                     else
                         {
@@ -942,7 +942,7 @@ public class Output
                                     left += samples[snd][samp];
                                     }
                                 }
-                           }
+                            }
 
                         // add reverb?
                         if (with.reverbWet > 0.0f)
@@ -958,11 +958,11 @@ public class Output
                             if (stereo)
                                 {
 
-                            /// freeverb freaks out with large values, so we will bound them
-                            if (left > MAX_FREEVERB_INPUT) left = MAX_FREEVERB_INPUT;    
-                            else if (left < -MAX_FREEVERB_INPUT) left = -MAX_FREEVERB_INPUT;    
-                            if (right > MAX_FREEVERB_INPUT) right = MAX_FREEVERB_INPUT;    
-                            else if (right < -MAX_FREEVERB_INPUT) right = -MAX_FREEVERB_INPUT;    
+                                /// freeverb freaks out with large values, so we will bound them
+                                if (left > MAX_FREEVERB_INPUT) left = MAX_FREEVERB_INPUT;    
+                                else if (left < -MAX_FREEVERB_INPUT) left = -MAX_FREEVERB_INPUT;    
+                                if (right > MAX_FREEVERB_INPUT) right = MAX_FREEVERB_INPUT;    
+                                else if (right < -MAX_FREEVERB_INPUT) right = -MAX_FREEVERB_INPUT;    
                             
                                 freeverbInput[0][0] = (float)left;
                                 freeverbInput[1][0] = (float)right;
@@ -972,9 +972,9 @@ public class Output
                                 }
                             else
                                 {
-                            /// freeverb freaks out with large values, so we will bound them
-                            if (left > MAX_FREEVERB_INPUT) left = MAX_FREEVERB_INPUT;    
-                            else if (left < -MAX_FREEVERB_INPUT) left = -MAX_FREEVERB_INPUT;    
+                                /// freeverb freaks out with large values, so we will bound them
+                                if (left > MAX_FREEVERB_INPUT) left = MAX_FREEVERB_INPUT;    
+                                else if (left < -MAX_FREEVERB_INPUT) left = -MAX_FREEVERB_INPUT;    
                             
                                 freeverbInput[0][0] = (float)left;
                                 freeverbInput[1][0] = (float)left;

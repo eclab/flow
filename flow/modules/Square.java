@@ -21,16 +21,16 @@ public class Square extends Unit implements UnitSource //, Parameterizable
 
     double lastMod = -1;
         
-	public static final double NORMALIZED_GAIN = 0.29344691229918385;
-	public static final double GAIN_MULTIPLIER = 4.0;
-	
-	double oldGain = -1;
+    public static final double NORMALIZED_GAIN = 0.29344691229918385;
+    public static final double GAIN_MULTIPLIER = 4.0;
+        
+    double oldGain = -1;
 
     public Square(Sound sound) 
         {
         super(sound);
         defineModulations(new Constant[] { Constant.HALF, new Constant(NORMALIZED_GAIN / GAIN_MULTIPLIER) }, 
-        		new String[] { "Pulse Width", "Gain" });
+            new String[] { "Pulse Width", "Gain" });
         setClearOnReset(false);
         buildPWM();
         }
@@ -45,10 +45,10 @@ public class Square extends Unit implements UnitSource //, Parameterizable
     public void buildPWM()
         {
         double mod = modulate(MOD_PULSE_WIDTH);
-    	double gain = modulate(MOD_GAIN) * GAIN_MULTIPLIER;
+        double gain = modulate(MOD_GAIN) * GAIN_MULTIPLIER;
         if (lastMod != mod || gain != oldGain)
             {
-	        double[] amplitudes = getAmplitudes(0);
+            double[] amplitudes = getAmplitudes(0);
                 
             if (mod == 0.5)  // easy case!
                 {

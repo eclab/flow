@@ -66,7 +66,7 @@ public class Unit extends Modulation
     public static final String DEFAULT_UNIT_OUT_NAME = "Out";
         
     /** The highest amplitude we'll permit to prevent things from going to infinity and NaN */
-    public static final double MAX_AMPLITUDE = 32768 * 32768;		// or something...
+    public static final double MAX_AMPLITUDE = 32768 * 32768;           // or something...
     
     public Unit(Sound sound)
         {
@@ -496,30 +496,30 @@ public class Unit extends Modulation
         }
     
     /** Sets the amplitudes of all partials of a given output port such that they are within
-     	a fairly large bound that is far from infinity.    */    
+        a fairly large bound that is far from infinity.    */    
     public void boundAmplitudes(int j)
         {
         double[] a = amplitudes[j];
         for(int i = 0; i < a.length; i++)
-        	{
-        	// This is done in an odd order so that we properly check for NaN
-        	if (a[i] <= MAX_AMPLITUDE)
-        		{
-        		// do nothing
-        		}
-        	else if (a[i] != a[i]) 
-        		{
-        		a[i] = 0;		// or whatever
-        		}
-        	else // (a[i] > MAX_AMPLITUDE) 
-        		{
-        		a[i] = MAX_AMPLITUDE;
-        		}
-        	}
+            {
+            // This is done in an odd order so that we properly check for NaN
+            if (a[i] <= MAX_AMPLITUDE)
+                {
+                // do nothing
+                }
+            else if (a[i] != a[i]) 
+                {
+                a[i] = 0;               // or whatever
+                }
+            else // (a[i] > MAX_AMPLITUDE) 
+                {
+                a[i] = MAX_AMPLITUDE;
+                }
+            }
         }
 
     /** Sets the amplitudes of all partials of all of a unit's output ports such that they are within
-     	a fairly large bound that is far from infinity.    */    
+        a fairly large bound that is far from infinity.    */    
     public void boundAmplitudes()
         {
         for(int i = 0; i < amplitudes.length; i++)
@@ -692,9 +692,9 @@ public class Unit extends Modulation
                 {
                 i++;
                 //swap(i, j, freq, amp, order);
-				swap(i, j, freq);
-				swap(i, j, amp);
-				swap(i, j, order);
+                swap(i, j, freq);
+                swap(i, j, amp);
+                swap(i, j, order);
                 }
             }
  
@@ -783,14 +783,14 @@ public class Unit extends Modulation
         double[] frequencies = this.frequencies[j];
         for(int i = 1; i < frequencies.length; i++)
             if (frequencies[i] < frequencies[i-1])
-            	return true;
+                return true;
         return false;
         }
 
 
-	// February 2022: It appears that for nearly-sorted arrays, insertion sort is generally faster than bubble sort.
-	public boolean simpleSort(int j, boolean copyAmplitudes)
-		{
+    // February 2022: It appears that for nearly-sorted arrays, insertion sort is generally faster than bubble sort.
+    public boolean simpleSort(int j, boolean copyAmplitudes)
+        {
         if (copyAmplitudes)
             {
             this.amplitudes[j] = this.amplitudes[j].clone();

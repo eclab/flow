@@ -34,7 +34,7 @@ public class Delay extends Unit
                 Constant.ZERO, Constant.ZERO, 
                 Constant.ZERO, Constant.ZERO, Constant.ZERO }, 
             new String[] { "Wet", "Initial Delay", "Later Delays", 
-                           "Initial Cut", "Later Cuts" });
+                              "Initial Cut", "Later Cuts" });
         }
 
     public static final int MAX_INITIAL_DELAY_LENGTH = (int)(Output.SAMPLING_RATE / 16);

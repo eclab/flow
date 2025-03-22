@@ -39,9 +39,9 @@ public class Subharmonics extends Unit implements UnitSource
         {
         super.go();
  
- 		copyAmplitudes(0);
- 		copyFrequencies(0);
- 		
+        copyAmplitudes(0);
+        copyFrequencies(0);
+                
         double[] amplitudes = getAmplitudes(0);        
         double[] frequencies = getFrequencies(0);        
         for(int i = 0; i < MAX_SUBHARMONICS; i++)

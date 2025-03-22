@@ -625,7 +625,7 @@ public class Prefs
             } 
         catch (Exception e) 
             {
-	        return Output.SIN_QUALITY_DEFAULT;
+            return Output.SIN_QUALITY_DEFAULT;
             }
         }
 
