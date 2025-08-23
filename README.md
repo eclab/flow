@@ -136,7 +136,7 @@ Flow should work fine if you have installed at least *Java 20*.
 
 4. Run Flow as:   `java -jar flow.jar`
 
-5. Flow benefits from a lower-latency garbage collector to prevent it from glitching.  You might instead run Flow as:     `java -jar flow.jar -XX:+UseZGC -XX:MaxGCPauseMillis=1`
+5. Flow benefits from a lower-latency garbage collector to prevent it from glitching.  You might instead run Flow as:     `java -XX:+UseZGC -XX:MaxGCPauseMillis=1 -jar flow.jar`
 
 
 
