@@ -139,4 +139,17 @@ Flow should work fine if you have installed at least *Java 20*.
 5. Flow benefits from a lower-latency garbage collector to prevent it from glitching.  You might instead run Flow as:     `java -XX:+UseZGC -XX:MaxGCPauseMillis=1 -jar flow.jar`
 
 
+On the Mac, running with recent versions of Java, you may see a warning that begins like this:
+
+    WARNING: A restricted method in java.lang.System has been called
+    WARNING: java.lang.System::load has been called by uk.co.xfactorylibrarians.coremidi4j.Loader 
+             in an unnamed module ....
+    WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+    WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Don't worry about it.  Java is now, for no good reason, starting to issue warnings about use of native JNI libraries.  Flow uses CoreMIDI4J to fix MIDI bugs on the Mac.  Ultimately you'll be required to run Java like this:
+
+        java --enable-native-access=ALL-UNNAMED -jar flow.jar
+
+... but not now.
 
