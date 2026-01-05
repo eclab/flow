@@ -10,10 +10,10 @@ With Help from V. Hoyle \
 Related projects:  
 
 * [Edisyn](https://github.com/eclab/edisyn), a patch editor toolkit with sophisticated exploration tools.
-* [Gizmo](https://cs.gmu.edu/~sean/projects/gizmo/), an Arduino-based MIDI Swiss Army knife.
+* [Gizmo](https://people.cs.gmu.edu/~sean/projects/gizmo/), an Arduino-based MIDI Swiss Army knife.
 * [Seq](https://github.com/eclab/seq), a very unusual hierarchical and modular music sequencer.
 * [Arduino Firmware](https://github.com/eclab/grains) (oscillators, modulators, etc.) for the AE Modular Grains module.  Includes an ultralight but full-featured [MIDI library for small microcontrollers](https://github.com/eclab/grains/tree/main/midi).
-* [*Computational Music Synthesis*](https://cs.gmu.edu/~sean/book/synthesis/), an open-content book on building software synthesizers.
+* [*Computational Music Synthesis*](https://people.cs.gmu.edu/~sean/book/synthesis/), an open-content book on building software synthesizers.
 
 ## Donations
 
@@ -27,7 +27,7 @@ Flow has almost 70 modules of different shapes and sizes, and currently supports
 
 ## Resources
 
-* Flow has an [extensive manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf) which discusses additive synthesis, Flow's modular approach, how to run it, how to integrate it with controllers and DAWs, and how to build new modules.
+* Flow has an [extensive manual](https://people.cs.gmu.edu/~eclab/projects/flow/flow.pdf) which discusses additive synthesis, Flow's modular approach, how to run it, how to integrate it with controllers and DAWs, and how to build new modules.
 
 * One of Flow's modules is a wavetable synth.  It's designed to load wavetables built with [WaveEdit](http://synthtech.com/waveedit/), and there are quite a number to choose from on their associated website, [WaveEditOnline](https://waveeditonline.com/)
 
@@ -38,13 +38,13 @@ Flow has almost 70 modules of different shapes and sizes, and currently supports
 ### Demos
 * A [video demonstrating how to set up a simple patch in Flow](https://youtu.be/zkmEVWfly-0).
 
-* Three songs made using only Flow in multitimbral mode, with Ableton serving as just the sequencer.  They are called [8](https://cs.gmu.edu/~sean/projects/synth/log/#8), [9](https://cs.gmu.edu/~sean/projects/synth/log/#9), and [10](https://cs.gmu.edu/~sean/projects/synth/log/#10).  8 is the best one. All three come with the Flow patches and Ableton files to recreate them.
+* Three songs made using only Flow in multitimbral mode, with Ableton serving as just the sequencer.  They are called [8](https://people.cs.gmu.edu/~sean/projects/synth/log/#8), [9](https://people.cs.gmu.edu/~sean/projects/synth/log/#9), and [10](https://people.cs.gmu.edu/~sean/projects/synth/log/#10).  8 is the best one. All three come with the Flow patches and Ableton files to recreate them.
 
-* One song using Flow in multitimbral mode with [Seq](https://github.com/eclab/seq) serving as the sequencer.  It's called [14](https://cs.gmu.edu/~sean/projects/synth/log/#14).  It's nothing special, it was written to stress-test Seq.
+* One song using Flow in multitimbral mode with [Seq](https://github.com/eclab/seq) serving as the sequencer.  It's called [14](https://people.cs.gmu.edu/~sean/projects/synth/log/#14).  It's nothing special, it was written to stress-test Seq.
 
 ### Patches
 
-* Flow's demo patches are located [here](flow/patches).   Contribute some!   You can get a zip file of all of them [here](https://cs.gmu.edu/~eclab/projects/flow/patches.zip).
+* Flow's demo patches are located [here](flow/patches).   Contribute some!   You can get a zip file of all of them [here](https://people.cs.gmu.edu/~eclab/projects/flow/patches.zip).
 
 ## Install and Run Flow
 
@@ -53,10 +53,10 @@ Flow is cross-platform and will run on a variety of platforms (Windows, Linux) b
 
 ### Installation and Running on MacOS
 
-First install Flow from this link: [Flow.dmg](https://cs.gmu.edu/~eclab/projects/flow/Flow.dmg). 
+First install Flow from this link: [Flow.dmg](https://people.cs.gmu.edu/~eclab/projects/flow/Flow.dmg). 
 Sadly, it's a whopping 50MB because it includes the Java VM.  :-(
 
-You'll also want to download some [patches](https://cs.gmu.edu/~eclab/projects/flow/patches.zip), some [wavetables](https://waveeditonline.com/), and the [manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf).  Pay attention to section 2.1 of the manual, where it explains how to tune Flow for your computer speed.  
+You'll also want to download some [patches](https://people.cs.gmu.edu/~eclab/projects/flow/patches.zip), some [wavetables](https://waveeditonline.com/), and the [manual](https://people.cs.gmu.edu/~eclab/projects/flow/flow.pdf).  Pay attention to section 2.1 of the manual, where it explains how to tune Flow for your computer speed.  
 
 MacOS has lately locked down the ability to run an application that's not from a commercial, paying Apple Developer.  And GMU is not one.  So you will have to instruct Sierra to permit Flow to run.
 
@@ -96,9 +96,9 @@ The following should work (but has not been tested):
 
 1. [Download and install at least Java 20](https://www.oracle.com/technetwork/java/javase/downloads).  The JRE should work fine.  Earlier versions of Java have a bug which causes Java apps (like Flow) to make teeny tiny windows on the latest high-resolution screens.
 
-2. Download Flow's jar file, called [flow.jar](https://cs.gmu.edu/~eclab/projects/flow/flow.jar).
+2. Download Flow's jar file, called [flow.jar](https://people.cs.gmu.edu/~eclab/projects/flow/flow.jar).
 
-3. You'll also want to download some [patches](https://cs.gmu.edu/~eclab/projects/flow/patches.zip), some [wavetables](https://waveeditonline.com/), and the [manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf).  Pay attention to section 2.1 of the manual, where it explains how to tune Flow for your computer speed.
+3. You'll also want to download some [patches](https://people.cs.gmu.edu/~eclab/projects/flow/patches.zip), some [wavetables](https://waveeditonline.com/), and the [manual](https://people.cs.gmu.edu/~eclab/projects/flow/flow.pdf).  Pay attention to section 2.1 of the manual, where it explains how to tune Flow for your computer speed.
 
 4. Double-click on flow.jar to launch Flow.
 
@@ -115,9 +115,9 @@ Flow should work fine if you have installed at least *Java 20*.
 
 1. Install at least Java 20 (openjdk).
 
-2. Download Flow's jar file, called [flow.jar](https://cs.gmu.edu/~eclab/projects/flow/flow.jar).
+2. Download Flow's jar file, called [flow.jar](https://people.cs.gmu.edu/~eclab/projects/flow/flow.jar).
 
-3. You'll also want to download some [patches](https://cs.gmu.edu/~eclab/projects/flow/patches.zip), some [wavetables](https://waveeditonline.com/), and the [manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf).  Pay attention to section 2.1 of the manual, where it explains how to tune Flow for your computer speed.
+3. You'll also want to download some [patches](https://people.cs.gmu.edu/~eclab/projects/flow/patches.zip), some [wavetables](https://waveeditonline.com/), and the [manual](https://people.cs.gmu.edu/~eclab/projects/flow/flow.pdf).  Pay attention to section 2.1 of the manual, where it explains how to tune Flow for your computer speed.
 
 4. You'll need to figure out how to make it so that double-clicking on the jar file launches it in java.  In Ubuntu, here's what you do: right-click on the jar file icon and choose "Properties".  Then select the "Open With" tab, and select your Java VM (for example "Open JDK Java 8 Runtime").  The press "Set as Default".  This makes the Java VM the default application to launch jar files.
 
@@ -130,9 +130,9 @@ Flow should work fine if you have installed at least *Java 20*.
 
 1. Make sure Java 20 or later installed.
 
-2. Download Flow's jar file, called [flow.jar](https://cs.gmu.edu/~eclab/projects/flow/flow.jar).
+2. Download Flow's jar file, called [flow.jar](https://people.cs.gmu.edu/~eclab/projects/flow/flow.jar).
 
-3. Grab some [patches](https://cs.gmu.edu/~eclab/projects/flow/patches.zip), some [wavetables](https://waveeditonline.com/), and the [manual](https://cs.gmu.edu/~eclab/projects/flow/flow.pdf).  
+3. Grab some [patches](https://people.cs.gmu.edu/~eclab/projects/flow/patches.zip), some [wavetables](https://waveeditonline.com/), and the [manual](https://people.cs.gmu.edu/~eclab/projects/flow/flow.pdf).  
 
 4. Run Flow as:   `java -jar flow.jar`
 
